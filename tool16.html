@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>الحاسبة المالية والاستشارية | FAROUK GRUP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Corporate Palette */
+            --primary: #0f172a;       /* Slate 900 - كحلي داكن */
+            --secondary: #1e293b;     /* Slate 800 */
+            --accent: #b48554;        /* Corporate Gold */
+            --accent-hover: #9c7246;
+            --bg-main: #f1f5f9;       /* Slate 100 */
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #334155;
+            --text-light: #64748b;
+            --danger: #ef4444;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.15);
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* الحاوية الرئيسية تم تصغيرها وتنسيقها */
+        .calc-container {
+            width: 950px;
+            max-width: 98vw;
+            height: 520px;
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            align-items: stretch;
+            background: transparent;
+        }
+
+        /* قسم الآلة الحاسبة (اليسار/اليمين) */
+        .calculator {
+            flex: 0 0 340px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-top: 4px solid var(--accent);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .calculator-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+        }
+
+        .calculator-header h2 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .calculator-header h2 i { color: var(--accent); }
+
+        /* الشاشة */
+        .screen-container {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.8rem 1rem;
+            margin-bottom: 1rem;
+            text-align: left;
+            direction: ltr;
+        }
+
+        .history-display {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            font-family: 'Inter', monospace;
+            min-height: 1.2rem;
+            margin-bottom: 0.2rem;
+            white-space: nowrap;
+            overflow-x: auto;
+        }
+
+        .main-display {
+            color: var(--primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Inter', monospace;
+            white-space: nowrap;
+            overflow-x: auto;
+            letter-spacing: -0.5px;
+        }
+
+        .error-message {
+            background-color: #fee2e2;
+            color: var(--danger);
+            border: 1px solid #fca5a5;
+            padding: 0.4rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            text-align: center;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        /* الأزرار */
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.4rem;
+            flex: 1;
+        }
+
+        .btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .btn:hover {
+            background: var(--bg-main);
+            border-color: #cbd5e1;
+        }
+
+        .btn:active { transform: scale(0.96); }
+
+        .btn-number { font-weight: 700; font-size: 1.1rem; color: var(--primary); }
+        
+        .btn-operator {
+            background: #fdfaf6;
+            color: var(--accent);
+            border-color: rgba(180, 133, 84, 0.3);
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+        .btn-operator:hover { background: rgba(180, 133, 84, 0.1); }
+
+        .btn-memory { font-size: 0.8rem; color: var(--text-light); }
+        
+        .btn-action { color: var(--danger); }
+        
+        .btn-equals {
+            background: var(--primary);
+            color: white;
+            grid-column: span 2;
+            border: none;
+        }
+        .btn-equals:hover { background: var(--secondary); }
+
+        .btn-finance {
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.8rem;
+            background: var(--secondary);
+            color: white;
+            border: none;
+        }
+        .btn-finance:hover { background: var(--primary); }
+
+        /* قسم السجل (الجدول الاحترافي) */
+        .history-panel {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-header h3 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-select {
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+            background: var(--bg-main);
+            color: var(--text-main);
+        }
+
+        .btn-export {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 0.4rem 0.8rem;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: 0.2s;
+        }
+        .btn-export:hover { background: var(--accent-hover); }
+
+        /* جدول السجل */
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        /* Custom Scrollbar */
+        .table-container::-webkit-scrollbar { width: 6px; }
+        .table-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        .history-table th {
+            background: var(--bg-main);
+            color: var(--text-light);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0.6rem 0.8rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-table td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        .history-table tr:hover { background-color: #f8fafc; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+        }
+        .badge-math { background: #e0f2fe; color: #0369a1; }
+        .badge-finance { background: #fef3c7; color: #b45309; }
+
+        .td-operation {
+            font-family: 'Inter', monospace;
+            color: var(--text-main);
+            direction: ltr;
+            text-align: left;
+        }
+
+        .td-result {
+            font-family: 'Inter', monospace;
+            font-weight: 700;
+            color: var(--primary);
+            direction: ltr;
+            text-align: left;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 0.4rem;
+            justify-content: flex-end;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 0.3rem;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+        .icon-btn.restore:hover { color: var(--accent); background: #fef3c7; }
+        .icon-btn.delete:hover { color: var(--danger); background: #fee2e2; }
+
+        .btn-clear-all {
+            width: 100%;
+            margin-top: 1rem;
+            padding: 0.6rem;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            color: var(--danger);
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .btn-clear-all:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+
+        @media (max-width: 850px) {
+            .calc-container {
+                flex-direction: column;
+                height: auto;
+                padding: 1rem;
+            }
+            .calculator { flex: none; width: 100%; max-width: 400px; margin: 0 auto; }
+            .history-panel { flex: none; height: 400px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="calc-container">
+        <div class="calculator">
+            <div class="calculator-header">
+                <h2><i class="fas fa-calculator"></i> الحاسبة الاستشارية</h2>
+            </div>
+            
+            <div class="error-message" id="errorMessage"></div>
+            
+            <div class="screen-container">
+                <div class="history-display" id="historyDisplay"></div>
+                <div class="main-display" id="display">0</div>
+            </div>
+
+            <div class="buttons-grid">
+                <button class="btn btn-memory" onclick="handleMemory('MC')">MC</button>
+                <button class="btn btn-memory" onclick="handleMemory('MR')">MR</button>
+                <button class="btn btn-memory" onclick="handleMemory('M+')">M+</button>
+                <button class="btn btn-memory" onclick="handleMemory('M-')">M-</button>
+                <button class="btn btn-action" onclick="clearEntry()">CE</button>
+
+                <button class="btn btn-number" onclick="appendToDisplay('9')">9</button>
+                <button class="btn btn-number" onclick="appendToDisplay('8')">8</button>
+                <button class="btn btn-number" onclick="appendToDisplay('7')">7</button>
+                <button class="btn btn-operator" onclick="setOperator('/')">÷</button>
+                <button class="btn btn-action" onclick="clearDisplay()">C</button>
+
+                <button class="btn btn-number" onclick="appendToDisplay('6')">6</button>
+                <button class="btn btn-number" onclick="appendToDisplay('5')">5</button>
+                <button class="btn btn-number" onclick="appendToDisplay('4')">4</button>
+                <button class="btn btn-operator" onclick="setOperator('*')">×</button>
+                <button class="btn" onclick="backspace()"><i class="fas fa-backspace"></i></button>
+
+                <button class="btn btn-number" onclick="appendToDisplay('3')">3</button>
+                <button class="btn btn-number" onclick="appendToDisplay('2')">2</button>
+                <button class="btn btn-number" onclick="appendToDisplay('1')">1</button>
+                <button class="btn btn-operator" onclick="setOperator('-')">-</button>
+                <button class="btn" onclick="calculateSquareRoot()">√</button>
+
+                <button class="btn" onclick="toggleSign()">±</button>
+                <button class="btn btn-number" onclick="appendToDisplay('.')">.</button>
+                <button class="btn btn-number" onclick="appendToDisplay('0')">0</button>
+                <button class="btn btn-operator" onclick="setOperator('+')">+</button>
+                <button class="btn" onclick="calculatePercent()">%</button>
+
+                <button class="btn btn-finance" onclick="applyTax()">ضريبة</button>
+                <button class="btn btn-finance" onclick="applyDiscount()">خصم</button>
+                <button class="btn btn-finance" onclick="calculateROI()">ROI</button>
+                <button class="btn btn-finance" onclick="calculateSimpleInterest()">فائدة</button>
+                <button class="btn" onclick="power()">xʸ</button>
+
+                <button class="btn btn-equals" onclick="calculateResult()">=</button>
+                <button class="btn" onclick="calculateReciprocal()">1/x</button>
+                <button class="btn" onclick="log10()">log</button>
+                <button class="btn" onclick="factorial()">n!</button>
+            </div>
+        </div>
+
+        <div class="history-panel">
+            <div class="history-header">
+                <h3><i class="fas fa-table"></i> سجل العمليات</h3>
+                <div class="history-controls">
+                    <select id="filterSelect" class="filter-select" onchange="filterHistory()">
+                        <option value="all">كل العمليات</option>
+                        <option value="+">جمع (+)</option>
+                        <option value="-">طرح (-)</option>
+                        <option value="*">ضرب (×)</option>
+                        <option value="/">قسمة (÷)</option>
+                        <option value="مالية">عمليات مالية / متقدمة</option>
+                    </select>
+                    <button class="btn-export" onclick="exportHistory()"><i class="fas fa-download"></i> تصدير CSV</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">النوع</th>
+                            <th style="width: 45%;">العملية المنجزة</th>
+                            <th style="width: 25%;">النتيجة</th>
+                            <th style="width: 15%; text-align: center;">إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        </tbody>
+                </table>
+            </div>
+            
+            <button class="btn-clear-all" onclick="clearHistory()"><i class="fas fa-trash-alt"></i> مسح كامل السجل</button>
+        </div>
+    </div>
+
+    <script>
+        // ---------- منطق الآلة الحاسبة ----------
+        let display = document.getElementById('display');
+        let historyDisplay = document.getElementById('historyDisplay');
+        let errorMsg = document.getElementById('errorMessage');
+        let historyTableBody = document.getElementById('historyTableBody');
+
+        let currentInput = '0';
+        let previousInput = '';
+        let operator = null;
+        let memory = 0;
+        let history = []; // مصفوفة لتخزين الكائنات { text, type }
+
+        function showError(text) {
+            errorMsg.style.display = 'block';
+            errorMsg.innerText = text;
+            setTimeout(() => { errorMsg.style.display = 'none'; }, 3000);
+        }
+
+        function updateDisplay() {
+            // تنسيق الرقم لمنع تجاوز الشاشة (تقريب الأرقام الطويلة جداً)
+            if(currentInput.length > 15 && !currentInput.includes('e')) {
+                let num = parseFloat(currentInput);
+                display.innerText = Number.isInteger(num) ? num : num.toPrecision(12).replace(/\.?0+$/, '');
+            } else {
+                display.innerText = currentInput;
+            }
+        }
+
+        function appendToDisplay(value) {
+            if (currentInput === '0' && value !== '.') {
+                currentInput = value;
+            } else {
+                if (value === '.' && currentInput.includes('.')) return;
+                currentInput += value;
+            }
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentInput = '0';
+            previousInput = '';
+            operator = null;
+            updateDisplay();
+            historyDisplay.innerText = '';
+        }
+
+        function clearEntry() {
+            currentInput = '0';
+            updateDisplay();
+        }
+
+        function backspace() {
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
+            } else {
+                currentInput = '0';
+            }
+            if(currentInput === '-') currentInput = '0';
+            updateDisplay();
+        }
+
+        function setOperator(op) {
+            if (operator !== null && previousInput !== '') {
+                calculateResult(false); // حساب صامت لربط العمليات
+            }
+            previousInput = currentInput;
+            currentInput = '0';
+            operator = op;
+            historyDisplay.innerText = previousInput + ' ' + operator;
+        }
+
+        function calculateResult(saveToHistory = true) {
+            if (operator === null || previousInput === '') return;
+
+            let prev = parseFloat(previousInput);
+            let curr = parseFloat(currentInput);
+            let result;
+            let type = operator;
+
+            switch (operator) {
+                case '+': result = prev + curr; break;
+                case '-': result = prev - curr; break;
+                case '*': result = prev * curr; break;
+                case '/': 
+                    if (curr === 0) {
+                        showError('خطأ رياضي: القسمة على صفر');
+                        return;
+                    }
+                    result = prev / curr; 
+                    break;
+                default: return;
+            }
+
+            // التعامل مع كسور جافاسكريبت المزعجة
+            result = Math.round(result * 1000000000) / 1000000000;
+
+            let operationStr = `${previousInput} ${operator} ${currentInput} = ${result}`;
+            
+            if(saveToHistory) {
+                history.unshift({ text: operationStr, type: type });
+                if (history.length > 50) history.pop(); // الاحتفاظ بآخر 50 عملية فقط
+                filterHistory();
+            }
+
+            currentInput = result.toString();
+            previousInput = '';
+            operator = null;
+            historyDisplay.innerText = operationStr;
+            updateDisplay();
+        }
+
+        // ---------- الوظائف الرياضية ----------
+        function toggleSign() {
+            if (currentInput !== '0') {
+                currentInput = (parseFloat(currentInput) * -1).toString();
+                updateDisplay();
+            }
+        }
+
+        function calculatePercent() {
+            let curr = parseFloat(currentInput);
+            let result;
+
+            if (previousInput !== '' && operator !== null) {
+                let prev = parseFloat(previousInput);
+                if (operator === '+') result = prev + (prev * curr / 100);
+                else if (operator === '-') result = prev - (prev * curr / 100);
+                else if (operator === '*') result = prev * (curr / 100);
+                else if (operator === '/') result = prev / (curr / 100);
+                else result = curr / 100;
+                
+                result = Math.round(result * 1000000000) / 1000000000;
+                let operationStr = `${prev} ${operator} ${curr}% = ${result}`;
+                history.unshift({ text: operationStr, type: operator });
+                filterHistory();
+                historyDisplay.innerText = operationStr;
+                currentInput = result.toString();
+                previousInput = '';
+                operator = null;
+            } else {
+                result = curr / 100;
+                currentInput = result.toString();
+            }
+            updateDisplay();
+        }
+
+        function calculateSquareRoot() {
+            let value = parseFloat(currentInput);
+            if (value < 0) {
+                showError('لا يمكن حساب الجذر لعدد سالب');
+                return;
+            }
+            let res = Math.sqrt(value);
+            res = Math.round(res * 1000000000) / 1000000000;
+            currentInput = res.toString();
+            history.unshift({ text: `√(${value}) = ${currentInput}`, type: 'مالية' });
+            filterHistory();
+            updateDisplay();
+        }
+
+        function calculateReciprocal() {
+            let value = parseFloat(currentInput);
+            if (value === 0) {
+                showError('لا يمكن القسمة على الصفر');
+                return;
+            }
+            let res = 1 / value;
+            res = Math.round(res * 1000000000) / 1000000000;
+            currentInput = res.toString();
+            history.unshift({ text: `1/(${value}) = ${currentInput}`, type: 'مالية' });
+            filterHistory();
+            updateDisplay();
+        }
+
+        function power() {
+            let base = parseFloat(currentInput);
+            let exponent = prompt('أدخل قيمة الأس (القوة):', '2');
+            if (exponent === null || exponent.trim() === '') return; // تم الإلغاء
+            let exp = parseFloat(exponent);
+            if (isNaN(exp)) { showError('قيمة غير صالحة'); return; }
+            
+            let res = Math.pow(base, exp);
+            res = Math.round(res * 1000000000) / 1000000000;
+            currentInput = res.toString();
+            history.unshift({ text: `${base}^${exp} = ${currentInput}`, type: 'مالية' });
+            filterHistory();
+            updateDisplay();
+        }
+
+        function log10() {
+            let val = parseFloat(currentInput);
+            if (val <= 0) { showError('اللوغاريتم للأعداد الموجبة فقط'); return; }
+            let res = Math.log10(val);
+            res = Math.round(res * 1000000000) / 1000000000;
+            currentInput = res.toString();
+            history.unshift({ text: `log10(${val}) = ${currentInput}`, type: 'مالية' });
+            filterHistory();
+            updateDisplay();
+        }
+
+        function factorial() {
+            let n = parseInt(currentInput);
+            if (isNaN(n) || n < 0 || n > 170) { 
+                showError('يجب إدخال عدد صحيح موجب (أقل من 170)'); 
+                return; 
+            }
+            let fact = 1;
+            for (let i = 2; i <= n; i++) fact *= i;
+            currentInput = fact.toString();
+            history.unshift({ text: `${n}! = ${currentInput}`, type: 'مالية' });
+            filterHistory();
+            updateDisplay();
+        }
+
+        // ---------- الوظائف المالية المتقدمة ----------
+        function applyTax() {
+            let rate = prompt('أدخل نسبة الضريبة المضافة (%) (مثال: 15):', '15');
+            if (rate === null || rate.trim() === '') return;
+            let r = parseFloat(rate);
+            if (isNaN(r)) return;
+            
+            let amount = parseFloat(currentInput);
+            let taxValue = amount * (r / 100);
+            let result = amount + taxValue;
+            result = Math.round(result * 100) / 100; // تقريب لخانتي عملة
+            
+            history.unshift({ text: `${amount} + ضريبة ${r}% = ${result}`, type: 'مالية' });
+            currentInput = result.toString();
+            updateDisplay();
+            filterHistory();
+        }
+
+        function applyDiscount() {
+            let rate = prompt('أدخل نسبة الخصم (%) (مثال: 10):', '10');
+            if (rate === null || rate.trim() === '') return;
+            let r = parseFloat(rate);
+            if (isNaN(r)) return;
+            
+            let amount = parseFloat(currentInput);
+            let discountValue = amount * (r / 100);
+            let result = amount - discountValue;
+            result = Math.round(result * 100) / 100;
+            
+            history.unshift({ text: `${amount} - خصم ${r}% = ${result}`, type: 'مالية' });
+            currentInput = result.toString();
+            updateDisplay();
+            filterHistory();
+        }
+
+        function calculateROI() {
+            let cost = parseFloat(currentInput);
+            if(cost === 0) { showError('يجب أن تكون التكلفة أكبر من صفر'); return; }
+            
+            let revenue = prompt('أدخل العائد الإجمالي المتوقع:', cost * 1.2);
+            if (revenue === null || revenue.trim() === '') return;
+            let rev = parseFloat(revenue);
+            if (isNaN(rev)) return;
+            
+            let roi = ((rev - cost) / cost) * 100;
+            roi = Math.round(roi * 100) / 100;
+            
+            history.unshift({ text: `ROI (تكلفة:${cost}, عائد:${rev}) = %${roi}`, type: 'مالية' });
+            currentInput = roi.toString();
+            updateDisplay();
+            filterHistory();
+        }
+
+        function calculateSimpleInterest() {
+            let principal = parseFloat(currentInput);
+            
+            let rate = prompt('معدل الفائدة السنوي المتوقع (%)', '5');
+            if (rate === null || rate.trim() === '') return;
+            let r = parseFloat(rate) / 100;
+            
+            let time = prompt('المدة الزمنية (بالسنوات)', '1');
+            if (time === null || time.trim() === '') return;
+            let t = parseFloat(time);
+            
+            if (isNaN(r) || isNaN(t)) return;
+            
+            let interest = principal * r * t;
+            interest = Math.round(interest * 100) / 100;
+            
+            history.unshift({ text: `فائدة (${principal}×${r*100}%×${t}سنة) = ${interest}`, type: 'مالية' });
+            currentInput = interest.toString();
+            updateDisplay();
+            filterHistory();
+        }
+
+        // ---------- الذاكرة ----------
+        function handleMemory(cmd) {
+            let value = parseFloat(currentInput);
+            switch (cmd) {
+                case 'MC': memory = 0; historyDisplay.innerText = "Memory Cleared"; setTimeout(()=>historyDisplay.innerText="",1000); break;
+                case 'MR': currentInput = memory.toString(); updateDisplay(); break;
+                case 'M+': memory += value; historyDisplay.innerText = "M+ " + value; setTimeout(()=>historyDisplay.innerText="",1000); break;
+                case 'M-': memory -= value; historyDisplay.innerText = "M- " + value; setTimeout(()=>historyDisplay.innerText="",1000); break;
+            }
+        }
+
+        // ---------- إدارة جدول السجل ----------
+        function renderHistory(filteredList) {
+            historyTableBody.innerHTML = '';
+            
+            if(filteredList.length === 0) {
+                historyTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-light); padding: 2rem 0;">لا توجد عمليات مسجلة حالياً</td></tr>`;
+                return;
+            }
+
+            filteredList.forEach((item, index) => {
+                let parts = item.text.split('=');
+                let operationStr = parts[0] ? parts[0].trim() : '';
+                let resultStr = parts[1] ? parts[1].trim() : item.text;
+                let badgeClass = item.type === 'مالية' ? 'badge-finance' : 'badge-math';
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge ${badgeClass}">${item.type}</span></td>
+                    <td class="td-operation">${operationStr}</td>
+                    <td class="td-result">${resultStr}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="icon-btn restore" title="استخدام النتيجة" onclick="restoreResult('${resultStr}')"><i class="fas fa-reply"></i></button>
+                            <button class="icon-btn delete" title="حذف القيد" onclick="deleteHistoryItem(${index})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                `;
+                historyTableBody.appendChild(tr);
+            });
+        }
+
+        function restoreResult(val) {
+            // إزالة رمز % إذا كان موجوداً
+            val = val.replace('%', '').trim();
+            currentInput = val;
+            updateDisplay();
+        }
+
+        function filterHistory() {
+            let filter = document.getElementById('filterSelect').value;
+            let filtered = history;
+            if (filter !== 'all') {
+                filtered = history.filter(item => item.type === filter);
+            }
+            renderHistory(filtered);
+        }
+
+        function deleteHistoryItem(index) {
+            let filter = document.getElementById('filterSelect').value;
+            let displayed = (filter === 'all') ? history : history.filter(i => i.type === filter);
+            
+            let realItem = displayed[index];
+            let actualIndex = history.findIndex(i => i === realItem);
+            
+            if (actualIndex !== -1) history.splice(actualIndex, 1);
+            filterHistory();
+        }
+
+        function clearHistory() {
+            if(confirm("هل أنت متأكد من مسح كافة سجلات الحسابات؟")) {
+                history = [];
+                filterHistory();
+            }
+        }
+
+        function exportHistory() {
+            if(history.length === 0) {
+                showError("السجل فارغ، لا يوجد ما يمكن تصديره");
+                return;
+            }
+            let csv = 'النوع,العملية المنجزة,النتيجة\n';
+            history.forEach(item => {
+                let parts = item.text.split('=');
+                let op = parts[0].trim().replace(/"/g, '""'); // حماية علامات التنصيص
+                let res = parts[1] ? parts[1].trim().replace(/"/g, '""') : '';
+                csv += `"${item.type}","${op}","${res}"\n`;
+            });
+            let blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `سجل_حسابات_مجموعة_فاروق_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+
+        // ---------- دعم لوحة المفاتيح ----------
+        document.addEventListener('keydown', function(e) {
+            if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+
+            const key = e.key;
+            if (['+', '-', '*', '/', '=', 'Enter', 'Escape', 'Backspace', 'Delete', '%'].includes(key) || 
+                (key >= '0' && key <= '9') || key === '.') {
+                e.preventDefault();
+            }
+
+            if (key >= '0' && key <= '9') appendToDisplay(key);
+            else if (key === '.') appendToDisplay('.');
+            else if (key === '+') setOperator('+');
+            else if (key === '-') setOperator('-');
+            else if (key === '*') setOperator('*');
+            else if (key === '/') setOperator('/');
+            else if (key === '=' || key === 'Enter') calculateResult();
+            else if (key === 'Escape') clearDisplay();
+            else if (key === 'Delete') clearEntry();
+            else if (key === 'Backspace') backspace();
+        });
+
+        // تهيئة الجدول عند البداية
+        renderHistory(history);
+    </script>
+</body>
+</html>

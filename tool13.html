@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>حاسبة تكلفة العمالة المثالية | FAROUK GRUP</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- AOS Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- html2canvas و jsPDF لتصدير PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold: #b8860b;
+            --gold-light: #d4b15a;
+            --gold-soft: rgba(184,134,11,0.1);
+            --dark: #0f0f0f;
+            --dark-light: #1a1a1a;
+            --white: #ffffff;
+            --offwhite: #f9f9f9;
+            --text: #333;
+            --card-bg: #fefcf6;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(184,134,11,0.03) 0px, transparent 20px),
+                radial-gradient(circle at 90% 70%, rgba(184,134,11,0.03) 0px, transparent 25px),
+                repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 1px, transparent 1px, transparent 10px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-shape {
+            position: absolute;
+            width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .shape-1 { top: -100px; right: -100px; animation: float 20s infinite ease-in-out; }
+        .shape-2 { bottom: -50px; left: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
+
+        @keyframes float {
+            0% { transform: translate(0,0) rotate(0deg); }
+            33% { transform: translate(30px,-30px) rotate(5deg); }
+            66% { transform: translate(-20px,20px) rotate(-5deg); }
+            100% { transform: translate(0,0) rotate(0deg); }
+        }
+
+        nav {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo h1 {
+            font-family: 'Alexandria', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #444;
+            margin: 0 0.8rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        nav a:hover { color: var(--gold); }
+        nav a i { margin-left: 5px; }
+
+        .hero-mini {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 1rem;
+            border-bottom: 4px solid var(--gold);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-mini::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
+            animation: rotate 40s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .hero-mini h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--gold-light);
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-mini p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.95;
+            position: relative;
+            z-index: 2;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .calculator-card {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(15px);
+            border: 2px solid var(--gold);
+            border-radius: 40px;
+            padding: 3rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(184,134,11,0.3) inset;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent 0%, rgba(184,134,11,0.05) 100%);
+            z-index: -1;
+        }
+        
+        .featured-badge {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #111;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            font-weight: 900;
+            border: 3px solid white;
+            z-index: 10;
+        }
+        .featured-badge i { font-size: 2rem; margin-bottom: 0.2rem; }
+        .featured-badge span { font-size: 0.9rem; text-align: center; }
+
+        .calculator-card h2 {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            text-align: center;
+            border-bottom: 2px solid var(--gold-soft);
+            padding-bottom: 0.5rem;
+        }
+
+        .currency-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--gold-soft);
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .currency-row label {
+            font-weight: 900;
+            color: var(--dark);
+            margin: 0;
+        }
+        .currency-row select {
+            width: 150px;
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--gold);
+            border-radius: 30px;
+            background: white;
+            font-weight: 700;
+        }
+        .currency-row input {
+            width: 250px;
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--gold);
+            border-radius: 30px;
+            background: white;
+            font-weight: 400;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        label i {
+            color: var(--gold);
+            margin-left: 0.5rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            background: var(--offwhite);
+            transition: 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(184,134,11,0.2);
+            background: var(--white);
+        }
+
+        .shifts-section {
+            background: var(--gold-soft);
+            border: 2px solid var(--gold-light);
+            border-radius: 30px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .shifts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .shifts-header h3 {
+            color: var(--gold);
+            font-weight: 900;
+        }
+
+        .shift-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            background: var(--white);
+            padding: 1rem;
+            border-radius: 30px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--gold-light);
+        }
+
+        .shift-row input {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .remove-shift {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-add {
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            border-radius: 50px;
+            padding: 0.8rem 2rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            transition: 0.3s;
+        }
+        .btn-add:hover {
+            background: var(--gold);
+            color: #111;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #111;
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 2.5rem;
+            font-weight: 900;
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 100%;
+            margin: 1rem 0;
+            box-shadow: 0 5px 20px rgba(184,134,11,0.4);
+            transition: 0.3s;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #111, #222);
+            color: var(--gold);
+            transform: translateY(-3px);
+        }
+
+        .results-section {
+            margin-top: 3rem;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, #fff 100%);
+            border: 1px solid var(--gold-light);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+        .result-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: 0 10px 25px rgba(184,134,11,0.15);
+        }
+        .result-card i {
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+        .result-card .label {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        .result-card .value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+        .result-card .unit {
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 30px;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        .suggestion-box {
+            background: var(--gold-soft);
+            border: 2px solid var(--gold);
+            border-radius: 30px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .suggestion-box h4 {
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .chart-container {
+            margin-top: 2rem;
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid var(--gold-light);
+            height: 300px;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin: 1rem 0;
+        }
+
+        .btn-export {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.8rem 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: 0.3s;
+        }
+        .btn-export:hover { background: #218838; }
+        .btn-export.word { background: #1e4a7a; }
+        .btn-export.word:hover { background: #0e3a5a; }
+
+        footer {
+            background: linear-gradient(145deg, #111, #1a1a1a);
+            color: #ddd;
+            padding: 3rem 1rem 2rem;
+            border-top: 3px solid var(--gold);
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .footer-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-social a {
+            color: var(--gold);
+            font-size: 1.8rem;
+            transition: 0.3s;
+        }
+        .footer-social a:hover {
+            color: var(--gold-light);
+            transform: translateY(-3px);
+        }
+
+        .footer-logo-box {
+            text-align: center;
+        }
+
+        .footer-logo-box h2 {
+            color: var(--gold);
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-logo-box div {
+            width: 60px;
+            height: 2px;
+            background: var(--gold);
+            margin: 0 auto;
+        }
+
+        .footer-payment .payment-card {
+            background: rgba(255,255,255,0.05);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-payment img {
+            height: 25px;
+            filter: brightness(0.9);
+            transition: 0.2s;
+        }
+        .footer-payment img:hover {
+            filter: brightness(1.2);
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid rgba(184,134,11,0.2);
+        }
+
+        .copyright {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #777;
+        }
+        .copyright span {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.8rem;
+            }
+            .logo {
+                flex-wrap: nowrap;
+                gap: 8px;
+                width: 100%;
+                justify-content: center;
+            }
+            .logo img { height: 35px; }
+            .logo h1 { font-size: 1rem; }
+            nav > div:last-child {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 6px;
+            }
+            nav a {
+                margin: 0;
+                font-size: 0.9rem;
+                padding: 4px 8px;
+                white-space: nowrap;
+            }
+            .hero-mini h2 { font-size: 2rem; }
+            .hero-mini p { font-size: 1rem; }
+            .calculator-card { padding: 2rem 1.5rem; }
+            .footer-row { flex-direction: column; text-align: center; }
+            .footer-social { justify-content: center; }
+            .featured-badge { width: 70px; height: 70px; }
+            .featured-badge i { font-size: 1.5rem; }
+            .featured-badge span { font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- أشكال هندسية -->
+<div class="floating-shape shape-1"></div>
+<div class="floating-shape shape-2"></div>
+
+<!-- Navigation -->
+<nav>
+    <div class="logo">
+        <img src="https://lh3.googleusercontent.com/d/1e6u-DPTinDJl_Q9wW3QvGgzFbXO_2sXa" alt="FAROUK GRUP LOGO">
+        <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+    </div>
+    <div>
+        <a href="https://www.farouk-grup.com/"><i class="fas fa-home"></i> الرئيسية</a>
+        <a href="https://www.farouk-grup.com/Home/Contact-Us" style="color:var(--gold)"><i class="fas fa-phone-alt"></i> تواصل معنا</a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero-mini">
+    <h2>💰 حاسبة تكلفة العمالة المثالية</h2>
+    <p>تحليل متقدم لتكاليف العمالة، الإنتاجية، والكفاءة التشغيلية</p>
+</section>
+
+<!-- Main Container -->
+<div class="container">
+    <div class="calculator-card" data-aos="fade-up">
+        <!-- الشارة المميزة -->
+        <div class="featured-badge">
+            <i class="fas fa-users"></i>
+            <span>عمالة</span>
+        </div>
+        
+        <h2><i class="fas fa-calculator"></i> بيانات المشروع والورديات</h2>
+
+        <!-- اختيار العملة واسم الجهة -->
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> اختر العملة:</label>
+            <select id="currencySelect">
+                <option value="$" selected>دولار ($)</option>
+                <option value="€">يورو (€)</option>
+                <option value="₺">ليرة تركية (₺)</option>
+                <option value="ج.م">جنيه مصري (ج.م)</option>
+                <option value="د.ك">دينار كويتي (د.ك)</option>
+                <option value="ر.س">ريال سعودي (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> اسم الجهة:</label>
+            <input type="text" id="companyName" value="شركة النور للتجارة" placeholder="الجهة المستفيدة">
+        </div>
+
+        <!-- المدخلات الأساسية -->
+        <div class="input-section">
+            <div>
+                <div class="form-group">
+                    <label><i class="fas fa-chart-line"></i> المبيعات الشهرية المستهدفة</label>
+                    <input type="number" id="monthlySales" value="50000" step="1000" min="0">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-receipt"></i> متوسط الفاتورة للعميل</label>
+                    <input type="number" id="avgBill" value="25" step="1" min="0">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> متوسط الأجر الشهري للموظف (يشمل التأمينات والبدلات)</label>
+                    <input type="number" id="avgMonthlyWage" value="2500" step="100" min="0">
+                </div>
+            </div>
+            <div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-week"></i> أيام العمل في الأسبوع</label>
+                    <input type="number" id="workingDays" value="6" min="1" max="7">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percent"></i> نسبة العمالة المستهدفة (مثلاً 25%)</label>
+                    <input type="number" id="targetLaborPercent" value="25" step="1" min="0" max="100">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-moon"></i> عدد الورديات اليومية</label>
+                    <select id="numShifts">
+                        <option value="1">وردية واحدة</option>
+                        <option value="2" selected>ورديتان</option>
+                        <option value="3">ثلاث ورديات</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم الورديات الديناميكي -->
+        <div class="shifts-section">
+            <div class="shifts-header">
+                <h3><i class="fas fa-clock"></i> تفاصيل الورديات</h3>
+                <button class="btn-add" id="addShiftBtn"><i class="fas fa-plus"></i> إضافة وردية</button>
+            </div>
+            <div id="shiftsContainer"></div>
+            <p class="hint" style="color: #666; font-size:0.9rem;"><i class="fas fa-info-circle"></i> أدخل عدد الموظفين في كل وردية وساعات الوردية.</p>
+        </div>
+
+        <!-- توزيع الإجازات -->
+        <div class="form-group" style="max-width:300px;">
+            <label><i class="fas fa-umbrella-beach"></i> توزيع العطل الأسبوعية</label>
+            <select id="vacationDistribution">
+                <option value="same">جميع الموظفين نفس العطلة</option>
+                <option value="staggered" selected>إجازات متداخلة (لضمان التغطية)</option>
+            </select>
+        </div>
+
+        <button class="btn-primary" id="calculateBtn"><i class="fas fa-chart-pie"></i> احسب التكلفة المثالية</button>
+
+        <!-- منطقة عرض النتائج -->
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="action-bar">
+                <button class="btn-export" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
+                <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير Word</button>
+            </div>
+
+            <div class="results-grid" id="resultsGrid"></div>
+            <div id="evaluationAlert"></div>
+            <div class="suggestion-box" id="suggestions"></div>
+            <div class="chart-container">
+                <canvas id="laborChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-container">
+        <div class="footer-content">
+            <div class="footer-row">
+                <div class="footer-social">
+                    <a href="https://www.instagram.com/faroukazem/" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=100091571594026&sk=about" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://wa.me/905550196682" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                </div>
+                <div class="footer-logo-box">
+                    <h2>مجموعة فاروق للاستشارات والأعمال</h2>
+                    <div></div>
+                </div>
+                <div class="footer-payment">
+                    <div class="payment-card">
+                        <img src="https://img.icons8.com/color/48/visa.png" alt="Visa">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="copyright">
+                جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
+                <p>Adnan Kahveci, Beylikdüzü / İstanbul, Türkiye</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- AOS -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: true, offset: 100 });
+
+    // ------------------ إدارة الورديات الديناميكية ------------------
+    let shiftCount = 2;
+
+    function renderShifts() {
+        const container = document.getElementById('shiftsContainer');
+        container.innerHTML = '';
+        for (let i = 1; i <= shiftCount; i++) {
+            const div = document.createElement('div');
+            div.className = 'shift-row';
+            div.innerHTML = `
+                <input type="number" id="shiftEmployees${i}" placeholder="عدد الموظفين" value="${i === 1 ? 3 : 2}" min="0" step="1">
+                <input type="number" id="shiftHours${i}" placeholder="ساعات الوردية" value="${i === 1 ? 8 : 6}" min="1" step="0.5">
+                <span style="color: var(--gold); font-weight:700;">الوردية ${i}</span>
+                ${i > 1 ? '<button class="remove-shift" onclick="removeShift('+i+')"><i class="fas fa-times"></i></button>' : ''}
+            `;
+            container.appendChild(div);
+        }
+    }
+
+    window.removeShift = function(index) {
+        shiftCount--;
+        renderShifts();
+    };
+
+    document.getElementById('addShiftBtn').addEventListener('click', function() {
+        shiftCount++;
+        renderShifts();
+    });
+
+    document.getElementById('numShifts').addEventListener('change', function() {
+        shiftCount = parseInt(this.value);
+        renderShifts();
+    });
+
+    // ------------------ الحساب الرئيسي ------------------
+    let laborChart;
+
+    document.getElementById('calculateBtn').addEventListener('click', function() {
+        const currency = document.getElementById('currencySelect').value;
+        const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+
+        const monthlySales = parseFloat(document.getElementById('monthlySales').value) || 0;
+        const avgBill = parseFloat(document.getElementById('avgBill').value) || 1;
+        const avgMonthlyWage = parseFloat(document.getElementById('avgMonthlyWage').value) || 0;
+        const workingDays = parseInt(document.getElementById('workingDays').value) || 6;
+        const targetPercent = parseFloat(document.getElementById('targetLaborPercent').value) || 25;
+        const vacationType = document.getElementById('vacationDistribution').value;
+
+        let totalEmployees = 0;
+        let totalShiftHours = 0;
+        for (let i = 1; i <= shiftCount; i++) {
+            const emp = parseInt(document.getElementById(`shiftEmployees${i}`)?.value) || 0;
+            const hours = parseFloat(document.getElementById(`shiftHours${i}`)?.value) || 0;
+            totalEmployees += emp;
+            totalShiftHours += emp * hours;
+        }
+
+        if (totalEmployees === 0 || totalShiftHours === 0) {
+            alert('الرجاء إدخال عدد الموظفين وساعات العمل لكل وردية');
+            return;
+        }
+
+        const weeksPerMonth = 4.33;
+        const daysPerMonth = workingDays * weeksPerMonth;
+
+        const monthlyLaborCost = totalEmployees * avgMonthlyWage;
+        const laborPercent = monthlySales ? (monthlyLaborCost / monthlySales) * 100 : 0;
+
+        const salesPerEmployee = totalEmployees ? monthlySales / totalEmployees : 0;
+        const dailyLaborCost = daysPerMonth ? monthlyLaborCost / daysPerMonth : 0;
+        const avgHoursPerEmployee = totalEmployees ? totalShiftHours / totalEmployees : 0;
+        const expectedCustomers = monthlySales / avgBill;
+        const customersPerEmployee = totalEmployees ? expectedCustomers / totalEmployees : 0;
+
+        const idealMin = targetPercent - 5;
+        const idealMax = targetPercent + 5;
+        let alertClass = '';
+        let alertMessage = '';
+        if (laborPercent < idealMin) {
+            alertClass = 'alert-warning';
+            alertMessage = `⚠️ نسبة العمالة (${laborPercent.toFixed(1)}%) أقل من المستوى المستهدف (${targetPercent}%). قد يكون الموظفون غير كافيين لخدمة المبيعات المتوقعة.`;
+        } else if (laborPercent > idealMax) {
+            alertClass = 'alert-danger';
+            alertMessage = `🔴 نسبة العمالة (${laborPercent.toFixed(1)}%) أعلى من المستوى المثالي (${targetPercent}%). هذا يشير إلى هدر في الرواتب.`;
+        } else {
+            alertClass = 'alert-success';
+            alertMessage = `✅ نسبة العمالة (${laborPercent.toFixed(1)}%) ضمن النطاق المثالي (${idealMin}-${idealMax}%).`;
+        }
+
+        let efficiencyRating = '';
+        if (laborPercent < 20) efficiencyRating = 'ممتاز';
+        else if (laborPercent <= 30) efficiencyRating = 'جيد';
+        else if (laborPercent <= 35) efficiencyRating = 'مرتفع';
+        else efficiencyRating = 'خطر';
+
+        document.getElementById('resultsSection').style.display = 'block';
+        document.getElementById('resultsGrid').innerHTML = `
+            <div class="result-card">
+                <i class="fas fa-user-friends"></i>
+                <div class="label">إجمالي الموظفين</div>
+                <div class="value">${totalEmployees}</div>
+                <div class="unit">موظف</div>
+            </div>
+            <div class="result-card">
+                <i class="fas fa-money-bill-wave"></i>
+                <div class="label">تكلفة العمالة الشهرية</div>
+                <div class="value">${currency}${monthlyLaborCost.toLocaleString()}</div>
+                <div class="unit">تقريباً</div>
+            </div>
+            <div class="result-card">
+                <i class="fas fa-percent"></i>
+                <div class="label">نسبة العمالة</div>
+                <div class="value">${laborPercent.toFixed(1)}%</div>
+                <div class="unit">من المبيعات</div>
+            </div>
+            <div class="result-card">
+                <i class="fas fa-chart-bar"></i>
+                <div class="label">المبيعات لكل موظف</div>
+                <div class="value">${currency}${salesPerEmployee.toFixed(0)}</div>
+                <div class="unit">شهرياً</div>
+            </div>
+            <div class="result-card">
+                <i class="fas fa-sun"></i>
+                <div class="label">تكلفة العمالة اليومية</div>
+                <div class="value">${currency}${dailyLaborCost.toFixed(0)}</div>
+                <div class="unit">يومياً</div>
+            </div>
+            <div class="result-card">
+                <i class="fas fa-hourglass-half"></i>
+                <div class="label">متوسط ساعات العمل</div>
+                <div class="value">${avgHoursPerEmployee.toFixed(1)}</div>
+                <div class="unit">ساعة/موظف/يوم</div>
+            </div>
+            <div class="result-card">
+                <i class="fas fa-users"></i>
+                <div class="label">العملاء المتوقعون</div>
+                <div class="value">${Math.round(expectedCustomers)}</div>
+                <div class="unit">عميل/شهر</div>
+            </div>
+            <div class="result-card">
+                <i class="fas fa-user-check"></i>
+                <div class="label">عملاء لكل موظف</div>
+                <div class="value">${customersPerEmployee.toFixed(0)}</div>
+                <div class="unit">عميل/موظف/شهر</div>
+            </div>
+            <div class="result-card">
+                <i class="fas fa-tachometer-alt"></i>
+                <div class="label">مؤشر الكفاءة</div>
+                <div class="value">${efficiencyRating}</div>
+                <div class="unit">${laborPercent.toFixed(1)}%</div>
+            </div>
+        `;
+
+        document.getElementById('evaluationAlert').innerHTML = `<div class="alert ${alertClass}">${alertMessage}</div>`;
+
+        let suggestions = '';
+        if (laborPercent > idealMax) {
+            suggestions += '<li>خفض عدد الموظفين في فترات الهدوء (حلل أوقات الذروة).</li>';
+            suggestions += '<li>دمج بعض المهام أو استخدام موظفين متعددي المهارات.</li>';
+            suggestions += '<li>زيادة المبيعات (التسويق) لخفض النسبة دون تغيير عدد الموظفين.</li>';
+        } else if (laborPercent < idealMin) {
+            suggestions += '<li>قد تحتاج إلى زيادة عدد الموظفين لخدمة العملاء بشكل أفضل.</li>';
+            suggestions += '<li>تأكد من أن المبيعات المستهدفة واقعية وقابلة للتحقيق.</li>';
+        } else {
+            suggestions += '<li>التوزيع الحالي جيد. استمر في مراقبة الأداء.</li>';
+        }
+
+        if (vacationType === 'staggered') {
+            suggestions += '<li>الإجازات المتداخلة تضمن تغطية جميع الأيام دون هدر. يفضل الاستمرار بهذا النظام.</li>';
+        } else {
+            suggestions += '<li>نظام الإجازات الموحدة قد يسبب نقصاً في التغطية يوم العطلة. فكر في اعتماد إجازات متداخلة.</li>';
+        }
+
+        const shiftAnalysis = [];
+        for (let i = 1; i <= shiftCount; i++) {
+            const emp = parseInt(document.getElementById(`shiftEmployees${i}`)?.value) || 0;
+            const hours = parseFloat(document.getElementById(`shiftHours${i}`)?.value) || 0;
+            shiftAnalysis.push(`الوردية ${i}: ${emp} موظفين، ${hours} ساعات.`);
+        }
+        suggestions += '<br><strong>توزيع الورديات الحالي:</strong><br>' + shiftAnalysis.join('<br>');
+
+        document.getElementById('suggestions').innerHTML = `<h4><i class="fas fa-lightbulb"></i> توصيات لتقليل الهدر وتحسين الكفاءة</h4><ul>${suggestions}</ul>`;
+
+        const ctx = document.getElementById('laborChart').getContext('2d');
+        if (laborChart) laborChart.destroy();
+        laborChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['المبيعات الشهرية', 'تكلفة العمالة'],
+                datasets: [{
+                    label: `القيمة (${currency})`,
+                    data: [monthlySales, monthlyLaborCost],
+                    backgroundColor: ['#28a745', '#b8860b']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // تخزين البيانات للتصدير
+        window.laborData = {
+            currency,
+            companyName,
+            monthlySales,
+            avgBill,
+            avgMonthlyWage,
+            workingDays,
+            targetPercent,
+            vacationType,
+            totalEmployees,
+            totalShiftHours,
+            monthlyLaborCost,
+            laborPercent,
+            salesPerEmployee,
+            dailyLaborCost,
+            avgHoursPerEmployee,
+            expectedCustomers,
+            customersPerEmployee,
+            efficiencyRating,
+            alertMessage,
+            shiftAnalysis,
+            suggestions
+        };
+    });
+
+    // ------------------ تصدير Word محسّن واحترافي ------------------
+    document.getElementById('exportWordBtn').addEventListener('click', async function() {
+        if (!window.laborData) {
+            alert('الرجاء إجراء التحليل أولاً');
+            return;
+        }
+        const d = window.laborData;
+        const currency = d.currency;
+        const companyName = d.companyName;
+
+        try {
+            // التقاط الرسم البياني
+            const canvas = document.getElementById('laborChart');
+            if (!canvas) return;
+            const chartCanvas = await html2canvas(canvas, { scale: 2, backgroundColor: '#ffffff' });
+            const chartImg = chartCanvas.toDataURL('image/png');
+
+            // جمع بطاقات KPI وتحويلها إلى جدول
+            const kpiCards = document.querySelectorAll('.result-card');
+            let kpiRows = '';
+            let row = '';
+            let count = 0;
+            kpiCards.forEach((card, index) => {
+                const icon = card.querySelector('i') ? card.querySelector('i').outerHTML : '';
+                const label = card.querySelector('.label') ? card.querySelector('.label').innerText : '';
+                const value = card.querySelector('.value') ? card.querySelector('.value').innerText : '';
+                const unit = card.querySelector('.unit') ? card.querySelector('.unit').innerText : '';
+
+                const cell = `
+                    <td style="border:1px solid #b8860b; padding:15px; text-align:center; background:#fefcf6; vertical-align:top;">
+                        ${icon}
+                        <div style="font-weight:700; color:#666; margin:0.3rem 0;">${label}</div>
+                        <div style="font-size:1.8rem; font-weight:900; color:#b8860b;">${value}</div>
+                        <div style="font-size:0.9rem; color:#777;">${unit}</div>
+                    </td>
+                `;
+                row += cell;
+                count++;
+                if (count % 2 === 0 || index === kpiCards.length - 1) {
+                    kpiRows += `<tr>${row}</tr>`;
+                    row = '';
+                }
+            });
+
+            // جدول المعطيات الأساسية
+            const summaryRows = `
+                <tr><th style="background:#fefcf6;">المبيعات الشهرية المستهدفة</th><td>${currency} ${d.monthlySales}</td></tr>
+                <tr><th style="background:#fefcf6;">متوسط الفاتورة للعميل</th><td>${currency} ${d.avgBill}</td></tr>
+                <tr><th style="background:#fefcf6;">متوسط الأجر الشهري للموظف</th><td>${currency} ${d.avgMonthlyWage}</td></tr>
+                <tr><th style="background:#fefcf6;">أيام العمل في الأسبوع</th><td>${d.workingDays}</td></tr>
+                <tr><th style="background:#fefcf6;">نسبة العمالة المستهدفة</th><td>${d.targetPercent}%</td></tr>
+                <tr><th style="background:#fefcf6;">إجمالي الموظفين</th><td>${d.totalEmployees}</td></tr>
+                <tr><th style="background:#fefcf6;">إجمالي ساعات العمل اليومية</th><td>${d.totalShiftHours}</td></tr>
+            `;
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            const reportHTML = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <meta charset='utf-8'>
+                    <style>
+                        body { font-family: 'Arial', sans-serif; direction: rtl; margin: 2rem; }
+                        .header { text-align: center; border-bottom: 3px solid #b8860b; padding-bottom: 10px; margin-bottom: 20px; }
+                        h2, h3 { color: #b8860b; }
+                        table { width: 100%; border-collapse: collapse; margin: 15px 0; direction: rtl; }
+                        th, td { border: 1px solid #b8860b; padding: 8px; text-align: center; }
+                        th { background: #fefcf6; color: #b8860b; }
+                        .chart-img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 10px; margin: 1rem 0; }
+                        .footer { text-align: center; margin-top: 40px; color: #888; border-top: 1px dashed #b8860b; padding-top: 10px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1 style="color:#b8860b;">مجموعة فاروق للاستشارات والأعمال</h1>
+                        <p>تقرير تحليل تكلفة العمالة المثالية</p>
+                        <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
+                    </div>
+
+                    <h2>المعطيات الأساسية</h2>
+                    <table>
+                        ${summaryRows}
+                    </table>
+
+                    <h2>مؤشرات الأداء</h2>
+                    <table>${kpiRows}</table>
+
+                    <div style="background:#fefcf6; border:1px solid #b8860b; border-radius:10px; padding:1rem; margin:1rem 0;">
+                        ${document.getElementById('evaluationAlert').innerHTML.replace(/class="alert/g, 'style="background:#d4edda; color:#155724; padding:1rem; border-radius:30px;"')}
+                    </div>
+
+                    <h2>الرسم البياني: المبيعات مقابل تكلفة العمالة</h2>
+                    <div style="text-align:center;"><img src="${chartImg}" class="chart-img" /></div>
+
+                    <h2>توصيات وتحسينات</h2>
+                    <div style="background:#fefcf6; border:1px solid #b8860b; border-radius:10px; padding:1rem;">
+                        ${document.getElementById('suggestions').innerHTML}
+                    </div>
+
+                    <div class="footer">
+                        تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة © ${now.getFullYear()}
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\uFEFF' + reportHTML], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `تقرير_عمالة_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+
+        } catch (error) {
+            console.error(error);
+            alert('حدث خطأ أثناء إنشاء تقرير Word');
+        }
+    });
+
+    // ------------------ تصدير PDF محسّن ------------------
+    document.getElementById('exportPdfBtn').addEventListener('click', async function() {
+        if (!window.laborData) {
+            alert('الرجاء إجراء التحليل أولاً');
+            return;
+        }
+
+        try {
+            const d = window.laborData;
+            const resultsSection = document.getElementById('resultsSection');
+            if (!resultsSection || resultsSection.style.display === 'none') return;
+
+            // إنشاء نسخة من منطقة النتائج مع إزالة الأزرار
+            const cloneSection = resultsSection.cloneNode(true);
+            const actionBar = cloneSection.querySelector('.action-bar');
+            if (actionBar) actionBar.remove();
+
+            const allButtons = cloneSection.querySelectorAll('button');
+            allButtons.forEach(btn => btn.style.display = 'none');
+
+            // تطبيق أنماط إضافية للطباعة
+            cloneSection.style.backgroundColor = '#ffffff';
+            cloneSection.style.padding = '20px';
+            cloneSection.style.borderRadius = '10px';
+            cloneSection.style.direction = 'rtl';
+            cloneSection.style.fontFamily = 'Tajawal, sans-serif';
+
+            // إضافة ترويسة باسم الجهة
+            const headerDiv = document.createElement('div');
+            headerDiv.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #b8860b; padding-bottom: 10px;">
+                    <h2 style="color: #b8860b; margin:0;">مجموعة فاروق للاستشارات والأعمال</h2>
+                    <p style="color: #666;">تقرير تحليل تكلفة العمالة المثالية</p>
+                    <p style="color: #666;">الجهة: ${d.companyName} | تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG-u-nu-latn')}</p>
+                </div>
+            `;
+            cloneSection.insertBefore(headerDiv, cloneSection.firstChild);
+
+            // إضافة تذييل
+            const footerDiv = document.createElement('div');
+            footerDiv.innerHTML = `
+                <div style="text-align: center; margin-top: 30px; color: #888; font-size:0.9rem; border-top: 1px dashed #b8860b; padding-top: 10px;">
+                    تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة © ${new Date().getFullYear()}
+                </div>
+            `;
+            cloneSection.appendChild(footerDiv);
+
+            // إخفاء العنصر خارج الشاشة
+            cloneSection.style.position = 'absolute';
+            cloneSection.style.left = '-9999px';
+            cloneSection.style.top = '0';
+            document.body.appendChild(cloneSection);
+
+            const canvas = await html2canvas(cloneSection, { scale: 2, backgroundColor: '#ffffff' });
+            const imgData = canvas.toDataURL('image/png');
+
+            document.body.removeChild(cloneSection);
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            const imgWidth = pdfWidth;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pdfHeight;
+
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pdfHeight;
+            }
+
+            pdf.save(`تقرير_عمالة_${d.companyName}.pdf`);
+        } catch (error) {
+            console.error(error);
+            alert('حدث خطأ أثناء إنشاء ملف PDF');
+        }
+    });
+
+    // تهيئة أولية
+    renderShifts();
+</script>
+</body>
+</html>

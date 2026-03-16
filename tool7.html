@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>حاسبة نقطة التعادل | FAROUK GRUP</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- AOS Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas لتصدير الرسم البياني -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --gold: #b8860b;
+            --gold-light: #d4b15a;
+            --gold-soft: rgba(184,134,11,0.1);
+            --dark: #0f0f0f;
+            --dark-light: #1a1a1a;
+            --white: #ffffff;
+            --offwhite: #f9f9f9;
+            --text: #333;
+            --card-bg: #fefcf6;
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(184,134,11,0.03) 0px, transparent 20px),
+                radial-gradient(circle at 90% 70%, rgba(184,134,11,0.03) 0px, transparent 25px),
+                repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 1px, transparent 1px, transparent 10px);
+            pointer-events: none; z-index: -1;
+        }
+        .floating-shape {
+            position: absolute;
+            width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%);
+            z-index: 0; pointer-events: none;
+        }
+        .shape-1 { top: -100px; right: -100px; animation: float 20s infinite ease-in-out; }
+        .shape-2 { bottom: -50px; left: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
+        @keyframes float {
+            0% { transform: translate(0,0) rotate(0deg); }
+            33% { transform: translate(30px,-30px) rotate(5deg); }
+            66% { transform: translate(-20px,20px) rotate(-5deg); }
+            100% { transform: translate(0,0) rotate(0deg); }
+        }
+        nav {
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+        }
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo img { height: 50px; width: auto; object-fit: contain; }
+        .logo h1 { font-family: 'Alexandria', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--gold); letter-spacing: 1px; }
+        nav a { text-decoration: none; color: #444; margin: 0 0.8rem; font-weight: 600; transition: 0.3s; }
+        nav a:hover { color: var(--gold); }
+        nav a i { margin-left: 5px; }
+        .hero-mini {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid var(--gold); position: relative; overflow: hidden;
+        }
+        .hero-mini::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
+            animation: rotate 40s linear infinite;
+        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .hero-mini h2 { font-size: 2.5rem; font-weight: 900; color: var(--gold-light); margin-bottom: 0.5rem; position: relative; z-index: 2; }
+        .hero-mini p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; opacity: 0.95; position: relative; z-index: 2; }
+        .calc-wrapper { max-width: 1200px; margin: 4rem auto; padding: 0 1.5rem; position: relative; z-index: 2; }
+        .calc-box {
+            background: rgba(255,255,255,0.9); backdrop-filter: blur(15px);
+            border: 2px solid var(--gold); border-radius: 40px; padding: 3rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(184,134,11,0.3) inset;
+            position: relative; overflow: hidden;
+        }
+        .calc-box::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, transparent 0%, rgba(184,134,11,0.05) 100%);
+            z-index: -1;
+        }
+        .featured-badge {
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #111; width: 100px; height: 100px; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900; border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 2rem; margin-bottom: 0.2rem; }
+        .featured-badge span { font-size: 0.9rem; text-align: center; }
+        .calc-box h2 { font-size: 2.2rem; font-weight: 900; color: var(--gold); margin-bottom: 2rem; text-align: center; }
+        .currency-row {
+            display: flex; align-items: center; gap: 1rem;
+            background: var(--gold-soft); padding: 0.8rem 1.5rem; border-radius: 50px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .currency-row label { font-weight: 900; color: var(--dark); margin: 0; }
+        .currency-row select, .currency-row input {
+            width: 150px; padding: 0.5rem 1rem; border: 2px solid var(--gold); border-radius: 30px;
+            background: white; font-weight: 700; font-family: 'Tajawal', sans-serif;
+        }
+        .currency-row input { width: 250px; }
+        .section-title-sm {
+            font-size: 1.5rem; font-weight: 900; color: var(--dark);
+            margin: 1.5rem 0 1rem 0; border-bottom: 2px solid var(--gold-soft); padding-bottom: 0.5rem;
+        }
+        .form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+        .form-group { flex: 1 1 200px; margin-bottom: 1rem; position: relative; }
+        label { display: block; margin-bottom: 0.3rem; font-weight: 700; color: var(--dark); font-size: 0.95rem; }
+        label i { color: var(--gold); margin-left: 0.4rem; }
+        input, select {
+            width: 100%; padding: 0.8rem 1rem; border: 2px solid #ddd; border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 1rem; transition: 0.3s; background: var(--offwhite);
+        }
+        input:focus, select:focus {
+            outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(184,134,11,0.2); background: var(--white);
+        }
+        .tooltip { position: relative; cursor: help; }
+        .tooltip .tooltiptext {
+            visibility: hidden; width: 220px; background-color: var(--dark); color: #fff; text-align: center;
+            border-radius: 6px; padding: 8px; position: absolute; z-index: 1; bottom: 130%; left: 50%;
+            margin-left: -110px; opacity: 0; transition: opacity 0.3s; font-size: 0.85rem;
+            border: 1px solid var(--gold); pointer-events: none;
+        }
+        .tooltip .tooltiptext::after {
+            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+            border-width: 5px; border-style: solid; border-color: var(--dark) transparent transparent transparent;
+        }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 1rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #111; font-weight: 900; font-size: 1.2rem; border: none; cursor: pointer;
+            transition: 0.3s; box-shadow: 0 5px 20px rgba(184,134,11,0.4); margin: 2rem 0;
+        }
+        .btn-calculate:hover {
+            background: linear-gradient(135deg, #111, #222); color: var(--gold);
+            transform: translateY(-3px); box-shadow: 0 10px 30px rgba(184,134,11,0.6);
+        }
+        .results-section { margin-top: 2rem; }
+        .results-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;
+        }
+        .result-card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, #fff 100%);
+            border: 1px solid var(--gold-light); border-radius: 20px; padding: 1.5rem; text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s;
+        }
+        .result-card:hover {
+            transform: translateY(-5px); border-color: var(--gold); box-shadow: 0 10px 25px rgba(184,134,11,0.15);
+        }
+        .result-card i { font-size: 2rem; color: var(--gold); margin-bottom: 0.5rem; }
+        .result-card h4 { font-size: 1rem; font-weight: 700; color: #666; margin-bottom: 0.5rem; }
+        .result-card .value { font-size: 1.8rem; font-weight: 900; color: var(--gold); }
+        .result-card .unit { font-size: 0.9rem; color: #777; margin-right: 0.2rem; }
+        .table-container {
+            overflow-x: auto; margin-top: 2rem; border: 1px solid var(--gold-light); border-radius: 20px;
+            background: white; padding: 1rem;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        th { background: var(--gold-soft); color: var(--dark); font-weight: 900; padding: 0.75rem; border-bottom: 2px solid var(--gold); }
+        td { padding: 0.75rem; border-bottom: 1px solid #eee; text-align: center; }
+        tr:last-child td { border-bottom: none; }
+        .positive { color: #28a745; font-weight: 700; }
+        .negative { color: #dc3545; font-weight: 700; }
+        .export-container { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
+        .export-btn {
+            background: #28a745; color: white; border: none; border-radius: 50px; padding: 0.8rem 2rem;
+            font-weight: 900; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 0.5rem;
+        }
+        .export-btn:hover { background: #218838; transform: translateY(-2px); }
+        .export-word-btn {
+            background: #1e4a7a; color: white; border: none; border-radius: 50px; padding: 0.8rem 2rem;
+            font-weight: 900; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 0.5rem;
+        }
+        .export-word-btn:hover { background: #0e3a5a; transform: translateY(-2px); }
+        .chart-container {
+            margin-top: 2rem;
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid var(--gold-light);
+            height: 300px;
+        }
+        footer {
+            background: linear-gradient(145deg, #111, #1a1a1a); color: #ddd;
+            padding: 3rem 1rem 2rem; border-top: 3px solid var(--gold); margin-top: 4rem;
+        }
+        .footer-container { max-width: 1200px; margin: 0 auto; }
+        .footer-content { display: flex; flex-direction: column; gap: 2rem; }
+        .footer-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 2rem; }
+        .footer-social { display: flex; gap: 1.5rem; }
+        .footer-social a { color: var(--gold); font-size: 1.8rem; transition: 0.3s; }
+        .footer-social a:hover { color: var(--gold-light); transform: translateY(-3px); }
+        .footer-logo-box { text-align: center; }
+        .footer-logo-box h2 { color: var(--gold); font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .footer-logo-box div { width: 60px; height: 2px; background: var(--gold); margin: 0 auto; }
+        .footer-payment .payment-card {
+            background: rgba(255,255,255,0.05); padding: 0.8rem 1.5rem; border-radius: 50px;
+            display: flex; gap: 1.5rem; align-items: center; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .footer-payment img { height: 25px; filter: brightness(0.9); transition: 0.2s; }
+        .footer-payment img:hover { filter: brightness(1.2); }
+        hr { border: none; border-top: 1px solid rgba(184,134,11,0.2); }
+        .copyright { text-align: center; font-size: 0.9rem; color: #777; }
+        .copyright span { color: var(--gold); font-weight: bold; }
+
+        /* أنماط الآلة الحاسبة المنبثقة (Modal) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: linear-gradient(145deg, #ffffff, #f5f5f5);
+            margin: 5% auto;
+            padding: 0;
+            border: 2px solid var(--gold);
+            border-radius: 30px;
+            width: 250px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            background: var(--gold-soft);
+            border-bottom: 2px solid var(--gold);
+            padding: 10px 15px;
+            border-radius: 28px 28px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: var(--dark); font-size: 1.1rem; font-weight: 900; }
+        .close { color: #666; float: left; font-size: 24px; font-weight: bold; cursor: pointer; transition: 0.2s; line-height: 1; }
+        .close:hover { color: var(--gold); transform: scale(1.1); }
+        .modal-body { padding: 15px; }
+        .calc-display {
+            width: 100%; height: 45px; font-size: 1.5rem; text-align: left; padding: 0 10px;
+            border: 2px solid var(--gold-light); border-radius: 20px; margin-bottom: 15px;
+            background: white; font-family: 'Tajawal', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: white; border: 2px solid var(--gold-light); border-radius: 15px; padding: 8px 0;
+            font-size: 1rem; font-weight: 700; color: var(--dark); cursor: pointer; transition: 0.2s;
+            font-family: 'Tajawal', sans-serif; box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+        }
+        .calc-btn:hover { background: var(--gold); color: white; border-color: var(--gold); transform: translateY(-2px); }
+        .calc-btn.operator { background: var(--gold-soft); color: var(--gold); font-weight: 900; font-size: 1.2rem; }
+        .calc-btn.operator:hover { background: var(--gold); color: white; }
+        .calc-btn.equals { background: var(--gold); color: white; grid-column: span 2; border-color: var(--gold); }
+        .calc-btn.equals:hover { background: #a67c0a; }
+
+        @media (max-width: 768px) {
+            nav { flex-direction: column; align-items: stretch; gap: 0.8rem; }
+            .logo { flex-wrap: nowrap; gap: 8px; width: 100%; justify-content: center; }
+            .logo img { height: 35px; }
+            .logo h1 { font-size: 1rem; }
+            nav > div:last-child { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+            nav a { margin: 0; font-size: 0.9rem; padding: 4px 8px; white-space: nowrap; }
+            .hero-mini h2 { font-size: 2rem; }
+            .hero-mini p { font-size: 1rem; }
+            .calc-box { padding: 2rem 1.5rem; }
+            .form-row { flex-direction: column; gap: 0; }
+            .featured-badge { width: 70px; height: 70px; }
+            .featured-badge i { font-size: 1.5rem; }
+            .featured-badge span { font-size: 0.7rem; }
+            .footer-row { flex-direction: column; text-align: center; }
+            .footer-social { justify-content: center; }
+            .footer-payment { justify-content: center; }
+            .modal-content { width: 90%; max-width: 250px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+
+    <nav>
+        <div class="logo">
+            <img src="https://lh3.googleusercontent.com/d/1e6u-DPTinDJl_Q9wW3QvGgzFbXO_2sXa" alt="FAROUK GRUP LOGO">
+            <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+        </div>
+        <div>
+            <a href="https://www.farouk-grup.com/"><i class="fas fa-home"></i> الرئيسية</a>
+            <a href="#" id="calculatorBtn" style="color:var(--gold)"><i class="fas fa-calculator"></i> آلة حاسبة</a>
+            <a href="https://www.farouk-grup.com/Home/Contact-Us" style="color:var(--gold)"><i class="fas fa-phone-alt"></i> تواصل معنا</a>
+        </div>
+    </nav>
+
+    <section class="hero-mini">
+        <h2>حاسبة نقطة التعادل</h2>
+        <p>احسب عدد الوحدات التي يجب بيعها لتغطية التكاليف – مع رسم بياني احترافي</p>
+    </section>
+
+    <section class="calc-wrapper">
+        <div class="calc-box" data-aos="fade-up">
+            <div class="featured-badge">
+                <i class="fas fa-chart-line"></i>
+                <span>تعادل</span>
+            </div>
+            <h2>بيانات التكلفة</h2>
+
+            <!-- اختيار العملة واسم الجهة -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> العملة:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>دولار ($)</option>
+                    <option value="€">يورو (€)</option>
+                    <option value="₺">ليرة تركية (₺)</option>
+                    <option value="ج.م">جنيه مصري (ج.م)</option>
+                    <option value="د.ك">دينار كويتي (د.ك)</option>
+                    <option value="ر.س">ريال سعودي (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> اسم الجهة:</label>
+                <input type="text" id="companyName" value="شركة الأفق للتجارة" placeholder="الجهة المستفيدة">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-building"></i> التكاليف الثابتة الشهرية</label>
+                    <input type="number" id="fixedCosts" value="200000" step="1000">
+                    <span class="tooltiptext">إيجار، رواتب، كهرباء، إلخ – التكاليف التي لا تتغير مع المبيعات.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-dollar-sign"></i> سعر بيع الوحدة</label>
+                    <input type="number" id="unitPrice" value="120" step="1">
+                    <span class="tooltiptext">سعر بيع الوحدة الواحدة من المنتج أو الخدمة.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-box"></i> التكلفة المتغيرة للوحدة</label>
+                    <input type="number" id="unitCost" value="60" step="1">
+                    <span class="tooltiptext">تكلفة المواد أو العمالة المباشرة لكل وحدة.</span>
+                </div>
+            </div>
+
+            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> احسب نقطة التعادل</button>
+
+            <!-- منطقة النتائج -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-cards" id="kpiCards"></div>
+
+                <!-- رسم بياني -->
+                <div class="section-title-sm">📊 تحليل التعادل البياني</div>
+                <div class="chart-container">
+                    <canvas id="breakevenChart"></canvas>
+                </div>
+
+                <!-- جدول توضيحي صغير -->
+                <div class="section-title-sm">📋 ملخص التحليل</div>
+                <div class="table-container" id="summaryTable"></div>
+
+                <div class="export-container">
+                    <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير إلى Excel</button>
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير تقرير (Word)</button>
+                </div>
+            </div>
+
+            <div id="initialMessage" style="margin-top:1rem; color:#666; text-align:center;">
+                <i class="fas fa-robot" style="color: var(--gold);"></i> سيتم عرض النتائج بعد الضغط على زر الحساب
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-row">
+                    <div class="footer-social">
+                        <a href="https://www.instagram.com/faroukazem/" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/profile.php?id=100091571594026&sk=about" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://wa.me/905550196682" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                    <div class="footer-logo-box">
+                        <h2>مجموعة فاروق للاستشارات والأعمال</h2>
+                        <div></div>
+                    </div>
+                    <div class="footer-payment">
+                        <div class="payment-card">
+                            <img src="https://img.icons8.com/color/48/visa.png" alt="Visa">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="copyright">
+                    جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
+                    <p>Adnan Kahveci, Beylikdüzü / İstanbul, Türkiye</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- نافذة الآلة الحاسبة المنبثقة (Modal) -->
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2><i class="fas fa-calculator" style="color: var(--gold);"></i> آلة حاسبة</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
+                    <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
+                    <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
+                    <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
+                    <button class="calc-btn" onclick="clearCalculator()">C</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
+                    <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
+                    <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
+                    <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true, offset: 100 });
+
+        let breakevenChart;
+
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            const currency = document.getElementById('currencySelect').value;
+            const fixedCosts = parseFloat(document.getElementById('fixedCosts').value) || 0;
+            const unitPrice = parseFloat(document.getElementById('unitPrice').value) || 0;
+            const unitCost = parseFloat(document.getElementById('unitCost').value) || 0;
+
+            if (fixedCosts <= 0 || unitPrice <= 0 || unitCost < 0) {
+                alert('الرجاء إدخال قيم صحيحة (التكاليف الثابتة وسعر البيع أكبر من صفر).');
+                return;
+            }
+
+            const contributionMargin = unitPrice - unitCost;
+            let breakevenUnits = 0;
+            let breakevenRevenue = 0;
+            let contributionMarginPercent = 0;
+
+            if (contributionMargin > 0) {
+                breakevenUnits = fixedCosts / contributionMargin;
+                breakevenRevenue = breakevenUnits * unitPrice;
+                contributionMarginPercent = (contributionMargin / unitPrice) * 100;
+            } else {
+                breakevenUnits = Infinity;
+                breakevenRevenue = Infinity;
+                contributionMarginPercent = (contributionMargin / unitPrice) * 100;
+            }
+
+            document.getElementById('initialMessage').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
+
+            const beUnitsDisplay = isFinite(breakevenUnits) ? breakevenUnits.toFixed(0) : '∞';
+            const beRevenueDisplay = isFinite(breakevenRevenue) ? currency + breakevenRevenue.toFixed(0) : 'غير قابل للتحقيق';
+            document.getElementById('kpiCards').innerHTML = `
+                <div class="result-card">
+                    <i class="fas fa-cubes"></i>
+                    <h4>كمية التعادل</h4>
+                    <div class="value">${beUnitsDisplay}</div>
+                    <div class="unit">وحدة / شهر</div>
+                </div>
+                <div class="result-card">
+                    <i class="fas fa-dollar-sign"></i>
+                    <h4>إيرادات التعادل</h4>
+                    <div class="value">${beRevenueDisplay}</div>
+                    <div class="unit">شهرياً</div>
+                </div>
+                <div class="result-card">
+                    <i class="fas fa-chart-pie"></i>
+                    <h4>هامش المساهمة</h4>
+                    <div class="value">${currency}${contributionMargin.toFixed(2)}</div>
+                    <div class="unit">للوحدة</div>
+                </div>
+                <div class="result-card">
+                    <i class="fas fa-percent"></i>
+                    <h4>نسبة هامش المساهمة</h4>
+                    <div class="value">${contributionMarginPercent.toFixed(2)}%</div>
+                </div>
+            `;
+
+            document.getElementById('summaryTable').innerHTML = `
+                <table>
+                    <tr><th>البيان</th><th>القيمة</th></tr>
+                    <tr><td>التكاليف الثابتة الشهرية</td><td>${currency}${fixedCosts.toFixed(0)}</td></tr>
+                    <tr><td>سعر بيع الوحدة</td><td>${currency}${unitPrice.toFixed(2)}</td></tr>
+                    <tr><td>التكلفة المتغيرة للوحدة</td><td>${currency}${unitCost.toFixed(2)}</td></tr>
+                    <tr><td>هامش المساهمة للوحدة</td><td>${currency}${contributionMargin.toFixed(2)}</td></tr>
+                    <tr><td>كمية التعادل الشهرية</td><td>${beUnitsDisplay} وحدة</td></tr>
+                    <tr><td>إيرادات التعادل الشهرية</td><td>${isFinite(breakevenRevenue) ? currency + breakevenRevenue.toFixed(0) : 'غير قابل للتحقيق'}</td></tr>
+                </table>
+            `;
+
+            const ctx = document.getElementById('breakevenChart').getContext('2d');
+            if (breakevenChart) breakevenChart.destroy();
+
+            let maxUnits = 1000;
+            if (isFinite(breakevenUnits) && breakevenUnits > 0) {
+                maxUnits = Math.ceil(breakevenUnits * 2);
+            }
+            const step = Math.ceil(maxUnits / 20);
+            const labels = [];
+            const revenueData = [];
+            const costData = [];
+            const beLine = [];
+
+            for (let units = 0; units <= maxUnits; units += step) {
+                labels.push(units);
+                revenueData.push(units * unitPrice);
+                costData.push(fixedCosts + units * unitCost);
+                beLine.push(isFinite(breakevenRevenue) ? breakevenRevenue : null);
+            }
+
+            breakevenChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'الإيرادات',
+                            data: revenueData,
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40,167,69,0.1)',
+                            tension: 0.1,
+                            fill: false
+                        },
+                        {
+                            label: 'التكاليف الكلية',
+                            data: costData,
+                            borderColor: '#dc3545',
+                            backgroundColor: 'rgba(220,53,69,0.1)',
+                            tension: 0.1,
+                            fill: false
+                        },
+                        {
+                            label: 'نقطة التعادل',
+                            data: beLine.map(val => val),
+                            borderColor: '#b8860b',
+                            borderDash: [5,5],
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        });
+
+        function exportToExcel() {
+            const currency = document.getElementById('currencySelect').value;
+            const fixedCosts = parseFloat(document.getElementById('fixedCosts').value) || 0;
+            const unitPrice = parseFloat(document.getElementById('unitPrice').value) || 0;
+            const unitCost = parseFloat(document.getElementById('unitCost').value) || 0;
+            const contributionMargin = unitPrice - unitCost;
+            const breakevenUnits = contributionMargin > 0 ? fixedCosts / contributionMargin : Infinity;
+            const breakevenRevenue = isFinite(breakevenUnits) ? breakevenUnits * unitPrice : Infinity;
+            const contributionMarginPercent = (contributionMargin / unitPrice) * 100;
+
+            const rows = [];
+            rows.push(['البيان', 'القيمة']);
+            rows.push(['التكاليف الثابتة الشهرية', fixedCosts.toFixed(0)]);
+            rows.push(['سعر بيع الوحدة', unitPrice.toFixed(2)]);
+            rows.push(['التكلفة المتغيرة للوحدة', unitCost.toFixed(2)]);
+            rows.push(['هامش المساهمة للوحدة', contributionMargin.toFixed(2)]);
+            rows.push(['نسبة هامش المساهمة (%)', contributionMarginPercent.toFixed(2)]);
+            rows.push(['كمية التعادل الشهرية', isFinite(breakevenUnits) ? breakevenUnits.toFixed(0) : 'غير قابل للتحقيق']);
+            rows.push(['إيرادات التعادل الشهرية', isFinite(breakevenRevenue) ? breakevenRevenue.toFixed(0) : 'غير قابل للتحقيق']);
+            let csvContent = rows.map(row => row.join(',')).join('\n');
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0,10).replace(/-/g,'');
+            link.download = `نقطة_تعادل_${dateStr}.csv`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // ------------------ دالة تصدير Word الاحترافية مع الرسم البياني وملخص التحليل ------------------
+        async function exportToWord() {
+            // التحقق من وجود النتائج
+            const resultsSection = document.getElementById('resultsSection');
+            if (!resultsSection || resultsSection.style.display === 'none') {
+                alert('الرجاء حساب النتائج أولاً.');
+                return;
+            }
+
+            try {
+                // التقاط الرسم البياني
+                const chartCanvas = document.getElementById('breakevenChart');
+                if (!chartCanvas) {
+                    alert('الرسم البياني غير متاح.');
+                    return;
+                }
+                const chartImage = await html2canvas(chartCanvas, { scale: 2, backgroundColor: '#ffffff' });
+                const imgData = chartImage.toDataURL('image/png');
+
+                // جلب القيم الأساسية
+                const currency = document.getElementById('currencySelect').value;
+                const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+                const fixedCosts = parseFloat(document.getElementById('fixedCosts').value) || 0;
+                const unitPrice = parseFloat(document.getElementById('unitPrice').value) || 0;
+                const unitCost = parseFloat(document.getElementById('unitCost').value) || 0;
+
+                // إعادة حساب المؤشرات
+                const contributionMargin = unitPrice - unitCost;
+                const breakevenUnits = contributionMargin > 0 ? fixedCosts / contributionMargin : Infinity;
+                const breakevenRevenue = isFinite(breakevenUnits) ? breakevenUnits * unitPrice : Infinity;
+                const contributionMarginPercent = (contributionMargin / unitPrice) * 100;
+
+                const beUnitsDisplay = isFinite(breakevenUnits) ? breakevenUnits.toFixed(0) : '∞';
+                const beRevenueDisplay = isFinite(breakevenRevenue) ? currency + breakevenRevenue.toFixed(0) : 'غير قابل للتحقيق';
+
+                // الحصول على محتوى جدول ملخص التحليل (مع الحفاظ على تنسيقه)
+                const summaryTableHTML = document.getElementById('summaryTable').innerHTML;
+
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                // بناء هيكل التقرير مع الحفاظ على النسق السابق وإضافة الرسم البياني وملخص التحليل
+                const htmlContent = `
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                    <head>
+                        <meta charset='utf-8'>
+                        <title>تقرير نقطة التعادل - FAROUK GRUP</title>
+                        <style>
+                            body { font-family: 'Arial', sans-serif; direction: rtl; text-align: right; margin: 2rem; }
+                            .report-header { text-align: center; border-bottom: 2px solid #b8860b; padding-bottom: 10px; margin-bottom: 20px; }
+                            h3 { color: #b8860b; margin-top: 25px; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 15px; direction: rtl; }
+                            th, td { border: 1px solid #b8860b; padding: 10px; text-align: center; }
+                            th { background-color: #fefcf6; color: #b8860b; font-weight: bold; }
+                            .footer { text-align: center; margin-top: 50px; font-size: 10pt; color: #888; border-top: 1px solid #eee; padding-top: 10px; }
+                            .chart-container { text-align: center; margin: 25px 0; }
+                            .chart-container img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 10px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="report-header">
+                            <h1 style="color: #b8860b; margin: 0;">مجموعة فاروق للاستشارات والأعمال</h1>
+                            <h2 style="color: #333;">تقرير تحليل نقطة التعادل (Break-Even Analysis)</h2>
+                            <p>تاريخ التقرير: ${dateStr}</p>
+                            <p>الجهة: ${companyName}</p>
+                        </div>
+
+                        <h3>أولاً: مدخلات الدراسة</h3>
+                        <table>
+                            <tr><th>البند</th><th>القيمة</th></tr>
+                            <tr><td>التكاليف الثابتة الشهرية</td><td>${fixedCosts.toFixed(0)} ${currency}</td></tr>
+                            <tr><td>سعر بيع الوحدة</td><td>${unitPrice.toFixed(2)} ${currency}</td></tr>
+                            <tr><td>التكلفة المتغيرة للوحدة</td><td>${unitCost.toFixed(2)} ${currency}</td></tr>
+                        </table>
+
+                        <h3>ثانياً: النتائج المستخلصة</h3>
+                        <table style="background-color: #fefcf6;">
+                            <tr><td style="font-weight: bold; color: #b8860b;">نقطة التعادل (بالوحدات)</td>
+                                <td style="font-size: 14pt; font-weight: bold;">${beUnitsDisplay} وحدة</td></tr>
+                            <tr><td style="font-weight: bold; color: #b8860b;">نقطة التعادل (بالقيمة المالية)</td>
+                                <td style="font-size: 14pt; font-weight: bold;">${beRevenueDisplay}</td></tr>
+                        </table>
+
+                        <h3>📊 تحليل التعادل البياني</h3>
+                        <div class="chart-container">
+                            <img src="${imgData}" alt="Breakeven Chart">
+                        </div>
+
+                        <h3>📋 ملخص التحليل</h3>
+                        ${summaryTableHTML}
+
+                        <div style="margin-top: 30px; padding: 15px; border-right: 5px solid #b8860b; background-color: #f9f9f9;">
+                            <strong>ملاحظة استشارية:</strong> تمثل نقطة التعادل الحد الأدنى من المبيعات اللازم لتغطية كافة التكاليف دون تحقيق ربح أو خسارة. أي مبيعات تتجاوز هذه النقطة ستبدأ في توليد أرباح صافية للمنشأة.
+                        </div>
+
+                        <div class="footer">
+                            تم استخراج هذا التقرير بواسطة مجموعة فاروق للاستشارات والأعمال - www.farouk-grup.com
+                        </div>
+                    </body>
+                    </html>
+                `;
+
+                // تصدير الملف مع BOM
+                const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `تقرير_نقطة_التعادل_${companyName}.doc`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+            } catch (error) {
+                console.error('خطأ في تصدير Word:', error);
+                alert('حدث خطأ أثناء إنشاء التقرير. يرجى المحاولة مرة أخرى.');
+            }
+        }
+
+        // ربط أزرار التصدير
+        document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+        document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+
+        // ------------------ آلة حاسبة منبثقة ------------------
+        const calcDisplay = document.getElementById('calcDisplay');
+        let currentCalcInput = '';
+
+        window.handleCalculatorInput = function(value) {
+            currentCalcInput += value;
+            calcDisplay.value = currentCalcInput;
+        }
+
+        window.clearCalculator = function() {
+            currentCalcInput = '';
+            calcDisplay.value = '';
+        }
+
+        window.backspaceCalculator = function() {
+            currentCalcInput = currentCalcInput.slice(0, -1);
+            calcDisplay.value = currentCalcInput;
+        }
+
+        window.calculateCalculatorResult = function() {
+            try {
+                let expression = currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/');
+                let result = eval(expression);
+                calcDisplay.value = result;
+                currentCalcInput = result.toString();
+            } catch (e) {
+                calcDisplay.value = 'خطأ';
+                currentCalcInput = '';
+            }
+        }
+
+        function handleKeyboard(e) {
+            if (modal.style.display !== 'block') return;
+            const key = e.key;
+            e.preventDefault();
+            e.stopPropagation();
+            if (key >= '0' && key <= '9') handleCalculatorInput(key);
+            else if (key === '.') handleCalculatorInput('.');
+            else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
+            else if (key === 'Enter' || key === '=') calculateCalculatorResult();
+            else if (key === 'Backspace') backspaceCalculator();
+            else if (key === 'Escape') modal.style.display = 'none';
+            else if (key === 'c' || key === 'C') clearCalculator();
+        }
+
+        document.addEventListener('keydown', handleKeyboard);
+
+        const modal = document.getElementById('calculatorModal');
+        const btn = document.getElementById('calculatorBtn');
+        const span = document.getElementsByClassName('close')[0];
+
+        btn.onclick = function(e) {
+            e.preventDefault();
+            modal.style.display = 'block';
+        }
+
+        span.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>نظام تدقيق SOPs المتقدم - تحليل المخاطر والتوصيات | FAROUK GRUP</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- AOS Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold: #b8860b;
+            --gold-light: #d4b15a;
+            --gold-soft: rgba(184,134,11,0.1);
+            --dark: #0f0f0f;
+            --dark-light: #1a1a1a;
+            --white: #ffffff;
+            --offwhite: #f9f9f9;
+            --text: #333;
+            --card-bg: #fefcf6;
+            --risk-high: #dc3545;
+            --risk-medium: #ffc107;
+            --risk-low: #28a745;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(184,134,11,0.03) 0px, transparent 20px),
+                radial-gradient(circle at 90% 70%, rgba(184,134,11,0.03) 0px, transparent 25px),
+                repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 1px, transparent 1px, transparent 10px);
+            pointer-events: none; z-index: -1;
+        }
+
+        .floating-shape {
+            position: absolute;
+            width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%);
+            z-index: 0; pointer-events: none;
+        }
+
+        .shape-1 { top: -100px; right: -100px; animation: float 20s infinite ease-in-out; }
+        .shape-2 { bottom: -50px; left: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
+
+        @keyframes float {
+            0% { transform: translate(0,0) rotate(0deg); }
+            33% { transform: translate(30px,-30px) rotate(5deg); }
+            66% { transform: translate(-20px,20px) rotate(-5deg); }
+            100% { transform: translate(0,0) rotate(0deg); }
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo h1 {
+            font-family: 'Alexandria', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #444;
+            margin: 0 0.8rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        nav a:hover { color: var(--gold); }
+        nav a i { margin-left: 5px; }
+
+        /* Hero Section */
+        .hero-mini {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 1rem;
+            border-bottom: 4px solid var(--gold);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-mini::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
+            animation: rotate 40s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .hero-mini h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--gold-light);
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-mini p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.95;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Card */
+        .sop-card {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(15px);
+            border: 2px solid var(--gold);
+            border-radius: 40px;
+            padding: 3rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(184,134,11,0.3) inset;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sop-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, transparent 0%, rgba(184,134,11,0.05) 100%);
+            z-index: -1;
+        }
+
+        .sop-card h2 {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            text-align: center;
+            border-bottom: 2px solid var(--gold-soft);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Info Row */
+        .info-row {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        .info-item {
+            flex: 1 1 250px;
+        }
+        .info-item label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        .info-item input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            background: var(--offwhite);
+        }
+        .info-item input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(184,134,11,0.2);
+            background: var(--white);
+        }
+
+        /* قسم التوقيع */
+        .signature-row {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            background: var(--gold-soft);
+            padding: 1.5rem;
+            border-radius: 30px;
+        }
+        .signature-item {
+            flex: 1;
+        }
+        .signature-item label {
+            font-weight: 700;
+            color: var(--dark);
+        }
+        .signature-item input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        /* Checklist Sections */
+        .checklist-section {
+            margin-bottom: 2rem;
+            border: 2px solid var(--gold-soft);
+            border-radius: 30px;
+            padding: 1.5rem;
+        }
+        .section-title {
+            color: var(--gold);
+            font-weight: 900;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .checklist-item {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+        }
+        .item-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .item-row input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--gold);
+            cursor: pointer;
+        }
+        .item-row label {
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            flex: 1;
+        }
+        .risk-badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #111;
+        }
+        .risk-high { background: var(--risk-high); color: white; }
+        .risk-medium { background: var(--risk-medium); }
+        .risk-low { background: var(--risk-low); color: white; }
+
+        .notes-field {
+            margin-top: 0.5rem;
+            margin-right: 2.2rem;
+            width: calc(100% - 2.2rem);
+        }
+        .notes-field textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            font-family: 'Tajawal', sans-serif;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .recommendation-box {
+            margin-top: 0.5rem;
+            margin-right: 2.2rem;
+            padding: 0.8rem;
+            border-radius: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            font-size: 0.9rem;
+        }
+        .recommendation-box strong {
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .result-area {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: var(--gold-soft);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .score {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+        .evaluation {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        .overall-risk {
+            font-size: 1.5rem;
+            font-weight: 900;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+        }
+        .risk-level-high { background: var(--risk-high); color: white; }
+        .risk-level-medium { background: var(--risk-medium); color: #111; }
+        .risk-level-low { background: var(--risk-low); color: white; }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #111;
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 2.5rem;
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 5px 20px rgba(184,134,11,0.4);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #111, #222);
+            color: var(--gold);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(184,134,11,0.6);
+        }
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            border-radius: 50px;
+            padding: 1rem 2.5rem;
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .btn-secondary:hover {
+            background: var(--gold);
+            color: #111;
+            transform: translateY(-3px);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(145deg, #111, #1a1a1a);
+            color: #ddd;
+            padding: 3rem 1rem 2rem;
+            border-top: 3px solid var(--gold);
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .footer-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-social a {
+            color: var(--gold);
+            font-size: 1.8rem;
+            transition: 0.3s;
+        }
+        .footer-social a:hover {
+            color: var(--gold-light);
+            transform: translateY(-3px);
+        }
+
+        .footer-logo-box {
+            text-align: center;
+        }
+
+        .footer-logo-box h2 {
+            color: var(--gold);
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-logo-box div {
+            width: 60px;
+            height: 2px;
+            background: var(--gold);
+            margin: 0 auto;
+        }
+
+        .footer-payment .payment-card {
+            background: rgba(255,255,255,0.05);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-payment img {
+            height: 25px;
+            filter: brightness(0.9);
+            transition: 0.2s;
+        }
+        .footer-payment img:hover {
+            filter: brightness(1.2);
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid rgba(184,134,11,0.2);
+        }
+
+        .copyright {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #777;
+        }
+        .copyright span {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.8rem;
+            }
+            .logo {
+                flex-wrap: nowrap;
+                gap: 8px;
+                width: 100%;
+                justify-content: center;
+            }
+            .logo img { height: 35px; }
+            .logo h1 { font-size: 1rem; }
+            nav > div:last-child {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 6px;
+            }
+            nav a {
+                margin: 0;
+                font-size: 0.9rem;
+                padding: 4px 8px;
+                white-space: nowrap;
+            }
+            .hero-mini h2 { font-size: 2rem; }
+            .hero-mini p { font-size: 1rem; }
+            .sop-card { padding: 2rem 1.5rem; }
+            .footer-row { flex-direction: column; text-align: center; }
+            .footer-social { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- أشكال هندسية -->
+<div class="floating-shape shape-1"></div>
+<div class="floating-shape shape-2"></div>
+
+<!-- Navigation -->
+<nav>
+    <div class="logo">
+        <img src="https://lh3.googleusercontent.com/d/1e6u-DPTinDJl_Q9wW3QvGgzFbXO_2sXa" alt="FAROUK GRUP LOGO">
+        <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+    </div>
+    <div>
+        <a href="https://www.farouk-grup.com/"><i class="fas fa-home"></i> الرئيسية</a>
+        <a href="https://www.farouk-grup.com/Home/Contact-Us" style="color:var(--gold)"><i class="fas fa-phone-alt"></i> تواصل معنا</a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero-mini">
+    <h2>📋 إجراءات التشغيل القياسية SOPs </h2>
+    <p>ضمان أن كل مهمة (إدارية، تشغيلية، أو خدمية) - توصيات تصحيحية فورية - تقارير احترافية</p>
+</section>
+
+<!-- Main Container -->
+<div class="container">
+    <div class="sop-card" data-aos="fade-up">
+        <h2><i class="fas fa-clipboard-list"></i> نموذج التدقيق اليومي مع تحليل المخاطر</h2>
+
+        <!-- تاريخ واسم المسؤول -->
+        <div class="info-row">
+            <div class="info-item">
+                <label><i class="fas fa-calendar-alt"></i> التاريخ</label>
+                <input type="date" id="checkDate">
+            </div>
+            <div class="info-item">
+                <label><i class="fas fa-user-tie"></i> اسم المسؤول</label>
+                <input type="text" id="inspectorName" placeholder="أدخل الاسم">
+            </div>
+        </div>
+
+        <!-- قسم التوقيع -->
+        <div class="signature-row" id="signatureSection">
+            <div class="signature-item">
+                <label><i class="fas fa-pen"></i> اسم المسؤول (للتوقيع)</label>
+                <input type="text" id="signatureName" placeholder="الاسم كاملاً">
+            </div>
+            <div class="signature-item">
+                <label><i class="fas fa-signature"></i> التوقيع</label>
+                <input type="text" id="signature" placeholder="التوقيع الإلكتروني أو اليدوي">
+            </div>
+        </div>
+
+        <!-- أقسام SOPs مع مستويات الخطر وملاحظات وتوصيات -->
+        <div id="checklistContainer">
+            <!-- القسم 1: استلام المواد الخام -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-truck"></i> 1. استلام المواد الخام</div>
+                
+                <!-- بند 1.1 -->
+                <div class="checklist-item" id="item-sop1_1">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop1_1" class="sop-item" data-risk="high" data-id="sop1_1">
+                        <label for="sop1_1">فحص درجة حرارة الشاحنات المبردة (≤ 4°C) والمجمدة (≤ -18°C)</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop1_1" placeholder="ملاحظات (مثال: سجلنا 5 درجات للشاحنة المبردة)"></textarea>
+                    </div>
+                    <div id="recommendation-sop1_1" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 1.2 -->
+                <div class="checklist-item" id="item-sop1_2">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop1_2" class="sop-item" data-risk="medium" data-id="sop1_2">
+                        <label for="sop1_2">التحقق من سلامة العبوات وعدم وجود تلف أو تسرب</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop1_2" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop1_2" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 1.3 -->
+                <div class="checklist-item" id="item-sop1_3">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop1_3" class="sop-item" data-risk="high" data-id="sop1_3">
+                        <label for="sop1_3">مراجعة تواريخ الصلاحية والتأكد من صلاحيتها للاستخدام</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop1_3" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop1_3" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 1.4 -->
+                <div class="checklist-item" id="item-sop1_4">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop1_4" class="sop-item" data-risk="medium" data-id="sop1_4">
+                        <label for="sop1_4">وجود الشهادات الصحية للمنتجات الحيوانية إن وجدت</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop1_4" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop1_4" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 1.5 -->
+                <div class="checklist-item" id="item-sop1_5">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop1_5" class="sop-item" data-risk="medium" data-id="sop1_5">
+                        <label for="sop1_5">فصل المواد النيئة عن الجاهزة أثناء النقل والتسليم</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop1_5" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop1_5" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 1.6 -->
+                <div class="checklist-item" id="item-sop1_6">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop1_6" class="sop-item" data-risk="low" data-id="sop1_6">
+                        <label for="sop1_6">تسجيل بيانات الاستلام في السجل المخصص</label>
+                        <span class="risk-badge risk-low">خطر منخفض</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop1_6" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop1_6" class="recommendation-box" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- القسم 2: التخزين (جاف، مبرد، مجمد) -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-warehouse"></i> 2. التخزين</div>
+
+                <!-- بند 2.1 -->
+                <div class="checklist-item" id="item-sop2_1">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop2_1" class="sop-item" data-risk="medium" data-id="sop2_1">
+                        <label for="sop2_1">درجة حرارة المخازن الجافة بين 10-21°C مع تهوية مناسبة</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop2_1" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop2_1" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 2.2 -->
+                <div class="checklist-item" id="item-sop2_2">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop2_2" class="sop-item" data-risk="low" data-id="sop2_2">
+                        <label for="sop2_2">الرفوف مرتفعة عن الأرض (15-20 سم) لتسهيل التنظيف</label>
+                        <span class="risk-badge risk-low">خطر منخفض</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop2_2" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop2_2" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 2.3 -->
+                <div class="checklist-item" id="item-sop2_3">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop2_3" class="sop-item" data-risk="high" data-id="sop2_3">
+                        <label for="sop2_3">تسجيل درجة حرارة الثلاجات (≤ 4°C) مرتين يومياً</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop2_3" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop2_3" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 2.4 -->
+                <div class="checklist-item" id="item-sop2_4">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop2_4" class="sop-item" data-risk="high" data-id="sop2_4">
+                        <label for="sop2_4">تسجيل درجة حرارة المجمدات (≤ -18°C) مرتين يومياً</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop2_4" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop2_4" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 2.5 -->
+                <div class="checklist-item" id="item-sop2_5">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop2_5" class="sop-item" data-risk="medium" data-id="sop2_5">
+                        <label for="sop2_5">تخزين المواد النيئة في الرفوف السفلية (تحت المطبوخة)</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop2_5" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop2_5" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 2.6 -->
+                <div class="checklist-item" id="item-sop2_6">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop2_6" class="sop-item" data-risk="high" data-id="sop2_6">
+                        <label for="sop2_6">فصل المواد الكيميائية والمنظفات عن المواد الغذائية</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop2_6" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop2_6" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 2.7 -->
+                <div class="checklist-item" id="item-sop2_7">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop2_7" class="sop-item" data-risk="low" data-id="sop2_7">
+                        <label for="sop2_7">تطبيق نظام FIFO (الأول وارداً أول صادراً)</label>
+                        <span class="risk-badge risk-low">خطر منخفض</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop2_7" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop2_7" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 2.8 -->
+                <div class="checklist-item" id="item-sop2_8">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop2_8" class="sop-item" data-risk="medium" data-id="sop2_8">
+                        <label for="sop2_8">عدم تكديس المواد لمنع انسداد التبريد</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop2_8" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop2_8" class="recommendation-box" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- القسم 3: التحضير والتجهيز -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-kitchen-set"></i> 3. التحضير والتجهيز</div>
+
+                <!-- بند 3.1 -->
+                <div class="checklist-item" id="item-sop3_1">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop3_1" class="sop-item" data-risk="high" data-id="sop3_1">
+                        <label for="sop3_1">غسل اليدين بالماء والصابون لمدة 20 ثانية قبل البدء</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop3_1" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop3_1" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 3.2 -->
+                <div class="checklist-item" id="item-sop3_2">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop3_2" class="sop-item" data-risk="high" data-id="sop3_2">
+                        <label for="sop3_2">استخدام ألواح تقطيع منفصلة للحوم، دواجن، خضار، وأسماك</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop3_2" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop3_2" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 3.3 -->
+                <div class="checklist-item" id="item-sop3_3">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop3_3" class="sop-item" data-risk="high" data-id="sop3_3">
+                        <label for="sop3_3">تعقيم الأدوات والأسطح بعد تحضير المواد النيئة</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop3_3" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop3_3" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 3.4 -->
+                <div class="checklist-item" id="item-sop3_4">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop3_4" class="sop-item" data-risk="high" data-id="sop3_4">
+                        <label for="sop3_4">عدم ترك المواد القابلة للتلف خارج التبريد لأكثر من ساعتين</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop3_4" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop3_4" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 3.5 -->
+                <div class="checklist-item" id="item-sop3_5">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop3_5" class="sop-item" data-risk="medium" data-id="sop3_5">
+                        <label for="sop3_5">إذابة الأغذية المجمدة في الثلاجة أو الميكروويف فقط</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop3_5" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop3_5" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 3.6 -->
+                <div class="checklist-item" id="item-sop3_6">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop3_6" class="sop-item" data-risk="medium" data-id="sop3_6">
+                        <label for="sop3_6">تغطية الأغذية أثناء التحضير لحمايتها من التلوث</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop3_6" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop3_6" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 3.7 -->
+                <div class="checklist-item" id="item-sop3_7">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop3_7" class="sop-item" data-risk="medium" data-id="sop3_7">
+                        <label for="sop3_7">غسل الخضروات والفواكه جيداً بالماء الجاري</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop3_7" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop3_7" class="recommendation-box" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- القسم 4: الطهي وإعادة التسخين -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-fire"></i> 4. الطهي وإعادة التسخين</div>
+
+                <!-- بند 4.1 -->
+                <div class="checklist-item" id="item-sop4_1">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop4_1" class="sop-item" data-risk="high" data-id="sop4_1">
+                        <label for="sop4_1">وصول درجة حرارة قلب الدواجن إلى 74°C</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop4_1" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop4_1" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 4.2 -->
+                <div class="checklist-item" id="item-sop4_2">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop4_2" class="sop-item" data-risk="high" data-id="sop4_2">
+                        <label for="sop4_2">وصول درجة حرارة اللحوم المفرومة إلى 71°C</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop4_2" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop4_2" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 4.3 -->
+                <div class="checklist-item" id="item-sop4_3">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop4_3" class="sop-item" data-risk="high" data-id="sop4_3">
+                        <label for="sop4_3">وصول درجة حرارة الأسماك واللحوم الكاملة إلى 63°C</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop4_3" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop4_3" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 4.4 -->
+                <div class="checklist-item" id="item-sop4_4">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop4_4" class="sop-item" data-risk="high" data-id="sop4_4">
+                        <label for="sop4_4">إعادة تسخين الأطعمة المحفوظة إلى 74°C خلال ساعتين</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop4_4" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop4_4" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 4.5 -->
+                <div class="checklist-item" id="item-sop4_5">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop4_5" class="sop-item" data-risk="medium" data-id="sop4_5">
+                        <label for="sop4_5">تسجيل درجات حرارة الطهي في السجل اليومي</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop4_5" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop4_5" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 4.6 -->
+                <div class="checklist-item" id="item-sop4_6">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop4_6" class="sop-item" data-risk="medium" data-id="sop4_6">
+                        <label for="sop4_6">عدم إعادة تسخين الطعام أكثر من مرة واحدة</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop4_6" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop4_6" class="recommendation-box" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- القسم 5: التقديم والخدمة -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-utensils"></i> 5. التقديم والخدمة</div>
+
+                <!-- بند 5.1 -->
+                <div class="checklist-item" id="item-sop5_1">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop5_1" class="sop-item" data-risk="high" data-id="sop5_1">
+                        <label for="sop5_1">غسل اليدين قبل تجهيز أطباق التقديم</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop5_1" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop5_1" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 5.2 -->
+                <div class="checklist-item" id="item-sop5_2">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop5_2" class="sop-item" data-risk="high" data-id="sop5_2">
+                        <label for="sop5_2">استخدام أواني نظيفة ومعقمة لكل طبق</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop5_2" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop5_2" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 5.3 -->
+                <div class="checklist-item" id="item-sop5_3">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop5_3" class="sop-item" data-risk="high" data-id="sop5_3">
+                        <label for="sop5_3">الحفاظ على درجة حرارة الأطعمة الساخنة (≥ 60°C) أثناء التقديم</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop5_3" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop5_3" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 5.4 -->
+                <div class="checklist-item" id="item-sop5_4">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop5_4" class="sop-item" data-risk="high" data-id="sop5_4">
+                        <label for="sop5_4">الحفاظ على درجة حرارة الأطعمة الباردة (≤ 4°C) أثناء التقديم</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop5_4" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop5_4" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 5.5 -->
+                <div class="checklist-item" id="item-sop5_5">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop5_5" class="sop-item" data-risk="medium" data-id="sop5_5">
+                        <label for="sop5_5">عدم لمس الأجزاء الصالحة للأكل باليد مباشرة</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop5_5" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop5_5" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 5.6 -->
+                <div class="checklist-item" id="item-sop5_6">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop5_6" class="sop-item" data-risk="medium" data-id="sop5_6">
+                        <label for="sop5_6">تغطية الأطعمة المعروضة في البوفيه المفتوح</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop5_6" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop5_6" class="recommendation-box" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- القسم 6: التبريد وحفظ الأغذية -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-snowflake"></i> 6. التبريد وحفظ الأغذية</div>
+
+                <!-- بند 6.1 -->
+                <div class="checklist-item" id="item-sop6_1">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop6_1" class="sop-item" data-risk="high" data-id="sop6_1">
+                        <label for="sop6_1">تبريد الأطعمة الساخنة من 60°C إلى 20°C خلال ساعتين</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop6_1" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop6_1" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 6.2 -->
+                <div class="checklist-item" id="item-sop6_2">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop6_2" class="sop-item" data-risk="high" data-id="sop6_2">
+                        <label for="sop6_2">ثم من 20°C إلى 4°C خلال 4 ساعات إضافية</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop6_2" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop6_2" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 6.3 -->
+                <div class="checklist-item" id="item-sop6_3">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop6_3" class="sop-item" data-risk="medium" data-id="sop6_3">
+                        <label for="sop6_3">استخدام أوعية ضحلة للتبريد السريع (لا يزيد عمقها عن 10 سم)</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop6_3" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop6_3" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 6.4 -->
+                <div class="checklist-item" id="item-sop6_4">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop6_4" class="sop-item" data-risk="medium" data-id="sop6_4">
+                        <label for="sop6_4">تغطية الأطعمة بعد التبريد الكامل مع وضع تاريخ التصنيع</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop6_4" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop6_4" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 6.5 -->
+                <div class="checklist-item" id="item-sop6_5">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop6_5" class="sop-item" data-risk="high" data-id="sop6_5">
+                        <label for="sop6_5">عدم تخزين الأطعمة الساخنة مباشرة في الثلاجة</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop6_5" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop6_5" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 6.6 -->
+                <div class="checklist-item" id="item-sop6_6">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop6_6" class="sop-item" data-risk="high" data-id="sop6_6">
+                        <label for="sop6_6">مراقبة درجات حرارة الثلاجات والمجمدات وتسجيلها</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop6_6" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop6_6" class="recommendation-box" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- القسم 7: النظافة الشخصية للعاملين -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-user-shield"></i> 7. النظافة الشخصية</div>
+
+                <!-- بند 7.1 -->
+                <div class="checklist-item" id="item-sop7_1">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop7_1" class="sop-item" data-risk="high" data-id="sop7_1">
+                        <label for="sop7_1">ارتداء الزي الرسمي النظيف (شيفون، مئزر، قبعة)</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop7_1" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop7_1" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 7.2 -->
+                <div class="checklist-item" id="item-sop7_2">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop7_2" class="sop-item" data-risk="high" data-id="sop7_2">
+                        <label for="sop7_2">تغطية الشعر بالكامل (شبكة أو قبعة)</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop7_2" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop7_2" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 7.3 -->
+                <div class="checklist-item" id="item-sop7_3">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop7_3" class="sop-item" data-risk="medium" data-id="sop7_3">
+                        <label for="sop7_3">عدم ارتداء المجوهرات أو الساعات أثناء العمل</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop7_3" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop7_3" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 7.4 -->
+                <div class="checklist-item" id="item-sop7_4">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop7_4" class="sop-item" data-risk="medium" data-id="sop7_4">
+                        <label for="sop7_4">تقليم الأظافر وعدم وضع طلاء أظافر</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop7_4" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop7_4" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 7.5 -->
+                <div class="checklist-item" id="item-sop7_5">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop7_5" class="sop-item" data-risk="high" data-id="sop7_5">
+                        <label for="sop7_5">الإبلاغ عن الأمراض المعدية (إسهال، قيء، التهابات جلدية)</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop7_5" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop7_5" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 7.6 -->
+                <div class="checklist-item" id="item-sop7_6">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop7_6" class="sop-item" data-risk="high" data-id="sop7_6">
+                        <label for="sop7_6">غسل اليدين بعد استخدام الحمام، التدخين، الأكل، لمس النفايات</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop7_6" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop7_6" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 7.7 -->
+                <div class="checklist-item" id="item-sop7_7">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop7_7" class="sop-item" data-risk="medium" data-id="sop7_7">
+                        <label for="sop7_7">وجود معقم كحولي في متناول اليدين</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop7_7" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop7_7" class="recommendation-box" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- القسم 8: تنظيف وتعقيم المعدات والمرافق -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-broom"></i> 8. التنظيف والتعقيم</div>
+
+                <!-- بند 8.1 -->
+                <div class="checklist-item" id="item-sop8_1">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop8_1" class="sop-item" data-risk="high" data-id="sop8_1">
+                        <label for="sop8_1">تنظيف وتعقيم أسطح العمل بعد كل استخدام</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop8_1" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop8_1" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 8.2 -->
+                <div class="checklist-item" id="item-sop8_2">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop8_2" class="sop-item" data-risk="high" data-id="sop8_2">
+                        <label for="sop8_2">غسل وتعقيم الأحواض وأماكن غسل اليدين</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop8_2" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop8_2" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 8.3 -->
+                <div class="checklist-item" id="item-sop8_3">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop8_3" class="sop-item" data-risk="medium" data-id="sop8_3">
+                        <label for="sop8_3">تنظيف الأرضيات والجدران من بقايا الطعام فوراً</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop8_3" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop8_3" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 8.4 -->
+                <div class="checklist-item" id="item-sop8_4">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop8_4" class="sop-item" data-risk="high" data-id="sop8_4">
+                        <label for="sop8_4">استخدام مواد معقمة معتمدة وبالتركيز الصحيح</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop8_4" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop8_4" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 8.5 -->
+                <div class="checklist-item" id="item-sop8_5">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop8_5" class="sop-item" data-risk="medium" data-id="sop8_5">
+                        <label for="sop8_5">جدول تنظيف معلّق ويتم التوقيع عليه يومياً</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop8_5" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop8_5" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 8.6 -->
+                <div class="checklist-item" id="item-sop8_6">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop8_6" class="sop-item" data-risk="medium" data-id="sop8_6">
+                        <label for="sop8_6">تنظيف مراوح الشفط والمكيفات بشكل دوري</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop8_6" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop8_6" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 8.7 -->
+                <div class="checklist-item" id="item-sop8_7">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop8_7" class="sop-item" data-risk="high" data-id="sop8_7">
+                        <label for="sop8_7">غسل الأواني والمعدات في غسالة أطباق بدرجة حرارة لا تقل عن 60°C</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop8_7" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop8_7" class="recommendation-box" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- القسم 9: مكافحة الآفات -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-bug"></i> 9. مكافحة الآفات</div>
+
+                <!-- بند 9.1 -->
+                <div class="checklist-item" id="item-sop9_1">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop9_1" class="sop-item" data-risk="high" data-id="sop9_1">
+                        <label for="sop9_1">عدم وجود حشرات أو قوارض في المنشأة</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop9_1" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop9_1" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 9.2 -->
+                <div class="checklist-item" id="item-sop9_2">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop9_2" class="sop-item" data-risk="medium" data-id="sop9_2">
+                        <label for="sop9_2">سد جميع الفتحات والشقوق في الجدران والأبواب والنوافذ</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop9_2" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop9_2" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 9.3 -->
+                <div class="checklist-item" id="item-sop9_3">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop9_3" class="sop-item" data-risk="medium" data-id="sop9_3">
+                        <label for="sop9_3">تركيب مصائد ضوئية أو لاصقة في الأماكن المناسبة</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop9_3" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop9_3" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 9.4 -->
+                <div class="checklist-item" id="item-sop9_4">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop9_4" class="sop-item" data-risk="medium" data-id="sop9_4">
+                        <label for="sop9_4">وجود عقد مع شركة مكافحة آفات معتمدة وتنفيذ الزيارات الدورية</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop9_4" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop9_4" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 9.5 -->
+                <div class="checklist-item" id="item-sop9_5">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop9_5" class="sop-item" data-risk="high" data-id="sop9_5">
+                        <label for="sop9_5">التخلص الفوري من النفايات وتنظيف الحاويات يومياً</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop9_5" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop9_5" class="recommendation-box" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- القسم 10: التوثيق والتدريب -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-file-alt"></i> 10. التوثيق والتدريب</div>
+
+                <!-- بند 10.1 -->
+                <div class="checklist-item" id="item-sop10_1">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop10_1" class="sop-item" data-risk="high" data-id="sop10_1">
+                        <label for="sop10_1">تسجيل درجات حرارة الثلاجات والمجمدات يومياً</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop10_1" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop10_1" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 10.2 -->
+                <div class="checklist-item" id="item-sop10_2">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop10_2" class="sop-item" data-risk="high" data-id="sop10_2">
+                        <label for="sop10_2">تسجيل درجات حرارة الطهي والتبريد في السجلات</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop10_2" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop10_2" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 10.3 -->
+                <div class="checklist-item" id="item-sop10_3">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop10_3" class="sop-item" data-risk="medium" data-id="sop10_3">
+                        <label for="sop10_3">الاحتفاظ بسجلات الاستلام لمدة لا تقل عن 6 أشهر</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop10_3" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop10_3" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 10.4 -->
+                <div class="checklist-item" id="item-sop10_4">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop10_4" class="sop-item" data-risk="low" data-id="sop10_4">
+                        <label for="sop10_4">توقيع المسؤول على جميع السجلات يومياً</label>
+                        <span class="risk-badge risk-low">خطر منخفض</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop10_4" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop10_4" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 10.5 -->
+                <div class="checklist-item" id="item-sop10_5">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop10_5" class="sop-item" data-risk="high" data-id="sop10_5">
+                        <label for="sop10_5">جميع العاملين حاصلون على تدريب في سلامة الغذاء</label>
+                        <span class="risk-badge risk-high">خطر مرتفع</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop10_5" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop10_5" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 10.6 -->
+                <div class="checklist-item" id="item-sop10_6">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop10_6" class="sop-item" data-risk="medium" data-id="sop10_6">
+                        <label for="sop10_6">وجود تعليمات واضحة معلقة (غسل اليدين، درجات الحرارة)</label>
+                        <span class="risk-badge risk-medium">خطر متوسط</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop10_6" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop10_6" class="recommendation-box" style="display: none;"></div>
+                </div>
+
+                <!-- بند 10.7 -->
+                <div class="checklist-item" id="item-sop10_7">
+                    <div class="item-row">
+                        <input type="checkbox" id="sop10_7" class="sop-item" data-risk="low" data-id="sop10_7">
+                        <label for="sop10_7">عقد اجتماعات دورية للتذكير بإجراءات السلامة</label>
+                        <span class="risk-badge risk-low">خطر منخفض</span>
+                    </div>
+                    <div class="notes-field">
+                        <textarea id="note-sop10_7" placeholder="ملاحظات"></textarea>
+                    </div>
+                    <div id="recommendation-sop10_7" class="recommendation-box" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- نتيجة التقييم -->
+        <div class="result-area" id="resultArea" style="display: none;">
+            <div>
+                <span class="score" id="scoreDisplay">0%</span>
+                <span class="evaluation" id="evaluationText"></span>
+            </div>
+            <div id="overallRiskDisplay" class="overall-risk"></div>
+        </div>
+
+        <!-- الأزرار -->
+        <div class="btn-group">
+            <button class="btn-primary" id="calculateBtn"><i class="fas fa-calculator"></i> احسب النتيجة والتوصيات</button>
+            <button class="btn-secondary" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير Word</button>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-container">
+        <div class="footer-content">
+            <div class="footer-row">
+                <div class="footer-social">
+                    <a href="https://www.instagram.com/faroukazem/" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=100091571594026&sk=about" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://wa.me/905550196682" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                </div>
+
+                <div class="footer-logo-box">
+                    <h2>مجموعة فاروق للاستشارات والأعمال</h2>
+                    <div></div>
+                </div>
+
+                <div class="footer-payment">
+                    <div class="payment-card">
+                        <img src="https://img.icons8.com/color/48/visa.png" alt="Visa">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="copyright">
+                جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
+                <p>Adnan Kahveci, Beylikdüzü / İstanbul, Türkiye</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- AOS -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: true, offset: 100 });
+
+    // تعيين تاريخ اليوم تلقائياً
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('checkDate').value = today;
+
+    // ========== قاعدة بيانات التوصيات التصحيحية ==========
+    const correctiveActions = {
+        // القسم 1
+        sop1_1: { risk: "مرتفع", action: "يجب رفض المواد إذا كانت درجة حرارتها أعلى من 4°C للمبردة أو -18°C للمجمدة.", recommendation: "استخدم مقياس حرارة معاير وسجل درجة الحرارة. إذا كانت مرتفعة، أعِد الشحنة فوراً." },
+        sop1_2: { risk: "متوسط", action: "العبوات التالفة قد تسبب تلوثاً. يجب عزل المواد ذات العبوات التالفة.", recommendation: "افحص العبوات عند الاستلام. إذا وجدت تالفة، أعدها أو استخدمها فوراً بعد التأكد." },
+        sop1_3: { risk: "مرتفع", action: "المواد منتهية الصلاحية يجب عدم استخدامها أبداً.", recommendation: "تحقق من التواريخ قبل الاستلام. أي مادة منتهية يجب رفضها." },
+        sop1_4: { risk: "متوسط", action: "المواد عالية الخطورة (لحوم، دواجن) تحتاج شهادة صحية.", recommendation: "اطلب الشهادة من المورد واحتفظ بها في الملف." },
+        sop1_5: { risk: "متوسط", action: "المواد النيئة قد تلوث الجاهزة إذا لم تفصل.", recommendation: "خصص منطقة منفصلة في شاحنة التوصيل للمواد النيئة والجاهزة." },
+        sop1_6: { risk: "منخفض", action: "عدم تسجيل بيانات الاستلام قد يؤدي لفقدان معلومات مهمة.", recommendation: "التأكد من تعبئة سجل الاستلام يومياً وتوقيعه." },
+
+        // القسم 2
+        sop2_1: { risk: "متوسط", action: "درجة حرارة المخازن الجافة غير مناسبة قد تؤثر على جودة المواد.", recommendation: "ركب مقياس حرارة وسجل القراءات يومياً، واضبط التهوية." },
+        sop2_2: { risk: "منخفض", action: "الرفوف المنخفضة تصعب التنظيف وتسمح بتراكم الأوساخ.", recommendation: "ارفع الرفوف إلى 15-20 سم عن الأرض." },
+        sop2_3: { risk: "مرتفع", action: "عدم تسجيل حرارة الثلاجات قد يؤدي إلى فساد الأغذية.", recommendation: "سجل درجة الحرارة مرتين يومياً وتأكد من بقائها ≤ 4°C." },
+        sop2_4: { risk: "مرتفع", action: "ارتفاع درجة حرارة المجمدات عن -18°C يفسد الأغذية المجمدة.", recommendation: "راقب وسجل درجة الحرارة يومياً." },
+        sop2_5: { risk: "متوسط", action: "تخزين المواد النيئة فوق المطبوخة يسبب تلوثاً.", recommendation: "احرص على وضع النيء في الرفوف السفلية." },
+        sop2_6: { risk: "مرتفع", action: "المواد الكيميائية بجوار الغذاء خطر تلوث كيميائي.", recommendation: "خصص مكاناً منفصلاً للمواد الكيميائية بعيداً عن الغذاء." },
+        sop2_7: { risk: "منخفض", action: "عدم تطبيق FIFO قد يسبب انتهاء صلاحية مواد.", recommendation: "درب العاملين على وضع المواد الجديدة خلف القديمة." },
+        sop2_8: { risk: "متوسط", action: "التكديس يمنع دوران الهواء ويؤثر على التبريد.", recommendation: "اترك مسافات بين المواد لضمان التبريد الجيد." },
+
+        // القسم 3
+        sop3_1: { risk: "مرتفع", action: "عدم غسل اليدين ينقل الملوثات للأغذية.", recommendation: "تأكد من غسل اليدين بالماء والصابون لمدة 20 ثانية قبل البدء." },
+        sop3_2: { risk: "مرتفع", action: "استخدام لوح واحد للحوم والدواجن والخضار يسبب تلوثاً متقاطعاً.", recommendation: "خصص ألواح تقطيع مختلفة بألوان مختلفة وعلّق تعليمات." },
+        sop3_3: { risk: "مرتفع", action: "عدم تعقيم الأدوات بعد تحضير النيء يلوث الأغذية الأخرى.", recommendation: "عقم الأدوات فور الانتهاء من تحضير المواد النيئة." },
+        sop3_4: { risk: "مرتفع", action: "ترك المواد خارج التبريد أكثر من ساعتين ينمو البكتيريا.", recommendation: "أعد المواد إلى الثلاجة فوراً، ولا تتجاوز ساعتين." },
+        sop3_5: { risk: "متوسط", action: "إذابة الأغذية في درجة حرارة الغرفة ينمو البكتيريا.", recommendation: "أذب الأغذية في الثلاجة أو الميكروويف فقط." },
+        sop3_6: { risk: "متوسط", action: "الأغذية غير المغطاة قد تتلوث.", recommendation: "غطِّ الأغذية أثناء التحضير." },
+        sop3_7: { risk: "متوسط", action: "الخضروات غير المغسولة قد تنقل ملوثات.", recommendation: "اغسل الخضروات والفواكه جيداً بالماء الجاري." },
+
+        // القسم 4
+        sop4_1: { risk: "مرتفع", action: "الدواجن غير المطهية جيداً تحمل بكتيريا السالمونيلا.", recommendation: "اطه الدواجن حتى تصل درجة الحرارة الداخلية إلى 74°C." },
+        sop4_2: { risk: "مرتفع", action: "اللحوم المفرومة تحتاج 71°C لقتل البكتيريا.", recommendation: "استخدم مقياس حرارة وتحقق من درجة الحرارة." },
+        sop4_3: { risk: "مرتفع", action: "الأسماك غير المطهية جيداً قد تحمل طفيليات.", recommendation: "اطه الأسماك حتى 63°C." },
+        sop4_4: { risk: "مرتفع", action: "إعادة التسخين غير الكافية لا تقتل البكتيريا.", recommendation: "أعد التسخين إلى 74°C خلال ساعتين." },
+        sop4_5: { risk: "متوسط", action: "عدم تسجيل درجات الحرارة يصعب تتبع المخالفات.", recommendation: "سجل درجات حرارة الطهي في سجل يومي." },
+        sop4_6: { risk: "متوسط", action: "إعادة التسخين المتكرر يفسد الطعام وينمو البكتيريا.", recommendation: "لا تعِد تسخين الطعام أكثر من مرة واحدة." },
+
+        // القسم 5
+        sop5_1: { risk: "مرتفع", action: "تجهيز الأطباق بأيدٍ غير نظيفة يلوثها.", recommendation: "اغسل يديك جيداً قبل التقديم." },
+        sop5_2: { risk: "مرتفع", action: "أوانٍ غير نظيفة تنقل التلوث.", recommendation: "تأكد من نظافة وتعقيم الأواني قبل الاستخدام." },
+        sop5_3: { risk: "مرتفع", action: "الطعام البارد ينمو البكتيريا إذا انخفضت حرارته عن 60°C.", recommendation: "استخدم طاولات تسخين للحفاظ على الحرارة." },
+        sop5_4: { risk: "مرتفع", action: "الطعام البارد يجب أن يبقى تحت 4°C.", recommendation: "استخدم طاولات مبردة للسلطات والمقبلات." },
+        sop5_5: { risk: "متوسط", action: "لمس الطعام باليد ينقل الملوثات.", recommendation: "استخدم قفازات أو أدوات نظيفة." },
+        sop5_6: { risk: "متوسط", action: "الطعام المكشوف في البوفيه يتعرض للتلوث.", recommendation: "استخدم أغطية شفافة للأطعمة المعروضة." },
+
+        // القسم 6
+        sop6_1: { risk: "مرتفع", action: "التبريد البطيء يسمح بنمو البكتيريا.", recommendation: "برد الطعام من 60°C إلى 20°C خلال ساعتين." },
+        sop6_2: { risk: "مرتفع", action: "المرحلة الثانية من التبريد مهمة لمنع الفساد.", recommendation: "أكمل التبريد إلى 4°C خلال 4 ساعات إضافية." },
+        sop6_3: { risk: "متوسط", action: "الأوعية العميقة تبطئ التبريد.", recommendation: "استخدم أوعية ضحلة (عمق أقل من 10 سم)." },
+        sop6_4: { risk: "متوسط", action: "الطعام غير المغطى قد يمتص روائح أو يتلوث.", recommendation: "غطِّ الطعام بعد التبريد وضع تاريخ التصنيع." },
+        sop6_5: { risk: "مرتفع", action: "وضع الطعام الساخن في الثلاجة يرفع درجة حرارة الثلاجة.", recommendation: "برد الطعام أولاً ثم ضعه في الثلاجة." },
+        sop6_6: { risk: "مرتفع", action: "عدم المراقبة يفقد السيطرة على درجات الحرارة.", recommendation: "سجل درجات الحرارة مرتين يومياً." },
+
+        // القسم 7
+        sop7_1: { risk: "مرتفع", action: "الزي غير النظيف ينقل الأوساخ للطعام.", recommendation: "وفر زياً نظيفاً يومياً." },
+        sop7_2: { risk: "مرتفع", action: "الشعر قد يسقط في الطعام.", recommendation: "الزم العاملين بارتداء أغطية الشعر." },
+        sop7_3: { risk: "متوسط", action: "المجوهرات تحمل البكتيريا وقد تسقط في الطعام.", recommendation: "امنع ارتداء المجوهرات أثناء العمل." },
+        sop7_4: { risk: "متوسط", action: "الأظافر الطويلة أو المطلية تخفي البكتيريا.", recommendation: "شدد على تقليم الأظافر وعدم وضع طلاء." },
+        sop7_5: { risk: "مرتفع", action: "العامل المريض ينقل الأمراض للطعام.", recommendation: "اطلب من العاملين إبلاغ المشرف عن أي أعراض." },
+        sop7_6: { risk: "مرتفع", action: "عدم غسل اليدين بعد الحمام أو النفايات ينقل الجراثيم.", recommendation: "وفر أحواض غسيل وتعليمات واضحة." },
+        sop7_7: { risk: "متوسط", action: "نقص المعقم يقلل من نظافة اليدين.", recommendation: "وفر معقمات كحولية في أماكن العمل." },
+
+        // القسم 8
+        sop8_1: { risk: "مرتفع", action: "الأسطح غير النظيفة تلوث الطعام.", recommendation: "نظف وعقم أسطح العمل بعد كل استخدام." },
+        sop8_2: { risk: "مرتفع", action: "الأحواض القذرة تنشر البكتيريا.", recommendation: "نظف الأحواض يومياً وعقمها." },
+        sop8_3: { risk: "متوسط", action: "بقايا الطعام على الأرض تجذب الآفات.", recommendation: "نظف الأرضيات فوراً." },
+        sop8_4: { risk: "مرتفع", action: "استخدام مواد غير معتمدة أو بتركيز خاطئ لا يعقم.", recommendation: "استخدم مواد معقمة معتمدة واتبع التعليمات." },
+        sop8_5: { risk: "متوسط", action: "عدم وجود جدول تنظيف يؤدي إلى تراكم الأوساخ.", recommendation: "أعد جدول تنظيف يومي وأسبوعي ووقع عليه." },
+        sop8_6: { risk: "متوسط", action: "مراوح الشفط المتسخة تلوث الهواء.", recommendation: "نظف مراوح الشفط والمكيفات بشكل دوري." },
+        sop8_7: { risk: "مرتفع", action: "غسل الأواني بماء بارد لا يعقم.", recommendation: "تأكد أن غسالة الأطباق تعمل على 60°C على الأقل." },
+
+        // القسم 9
+        sop9_1: { risk: "مرتفع", action: "وجود آفات يشير إلى خلل في النظافة.", recommendation: "افحص المنشأة يومياً وأغلق أي مداخل." },
+        sop9_2: { risk: "متوسط", action: "الفتحات تسمح بدخول الحشرات.", recommendation: "سد جميع الفتحات في الجدران والأبواب." },
+        sop9_3: { risk: "متوسط", action: "عدم وجود مصائد يسمح بتكاثر الآفات.", recommendation: "ركب مصائد ضوئية أو لاصقة في الأماكن المناسبة." },
+        sop9_4: { risk: "متوسط", action: "مكافحة الآفات المهنية ضرورية.", recommendation: "احتفظ بعقد مع شركة مكافحة آفات معتمدة." },
+        sop9_5: { risk: "مرتفع", action: "النفايات المتراكمة تجذب الآفات.", recommendation: "تخلص من النفايات فوراً ونظف الحاويات." },
+
+        // القسم 10
+        sop10_1: { risk: "مرتفع", action: "عدم التسجيل يجعل من المستحيل تتبع الانحرافات.", recommendation: "سجل درجات حرارة الثلاجات والمجمدات يومياً." },
+        sop10_2: { risk: "مرتفع", action: "درجات الطهي والتبريد أساسية لسلامة الغذاء.", recommendation: "سجلها في سجل خاص." },
+        sop10_3: { risk: "متوسط", action: "فقدان سجلات الاستلام يعيق التتبع.", recommendation: "احتفظ بالسجلات لمدة 6 أشهر." },
+        sop10_4: { risk: "منخفض", action: "التوقيع يضمن المسؤولية.", recommendation: "اطلب توقيع المسؤول على جميع السجلات." },
+        sop10_5: { risk: "مرتفع", action: "العاملون غير المدربين يجهلون إجراءات السلامة.", recommendation: "قدم دورات تدريبية دورية." },
+        sop10_6: { risk: "متوسط", action: "غياب التعليمات يؤدي إلى نسيان الإجراءات.", recommendation: "علق تعليمات غسل اليدين ودرجات الحرارة." },
+        sop10_7: { risk: "منخفض", action: "الاجتماعات الدورية تذكر العاملين.", recommendation: "عقد اجتماعات أسبوعية للتوعية." }
+    };
+
+    // ========== إظهار التوصيات بناءً على حالة checkbox ==========
+    function setupRecommendations() {
+        const items = document.querySelectorAll('.sop-item');
+        items.forEach(item => {
+            item.addEventListener('change', function() {
+                const id = this.dataset.id;
+                const recBox = document.getElementById(`recommendation-${id}`);
+                if (!this.checked) {
+                    // غير مطابق -> أظهر التوصية
+                    const data = correctiveActions[id];
+                    if (data) {
+                        recBox.style.display = 'block';
+                        recBox.innerHTML = `
+                            <strong>⚠️ مستوى الخطر: ${data.risk}</strong><br>
+                            <strong>الإجراء التصحيحي:</strong> ${data.action}<br>
+                            <strong>التوصية:</strong> ${data.recommendation}
+                        `;
+                    } else {
+                        recBox.style.display = 'none';
+                    }
+                } else {
+                    // مطابق -> أخفِ التوصية
+                    recBox.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // ========== حساب النتيجة الإجمالية ومستوى الخطر العام ==========
+    document.getElementById('calculateBtn').addEventListener('click', function() {
+        const items = document.querySelectorAll('.sop-item');
+        let checked = 0;
+        let total = items.length;
+        items.forEach(item => {
+            if (item.checked) checked++;
+        });
+
+        const percent = Math.round((checked / total) * 100);
+        const resultArea = document.getElementById('resultArea');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const evaluationText = document.getElementById('evaluationText');
+        const overallRiskDisplay = document.getElementById('overallRiskDisplay');
+
+        resultArea.style.display = 'flex';
+        scoreDisplay.textContent = percent + '%';
+
+        // تقييم عام ومستوى الخطر
+        let evaluation = '';
+        let overallRiskLevel = '';
+        let riskClass = '';
+        if (percent === 100) {
+            evaluation = 'ممتاز! امتثال كامل لمعايير SOPs.';
+            overallRiskLevel = 'منخفض';
+            riskClass = 'risk-level-low';
+        } else if (percent >= 90) {
+            evaluation = 'جيد جداً، مع بعض التحسينات البسيطة.';
+            overallRiskLevel = 'منخفض';
+            riskClass = 'risk-level-low';
+        } else if (percent >= 75) {
+            evaluation = 'مقبول، لكن هناك ملاحظات يجب معالجتها.';
+            overallRiskLevel = 'متوسط';
+            riskClass = 'risk-level-medium';
+        } else if (percent >= 50) {
+            evaluation = 'تحتاج إلى تحسين كبير في عدة مجالات.';
+            overallRiskLevel = 'مرتفع';
+            riskClass = 'risk-level-high';
+        } else {
+            evaluation = 'غير مطابق للمعايير – خطر تشغيلي محتمل.';
+            overallRiskLevel = 'مرتفع جداً';
+            riskClass = 'risk-level-high';
+        }
+
+        evaluationText.textContent = evaluation;
+        overallRiskDisplay.textContent = `مستوى الخطر العام: ${overallRiskLevel}`;
+        overallRiskDisplay.className = `overall-risk ${riskClass}`;
+    });
+
+    // ========== تصدير Word مع جميع البيانات ==========
+    document.getElementById('exportWordBtn').addEventListener('click', function() {
+        const date = document.getElementById('checkDate').value;
+        const inspector = document.getElementById('inspectorName').value || 'غير محدد';
+        const signatureName = document.getElementById('signatureName')?.value || '';
+        const signature = document.getElementById('signature')?.value || '';
+
+        // جمع بنود الأقسام مع الملاحظات والتوصيات
+        const sections = document.querySelectorAll('.checklist-section');
+        let itemsHTML = '';
+        sections.forEach(section => {
+            const sectionTitle = section.querySelector('.section-title').innerText;
+            itemsHTML += `<h3 style="color:#b8860b; margin-top:20px;">${sectionTitle}</h3>`;
+
+            const checklistItems = section.querySelectorAll('.checklist-item');
+            checklistItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const label = item.querySelector('label').innerText;
+                const note = item.querySelector('textarea')?.value || '';
+                const riskBadge = item.querySelector('.risk-badge')?.innerText || '';
+                const status = checkbox.checked ? '✅ مطابق' : '❌ غير مطابق';
+                let recommendationText = '';
+                if (!checkbox.checked) {
+                    const id = checkbox.dataset.id;
+                    const data = correctiveActions[id];
+                    if (data) {
+                        recommendationText = `<p style="color:#856404;"><strong>التوصية:</strong> ${data.recommendation}</p>`;
+                    }
+                }
+
+                itemsHTML += `
+                    <div style="margin:10px 0; padding:10px; border-bottom:1px solid #eee;">
+                        <p><strong>${status}</strong> - ${label} (${riskBadge})</p>
+                        ${note ? `<p><strong>ملاحظات:</strong> ${note}</p>` : ''}
+                        ${recommendationText}
+                    </div>
+                `;
+            });
+        });
+
+        // النتيجة النهائية
+        const score = document.getElementById('scoreDisplay').textContent;
+        const evaluation = document.getElementById('evaluationText').textContent;
+        const overallRisk = document.getElementById('overallRiskDisplay').textContent;
+
+        const style = `
+            <style>
+                body { font-family: 'Tajawal', sans-serif; margin: 2rem; }
+                h1 { color: #b8860b; border-bottom: 2px solid #b8860b; }
+                .result { background: #fef6e6; padding: 1rem; border-right: 4px solid #b8860b; }
+                .signature { margin-top: 40px; display: flex; justify-content: space-between; }
+            </style>
+        `;
+
+        const content = `
+            <!DOCTYPE html>
+            <html dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <title>تقرير تدقيق SOPs المتقدم</title>
+                ${style}
+            </head>
+            <body>
+                <h1>📋 تقرير التدقيق اليومي لإجراءات التشغيل القياسية (SOPs) مع تحليل المخاطر</h1>
+                <p><strong>التاريخ:</strong> ${date}</p>
+                <p><strong>المسؤول:</strong> ${inspector}</p>
+                <hr>
+                ${itemsHTML}
+                <hr>
+                <div class="result">
+                    <h2>النتيجة النهائية</h2>
+                    <p style="font-size:1.5rem; font-weight:900;">${score}</p>
+                    <p>${evaluation}</p>
+                    <p>${overallRisk}</p>
+                </div>
+
+                <!-- توقيع المسؤول -->
+                <div class="signature">
+                    <div>
+                        <p><strong>اسم المسؤول:</strong> ${signatureName || inspector}</p>
+                    </div>
+                    <div>
+                        <p><strong>التوقيع:</strong> ${signature || "________________"}</p>
+                    </div>
+                </div>
+
+                <p style="margin-top:40px; color:#777;">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة</p>
+            </body>
+            </html>
+        `;
+
+        const blob = new Blob(['\uFEFF' + content], { type: 'application/msword' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `تقرير_SOPs_${date}.doc`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    });
+
+    // تفعيل التوصيات
+    setupRecommendations();
+</script>
+
+</body>
+</html>

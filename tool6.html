@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>تحليل المخاطر المتقدم (مونت كارلو) | FAROUK GRUP</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- AOS Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas لتصدير الرسم البياني -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --gold: #b8860b;
+            --gold-light: #d4b15a;
+            --gold-soft: rgba(184,134,11,0.1);
+            --dark: #0f0f0f;
+            --dark-light: #1a1a1a;
+            --white: #ffffff;
+            --offwhite: #f9f9f9;
+            --text: #333;
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(184,134,11,0.03) 0px, transparent 20px),
+                radial-gradient(circle at 90% 70%, rgba(184,134,11,0.03) 0px, transparent 25px),
+                repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 1px, transparent 1px, transparent 10px);
+            pointer-events: none; z-index: -1;
+        }
+        .floating-shape {
+            position: absolute;
+            width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%);
+            z-index: 0; pointer-events: none;
+        }
+        .shape-1 { top: -100px; right: -100px; animation: float 20s infinite ease-in-out; }
+        .shape-2 { bottom: -50px; left: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
+        @keyframes float {
+            0% { transform: translate(0,0) rotate(0deg); }
+            33% { transform: translate(30px,-30px) rotate(5deg); }
+            66% { transform: translate(-20px,20px) rotate(-5deg); }
+            100% { transform: translate(0,0) rotate(0deg); }
+        }
+        nav {
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+        }
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo img { height: 50px; width: auto; object-fit: contain; }
+        .logo h1 { font-family: 'Alexandria', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--gold); letter-spacing: 1px; }
+        nav a { text-decoration: none; color: #444; margin: 0 0.8rem; font-weight: 600; transition: 0.3s; }
+        nav a:hover { color: var(--gold); }
+        nav a i { margin-left: 5px; }
+        .hero-mini {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid var(--gold); position: relative; overflow: hidden;
+        }
+        .hero-mini::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
+            animation: rotate 40s linear infinite;
+        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .hero-mini h2 { font-size: 2.5rem; font-weight: 900; color: var(--gold-light); margin-bottom: 0.5rem; position: relative; z-index: 2; }
+        .hero-mini p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; opacity: 0.95; position: relative; z-index: 2; }
+        .calc-wrapper { max-width: 1200px; margin: 4rem auto; padding: 0 1.5rem; position: relative; z-index: 2; }
+        .calc-box {
+            background: rgba(255,255,255,0.9); backdrop-filter: blur(15px);
+            border: 2px solid var(--gold); border-radius: 40px; padding: 3rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(184,134,11,0.3) inset;
+            position: relative; overflow: hidden;
+        }
+        .calc-box::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, transparent 0%, rgba(184,134,11,0.05) 100%);
+            z-index: -1;
+        }
+        .featured-badge {
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #111; width: 100px; height: 100px; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900; border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 2rem; margin-bottom: 0.2rem; }
+        .featured-badge span { font-size: 0.9rem; text-align: center; }
+        .calc-box h2 { font-size: 2.2rem; font-weight: 900; color: var(--gold); margin-bottom: 2rem; text-align: center; }
+        .analysis-type {
+            display: flex; gap: 2rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap;
+        }
+        .analysis-option {
+            background: var(--gold-soft); border: 2px solid transparent; border-radius: 50px; padding: 0.8rem 2rem; cursor: pointer; transition: 0.3s; font-weight: 700;
+        }
+        .analysis-option.active {
+            border-color: var(--gold); background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #111;
+        }
+        .currency-row {
+            display: flex; align-items: center; justify-content: flex-start; gap: 1rem;
+            background: var(--gold-soft); padding: 0.8rem 1.5rem; border-radius: 50px; margin-bottom: 2rem; flex-wrap: wrap;
+        }
+        .currency-row select, .currency-row input {
+            width: 150px; padding: 0.5rem 1rem; border: 2px solid var(--gold); border-radius: 30px; background: white; font-weight: 700; font-family: 'Tajawal', sans-serif;
+        }
+        .currency-row input { width: 250px; }
+        .section-title-sm {
+            font-size: 1.5rem; font-weight: 900; color: var(--dark);
+            margin: 1.5rem 0 1rem 0; border-bottom: 2px solid var(--gold-soft); padding-bottom: 0.5rem;
+        }
+        .form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+        .form-group { flex: 1 1 200px; margin-bottom: 1rem; position: relative; }
+        label { display: block; margin-bottom: 0.3rem; font-weight: 700; color: var(--dark); font-size: 0.95rem; }
+        label i { color: var(--gold); margin-left: 0.4rem; }
+        input, select {
+            width: 100%; padding: 0.8rem 1rem; border: 2px solid #ddd; border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 1rem; transition: 0.3s; background: var(--offwhite);
+        }
+        input:focus, select:focus {
+            outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(184,134,11,0.2); background: var(--white);
+        }
+        .tooltip { position: relative; cursor: help; }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: var(--dark);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 130%; left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+            border: 1px solid var(--gold);
+            pointer-events: none;
+        }
+        .tooltip .tooltiptext::after {
+            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+            border-width: 5px; border-style: solid; border-color: var(--dark) transparent transparent transparent;
+        }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 1rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #111; font-weight: 900; font-size: 1.2rem; border: none; cursor: pointer;
+            transition: 0.3s; box-shadow: 0 5px 20px rgba(184,134,11,0.4); margin: 2rem 0;
+        }
+        .btn-calculate:hover {
+            background: linear-gradient(135deg, #111, #222); color: var(--gold);
+            transform: translateY(-3px); box-shadow: 0 10px 30px rgba(184,134,11,0.6);
+        }
+        .results-section { margin-top: 2rem; }
+        .results-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;
+        }
+        .result-card {
+            background: linear-gradient(135deg, #fefcf6 0%, #fff 100%);
+            border: 1px solid var(--gold-light); border-radius: 20px; padding: 1.5rem; text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s;
+        }
+        .result-card:hover { transform: translateY(-5px); border-color: var(--gold); box-shadow: 0 10px 25px rgba(184,134,11,0.15); }
+        .result-card i { font-size: 2rem; color: var(--gold); margin-bottom: 0.5rem; }
+        .result-card h4 { font-size: 1rem; font-weight: 700; color: #666; margin-bottom: 0.5rem; }
+        .result-card .value { font-size: 1.8rem; font-weight: 900; color: var(--gold); }
+        .result-card .unit { font-size: 0.9rem; color: #777; margin-right: 0.2rem; }
+        .table-container { overflow-x: auto; margin-top: 2rem; border: 1px solid var(--gold-light); border-radius: 20px; background: white; padding: 1rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        th { background: var(--gold-soft); color: var(--dark); font-weight: 900; padding: 0.75rem; border-bottom: 2px solid var(--gold); }
+        td { padding: 0.75rem; border-bottom: 1px solid #eee; text-align: center; }
+        .positive { color: #28a745; font-weight: 700; }
+        .negative { color: #dc3545; font-weight: 700; }
+        .export-btn, .export-word-btn {
+            border: none; border-radius: 50px; padding: 0.8rem 2rem; font-weight: 900; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 0.5rem;
+        }
+        .export-btn { background: #28a745; color: white; }
+        .export-btn:hover { background: #218838; transform: translateY(-2px); }
+        .export-word-btn { background: #1e4a7a; color: white; }
+        .export-word-btn:hover { background: #0e3a5a; transform: translateY(-2px); }
+        .chart-container { margin-top: 2rem; background: white; border-radius: 20px; padding: 1rem; border: 1px solid var(--gold-light); height: 300px; }
+        footer {
+            background: linear-gradient(145deg, #111, #1a1a1a); color: #ddd;
+            padding: 3rem 1rem 2rem; border-top: 3px solid var(--gold); margin-top: 4rem;
+        }
+        .footer-container { max-width: 1200px; margin: 0 auto; }
+        .footer-content { display: flex; flex-direction: column; gap: 2rem; }
+        .footer-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 2rem; }
+        .footer-social { display: flex; gap: 1.5rem; }
+        .footer-social a { color: var(--gold); font-size: 1.8rem; transition: 0.3s; }
+        .footer-social a:hover { color: var(--gold-light); transform: translateY(-3px); }
+        .footer-logo-box { text-align: center; }
+        .footer-logo-box h2 { color: var(--gold); font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .footer-logo-box div { width: 60px; height: 2px; background: var(--gold); margin: 0 auto; }
+        .footer-payment .payment-card {
+            background: rgba(255,255,255,0.05); padding: 0.8rem 1.5rem; border-radius: 50px;
+            display: flex; gap: 1.5rem; align-items: center; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .footer-payment img { height: 25px; filter: brightness(0.9); transition: 0.2s; }
+        .footer-payment img:hover { filter: brightness(1.2); }
+        hr { border: none; border-top: 1px solid rgba(184,134,11,0.2); }
+        .copyright { text-align: center; font-size: 0.9rem; color: #777; }
+        .copyright span { color: var(--gold); font-weight: bold; }
+        @media (max-width: 768px) {
+            nav { flex-direction: column; align-items: stretch; gap: 0.8rem; }
+            .logo { flex-wrap: nowrap; gap: 8px; width: 100%; justify-content: center; }
+            .logo img { height: 35px; }
+            .logo h1 { font-size: 1rem; }
+            nav > div:last-child { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+            nav a { margin: 0; font-size: 0.9rem; padding: 4px 8px; white-space: nowrap; }
+            .hero-mini h2 { font-size: 2rem; }
+            .hero-mini p { font-size: 1rem; }
+            .calc-box { padding: 2rem 1.5rem; }
+            .form-row { flex-direction: column; gap: 0; }
+            .featured-badge { width: 70px; height: 70px; }
+            .featured-badge i { font-size: 1.5rem; }
+            .featured-badge span { font-size: 0.7rem; }
+            .footer-row { flex-direction: column; text-align: center; }
+            .footer-social { justify-content: center; }
+        }
+        .hidden-section { display: none; }
+
+        /* أنماط الآلة الحاسبة المنبثقة (Modal) - مصغرة 30% */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: linear-gradient(145deg, #ffffff, #f5f5f5);
+            margin: 5% auto;
+            padding: 0;
+            border: 2px solid var(--gold);
+            border-radius: 30px;
+            width: 250px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            background: var(--gold-soft);
+            border-bottom: 2px solid var(--gold);
+            padding: 10px 15px;
+            border-radius: 28px 28px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h2 {
+            margin: 0;
+            color: var(--dark);
+            font-size: 1.1rem;
+            font-weight: 900;
+        }
+        .close {
+            color: #666;
+            float: left;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            line-height: 1;
+        }
+        .close:hover {
+            color: var(--gold);
+            transform: scale(1.1);
+        }
+        .modal-body {
+            padding: 15px;
+        }
+        .calc-display {
+            width: 100%;
+            height: 45px;
+            font-size: 1.5rem;
+            text-align: left;
+            padding: 0 10px;
+            border: 2px solid var(--gold-light);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            background: white;
+            font-family: 'Tajawal', monospace;
+            direction: ltr;
+        }
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+        .calc-btn {
+            background: white;
+            border: 2px solid var(--gold-light);
+            border-radius: 15px;
+            padding: 8px 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--dark);
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Tajawal', sans-serif;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+        }
+        .calc-btn:hover {
+            background: var(--gold);
+            color: white;
+            border-color: var(--gold);
+            transform: translateY(-2px);
+        }
+        .calc-btn.operator {
+            background: var(--gold-soft);
+            color: var(--gold);
+            font-weight: 900;
+            font-size: 1.2rem;
+        }
+        .calc-btn.operator:hover {
+            background: var(--gold);
+            color: white;
+        }
+        .calc-btn.equals {
+            background: var(--gold);
+            color: white;
+            grid-column: span 2;
+            border-color: var(--gold);
+        }
+        .calc-btn.equals:hover {
+            background: #a67c0a;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+
+    <nav>
+        <div class="logo">
+            <img src="https://lh3.googleusercontent.com/d/1e6u-DPTinDJl_Q9wW3QvGgzFbXO_2sXa" alt="FAROUK GRUP LOGO">
+            <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+        </div>
+        <div>
+            <a href="https://www.farouk-grup.com/"><i class="fas fa-home"></i> الرئيسية</a>
+            <a href="#" id="calculatorBtn" style="color:var(--gold)"><i class="fas fa-calculator"></i> آلة حاسبة</a>
+            <a href="https://www.farouk-grup.com/Home/Contact-Us" style="color:var(--gold)"><i class="fas fa-phone-alt"></i> تواصل معنا</a>
+        </div>
+    </nav>
+
+    <section class="hero-mini">
+        <h2>محاكاة المخاطر المتقدمة (Monte Carlo)</h2>
+        <p>اختر نوع التحليل: حساسية تقليدية أو محاكاة احتمالية بآلاف السيناريوهات</p>
+    </section>
+
+    <section class="calc-wrapper">
+        <div class="calc-box" data-aos="fade-up">
+            <div class="featured-badge">
+                <i class="fas fa-chart-line"></i>
+                <span>مونت كارلو</span>
+            </div>
+            <h2>تحليل المخاطر الاحتمالي</h2>
+
+            <!-- اختيار العملة واسم الجهة -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> العملة:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>دولار ($)</option>
+                    <option value="€">يورو (€)</option>
+                    <option value="₺">ليرة تركية (₺)</option>
+                    <option value="ج.م">جنيه مصري (ج.م)</option>
+                    <option value="د.ك">دينار كويتي (د.ك)</option>
+                    <option value="ر.س">ريال سعودي (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> اسم الجهة:</label>
+                <input type="text" id="companyName" value="شركة الأفق للتجارة" placeholder="الجهة المستفيدة">
+            </div>
+
+            <!-- اختيار نوع التحليل -->
+            <div class="analysis-type">
+                <div class="analysis-option active" id="optSensitivity" onclick="setAnalysisType('sensitivity')">
+                    <i class="fas fa-table"></i> تحليل حساسية (Two-Way)
+                </div>
+                <div class="analysis-option" id="optMonteCarlo" onclick="setAnalysisType('montecarlo')">
+                    <i class="fas fa-random"></i> محاكاة مونت كارلو
+                </div>
+            </div>
+
+            <!-- الحالة الأساسية (مشتركة) -->
+            <div class="section-title-sm">📈 الحالة الأساسية (Base Case)</div>
+            <div class="form-row">
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-coins"></i> الاستثمار الأولي</label>
+                    <input type="number" id="initialInvestment" value="545200" step="1000">
+                    <span class="tooltiptext">التكلفة الأولية للمشروع (رأس المال المستثمر).</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-chart-line"></i> الإيرادات السنوية (السنة الأولى)</label>
+                    <input type="number" id="annualRevenue" value="2640000" step="10000">
+                    <span class="tooltiptext">الإيرادات المتوقعة في السنة الأولى.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-file-alt"></i> التكاليف السنوية (السنة الأولى)</label>
+                    <input type="number" id="annualCosts" value="2851200" step="10000">
+                    <span class="tooltiptext">التكاليف التشغيلية في السنة الأولى (بدون إهلاك).</span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-chart-line"></i> الإهلاك السنوي</label>
+                    <input type="number" id="depreciation" value="18750" step="1000">
+                    <span class="tooltiptext">قيمة الإهلاك السنوي (ثابتة).</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-arrow-up"></i> نمو الإيرادات السنوي (%)</label>
+                    <input type="number" id="growthRevenue" value="10" step="0.1">
+                    <span class="tooltiptext">معدل النمو السنوي للإيرادات (مثل 10%).</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-arrow-down"></i> نمو التكاليف السنوي (%)</label>
+                    <input type="number" id="growthCosts" value="5" step="0.1">
+                    <span class="tooltiptext">معدل النمو السنوي للتكاليف (مثل 5%).</span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-percent"></i> معدل الخصم (%)</label>
+                    <input type="number" id="discountRate" value="10" step="0.1">
+                    <span class="tooltiptext">معدل العائد المطلوب (WACC).</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-percent"></i> معدل الضريبة (%)</label>
+                    <input type="number" id="taxRate" value="25" step="1">
+                    <span class="tooltiptext">نسبة ضريبة الدخل.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-calendar-alt"></i> عدد السنوات</label>
+                    <input type="number" id="years" value="8" min="1" max="30">
+                    <span class="tooltiptext">مدة المشروع بالسنوات.</span>
+                </div>
+            </div>
+
+            <!-- مدخلات تحليل الحساسية (تظهر افتراضياً) -->
+            <div id="sensitivityInputs" class="sensitivity-inputs">
+                <div class="section-title-sm">⚡ متغيرات الحساسية</div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-arrow-up"></i> التغير في الإيرادات (%)</label>
+                        <input type="number" id="revChange" value="10" step="1">
+                        <span class="tooltiptext">نسبة التغيير (10% تعني -10%، 0، +10%).</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-arrow-down"></i> التغير في التكاليف (%)</label>
+                        <input type="number" id="costChange" value="10" step="1">
+                        <span class="tooltiptext">نسبة التغيير في التكاليف.</span>
+                    </div>
+                </div>
+                <p style="color:var(--gold); font-size:0.9rem; margin-top:0.5rem;"><i class="fas fa-info-circle"></i> قم بتغيير القيم ثم اضغط على زر "تشغيل التحليل" لتحديث النتائج.</p>
+            </div>
+
+            <!-- مدخلات مونت كارلو (مخفية افتراضياً) -->
+            <div id="monteCarloInputs" class="monte-carlo-inputs hidden-section">
+                <div class="section-title-sm">🎲 معاملات محاكاة مونت كارلو</div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-chart-line"></i> تقلب الإيرادات (σ%)</label>
+                        <input type="number" id="revVolatility" value="15" step="1">
+                        <span class="tooltiptext">الانحراف المعياري السنوي للإيرادات (مقياس للمخاطر).</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-chart-line"></i> تقلب التكاليف (σ%)</label>
+                        <input type="number" id="costVolatility" value="10" step="1">
+                        <span class="tooltiptext">الانحراف المعياري السنوي للتكاليف.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-dice"></i> عدد التكرارات</label>
+                        <input type="number" id="numSimulations" value="5000" step="1000" min="1000" max="20000">
+                        <span class="tooltiptext">عدد السيناريوهات العشوائية (1000-20000).</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> تشغيل التحليل</button>
+
+            <!-- منطقة النتائج -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-cards" id="kpiCards"></div>
+
+                <!-- منطقة نتائج الحساسية (تظهر افتراضياً) -->
+                <div id="sensitivityResults">
+                    <div class="section-title-sm">📊 مصفوفة الحساسية ثنائية الاتجاه (NPV)</div>
+                    <div class="table-container" id="sensitivityTable"></div>
+                </div>
+
+                <!-- منطقة نتائج مونت كارلو (مخفية افتراضياً) -->
+                <div id="monteCarloResults" class="hidden-section">
+                    <div class="section-title-sm">📈 التوزيع الاحتمالي لصافي القيمة الحالية (NPV)</div>
+                    <div class="chart-container">
+                        <canvas id="npvHistogram"></canvas>
+                    </div>
+                    <div class="section-title-sm">📊 إحصائيات المخاطر</div>
+                    <div class="table-container" id="monteCarloStats"></div>
+                </div>
+
+                <!-- أزرار التصدير -->
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                    <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير النتائج</button>
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تقرير كامل</button>
+                </div>
+
+                <div class="section-title-sm">📝 تفسير النتائج</div>
+                <div class="result-card" id="interpretation" style="text-align:right;"></div>
+            </div>
+
+            <div id="initialMessage" style="margin-top:1rem; color:#666; text-align:center;">
+                <i class="fas fa-robot" style="color: var(--gold);"></i> سيتم عرض النتائج بعد الضغط على زر التحليل
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-row">
+                    <div class="footer-social">
+                        <a href="https://www.instagram.com/faroukazem/" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/profile.php?id=100091571594026&sk=about" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://wa.me/905550196682" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                    <div class="footer-logo-box">
+                        <h2>مجموعة فاروق للاستشارات والأعمال</h2>
+                        <div></div>
+                    </div>
+                    <div class="footer-payment">
+                        <div class="payment-card">
+                            <img src="https://img.icons8.com/color/48/visa.png" alt="Visa">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="copyright">
+                    جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
+                    <p>Adnan Kahveci, Beylikdüzü / İstanbul, Türkiye</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- نافذة الآلة الحاسبة المنبثقة (Modal) -->
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2><i class="fas fa-calculator" style="color: var(--gold);"></i> آلة حاسبة</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
+                    <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
+                    <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
+                    <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
+                    <button class="calc-btn" onclick="clearCalculator()">C</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
+                    <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
+                    <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
+                    <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true, offset: 100 });
+
+        let currentAnalysisType = 'sensitivity'; // 'sensitivity' or 'montecarlo'
+
+        window.setAnalysisType = function(type) {
+            currentAnalysisType = type;
+            document.getElementById('optSensitivity').classList.toggle('active', type === 'sensitivity');
+            document.getElementById('optMonteCarlo').classList.toggle('active', type === 'montecarlo');
+            
+            if (type === 'sensitivity') {
+                document.getElementById('sensitivityInputs').classList.remove('hidden-section');
+                document.getElementById('monteCarloInputs').classList.add('hidden-section');
+            } else {
+                document.getElementById('sensitivityInputs').classList.add('hidden-section');
+                document.getElementById('monteCarloInputs').classList.remove('hidden-section');
+            }
+        };
+
+        // قراءة البيانات من Query String (الرابط) عند تحميل الصفحة
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            const getParam = (key, defaultValue = '') => urlParams.get(key) || defaultValue;
+
+            const fixedCap = parseFloat(getParam('fixedCapital')) || 0;
+            const setupCap = parseFloat(getParam('setupCapital')) || 0;
+            if (fixedCap > 0 || setupCap > 0) {
+                document.getElementById('initialInvestment').value = fixedCap + setupCap;
+            }
+
+            const monthlySales = parseFloat(getParam('monthlySales')) || 0;
+            if (monthlySales > 0) {
+                document.getElementById('annualRevenue').value = monthlySales * 12;
+            }
+
+            const employees = parseFloat(getParam('employees')) || 0;
+            const netSalary = parseFloat(getParam('netSalary')) || 0;
+            const salaryBurden = parseFloat(getParam('salaryBurden')) || 1;
+            const netRent = parseFloat(getParam('netRent')) || 0;
+            const rentTax = parseFloat(getParam('rentTax')) || 0;
+            const opexMonthly = parseFloat(getParam('opexMonthly')) || 0;
+            const rawMaterialPercent = parseFloat(getParam('rawMaterialPercent')) || 0;
+            const monthlySalesForCost = monthlySales > 0 ? monthlySales : 0;
+
+            const salariesAnnual = employees * netSalary * salaryBurden * 12;
+            const rentAnnual = netRent * (1 + rentTax / 100) * 12;
+            const opexAnnual = opexMonthly * 12;
+            const rawMaterialsAnnual = monthlySalesForCost * rawMaterialPercent * 12;
+
+            const annualCosts = salariesAnnual + rentAnnual + opexAnnual + rawMaterialsAnnual;
+            if (annualCosts > 0) {
+                document.getElementById('annualCosts').value = annualCosts;
+            }
+
+            const fixedCapital = parseFloat(getParam('fixedCapital')) || 0;
+            const lifeYears = parseFloat(getParam('lifeYears')) || 8;
+            if (fixedCapital > 0 && lifeYears > 0) {
+                document.getElementById('depreciation').value = (fixedCapital / lifeYears).toFixed(0);
+            }
+
+            const growth = getParam('growthRate');
+            if (growth) document.getElementById('growthRevenue').value = growth;
+            const expGrowth = getParam('expGrowth');
+            if (expGrowth) document.getElementById('growthCosts').value = expGrowth;
+
+            const discount = getParam('discountRate');
+            if (discount) document.getElementById('discountRate').value = discount;
+
+            const tax = getParam('taxRate');
+            if (tax) document.getElementById('taxRate').value = tax;
+
+            const years = getParam('lifeYears');
+            if (years) document.getElementById('years').value = years;
+
+            const currency = getParam('currency');
+            if (currency) document.getElementById('currencySelect').value = currency;
+
+            if (urlParams.toString()) {
+                alert('✅ تم تحميل البيانات من دراسة الجدوى. يمكنك تعديلها ثم الضغط على تشغيل التحليل.');
+            }
+        });
+
+        // دوال التصدير
+        function exportToExcel() {
+            if (currentAnalysisType === 'sensitivity') {
+                const table = document.querySelector('#sensitivityTable table');
+                if (!table) { alert('لا يوجد جدول للتصدير.'); return; }
+                exportTableToCSV(table, 'تحليل_حساسية');
+            } else {
+                const table = document.querySelector('#monteCarloStats table');
+                if (!table) { alert('لا توجد إحصائيات للتصدير.'); return; }
+                exportTableToCSV(table, 'مونت_كارلو_احصائيات');
+            }
+        }
+
+        function exportTableToCSV(table, filename) {
+            const rows = [];
+            const headers = [];
+            table.querySelectorAll('thead th').forEach(th => headers.push(th.innerText));
+            rows.push(headers);
+            table.querySelectorAll('tbody tr').forEach(tr => {
+                const row = [];
+                tr.querySelectorAll('td').forEach(td => row.push(td.innerText));
+                rows.push(row);
+            });
+            let csvContent = rows.map(row => row.map(cell => cell.includes(',') ? `"${cell}"` : cell).join(',')).join('\n');
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0,10).replace(/-/g,'');
+            link.download = `${filename}_${dateStr}.csv`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // دالة تصدير Word المحسّنة (مثل اتفاقنا الأخير)
+        async function exportToWord() {
+            // التحقق من وجود نتائج
+            if (document.getElementById('resultsSection').style.display === 'none') {
+                alert('الرجاء إجراء التحليل أولاً.');
+                return;
+            }
+
+            try {
+                const currency = document.getElementById('currencySelect').value;
+                const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+                const investment = document.getElementById('initialInvestment').value;
+                const revenue = document.getElementById('annualRevenue').value;
+                const costs = document.getElementById('annualCosts').value;
+                const depr = document.getElementById('depreciation').value;
+                const discount = document.getElementById('discountRate').value;
+                const tax = document.getElementById('taxRate').value;
+                const years = document.getElementById('years').value;
+                const growthRev = document.getElementById('growthRevenue').value;
+                const growthCost = document.getElementById('growthCosts').value;
+
+                // التقاط صورة الرسم البياني إذا كان تحليل مونت كارلو
+                let chartImage = '';
+                if (currentAnalysisType === 'montecarlo') {
+                    const canvas = document.getElementById('npvHistogram');
+                    if (canvas) {
+                        const chartCanvas = await html2canvas(canvas, { scale: 2, backgroundColor: '#ffffff' });
+                        chartImage = chartCanvas.toDataURL('image/png');
+                    }
+                }
+
+                // جمع محتوى KPI cards (نأخذ أول بطاقتين فقط أو كلها)
+                const kpiCards = document.getElementById('kpiCards').innerHTML;
+
+                // بناء هيكل التقرير بنفس نمط حاسبة نقطة التعادل
+                const htmlContent = `
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                    <head>
+                        <meta charset='utf-8'>
+                        <title>تقرير تحليل المخاطر - FAROUK GRUP</title>
+                        <style>
+                            body { font-family: 'Arial', sans-serif; direction: rtl; text-align: right; margin: 2rem; }
+                            .report-header { text-align: center; border-bottom: 2px solid #b8860b; padding-bottom: 10px; margin-bottom: 20px; }
+                            h3 { color: #b8860b; margin-top: 25px; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 15px; direction: rtl; }
+                            th, td { border: 1px solid #b8860b; padding: 10px; text-align: center; }
+                            th { background-color: #fefcf6; color: #b8860b; font-weight: bold; }
+                            .footer { text-align: center; margin-top: 50px; font-size: 10pt; color: #888; border-top: 1px solid #eee; padding-top: 10px; }
+                            .chart-container { text-align: center; margin: 25px 0; }
+                            .chart-container img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 10px; }
+                            .result-card { background: #f9f9f9; border: 1px solid #b8860b; border-radius: 10px; padding: 1rem; margin: 1rem 0; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="report-header">
+                            <h1 style="color: #b8860b; margin: 0;">مجموعة فاروق للاستشارات والأعمال</h1>
+                            <h2 style="color: #333;">تقرير تحليل المخاطر (${currentAnalysisType === 'sensitivity' ? 'حساسية' : 'مونت كارلو'})</h2>
+                            <p>تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG')}</p>
+                            <p>الجهة: ${companyName}</p>
+                        </div>
+
+                        <h3>المعطيات الأساسية</h3>
+                        <table>
+                            <tr><th>البيان</th><th>القيمة</th></tr>
+                            <tr><td>الاستثمار الأولي</td><td>${currency} ${investment}</td></tr>
+                            <tr><td>الإيرادات السنوية (سنة 1)</td><td>${currency} ${revenue}</td></tr>
+                            <tr><td>التكاليف السنوية (سنة 1)</td><td>${currency} ${costs}</td></tr>
+                            <tr><td>الإهلاك السنوي</td><td>${currency} ${depr}</td></tr>
+                            <tr><td>نمو الإيرادات</td><td>${growthRev}%</td></tr>
+                            <tr><td>نمو التكاليف</td><td>${growthCost}%</td></tr>
+                            <tr><td>معدل الخصم</td><td>${discount}%</td></tr>
+                            <tr><td>معدل الضريبة</td><td>${tax}%</td></tr>
+                            <tr><td>عدد السنوات</td><td>${years}</td></tr>
+                        </table>
+
+                        <h3>مؤشرات الأداء الأساسية</h3>
+                        <div class="result-card">
+                            ${kpiCards}
+                        </div>
+
+                        ${currentAnalysisType === 'sensitivity' ? `
+                            <h3>مصفوفة الحساسية ثنائية الاتجاه (NPV)</h3>
+                            ${document.getElementById('sensitivityTable').innerHTML}
+                        ` : `
+                            <h3>إحصائيات المخاطر</h3>
+                            ${document.getElementById('monteCarloStats').innerHTML}
+                            ${chartImage ? `
+                                <h3>التوزيع الاحتمالي لـ NPV</h3>
+                                <div class="chart-container">
+                                    <img src="${chartImage}" alt="NPV Histogram">
+                                </div>
+                            ` : ''}
+                        `}
+
+                        <h3>تفسير النتائج</h3>
+                        <div class="result-card">
+                            ${document.getElementById('interpretation').innerHTML}
+                        </div>
+
+                        <div class="footer">
+                            تم استخراج هذا التقرير بواسطة مجموعة فاروق للاستشارات والأعمال - www.farouk-grup.com
+                        </div>
+                    </body>
+                    </html>
+                `;
+
+                const blob = new Blob(['\uFEFF' + htmlContent], { type: 'application/msword' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `تقرير_مخاطر_${companyName}.doc`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+
+            } catch (error) {
+                console.error('خطأ في تصدير Word:', error);
+                alert('حدث خطأ أثناء إنشاء التقرير. يرجى المحاولة مرة أخرى.');
+            }
+        }
+
+        // دوال حساب NPV و IRR (مع الأخذ في الاعتبار الإهلاك)
+        function computeNPV(initial, revenue0, costs0, depr, growthRev, growthCost, tax, years, discount) {
+            let npv = -initial;
+            for (let i = 1; i <= years; i++) {
+                let rev = revenue0 * Math.pow(1 + growthRev, i - 1);
+                let cost = costs0 * Math.pow(1 + growthCost, i - 1);
+                let ebit = rev - cost - depr;
+                let taxPaid = ebit > 0 ? ebit * tax : 0;
+                let cf = ebit - taxPaid + depr;  // صافي الربح + الإهلاك
+                npv += cf / Math.pow(1 + discount, i);
+            }
+            return npv;
+        }
+
+        function computeIRR(initial, revenue0, costs0, depr, growthRev, growthCost, tax, years) {
+            let npvFunc = (r) => {
+                let npv = -initial;
+                for (let i = 1; i <= years; i++) {
+                    let rev = revenue0 * Math.pow(1 + growthRev, i - 1);
+                    let cost = costs0 * Math.pow(1 + growthCost, i - 1);
+                    let ebit = rev - cost - depr;
+                    let taxPaid = ebit > 0 ? ebit * tax : 0;
+                    let cf = ebit - taxPaid + depr;
+                    npv += cf / Math.pow(1 + r, i);
+                }
+                return npv;
+            };
+            let low = -0.99, high = 10;
+            for (let iter = 0; iter < 100; iter++) {
+                let mid = (low + high) / 2;
+                if (npvFunc(mid) > 0) low = mid;
+                else high = mid;
+                if (high - low < 1e-6) return mid;
+            }
+            let final = (low + high) / 2;
+            return isFinite(final) ? final : 0;
+        }
+
+        // دالة لتوليد رقم عشوائي طبيعي (Box-Muller)
+        function normalRandom(mean = 0, std = 1) {
+            let u = 0, v = 0;
+            while(u === 0) u = Math.random();
+            while(v === 0) v = Math.random();
+            let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+            return mean + std * num;
+        }
+
+        // الحدث الرئيسي
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            const currency = document.getElementById('currencySelect').value;
+            const investment = parseFloat(document.getElementById('initialInvestment').value) || 0;
+            const revenue0 = parseFloat(document.getElementById('annualRevenue').value) || 0;
+            const costs0 = parseFloat(document.getElementById('annualCosts').value) || 0;
+            const depr = parseFloat(document.getElementById('depreciation').value) || 0;
+            const growthRev = parseFloat(document.getElementById('growthRevenue').value) / 100 || 0;
+            const growthCost = parseFloat(document.getElementById('growthCosts').value) / 100 || 0;
+            const discount = parseFloat(document.getElementById('discountRate').value) / 100 || 0;
+            const tax = parseFloat(document.getElementById('taxRate').value) / 100 || 0;
+            const years = parseInt(document.getElementById('years').value) || 8;
+
+            if (investment <= 0 || revenue0 <= 0) { alert('الرجاء إدخال قيم صحيحة'); return; }
+
+            const baseNPV = computeNPV(investment, revenue0, costs0, depr, growthRev, growthCost, tax, years, discount);
+            const baseIRR = computeIRR(investment, revenue0, costs0, depr, growthRev, growthCost, tax, years);
+
+            // تحديث KPI cards
+            document.getElementById('kpiCards').innerHTML = `
+                <div class="result-card">
+                    <i class="fas fa-coins"></i>
+                    <h4>NPV الأساسي</h4>
+                    <div class="value">${currency}${baseNPV.toFixed(0)}</div>
+                    <div class="unit">${baseNPV > 0 ? 'مربح' : 'غير مربح'}</div>
+                </div>
+                <div class="result-card">
+                    <i class="fas fa-percent"></i>
+                    <h4>IRR الأساسي</h4>
+                    <div class="value">${isFinite(baseIRR) ? (baseIRR*100).toFixed(2) : 'غير محدد'}%</div>
+                </div>
+            `;
+
+            document.getElementById('initialMessage').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
+
+            if (currentAnalysisType === 'sensitivity') {
+                // تحليل الحساسية ثنائي الاتجاه
+                document.getElementById('sensitivityResults').classList.remove('hidden-section');
+                document.getElementById('monteCarloResults').classList.add('hidden-section');
+
+                const revChange = parseFloat(document.getElementById('revChange').value) / 100 || 0;
+                const costChange = parseFloat(document.getElementById('costChange').value) / 100 || 0;
+
+                const revMultipliers = [1 - revChange, 1, 1 + revChange];
+                const costMultipliers = [1 - costChange, 1, 1 + costChange];
+                const revLabels = ['-' + (revChange*100).toFixed(0) + '%', '0%', '+' + (revChange*100).toFixed(0) + '%'];
+                const costLabels = ['-' + (costChange*100).toFixed(0) + '%', '0%', '+' + (costChange*100).toFixed(0) + '%'];
+
+                let matrix = [];
+                for (let i = 0; i < 3; i++) {
+                    let row = [];
+                    for (let j = 0; j < 3; j++) {
+                        let newRevenue0 = revenue0 * revMultipliers[i];
+                        let newCosts0 = costs0 * costMultipliers[j];
+                        let npv = computeNPV(investment, newRevenue0, newCosts0, depr, growthRev, growthCost, tax, years, discount);
+                        row.push(npv);
+                    }
+                    matrix.push(row);
+                }
+
+                let tableHtml = '<table><thead><tr><th>الإيرادات \\ التكاليف</th>';
+                costLabels.forEach(l => tableHtml += `<th>${l}</th>`);
+                tableHtml += '</tr></thead><tbody>';
+                for (let i = 0; i < 3; i++) {
+                    tableHtml += `<tr><td>${revLabels[i]}</td>`;
+                    for (let j = 0; j < 3; j++) {
+                        let npv = matrix[i][j];
+                        let npvClass = npv > 0 ? 'positive' : (npv < 0 ? 'negative' : '');
+                        tableHtml += `<td class="${npvClass}">${currency}${npv.toFixed(0)}</td>`;
+                    }
+                    tableHtml += '</tr>';
+                }
+                tableHtml += '</tbody></table>';
+                document.getElementById('sensitivityTable').innerHTML = tableHtml;
+
+                // تفسير النتائج
+                let maxNPV = Math.max(...matrix.flat());
+                let minNPV = Math.min(...matrix.flat());
+                let interpretation = `
+                    <p><i class="fas fa-chart-line" style="color:var(--gold);"></i> المشروع في الحالة الأساسية ${baseNPV > 0 ? 'مربح' : 'غير مربح'} (NPV = ${currency}${baseNPV.toFixed(0)}).</p>
+                    <p><i class="fas fa-balance-scale" style="color:var(--gold);"></i> أكثر سيناريو تفاؤلاً: إيرادات أعلى وتكاليف أقل (NPV = ${currency}${maxNPV.toFixed(0)}).</p>
+                    <p><i class="fas fa-exclamation-triangle" style="color:var(--gold);"></i> أكثر سيناريو تشاؤماً: إيرادات أقل وتكاليف أعلى (NPV = ${currency}${minNPV.toFixed(0)}).</p>
+                `;
+                document.getElementById('interpretation').innerHTML = interpretation;
+
+            } else {
+                // محاكاة مونت كارلو
+                document.getElementById('sensitivityResults').classList.add('hidden-section');
+                document.getElementById('monteCarloResults').classList.remove('hidden-section');
+
+                const revVol = parseFloat(document.getElementById('revVolatility').value) / 100 || 0.15;
+                const costVol = parseFloat(document.getElementById('costVolatility').value) / 100 || 0.10;
+                const numSims = parseInt(document.getElementById('numSimulations').value) || 5000;
+
+                let npvResults = [];
+
+                for (let sim = 0; sim < numSims; sim++) {
+                    // توليد قيم عشوائية للإيرادات والتكاليف للسنة الأولى (توزيع طبيعي)
+                    let randRev0 = revenue0 * (1 + normalRandom(0, revVol));
+                    let randCost0 = costs0 * (1 + normalRandom(0, costVol));
+                    
+                    randRev0 = Math.max(0, randRev0);
+                    randCost0 = Math.max(0, randCost0);
+                    
+                    let npv = computeNPV(investment, randRev0, randCost0, depr, growthRev, growthCost, tax, years, discount);
+                    npvResults.push(npv);
+                }
+
+                // ترتيب النتائج
+                npvResults.sort((a, b) => a - b);
+                
+                // حساب الإحصائيات
+                const meanNPV = npvResults.reduce((a, b) => a + b, 0) / numSims;
+                const medianNPV = npvResults[Math.floor(numSims / 2)];
+                const p5NPV = npvResults[Math.floor(numSims * 0.05)];
+                const p95NPV = npvResults[Math.floor(numSims * 0.95)];
+                const probLoss = (npvResults.filter(v => v < 0).length / numSims * 100).toFixed(2);
+                const stdNPV = Math.sqrt(npvResults.reduce((acc, v) => acc + Math.pow(v - meanNPV, 2), 0) / numSims);
+
+                // رسم الهيستوغرام
+                const ctx = document.getElementById('npvHistogram').getContext('2d');
+                
+                // إنشاء 30 فاصل
+                const minNPV = npvResults[0];
+                const maxNPV = npvResults[npvResults.length - 1];
+                const binWidth = (maxNPV - minNPV) / 30;
+                let bins = new Array(30).fill(0);
+                let binLabels = [];
+                
+                for (let i = 0; i < 30; i++) {
+                    let binStart = minNPV + i * binWidth;
+                    let binEnd = minNPV + (i + 1) * binWidth;
+                    binLabels.push(`${currency}${((binStart + binEnd) / 2 / 1000).toFixed(0)}ألف`);
+                    
+                    npvResults.forEach(v => {
+                        if (v >= binStart && v < binEnd) bins[i]++;
+                    });
+                }
+
+                if (window.npvChart) window.npvChart.destroy();
+                window.npvChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: binLabels,
+                        datasets: [{
+                            label: 'عدد السيناريوهات',
+                            data: bins,
+                            backgroundColor: 'rgba(184, 134, 11, 0.5)',
+                            borderColor: '#b8860b',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+
+                // عرض الإحصائيات
+                let statsHtml = `
+                    <table>
+                        <thead><tr><th>المؤشر</th><th>القيمة</th></tr></thead>
+                        <tbody>
+                            <tr><td>متوسط NPV</td><td class="${meanNPV > 0 ? 'positive' : 'negative'}">${currency}${meanNPV.toFixed(0)}</td></tr>
+                            <tr><td>الوسيط (Median NPV)</td><td class="${medianNPV > 0 ? 'positive' : 'negative'}">${currency}${medianNPV.toFixed(0)}</td></tr>
+                            <tr><td>أسوأ 5% (VaR 95%)</td><td class="negative">${currency}${p5NPV.toFixed(0)}</td></tr>
+                            <tr><td>أفضل 5%</td><td class="positive">${currency}${p95NPV.toFixed(0)}</td></tr>
+                            <tr><td>احتمالية الخسارة</td><td class="${probLoss > 50 ? 'negative' : 'positive'}">${probLoss}%</td></tr>
+                            <tr><td>الانحراف المعياري</td><td>${currency}${stdNPV.toFixed(0)}</td></tr>
+                        </tbody>
+                    </table>
+                `;
+                document.getElementById('monteCarloStats').innerHTML = statsHtml;
+
+                // تفسير النتائج
+                let interpretation = `
+                    <p><i class="fas fa-chart-line" style="color:var(--gold);"></i> متوسط NPV المتوقع: ${currency}${meanNPV.toFixed(0)} (${meanNPV > 0 ? 'مربح' : 'خاسر'})</p>
+                    <p><i class="fas fa-exclamation-triangle" style="color:var(--gold);"></i> هناك احتمال بنسبة ${probLoss}% أن يكون المشروع خاسراً.</p>
+                    <p><i class="fas fa-shield-alt" style="color:var(--gold);"></i> في أسوأ 5% من السيناريوهات، الخسارة قد تصل إلى ${currency}${Math.abs(p5NPV).toFixed(0)} (VaR 95%).</p>
+                    <p><i class="fas fa-chart-bar" style="color:var(--gold);"></i> الانحراف المعياري للـ NPV هو ${currency}${stdNPV.toFixed(0)}.</p>
+                `;
+                document.getElementById('interpretation').innerHTML = interpretation;
+            }
+        });
+
+        // ربط أزرار التصدير
+        document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+        document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+
+        // ------------------ آلة حاسبة منبثقة ------------------
+        const calcDisplay = document.getElementById('calcDisplay');
+        let currentCalcInput = '';
+
+        window.handleCalculatorInput = function(value) {
+            currentCalcInput += value;
+            calcDisplay.value = currentCalcInput;
+        }
+
+        window.clearCalculator = function() {
+            currentCalcInput = '';
+            calcDisplay.value = '';
+        }
+
+        window.backspaceCalculator = function() {
+            currentCalcInput = currentCalcInput.slice(0, -1);
+            calcDisplay.value = currentCalcInput;
+        }
+
+        window.calculateCalculatorResult = function() {
+            try {
+                let expression = currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/');
+                let result = eval(expression);
+                calcDisplay.value = result;
+                currentCalcInput = result.toString();
+            } catch (e) {
+                calcDisplay.value = 'خطأ';
+                currentCalcInput = '';
+            }
+        }
+
+        function handleKeyboard(e) {
+            if (modal.style.display !== 'block') return;
+            const key = e.key;
+            e.preventDefault();
+            e.stopPropagation();
+            if (key >= '0' && key <= '9') handleCalculatorInput(key);
+            else if (key === '.') handleCalculatorInput('.');
+            else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
+            else if (key === 'Enter' || key === '=') calculateCalculatorResult();
+            else if (key === 'Backspace') backspaceCalculator();
+            else if (key === 'Escape') modal.style.display = 'none';
+            else if (key === 'c' || key === 'C') clearCalculator();
+        }
+
+        document.addEventListener('keydown', handleKeyboard);
+
+        const modal = document.getElementById('calculatorModal');
+        const btn = document.getElementById('calculatorBtn');
+        const span = document.getElementsByClassName('close')[0];
+
+        btn.onclick = function(e) {
+            e.preventDefault();
+            modal.style.display = 'block';
+        }
+
+        span.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

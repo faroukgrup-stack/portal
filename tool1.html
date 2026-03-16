@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دراسة الجدوى المالية الشاملة | FAROUK GRUP</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<!-- مكتبة الرسوم البيانية (Chart.js) و html2canvas لتصدير Word -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* جميع الأنماط كما هي (لم تتغير) */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --gold: #b8860b;
+    --gold-light: #d4b15a;
+    --gold-soft: rgba(184,134,11,0.1);
+    --dark: #0f0f0f;
+    --dark-light: #1a1a1a;
+    --white: #ffffff;
+    --offwhite: #f9f9f9;
+    --text: #333;
+}
+body {
+    font-family: 'Tajawal', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    position: relative;
+}
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(184,134,11,0.03) 0px, transparent 20px),
+        radial-gradient(circle at 90% 70%, rgba(184,134,11,0.03) 0px, transparent 25px),
+        repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 1px, transparent 1px, transparent 10px);
+    pointer-events: none; z-index: -1;
+}
+.floating-shape {
+    position: absolute;
+    width: 300px; height: 300px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%);
+    z-index: 0; pointer-events: none;
+}
+.shape-1 { top: -100px; right: -100px; animation: float 20s infinite ease-in-out; }
+.shape-2 { bottom: -50px; left: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
+@keyframes float {
+    0% { transform: translate(0,0) rotate(0deg); }
+    33% { transform: translate(30px,-30px) rotate(5deg); }
+    66% { transform: translate(-20px,20px) rotate(-5deg); }
+    100% { transform: translate(0,0) rotate(0deg); }
+}
+nav {
+    background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+    padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+}
+.logo { display: flex; align-items: center; gap: 15px; }
+.logo img { height: 50px; width: auto; object-fit: contain; }
+.logo h1 { font-family: 'Alexandria', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--gold); letter-spacing: 1px; }
+nav a { text-decoration: none; color: #444; margin: 0 0.8rem; font-weight: 600; transition: 0.3s; }
+nav a:hover { color: var(--gold); }
+nav a i { margin-left: 5px; }
+.hero-mini {
+    background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+    color: white; text-align: center; padding: 3rem 1rem;
+    border-bottom: 4px solid var(--gold); position: relative; overflow: hidden;
+}
+.hero-mini::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
+    animation: rotate 40s linear infinite;
+}
+@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.hero-mini h2 { font-size: 2.5rem; font-weight: 900; color: var(--gold-light); margin-bottom: 0.5rem; position: relative; z-index: 2; }
+.hero-mini p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; opacity: 0.95; position: relative; z-index: 2; }
+.calc-wrapper { max-width: 1200px; margin: 4rem auto; padding: 0 1.5rem; position: relative; z-index: 2; }
+.calc-box {
+    background: rgba(255,255,255,0.9); backdrop-filter: blur(15px);
+    border: 2px solid var(--gold); border-radius: 40px; padding: 3rem;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(184,134,11,0.3) inset;
+    position: relative; overflow: hidden;
+}
+.calc-box::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, transparent 0%, rgba(184,134,11,0.05) 100%);
+    z-index: -1;
+}
+.featured-badge {
+    position: absolute; top: -10px; left: -10px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: #111; width: 100px; height: 100px; border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900; border: 3px solid white; z-index: 10;
+}
+.featured-badge i { font-size: 2rem; margin-bottom: 0.2rem; }
+.featured-badge span { font-size: 0.9rem; text-align: center; }
+.calc-box h2 { font-size: 2.2rem; font-weight: 900; color: var(--gold); margin-bottom: 2rem; text-align: center; }
+
+.currency-row {
+    display: flex; align-items: center; justify-content: flex-start; gap: 1rem;
+    background: var(--gold-soft); padding: 0.8rem 1.5rem; border-radius: 50px;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+.currency-row label { font-weight: 900; color: var(--dark); margin: 0; }
+.currency-row select, .currency-row input {
+    width: 150px; padding: 0.5rem 1rem; border: 2px solid var(--gold); border-radius: 30px;
+    font-family: 'Tajawal', sans-serif; font-weight: 700; background: white;
+}
+.currency-row input { width: 250px; }
+
+.section-title-sm {
+    font-size: 1.5rem; font-weight: 900; color: var(--dark);
+    margin: 1.5rem 0 1rem 0; border-bottom: 2px solid var(--gold-soft); padding-bottom: 0.5rem;
+}
+.form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+.form-group { flex: 1 1 200px; margin-bottom: 1rem; position: relative; }
+label { display: block; margin-bottom: 0.3rem; font-weight: 700; color: var(--dark); font-size: 0.95rem; }
+label i { color: var(--gold); margin-left: 0.4rem; }
+input, select {
+    width: 100%; padding: 0.8rem 1rem; border: 2px solid #ddd; border-radius: 30px;
+    font-family: 'Tajawal', sans-serif; font-size: 1rem; transition: 0.3s; background: var(--offwhite);
+}
+input:focus, select:focus {
+    outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(184,134,11,0.2); background: var(--white);
+}
+.tooltip {
+    position: relative;
+    cursor: help;
+}
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 220px;
+    background-color: var(--dark);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 130%; left: 50%;
+    margin-left: -110px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.85rem;
+    border: 1px solid var(--gold);
+    pointer-events: none;
+}
+.tooltip .tooltiptext::after {
+    content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+    border-width: 5px; border-style: solid; border-color: var(--dark) transparent transparent transparent;
+}
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+.btn-calculate {
+    display: flex; align-items: center; justify-content: center; gap: 1rem;
+    width: 100%; padding: 1.2rem; border-radius: 50px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: #111; font-weight: 900; font-size: 1.2rem; border: none; cursor: pointer;
+    transition: 0.3s; box-shadow: 0 5px 20px rgba(184,134,11,0.4); margin: 2rem 0;
+}
+.btn-calculate:hover {
+    background: linear-gradient(135deg, #111, #222); color: var(--gold);
+    transform: translateY(-3px); box-shadow: 0 10px 30px rgba(184,134,11,0.6);
+}
+.results-section { margin-top: 2rem; }
+.results-cards {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;
+}
+.result-card {
+    background: linear-gradient(135deg, #fefcf6 0%, #fff 100%);
+    border: 1px solid var(--gold-light); border-radius: 20px; padding: 1.5rem; text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s;
+}
+.result-card:hover {
+    transform: translateY(-5px); border-color: var(--gold); box-shadow: 0 10px 25px rgba(184,134,11,0.15);
+}
+.result-card i { font-size: 2rem; color: var(--gold); margin-bottom: 0.5rem; }
+.result-card h4 { font-size: 1rem; font-weight: 700; color: #666; margin-bottom: 0.5rem; }
+.result-card .value { font-size: 1.8rem; font-weight: 900; color: var(--gold); }
+.result-card .unit { font-size: 0.9rem; color: #777; margin-right: 0.2rem; }
+.result-card .status {
+    font-size: 0.9rem; margin-top: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 20px; display: inline-block;
+}
+.status-good { background: #28a745; color: white; }
+.status-bad { background: #dc3545; color: white; }
+.status-warning { background: #ffc107; color: #111; }
+.table-container { overflow-x: auto; margin-top: 2rem; border: 1px solid var(--gold-light); border-radius: 20px; background: white; padding: 1rem; max-height: 400px; overflow-y: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th { background: var(--gold-soft); color: var(--dark); font-weight: 900; padding: 0.75rem; border-bottom: 2px solid var(--gold); position: sticky; top: 0; background: white; z-index: 1; }
+td { padding: 0.75rem; border-bottom: 1px solid #eee; text-align: center; }
+tr:last-child td { border-bottom: none; }
+.positive { color: #28a745; font-weight: 700; }
+.negative { color: #dc3545; font-weight: 700; }
+
+.export-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.8rem 2rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0.5rem 0 0;
+}
+.export-btn:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+.export-word-btn {
+    background: #1e4a7a;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.8rem 2rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0.5rem 0 0;
+}
+.export-word-btn:hover {
+    background: #0e3a5a;
+    transform: translateY(-2px);
+}
+.export-pdf-btn {
+    background: #b8860b;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.8rem 2rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0.5rem 0 0;
+}
+.export-pdf-btn:hover {
+    background: #8b1a1a;
+    transform: translateY(-2px);
+}
+.export-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+}
+
+/* أنماط الرسوم البيانية */
+.charts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+.chart-card {
+    background: white;
+    border: 1px solid var(--gold-light);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+.chart-card h3 {
+    color: var(--gold);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 300px;
+}
+
+/* أنماط تحليل السيناريوهات */
+.scenario-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+.scenario-card {
+    background: linear-gradient(145deg, #fefcf6, #fff);
+    border: 2px solid;
+    border-radius: 20px;
+    padding: 1.5rem;
+    text-align: center;
+}
+.scenario-card.optimistic { border-color: #28a745; }
+.scenario-card.expected { border-color: #ffc107; }
+.scenario-card.pessimistic { border-color: #dc3545; }
+.scenario-card h4 { font-size: 1.3rem; margin-bottom: 1rem; }
+.scenario-card .value { font-size: 1.5rem; font-weight: 900; }
+.scenario-card .label { color: #666; margin-top: 0.5rem; }
+
+footer {
+    background: linear-gradient(145deg, #111, #1a1a1a); color: #ddd;
+    padding: 3rem 1rem 2rem; border-top: 3px solid var(--gold); margin-top: 4rem;
+}
+.footer-container { max-width: 1200px; margin: 0 auto; }
+.footer-content { display: flex; flex-direction: column; gap: 2rem; }
+.footer-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 2rem; }
+.footer-social { display: flex; gap: 1.5rem; }
+.footer-social a { color: var(--gold); font-size: 1.8rem; transition: 0.3s; }
+.footer-social a:hover { color: var(--gold-light); transform: translateY(-3px); }
+.footer-logo-box { text-align: center; }
+.footer-logo-box h2 { color: var(--gold); font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; }
+.footer-logo-box div { width: 60px; height: 2px; background: var(--gold); margin: 0 auto; }
+.footer-payment .payment-card {
+    background: rgba(255,255,255,0.05); padding: 0.8rem 1.5rem; border-radius: 50px;
+    display: flex; gap: 1.5rem; align-items: center; border: 1px solid rgba(255,255,255,0.1);
+}
+.footer-payment img { height: 25px; filter: brightness(0.9); transition: 0.2s; }
+.footer-payment img:hover { filter: brightness(1.2); }
+hr { border: none; border-top: 1px solid rgba(184,134,11,0.2); }
+.copyright { text-align: center; font-size: 0.9rem; color: #777; }
+.copyright span { color: var(--gold); font-weight: bold; }
+@media (max-width: 768px) {
+    nav { flex-direction: column; align-items: stretch; gap: 0.8rem; }
+    .logo { flex-wrap: nowrap; gap: 8px; width: 100%; justify-content: center; }
+    .logo img { height: 35px; }
+    .logo h1 { font-size: 1rem; }
+    nav > div:last-child { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+    nav a { margin: 0; font-size: 0.9rem; padding: 4px 8px; white-space: nowrap; }
+    .hero-mini h2 { font-size: 2rem; }
+    .hero-mini p { font-size: 1rem; }
+    .calc-box { padding: 2rem 1.5rem; }
+    .form-row { flex-direction: column; gap: 0; }
+    .featured-badge { width: 70px; height: 70px; }
+    .featured-badge i { font-size: 1.5rem; }
+    .featured-badge span { font-size: 0.7rem; }
+    .footer-row { flex-direction: column; text-align: center; }
+    .footer-social { justify-content: center; }
+    .footer-payment { justify-content: center; }
+}
+
+/* أنماط الآلة الحاسبة المنبثقة (Modal) - مصغرة 30% */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+}
+.modal-content {
+    background: linear-gradient(145deg, #ffffff, #f5f5f5);
+    margin: 5% auto;
+    padding: 0;
+    border: 2px solid var(--gold);
+    border-radius: 30px;
+    width: 250px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    animation: slideIn 0.3s ease-out;
+}
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.modal-header {
+    background: var(--gold-soft);
+    border-bottom: 2px solid var(--gold);
+    padding: 10px 15px;
+    border-radius: 28px 28px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.modal-header h2 {
+    margin: 0;
+    color: var(--dark);
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+.close {
+    color: #666;
+    float: left;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    line-height: 1;
+}
+.close:hover {
+    color: var(--gold);
+    transform: scale(1.1);
+}
+.modal-body {
+    padding: 15px;
+}
+.calc-display {
+    width: 100%;
+    height: 45px;
+    font-size: 1.5rem;
+    text-align: left;
+    padding: 0 10px;
+    border: 2px solid var(--gold-light);
+    border-radius: 20px;
+    margin-bottom: 15px;
+    background: white;
+    font-family: 'Tajawal', monospace;
+    direction: ltr;
+}
+.calc-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+}
+.calc-btn {
+    background: white;
+    border: 2px solid var(--gold-light);
+    border-radius: 15px;
+    padding: 8px 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dark);
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: 'Tajawal', sans-serif;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+}
+.calc-btn:hover {
+    background: var(--gold);
+    color: white;
+    border-color: var(--gold);
+    transform: translateY(-2px);
+}
+.calc-btn.operator {
+    background: var(--gold-soft);
+    color: var(--gold);
+    font-weight: 900;
+    font-size: 1.2rem;
+}
+.calc-btn.operator:hover {
+    background: var(--gold);
+    color: white;
+}
+.calc-btn.equals {
+    background: var(--gold);
+    color: white;
+    grid-column: span 2;
+    border-color: var(--gold);
+}
+.calc-btn.equals:hover {
+    background: #a67c0a;
+}
+</style>
+</head>
+<body>
+<div class="floating-shape shape-1"></div>
+<div class="floating-shape shape-2"></div>
+
+<nav>
+    <div class="logo">
+        <img src="https://lh3.googleusercontent.com/d/1e6u-DPTinDJl_Q9wW3QvGgzFbXO_2sXa" alt="FAROUK GRUP LOGO">
+        <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+    </div>
+    <div>
+        <a href="https://www.farouk-grup.com/"><i class="fas fa-home"></i> الرئيسية</a>
+        <a href="#" id="calculatorBtn" style="color:var(--gold)"><i class="fas fa-calculator"></i> آلة حاسبة</a>
+        <a href="https://www.farouk-grup.com/Home/Contact-Us" style="color:var(--gold)"><i class="fas fa-phone-alt"></i> تواصل معنا</a>
+    </div>
+</nav>
+
+<section class="hero-mini">
+    <h2>دراسة الجدوى المالية الشاملة</h2>
+    <p>تحليل متكامل – رأس المال العامل، تقييم الاستثمار، المؤشرات، نقطة التعادل</p>
+</section>
+
+<section class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <div class="featured-badge">
+            <i class="fas fa-chart-pie"></i>
+            <span>جدوى</span>
+        </div>
+        <h2>البيانات الأساسية للمشروع</h2>
+
+        <!-- اختيار العملة واسم الجهة -->
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> العملة:</label>
+            <select id="currencySelect">
+                <option value="$" selected>دولار ($)</option>
+                <option value="€">يورو (€)</option>
+                <option value="₺">ليرة تركية (₺)</option>
+                <option value="ج.م">جنيه مصري (ج.م)</option>
+                <option value="د.ك">دينار كويتي (د.ك)</option>
+                <option value="ر.س">ريال سعودي (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> اسم الجهة:</label>
+            <input type="text" id="companyName" value="شركة الأفق للتجارة" placeholder="الجهة المستفيدة">
+        </div>
+
+        <!-- رأس المال -->
+        <div class="section-title-sm">💰 رأس المال المستثمر (قبل رأس المال العامل)</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-building"></i> رأس المال الثابت</label>
+                <input type="number" id="fixedCapital" value="150000" step="1000">
+                <span class="tooltiptext">الأصول الثابتة (آلات، معدات، مباني) التي تستهلك.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-file-invoice"></i> رأس المال التأسيسي</label>
+                <input type="number" id="setupCapital" value="100000" step="1000">
+                <span class="tooltiptext">مصاريف ما قبل التشغيل (دراسات، تراخيص، إلخ).</span>
+            </div>
+        </div>
+
+        <!-- تفاصيل المصاريف الشهرية لحساب رأس المال العامل -->
+        <div class="section-title-sm">📆 بيانات رأس المال العامل (شهرية)</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-chart-line"></i> المبيعات النقدية الشهرية</label>
+                <input type="number" id="monthlySales" value="220000" step="1000">
+                <span class="tooltiptext">متوسط المبيعات النقدية الشهرية (يُفترض ثباتها للسنة الأولى).</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-users"></i> عدد الموظفين</label>
+                <input type="number" id="employees" value="2" step="1">
+                <span class="tooltiptext">عدد الموظفين (يستخدم لحساب الرواتب).</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-user-tie"></i> متوسط الراتب الشهري (صافي)</label>
+                <input type="number" id="netSalary" value="30000" step="1000">
+                <span class="tooltiptext">الراتب الصافي للموظف الواحد شهرياً.</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-hand-holding-usd"></i> نسبة تكاليف الموظفين (بدل+تأمين)</label>
+                <input type="number" id="salaryBurden" value="1.61" step="0.01">
+                <span class="tooltiptext">معامل تحويل الراتب الصافي إلى التكلفة الفعلية (مثل 1.61).</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-store"></i> الإيجار الشهري (صافي)</label>
+                <input type="number" id="netRent" value="50000" step="1000">
+                <span class="tooltiptext">صافي الإيجار المدفوع شهرياً.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> ضريبة القيمة المضافة على الإيجار</label>
+                <input type="number" id="rentTax" value="20" step="1">
+                <span class="tooltiptext">نسبة الضريبة على الإيجار (مثل 20%).</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> إجمالي التكاليف المتغيرة (% من المبيعات)</label>
+                <input type="number" id="totalVariableCostPercent" value="0.3" step="0.01" min="0" max="1">
+                <span class="tooltiptext">نسبة التكاليف المتغيرة من المبيعات (مواد أولية، عمولات، تغليف، إلخ).</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-tools"></i> مصاريف تشغيلية شهرية ثابتة</label>
+                <input type="number" id="opexMonthly" value="15000" step="1000">
+                <span class="tooltiptext">مصاريف تشغيلية ثابتة شهرياً (كهرباء، إنترنت، إلخ).</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-piggy-bank"></i> احتياطي نقدي شهري</label>
+                <input type="number" id="cashReserve" value="7000" step="1000">
+                <span class="tooltiptext">مبلغ احتياطي نقدي يتم تخصيصه شهرياً (يؤثر على رأس المال العامل فقط).</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-clock"></i> شهور تغطية رأس المال العامل</label>
+                <input type="number" id="wcMonths" value="3" step="1" min="0">
+                <span class="tooltiptext">عدد أشهر المصاريف الثابتة التي يجب تغطيتها نقداً (رأس مال عامل).</span>
+            </div>
+        </div>
+
+        <!-- افتراضات النمو والخصم -->
+        <div class="section-title-sm">📈 افتراضات النمو والتقييم</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-arrow-up"></i> نمو المبيعات السنوي (%)</label>
+                <input type="number" id="growthRate" value="10" step="0.1">
+                <span class="tooltiptext">معدل النمو السنوي للإيرادات (مثل 10%).</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-arrow-down"></i> نمو المصاريف السنوي (%)</label>
+                <input type="number" id="expGrowth" value="5" step="0.1">
+                <span class="tooltiptext">معدل النمو السنوي للمصاريف الثابتة (تضخم).</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> معدل الخصم (WACC) (%)</label>
+                <input type="number" id="discountRate" value="10" step="0.1">
+                <span class="tooltiptext">تكلفة رأس المال أو معدل العائد المطلوب.</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> ضريبة الدخل (%)</label>
+                <input type="number" id="taxRate" value="25" step="0.1">
+                <span class="tooltiptext">نسبة ضريبة الدخل على الأرباح.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-calendar-alt"></i> العمر الإنتاجي (سنوات)</label>
+                <input type="number" id="lifeYears" value="8" step="1" min="1" max="20">
+                <span class="tooltiptext">عدد السنوات التي سيتم استهلاك الأصول الثابتة خلالها.</span>
+            </div>
+        </div>
+
+        <!-- نقطة التعادل -->
+        <div class="section-title-sm">⚖️ بيانات نقطة التعادل</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-dollar-sign"></i> سعر بيع الوحدة</label>
+                <input type="number" id="pricePerUnit" value="6500" step="10">
+                <span class="tooltiptext">سعر بيع الوحدة الواحدة.</span>
+            </div>
+        </div>
+
+        <!-- مؤشرات إضافية -->
+        <div class="section-title-sm">📊 مؤشرات إضافية</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> معدل إعادة الاستثمار (MIRR) (%)</label>
+                <input type="number" id="reinvestRate" value="10" step="0.1">
+                <span class="tooltiptext">المعدل الذي يمكن إعادة استثمار التدفقات النقدية به.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-hand-holding-usd"></i> خدمة الدين السنوية (اختياري)</label>
+                <input type="number" id="debtService" value="0" step="1000">
+                <span class="tooltiptext">الأقساط السنوية للقرض (لحساب DSCR).</span>
+            </div>
+        </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> احسب الجدوى والمؤشرات</button>
+
+        <!-- منطقة النتائج -->
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-cards" id="kpiCards"></div>
+
+            <!-- بطاقة تقييم المشروع -->
+            <div class="result-card" id="projectScore" style="margin-bottom:2rem;"></div>
+
+            <!-- الرسوم البيانية -->
+            <div class="section-title-sm">📊 الرسوم البيانية</div>
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3>التدفقات النقدية السنوية</h3>
+                    <canvas id="cashFlowChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>منحنى NPV (الحساسية للخصم)</h3>
+                    <canvas id="npvCurveChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>الإيرادات vs المصروفات</h3>
+                    <canvas id="revExpChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>نقطة التعادل</h3>
+                    <canvas id="breakevenChart"></canvas>
+                </div>
+            </div>
+
+            <!-- جدول التدفقات النقدية -->
+            <div class="section-title-sm">📋 التدفقات النقدية المتوقعة </div>
+            <div class="table-container" id="cashFlowTable"></div>
+
+            <!-- أزرار التصدير (PDF تم إزالته) -->
+            <div class="export-container">
+                <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير الجدول إلى Excel</button>
+                <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير تقرير كامل (Word)</button>
+                <!-- تم إزالة زر PDF -->
+            </div>
+
+            <!-- بيانات تحليل المخاطر -->
+            <div class="section-title-sm">📋 بيانات تحليل المخاطر (لإستخدامها بتحليل الحساسية)</div>
+            <div class="result-card" id="riskDataCard" style="text-align:right; padding:1.5rem;">
+                <div id="riskDataText"></div>
+            </div>
+
+            <!-- تحليل نقطة التعادل -->
+            <div class="section-title-sm">🎯 نقطة التعادل (متوافقة مع التدفقات النقدية)</div>
+            <div class="result-card" id="breakevenCard" style="text-align:right; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center;"></div>
+
+            <!-- تحليل السيناريوهات -->
+            <div class="section-title-sm">🔮 تحليل السيناريوهات</div>
+            <div class="scenario-container" id="scenarioContainer"></div>
+
+            <!-- قسم تحليل الحساسية -->
+            <div class="section-title-sm">🔍 تحليل الحساسية (One-Way)</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-sliders-h"></i> المتغير المراد تحليله</label>
+                    <select id="sensitivityVar">
+                        <option value="monthlySales">المبيعات الشهرية</option>
+                        <option value="fixedCosts">التكاليف الثابتة (رواتب+إيجار+مصاريف)</option>
+                        <option value="totalVariableCostPercent">نسبة التكاليف المتغيرة</option>
+                        <option value="discountRate">معدل الخصم</option>
+                        <option value="growthRate">نمو المبيعات</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percent"></i> مدى التغيير (±%)</label>
+                    <input type="number" id="sensitivityRange" value="20" min="5" max="100" step="5">
+                </div>
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                    <button class="btn-calculate" id="runSensitivity" style="margin:0; padding:0.8rem 2rem;"><i class="fas fa-chart-line"></i> تشغيل</button>
+                </div>
+            </div>
+            <div id="sensitivityResults" style="margin-top:1rem; overflow-x:auto;"></div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem; color:#666; text-align:center;">
+            <i class="fas fa-robot" style="color: var(--gold);"></i> سيتم عرض النتائج بعد الضغط على زر الحساب
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-content">
+            <div class="footer-row">
+                <div class="footer-social">
+                    <a href="https://www.instagram.com/faroukazem/" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=100091571594026&sk=about" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://wa.me/905550196682" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                </div>
+                <div class="footer-logo-box">
+                    <h2>مجموعة فاروق للاستشارات والأعمال</h2>
+                    <div></div>
+                </div>
+                <div class="footer-payment">
+                    <div class="payment-card">
+                        <img src="https://img.icons8.com/color/48/visa.png" alt="Visa">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="copyright">
+                جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
+                <p>Adnan Kahveci, Beylikdüzü / İstanbul, Türkiye</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- نافذة الآلة الحاسبة المنبثقة (Modal) -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close">&times;</span>
+            <h2><i class="fas fa-calculator" style="color: var(--gold);"></i> آلة حاسبة</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
+                <button class="calc-btn" onclick="clearCalculator()">C</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
+                <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
+                <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+AOS.init({ duration: 800, once: true, offset: 100 });
+
+// دوال تصدير Excel و Word (كما هي مع تحسين Word ليشمل الرسوم البيانية)
+function exportToExcel() {
+    const table = document.querySelector('#cashFlowTable table');
+    if (!table) {
+        alert('لا يوجد جدول للتصدير. قم بإجراء التحليل أولاً.');
+        return;
+    }
+    const rows = [];
+    const headers = [];
+    table.querySelectorAll('thead th').forEach(th => headers.push(th.innerText));
+    rows.push(headers);
+    table.querySelectorAll('tbody tr').forEach(tr => {
+        const row = [];
+        tr.querySelectorAll('td').forEach(td => row.push(td.innerText));
+        rows.push(row);
+    });
+    let csvContent = rows.map(row => row.map(cell => (cell.includes(',') ? `"${cell}"` : cell)).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0,10).replace(/-/g,'');
+    link.download = `جدوى_مالية_${dateStr}.csv`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+}
+
+// دالة تصدير Word المحسّنة (وفقًا للاتفاق الأخير) - مؤشرات الأداء كجدول
+async function exportToWord() {
+    const currency = document.getElementById('currencySelect').value;
+    const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+    const resultsSection = document.getElementById('resultsSection');
+    if (resultsSection.style.display === 'none') {
+        alert('الرجاء إجراء التحليل أولاً.');
+        return;
+    }
+
+    try {
+        // التقاط صور الرسوم البيانية باستخدام html2canvas
+        const chartCanvases = document.querySelectorAll('.chart-card canvas');
+        const chartImages = [];
+        for (let canvas of chartCanvases) {
+            try {
+                const canvasImage = await html2canvas(canvas, { scale: 2, backgroundColor: '#ffffff' });
+                chartImages.push(canvasImage.toDataURL('image/png'));
+            } catch (e) {
+                chartImages.push('');
+            }
+        }
+
+        // بناء بطاقات KPI كجدول (Table)
+        const kpiCards = document.querySelectorAll('.result-card');
+        let kpiTableRows = '';
+        let row = '';
+        let count = 0;
+
+        kpiCards.forEach((card, index) => {
+            // استخراج المحتوى من كل بطاقة
+            const icon = card.querySelector('i') ? card.querySelector('i').outerHTML : '';
+            const title = card.querySelector('h4') ? card.querySelector('h4').innerText : '';
+            const value = card.querySelector('.value') ? card.querySelector('.value').innerText : '';
+            const unit = card.querySelector('.unit') ? card.querySelector('.unit').innerText : '';
+            const status = card.querySelector('.status') ? card.querySelector('.status').outerHTML : '';
+
+            // بناء خلية الجدول
+            const cell = `
+                <td style="border: 1px solid #b8860b; padding: 15px; text-align: center; background-color: #fefcf6; width: 50%;">
+                    ${icon}
+                    <h4 style="margin: 0.5rem 0; color: #666;">${title}</h4>
+                    <div class="value" style="font-size: 1.8rem; font-weight: 900; color: #b8860b;">${value}</div>
+                    <div class="unit" style="font-size: 0.9rem; color: #777;">${unit}</div>
+                    ${status ? status.replace(/class="status/g, 'style="margin-top:0.3rem; padding:0.2rem 0.5rem; border-radius:20px; display:inline-block;') : ''}
+                </td>
+            `;
+
+            row += cell;
+            count++;
+
+            // كل بطاقتين في صف واحد
+            if (count % 2 === 0 || index === kpiCards.length - 1) {
+                kpiTableRows += `<tr>${row}</tr>`;
+                row = '';
+            }
+        });
+
+        // باقي المحتوى (بطاقة التقييم، الجدول، الرسوم البيانية، إلخ)
+        const projectScoreHTML = document.getElementById('projectScore').innerHTML;
+        const tableHTML = document.querySelector('#cashFlowTable').innerHTML;
+        const breakevenHTML = document.getElementById('breakevenCard').innerHTML;
+        const scenarioHTML = document.getElementById('scenarioContainer').innerHTML;
+        const sensitivityHTML = document.getElementById('sensitivityResults').innerHTML || '';
+
+        // بناء الرسوم البيانية في التقرير
+        let chartsHTML = '';
+        if (chartImages.some(img => img)) {
+            chartsHTML = '<div style="text-align:center;"><h2 style="color:#b8860b;">الرسوم البيانية</h2>';
+            chartImages.forEach((img, idx) => {
+                if (img) {
+                    chartsHTML += `<img src="${img}" style="max-width:100%; margin-bottom:20px; border:1px solid #b8860b; border-radius:8px;" /><br>`;
+                }
+            });
+            chartsHTML += '</div>';
+        }
+
+        // تاريخ التقرير
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        // بناء التقرير النهائي
+        const reportHTML = `
+            <!DOCTYPE html>
+            <html dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <title>تقرير الجدوى المالية - FAROUK GRUP</title>
+                <style>
+                    body { font-family: 'Tajawal', sans-serif; margin: 2rem; }
+                    .header { text-align: center; border-bottom: 3px solid #b8860b; padding-bottom: 1rem; margin-bottom: 2rem; }
+                    .header h1 { color: #b8860b; margin: 0; }
+                    .header p { color: #555; }
+                    h2 { color: #b8860b; border-bottom: 2px solid #b8860b33; padding-bottom: 0.3rem; margin-top: 1.5rem; }
+                    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+                    th { background: rgba(184,134,11,0.1); padding: 0.5rem; border: 1px solid #b8860b; }
+                    td { padding: 0.5rem; border: 1px solid #ddd; text-align: center; }
+                    .positive { color: green; }
+                    .negative { color: red; }
+                    .result-card { background: #f9f9f9; border: 1px solid #b8860b; border-radius: 10px; padding: 1rem; margin: 1rem 0; }
+                    .status-good { background: #28a745; color: white; padding: 0.2rem 0.5rem; border-radius: 20px; display: inline-block; }
+                    .status-bad { background: #dc3545; color: white; padding: 0.2rem 0.5rem; border-radius: 20px; display: inline-block; }
+                    .status-warning { background: #ffc107; color: #111; padding: 0.2rem 0.5rem; border-radius: 20px; display: inline-block; }
+                    .scenario-card { border: 2px solid; border-radius: 10px; padding: 1rem; margin: 0.5rem; display: inline-block; width: 30%; }
+                    .footer { text-align: center; margin-top: 3rem; color: #888; border-top: 1px dashed #b8860b; padding-top: 1rem; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+                    <p>تقرير الجدوى المالية الشاملة</p>
+                    <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
+                    <p>العملة: ${currency}</p>
+                </div>
+
+                <h2>مؤشرات الأداء الرئيسية</h2>
+                <table style="width:100%; border-collapse: collapse;" dir="rtl">
+                    ${kpiTableRows}
+                </table>
+
+                <h2>تقييم المشروع</h2>
+                <div class="result-card">
+                    ${projectScoreHTML}
+                </div>
+
+                ${chartsHTML}
+
+                <h2>التدفقات النقدية المتوقعة</h2>
+                ${tableHTML}
+
+                <h2>نقطة التعادل</h2>
+                <div class="result-card">
+                    ${breakevenHTML}
+                </div>
+
+                <h2>تحليل السيناريوهات</h2>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                    ${scenarioHTML}
+                </div>
+
+                ${sensitivityHTML ? '<h2>تحليل الحساسية</h2>' + sensitivityHTML : ''}
+
+                <div class="footer">
+                    تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة © ${now.getFullYear()}
+                </div>
+            </body>
+            </html>
+        `;
+
+        // تصدير الملف
+        const blob = new Blob(['\uFEFF' + reportHTML], { type: 'application/msword' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `تقرير_جدوى_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+
+    } catch (error) {
+        console.error('خطأ في تصدير Word:', error);
+        alert('حدث خطأ أثناء إنشاء التقرير. يرجى المحاولة مرة أخرى.');
+    }
+}
+
+// دوال IRR و MIRR (محسنة)
+function calculateIRR(cashFlows, guess = 0.1, maxIter = 10000, tol = 1e-8) {
+    let hasPositive = false, hasNegative = false;
+    for (let i = 0; i < cashFlows.length; i++) {
+        if (cashFlows[i] > 0) hasPositive = true;
+        if (cashFlows[i] < 0) hasNegative = true;
+    }
+    if (!hasPositive || !hasNegative) return NaN;
+
+    let low = -0.99;
+    let high = 1e6;
+    let fLow = 0, fHigh = 0;
+    for (let i = 0; i < cashFlows.length; i++) {
+        fLow += cashFlows[i] / Math.pow(1 + low, i);
+        fHigh += cashFlows[i] / Math.pow(1 + high, i);
+    }
+
+    if (fLow * fHigh > 0) {
+        let step = 1;
+        while (fLow * fHigh > 0 && high < 1e12) {
+            high *= 2;
+            fHigh = 0;
+            for (let i = 0; i < cashFlows.length; i++) fHigh += cashFlows[i] / Math.pow(1 + high, i);
+        }
+        if (fLow * fHigh > 0) return NaN;
+    }
+
+    for (let iter = 0; iter < maxIter; iter++) {
+        let mid = (low + high) / 2;
+        let fMid = 0;
+        for (let i = 0; i < cashFlows.length; i++) fMid += cashFlows[i] / Math.pow(1 + mid, i);
+        if (Math.abs(fMid) < tol) return mid;
+        if (fMid > 0) low = mid;
+        else high = mid;
+    }
+    return (low + high) / 2;
+}
+
+function calculateMIRR(cashFlows, financeRate, reinvestRate) {
+    let n = cashFlows.length - 1;
+    let pvNeg = 0;
+    let fvPos = 0;
+    for (let i = 0; i <= n; i++) {
+        if (cashFlows[i] < 0) {
+            pvNeg += cashFlows[i] / Math.pow(1 + financeRate, i);
+        } else if (cashFlows[i] > 0) {
+            fvPos += cashFlows[i] * Math.pow(1 + reinvestRate, n - i);
+        }
+    }
+    if (pvNeg === 0) return NaN;
+    return Math.pow(-fvPos / pvNeg, 1 / n) - 1;
+}
+
+// دالة حسابية آمنة بدلاً من eval
+function safeEvaluate(expression) {
+    let expr = expression.replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/');
+    if (!/^[0-9+\-*/().]+$/.test(expr)) {
+        throw new Error('تعبير غير صالح');
+    }
+    return new Function('return ' + expr)();
+}
+
+// دالة لحساب المشروع بالكامل (معدلة بالمنطق المالي الصحيح)
+function computeProjectFromInputs(inputs) {
+    const fixedCap = inputs.fixedCapital;
+    const setupCap = inputs.setupCapital;
+    const monthlySales = inputs.monthlySales;
+    const employees = inputs.employees;
+    const netSalary = inputs.netSalary;
+    const salaryBurden = inputs.salaryBurden;
+    const netRent = inputs.netRent;
+    const rentTax = inputs.rentTax;
+    const totalVariableCostPercent = inputs.totalVariableCostPercent;
+    const opexMonthly = inputs.opexMonthly;
+    const cashReserve = inputs.cashReserve;
+    const growth = inputs.growth;
+    const expGrowth = inputs.expGrowth;
+    const discount = inputs.discount;
+    const taxRate = inputs.taxRate;
+    const lifeYears = inputs.lifeYears;
+    const reinvestRate = inputs.reinvestRate;
+    const wcMonths = inputs.wcMonths;
+
+    const salariesMonthly = employees * netSalary * salaryBurden;
+    const rentMonthly = netRent * (1 + rentTax);
+    const fixedMonthly = salariesMonthly + rentMonthly + opexMonthly;
+    const totalFixedMonthly = fixedMonthly + cashReserve;
+    
+    const workingCapitalRequired = totalFixedMonthly * wcMonths;
+    const totalInvestment = fixedCap + setupCap + workingCapitalRequired;
+
+    const revenue1 = monthlySales * 12;
+    const salariesAnnual = salariesMonthly * 12;
+    const rentAnnual = rentMonthly * 12;
+    const opexAnnual = opexMonthly * 12;
+    const fixedExpenses1 = salariesAnnual + rentAnnual + opexAnnual;
+    const variableExpenses1 = revenue1 * totalVariableCostPercent;
+
+    const depreciation = fixedCap / lifeYears;
+    const years = lifeYears;
+
+    let revenues = [], fixedExpenses = [], variableExpenses = [], ebit = [], tax = [], nopat = [], fcf = [];
+    let cashFlows = [-totalInvestment];
+
+    for (let i = 1; i <= years; i++) {
+        let rev = revenue1 * Math.pow(1 + growth, i - 1);
+        let fixedExp = fixedExpenses1 * Math.pow(1 + expGrowth, i - 1);
+        let varExp = rev * totalVariableCostPercent;
+        let totalExpenses = fixedExp + varExp;
+        let ebit_ = rev - totalExpenses - depreciation;
+        let tax_ = ebit_ > 0 ? ebit_ * taxRate : 0;
+        let nopat_ = ebit_ - tax_;
+        let fcf_ = nopat_ + depreciation;
+        revenues.push(rev);
+        fixedExpenses.push(fixedExp);
+        variableExpenses.push(varExp);
+        ebit.push(ebit_);
+        tax.push(tax_);
+        nopat.push(nopat_);
+        fcf.push(fcf_);
+        cashFlows.push(fcf_);
+    }
+
+    let npv = -totalInvestment;
+    for (let i = 1; i <= years; i++) {
+        npv += fcf[i-1] / Math.pow(1 + discount, i);
+    }
+
+    const irrValue = calculateIRR(cashFlows);
+    const mirrValue = calculateMIRR(cashFlows, discount, reinvestRate);
+
+    let cum = 0, paybackYear = null, paybackFraction = 0;
+    for (let i = 0; i < cashFlows.length; i++) {
+        cum += cashFlows[i];
+        if (cum >= 0 && paybackYear === null) {
+            paybackYear = i;
+            let prevCum = cum - cashFlows[i];
+            paybackFraction = -prevCum / cashFlows[i];
+            break;
+        }
+    }
+    const payback = paybackYear !== null ? paybackYear - 1 + paybackFraction : null;
+
+    let discountedCum = 0, dpbpYear = null, dpbpFraction = 0;
+    for (let i = 0; i < cashFlows.length; i++) {
+        let dcf = cashFlows[i] / Math.pow(1 + discount, i);
+        discountedCum += dcf;
+        if (discountedCum >= 0 && dpbpYear === null) {
+            dpbpYear = i;
+            let prevCum = discountedCum - dcf;
+            dpbpFraction = -prevCum / dcf;
+            break;
+        }
+    }
+    const dpbp = dpbpYear !== null ? dpbpYear - 1 + dpbpFraction : null;
+
+    const pvFuture = cashFlows.slice(1).reduce((acc, val, idx) => acc + val / Math.pow(1 + discount, idx + 1), 0);
+    const pi = pvFuture / Math.abs(cashFlows[0]);
+
+    const avgNetProfit = nopat.reduce((a,b) => a + b, 0) / years;
+    const roi = avgNetProfit / totalInvestment;
+
+    const operatingMargin = revenues[0] ? (ebit[0] / revenues[0]) * 100 : 0;
+
+    const debtService = inputs.debtService || 0;
+    const ebitda1 = ebit[0] + depreciation;
+    const dscr = debtService > 0 ? ebitda1 / debtService : 0;
+
+    const totalFixedAnnual = fixedExpenses1;
+    const contributionMarginRatio = 1 - totalVariableCostPercent;
+    const beRevenueActual = totalFixedAnnual / contributionMarginRatio;
+    const beUnitsActual = beRevenueActual / inputs.pricePerUnit;
+
+    const ebitda = ebit[0] + depreciation;
+    const netIncome = nopat[0];
+    const netProfitMargin = revenues[0] ? (netIncome / revenues[0]) * 100 : 0;
+
+    return {
+        npv, irr: irrValue, mirr: mirrValue, payback, dpbp, pi, roi,
+        operatingMargin, dscr, workingCapitalRequired, totalInvestment,
+        beRevenueActual, beUnitsActual, totalFixedMonthly, contributionMarginRatio,
+        revenues, fixedExpenses, variableExpenses, ebit, tax, nopat, fcf, years, depreciation,
+        cashFlows,
+        ebitda, netIncome, netProfitMargin
+    };
+}
+
+// دالة تقييم المشروع
+function evaluateProject(res, inputs) {
+    let score = 0;
+    const details = [];
+
+    if (res.npv > 0) {
+        score += 20;
+        details.push("✅ NPV موجب");
+    } else {
+        details.push("❌ NPV سالب");
+    }
+
+    if (!isNaN(res.irr) && res.irr > inputs.discount) {
+        score += 20;
+        details.push("✅ IRR > معدل الخصم");
+    } else {
+        details.push("❌ IRR ≤ معدل الخصم");
+    }
+
+    if (res.pi >= 1) {
+        score += 20;
+        details.push("✅ PI ≥ 1");
+    } else {
+        details.push("❌ PI < 1");
+    }
+
+    const halfLife = inputs.lifeYears / 2;
+    if (res.payback !== null && res.payback < halfLife) {
+        score += 20;
+        details.push(`✅ فترة الاسترداد (${res.payback.toFixed(1)} سنة) < نصف العمر (${halfLife} سنة)`);
+    } else if (res.payback !== null) {
+        details.push(`❌ فترة الاسترداد (${res.payback.toFixed(1)} سنة) ≥ نصف العمر (${halfLife} سنة)`);
+    } else {
+        details.push("❌ لا يوجد استرداد خلال عمر المشروع");
+    }
+
+    if (inputs.debtService > 0) {
+        if (res.dscr > 1.3) {
+            score += 20;
+            details.push(`✅ DSCR (${res.dscr.toFixed(2)}) > 1.3`);
+        } else {
+            details.push(`❌ DSCR (${res.dscr.toFixed(2)}) ≤ 1.3`);
+        }
+    } else {
+        score += 20;
+        details.push("✅ لا يوجد دين (افتراضي 20 نقطة)");
+    }
+
+    let grade = "";
+    let gradeClass = "";
+    let icon = "";
+    if (score >= 80) {
+        grade = "ممتاز";
+        gradeClass = "status-good";
+        icon = "🟢";
+    } else if (score >= 50) {
+        grade = "مقبول";
+        gradeClass = "status-warning";
+        icon = "🟡";
+    } else {
+        grade = "عالي المخاطر";
+        gradeClass = "status-bad";
+        icon = "🔴";
+    }
+
+    return { score, grade, gradeClass, icon, details };
+}
+
+// رسم الرسوم البيانية
+let charts = {};
+
+function renderCharts(res, inputs, currency) {
+    // تدمير المخططات القديمة إن وجدت
+    for (let key in charts) {
+        if (charts[key]) charts[key].destroy();
+    }
+
+    // 1. التدفقات النقدية
+    const ctx1 = document.getElementById('cashFlowChart').getContext('2d');
+    charts.cashFlow = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: Array.from({ length: res.years }, (_, i) => `سنة ${i+1}`),
+            datasets: [{
+                label: 'التدفق النقدي الحر',
+                data: res.fcf,
+                backgroundColor: 'rgba(184,134,11,0.7)',
+                borderColor: '#b8860b',
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+
+    // 2. منحنى NPV (حساسية لسعر الخصم)
+    const discountRates = [5, 7, 10, 12, 15, 18, 20];
+    const npvValues = discountRates.map(r => {
+        let d = r / 100;
+        let npv = -res.totalInvestment;
+        for (let i = 1; i <= res.years; i++) {
+            npv += res.fcf[i-1] / Math.pow(1 + d, i);
+        }
+        return npv;
+    });
+    const ctx2 = document.getElementById('npvCurveChart').getContext('2d');
+    charts.npvCurve = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: discountRates.map(r => r + '%'),
+            datasets: [{
+                label: 'صافي القيمة الحالية',
+                data: npvValues,
+                borderColor: '#b8860b',
+                backgroundColor: 'rgba(184,134,11,0.1)',
+                fill: true,
+                tension: 0.1
+            }]
+        },
+        options: { responsive: true }
+    });
+
+    // 3. الإيرادات vs المصروفات
+    const ctx3 = document.getElementById('revExpChart').getContext('2d');
+    charts.revExp = new Chart(ctx3, {
+        type: 'line',
+        data: {
+            labels: Array.from({ length: res.years }, (_, i) => `سنة ${i+1}`),
+            datasets: [
+                { label: 'الإيرادات', data: res.revenues, borderColor: '#28a745', backgroundColor: 'transparent', tension: 0.1 },
+                { label: 'إجمالي المصروفات', data: res.fixedExpenses.map((f, i) => f + res.variableExpenses[i]), borderColor: '#dc3545', backgroundColor: 'transparent', tension: 0.1 }
+            ]
+        },
+        options: { responsive: true }
+    });
+
+    // 4. نقطة التعادل (رسم بياني يوضح التكاليف الثابتة، المتغيرة، والإيرادات)
+    const beUnits = res.beUnitsActual;
+    const units = [0, beUnits, beUnits * 1.5];
+    const revenueData = units.map(u => u * inputs.pricePerUnit);
+    const fixedCostData = units.map(() => res.fixedExpenses[0]); // ثابت
+    const totalCostData = units.map(u => res.fixedExpenses[0] + u * inputs.pricePerUnit * res.totalVariableCostPercent); // ثابت + متغير
+    const ctx4 = document.getElementById('breakevenChart').getContext('2d');
+    charts.breakeven = new Chart(ctx4, {
+        type: 'line',
+        data: {
+            labels: units.map(u => u.toFixed(0) + ' وحدة'),
+            datasets: [
+                { label: 'الإيرادات', data: revenueData, borderColor: '#28a745', backgroundColor: 'transparent' },
+                { label: 'التكلفة الكلية', data: totalCostData, borderColor: '#dc3545', backgroundColor: 'transparent' },
+                { label: 'التكلفة الثابتة', data: fixedCostData, borderColor: '#b8860b', backgroundColor: 'transparent', borderDash: [5,5] }
+            ]
+        },
+        options: { responsive: true }
+    });
+}
+
+// تحليل السيناريوهات (مع معالجة NaN)
+function renderScenarios(res, inputs, currency) {
+    // سيناريو متشائم: مبيعات -20%، تكاليف متغيرة +10%، نمو مبيعات منخفض
+    const pessimisticInputs = { ...inputs };
+    pessimisticInputs.monthlySales = inputs.monthlySales * 0.8;
+    pessimisticInputs.totalVariableCostPercent = Math.min(inputs.totalVariableCostPercent * 1.1, 1);
+    pessimisticInputs.growth = inputs.growth * 0.5;
+    const pesRes = computeProjectFromInputs(pessimisticInputs);
+
+    // سيناريو متفائل: مبيعات +20%، تكاليف متغيرة -10%، نمو مبيعات مرتفع
+    const optimisticInputs = { ...inputs };
+    optimisticInputs.monthlySales = inputs.monthlySales * 1.2;
+    optimisticInputs.totalVariableCostPercent = Math.max(inputs.totalVariableCostPercent * 0.9, 0);
+    optimisticInputs.growth = inputs.growth * 1.5;
+    const optRes = computeProjectFromInputs(optimisticInputs);
+
+    const container = document.getElementById('scenarioContainer');
+    container.innerHTML = `
+        <div class="scenario-card pessimistic">
+            <h4>🔴 سيناريو متشائم</h4>
+            <div class="value">${currency}${pesRes.npv.toFixed(0)}</div>
+            <div class="label">NPV</div>
+            <div class="value">${!isNaN(pesRes.irr) ? (pesRes.irr*100).toFixed(2) + '%' : 'غير محدد'}</div>
+            <div class="label">IRR</div>
+        </div>
+        <div class="scenario-card expected">
+            <h4>🟡 سيناريو متوقع</h4>
+            <div class="value">${currency}${res.npv.toFixed(0)}</div>
+            <div class="label">NPV</div>
+            <div class="value">${!isNaN(res.irr) ? (res.irr*100).toFixed(2) + '%' : 'غير محدد'}</div>
+            <div class="label">IRR</div>
+        </div>
+        <div class="scenario-card optimistic">
+            <h4>🟢 سيناريو متفائل</h4>
+            <div class="value">${currency}${optRes.npv.toFixed(0)}</div>
+            <div class="label">NPV</div>
+            <div class="value">${!isNaN(optRes.irr) ? (optRes.irr*100).toFixed(2) + '%' : 'غير محدد'}</div>
+            <div class="label">IRR</div>
+        </div>
+    `;
+}
+
+// الحدث الرئيسي للحساب
+document.getElementById('calculateBtn').addEventListener('click', function() {
+    const currency = document.getElementById('currencySelect').value;
+
+    const inputs = {
+        fixedCapital: parseFloat(document.getElementById('fixedCapital').value) || 0,
+        setupCapital: parseFloat(document.getElementById('setupCapital').value) || 0,
+        monthlySales: parseFloat(document.getElementById('monthlySales').value) || 0,
+        employees: parseFloat(document.getElementById('employees').value) || 0,
+        netSalary: parseFloat(document.getElementById('netSalary').value) || 0,
+        salaryBurden: parseFloat(document.getElementById('salaryBurden').value) || 1,
+        netRent: parseFloat(document.getElementById('netRent').value) || 0,
+        rentTax: parseFloat(document.getElementById('rentTax').value) / 100 || 0,
+        totalVariableCostPercent: parseFloat(document.getElementById('totalVariableCostPercent').value) || 0,
+        opexMonthly: parseFloat(document.getElementById('opexMonthly').value) || 0,
+        cashReserve: parseFloat(document.getElementById('cashReserve').value) || 0,
+        wcMonths: parseFloat(document.getElementById('wcMonths').value) || 3,
+        growth: parseFloat(document.getElementById('growthRate').value) / 100 || 0,
+        expGrowth: parseFloat(document.getElementById('expGrowth').value) / 100 || 0,
+        discount: parseFloat(document.getElementById('discountRate').value) / 100 || 0.15,
+        taxRate: parseFloat(document.getElementById('taxRate').value) / 100 || 0.25,
+        lifeYears: parseInt(document.getElementById('lifeYears').value) || 8,
+        reinvestRate: parseFloat(document.getElementById('reinvestRate').value) / 100 || 0.10,
+        debtService: parseFloat(document.getElementById('debtService').value) || 0,
+        pricePerUnit: parseFloat(document.getElementById('pricePerUnit').value) || 0
+    };
+
+    const res = computeProjectFromInputs(inputs);
+
+    // تخزين النتائج للاستخدام في PDF (إذا احتجنا لاحقاً)
+    window.lastResult = res;
+    window.lastInputs = inputs;
+
+    document.getElementById('initialMessage').style.display = 'none';
+    const resultsSection = document.getElementById('resultsSection');
+    resultsSection.style.display = 'block';
+
+    // عرض بطاقات KPI (مع المؤشرات الجديدة)
+    document.getElementById('kpiCards').innerHTML = `
+        <div class="result-card">
+            <i class="fas fa-coins"></i>
+            <h4>صافي القيمة الحالية (NPV)</h4>
+            <div class="value">${currency}${res.npv.toFixed(0)}</div>
+            <div class="status ${res.npv > 0 ? 'status-good' : res.npv < 0 ? 'status-bad' : 'status-warning'}">
+                ${res.npv > 0 ? 'مقبول (إيجابي)' : res.npv < 0 ? 'غير مقبول' : 'محايد'}
+            </div>
+        </div>
+        <div class="result-card">
+            <i class="fas fa-percent"></i>
+            <h4>معدل العائد الداخلي (IRR)</h4>
+            <div class="value">${!isNaN(res.irr) ? (res.irr * 100).toFixed(2) : 'غير محدد'}%</div>
+            <div class="status ${res.irr > inputs.discount ? 'status-good' : 'status-bad'}">
+                ${!isNaN(res.irr) ? (res.irr > inputs.discount ? '> معدل الخصم' : '< معدل الخصم') : ''}
+            </div>
+        </div>
+        <div class="result-card">
+            <i class="fas fa-chart-pie"></i>
+            <h4>مؤشر الربحية (PI)</h4>
+            <div class="value">${res.pi.toFixed(2)}</div>
+            <div class="unit">${res.pi >= 1 ? 'مربح' : 'غير مربح'}</div>
+        </div>
+        <div class="result-card">
+            <i class="fas fa-clock"></i>
+            <h4>فترة الاسترداد</h4>
+            <div class="value">${res.payback !== null ? res.payback.toFixed(1) : '∞'}</div>
+            <div class="unit">سنة</div>
+        </div>
+        <div class="result-card">
+            <i class="fas fa-hourglass-half"></i>
+            <h4>الاسترداد المخصوم</h4>
+            <div class="value">${res.dpbp !== null ? res.dpbp.toFixed(1) : '∞'}</div>
+            <div class="unit">سنة</div>
+        </div>
+        <div class="result-card">
+            <i class="fas fa-percent"></i>
+            <h4>العائد على الاستثمار (ROI)</h4>
+            <div class="value">${(res.roi * 100).toFixed(2)}%</div>
+            <div class="unit">متوسط سنوي</div>
+        </div>
+        <div class="result-card">
+            <i class="fas fa-hand-holding-usd"></i>
+            <h4>رأس المال العامل المطلوب</h4>
+            <div class="value">${currency}${res.workingCapitalRequired.toFixed(0)}</div>
+            <div class="unit">يُضاف للاستثمار</div>
+        </div>
+        <div class="result-card">
+            <i class="fas fa-percent"></i>
+            <h4>هامش التشغيل (Operating Margin)</h4>
+            <div class="value">${res.operatingMargin.toFixed(2)}%</div>
+            <div class="unit">السنة الأولى</div>
+        </div>
+        <div class="result-card">
+            <i class="fas fa-percent"></i>
+            <h4>معدل العائد المعدل (MIRR)</h4>
+            <div class="value">${!isNaN(res.mirr) ? (res.mirr * 100).toFixed(2) : 'غير محدد'}</div>
+            <div class="unit">بمعدل إعادة ${(inputs.reinvestRate*100).toFixed(1)}%</div>
+        </div>
+        <div class="result-card">
+            <i class="fas fa-shield-alt"></i>
+            <h4>نسبة تغطية الدين (DSCR)</h4>
+            <div class="value">${res.dscr.toFixed(2)}</div>
+            <div class="unit">${res.dscr > 1 ? 'آمن' : 'ضعيف'}</div>
+        </div>
+        <div class="result-card">
+            <i class="fas fa-chart-line"></i>
+            <h4>EBITDA (السنة الأولى)</h4>
+            <div class="value">${currency}${res.ebitda.toFixed(0)}</div>
+            <div class="unit">الأرباح قبل الفوائد والضرائب والإهلاك</div>
+        </div>
+        <div class="result-card">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <h4>صافي الربح (السنة الأولى)</h4>
+            <div class="value">${currency}${res.netIncome.toFixed(0)}</div>
+            <div class="unit">بعد الضريبة</div>
+        </div>
+        <div class="result-card">
+            <i class="fas fa-percent"></i>
+            <h4>هامش الربح الصافي</h4>
+            <div class="value">${res.netProfitMargin.toFixed(2)}%</div>
+            <div class="unit">السنة الأولى</div>
+        </div>
+    `;
+
+    // تقييم المشروع
+    const evaluation = evaluateProject(res, inputs);
+    let detailsHtml = evaluation.details.map(d => `<div style="font-size:0.9rem; text-align:right; margin:0.2rem 0;">${d}</div>`).join('');
+    document.getElementById('projectScore').innerHTML = `
+        <h3><i class="fas fa-star" style="color:var(--gold);"></i> تقييم المشروع</h3>
+        <div style="font-size:2rem; font-weight:900; color:var(--gold);">${evaluation.score} / 100</div>
+        <div class="status ${evaluation.gradeClass}" style="font-size:1.2rem; margin-top:0.5rem;">${evaluation.icon} ${evaluation.grade}</div>
+        <div style="margin-top:1rem; border-top:1px solid var(--gold-soft); padding-top:0.5rem;">
+            ${detailsHtml}
+        </div>
+    `;
+
+    // جدول التدفقات النقدية
+    let tableHtml = '<table><thead><tr><th>السنة</th><th>الإيرادات</th><th>المصاريف الثابتة</th><th>المصاريف المتغيرة</th><th>الإهلاك</th><th>EBIT</th><th>الضريبة</th><th>صافي الربح</th><th>التدفق النقدي</th></tr></thead><tbody>';
+    for (let i = 0; i < res.years; i++) {
+        tableHtml += `<tr>
+            <td>${i+1}</td>
+            <td>${currency}${res.revenues[i].toFixed(0)}</td>
+            <td>${currency}${res.fixedExpenses[i].toFixed(0)}</td>
+            <td>${currency}${res.variableExpenses[i].toFixed(0)}</td>
+            <td>${currency}${res.depreciation.toFixed(0)}</td>
+            <td class="${res.ebit[i] < 0 ? 'negative' : 'positive'}">${currency}${res.ebit[i].toFixed(0)}</td>
+            <td>${currency}${res.tax[i].toFixed(0)}</td>
+            <td class="${res.nopat[i] < 0 ? 'negative' : 'positive'}">${currency}${res.nopat[i].toFixed(0)}</td>
+            <td class="${res.fcf[i] < 0 ? 'negative' : 'positive'}">${currency}${res.fcf[i].toFixed(0)}</td>
+        </tr>`;
+    }
+    tableHtml += '</tbody></table>';
+    document.getElementById('cashFlowTable').innerHTML = tableHtml;
+
+    // بيانات تحليل المخاطر
+    const riskData = {
+        initialInvestment: res.totalInvestment.toFixed(0),
+        annualRevenue: res.revenues[0].toFixed(0),
+        annualFixedCosts: res.fixedExpenses[0].toFixed(0),
+        annualVariableCosts: res.variableExpenses[0].toFixed(0),
+        depreciation: res.depreciation.toFixed(0),
+        growthRevenue: (inputs.growth * 100).toFixed(1),
+        growthCosts: (inputs.expGrowth * 100).toFixed(1),
+        discountRate: (inputs.discount * 100).toFixed(1),
+        taxRate: (inputs.taxRate * 100).toFixed(0),
+        years: inputs.lifeYears
+    };
+    const riskDataText = `
+        <strong>الاستثمار الأولي:</strong> ${currency} ${riskData.initialInvestment}<br>
+        <strong>الإيرادات السنوية (السنة الأولى):</strong> ${currency} ${riskData.annualRevenue}<br>
+        <strong>التكاليف الثابتة السنوية (السنة الأولى):</strong> ${currency} ${riskData.annualFixedCosts}<br>
+        <strong>التكاليف المتغيرة السنوية (السنة الأولى):</strong> ${currency} ${riskData.annualVariableCosts}<br>
+        <strong>الإهلاك السنوي:</strong> ${currency} ${riskData.depreciation}<br>
+        <strong>نمو الإيرادات السنوي:</strong> ${riskData.growthRevenue}%<br>
+        <strong>نمو التكاليف الثابتة السنوي:</strong> ${riskData.growthCosts}%<br>
+        <strong>معدل الخصم:</strong> ${riskData.discountRate}%<br>
+        <strong>معدل الضريبة:</strong> ${riskData.taxRate}%<br>
+        <strong>عدد السنوات:</strong> ${riskData.years}
+    `;
+    document.getElementById('riskDataText').innerHTML = riskDataText;
+
+    // نقطة التعادل
+    document.getElementById('breakevenCard').innerHTML = `
+        <div style="width:100%;">
+            <span><i class="fas fa-calendar-alt" style="color:var(--gold);"></i> <strong>إيرادات التعادل (سنوية):</strong> ${currency}${res.beRevenueActual.toFixed(0)}</span><br>
+            <span><i class="fas fa-boxes" style="color:var(--gold);"></i> <strong>عدد الوحدات (سنوياً):</strong> ${res.beUnitsActual.toFixed(0)} وحدة (بسعر ${currency}${inputs.pricePerUnit})</span><br>
+            <span><i class="fas fa-calendar-week" style="color:var(--gold);"></i> <strong>شهرياً:</strong> ≈ ${(res.beRevenueActual/12).toFixed(0)} إيرادات / ${(res.beUnitsActual/12).toFixed(0)} وحدة</span>
+            <span style="display:block; margin-top:0.5rem; font-size:0.9rem; color:#666; background:var(--gold-soft); padding:0.3rem; border-radius:10px;">
+                (التكاليف الثابتة الشهرية المستخدمة: ${currency}${res.totalFixedMonthly.toFixed(0)}، هامش المساهمة = ${(res.contributionMarginRatio*100).toFixed(0)}%)
+            </span>
+        </div>
+    `;
+
+    // رسم الرسوم البيانية
+    renderCharts(res, inputs, currency);
+
+    // تحليل السيناريوهات
+    renderScenarios(res, inputs, currency);
+});
+
+// تحليل الحساسية
+document.getElementById('runSensitivity').addEventListener('click', function() {
+    const inputs = {
+        fixedCapital: parseFloat(document.getElementById('fixedCapital').value) || 0,
+        setupCapital: parseFloat(document.getElementById('setupCapital').value) || 0,
+        monthlySales: parseFloat(document.getElementById('monthlySales').value) || 0,
+        employees: parseFloat(document.getElementById('employees').value) || 0,
+        netSalary: parseFloat(document.getElementById('netSalary').value) || 0,
+        salaryBurden: parseFloat(document.getElementById('salaryBurden').value) || 1,
+        netRent: parseFloat(document.getElementById('netRent').value) || 0,
+        rentTax: parseFloat(document.getElementById('rentTax').value) / 100 || 0,
+        totalVariableCostPercent: parseFloat(document.getElementById('totalVariableCostPercent').value) || 0,
+        opexMonthly: parseFloat(document.getElementById('opexMonthly').value) || 0,
+        cashReserve: parseFloat(document.getElementById('cashReserve').value) || 0,
+        wcMonths: parseFloat(document.getElementById('wcMonths').value) || 3,
+        growth: parseFloat(document.getElementById('growthRate').value) / 100 || 0,
+        expGrowth: parseFloat(document.getElementById('expGrowth').value) / 100 || 0,
+        discount: parseFloat(document.getElementById('discountRate').value) / 100 || 0.15,
+        taxRate: parseFloat(document.getElementById('taxRate').value) / 100 || 0.25,
+        lifeYears: parseInt(document.getElementById('lifeYears').value) || 8,
+        reinvestRate: parseFloat(document.getElementById('reinvestRate').value) / 100 || 0.10,
+        debtService: parseFloat(document.getElementById('debtService').value) || 0,
+        pricePerUnit: parseFloat(document.getElementById('pricePerUnit').value) || 0
+    };
+
+    const sensitivityVar = document.getElementById('sensitivityVar').value;
+    const rangePercent = parseFloat(document.getElementById('sensitivityRange').value) / 100;
+
+    const multipliers = [-rangePercent, -rangePercent/2, 0, rangePercent/2, rangePercent];
+    const labels = [];
+    const npvResults = [];
+    const irrResults = [];
+
+    for (let m of multipliers) {
+        let modifiedInputs = { ...inputs };
+        if (sensitivityVar === 'monthlySales') {
+            modifiedInputs.monthlySales = inputs.monthlySales * (1 + m);
+        } else if (sensitivityVar === 'fixedCosts') {
+            modifiedInputs.netSalary = inputs.netSalary * (1 + m);
+            modifiedInputs.netRent = inputs.netRent * (1 + m);
+            modifiedInputs.opexMonthly = inputs.opexMonthly * (1 + m);
+        } else if (sensitivityVar === 'totalVariableCostPercent') {
+            modifiedInputs.totalVariableCostPercent = inputs.totalVariableCostPercent * (1 + m);
+            if (modifiedInputs.totalVariableCostPercent > 1) modifiedInputs.totalVariableCostPercent = 1;
+            if (modifiedInputs.totalVariableCostPercent < 0) modifiedInputs.totalVariableCostPercent = 0;
+        } else if (sensitivityVar === 'discountRate') {
+            modifiedInputs.discount = inputs.discount * (1 + m);
+        } else if (sensitivityVar === 'growthRate') {
+            modifiedInputs.growth = inputs.growth * (1 + m);
+        }
+
+        const res = computeProjectFromInputs(modifiedInputs);
+        npvResults.push(res.npv);
+        irrResults.push(res.irr * 100);
+        labels.push((m*100).toFixed(0) + '%');
+    }
+
+    let tableHtml = '<table><thead><tr><th>التغيير</th><th>NPV</th><th>IRR (%)</th></tr></thead><tbody>';
+    for (let i = 0; i < labels.length; i++) {
+        tableHtml += `<tr>
+            <td>${labels[i]}</td>
+            <td class="${npvResults[i] > 0 ? 'positive' : 'negative'}">${document.getElementById('currencySelect').value}${npvResults[i].toFixed(0)}</td>
+            <td>${irrResults[i].toFixed(2)}%</td>
+        </tr>`;
+    }
+    tableHtml += '</tbody></table>';
+    document.getElementById('sensitivityResults').innerHTML = tableHtml;
+});
+
+// ربط أزرار التصدير
+document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+
+// ------------------ آلة حاسبة منبثقة ------------------
+const calcDisplay = document.getElementById('calcDisplay');
+let currentCalcInput = '';
+
+window.handleCalculatorInput = function(value) {
+    currentCalcInput += value;
+    calcDisplay.value = currentCalcInput;
+}
+
+window.clearCalculator = function() {
+    currentCalcInput = '';
+    calcDisplay.value = '';
+}
+
+window.backspaceCalculator = function() {
+    currentCalcInput = currentCalcInput.slice(0, -1);
+    calcDisplay.value = currentCalcInput;
+}
+
+window.calculateCalculatorResult = function() {
+    try {
+        let result = safeEvaluate(currentCalcInput);
+        calcDisplay.value = result;
+        currentCalcInput = result.toString();
+    } catch (e) {
+        calcDisplay.value = 'خطأ';
+        currentCalcInput = '';
+    }
+}
+
+function handleKeyboard(e) {
+    if (modal.style.display !== 'block') return;
+    const key = e.key;
+    e.preventDefault();
+    e.stopPropagation();
+    if (key >= '0' && key <= '9') handleCalculatorInput(key);
+    else if (key === '.') handleCalculatorInput('.');
+    else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
+    else if (key === 'Enter' || key === '=') calculateCalculatorResult();
+    else if (key === 'Backspace') backspaceCalculator();
+    else if (key === 'Escape') modal.style.display = 'none';
+    else if (key === 'c' || key === 'C') clearCalculator();
+}
+
+document.addEventListener('keydown', handleKeyboard);
+
+const modal = document.getElementById('calculatorModal');
+const btn = document.getElementById('calculatorBtn');
+const span = document.getElementsByClassName('close')[0];
+
+btn.onclick = function(e) {
+    e.preventDefault();
+    modal.style.display = 'block';
+}
+
+span.onclick = function() {
+    modal.style.display = 'none';
+}
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
+</body>
+</html>
