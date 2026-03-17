@@ -2,12 +2,12 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
     <title>نظام تدقيق HACCP المتقدم - تحليل المخاطر والتوصيات | FAROUK GRUP</title>
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <!-- AOS Library -->
@@ -21,6 +21,20 @@
         }
 
         :root {
+            --bg-dark: #0b0e17;
+            --bg-panel: rgba(18, 24, 36, 0.85);
+            --bg-card: rgba(22, 30, 46, 0.8);
+            --border-light: rgba(180, 133, 84, 0.25);
+            --accent-glow: #b48554;
+            --accent-soft: #cfa776;
+            --text-light: #f0f4fa;
+            --text-muted: #aab7d4;
+            --text-dark: #0b0e17;
+            --shadow-soft: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 133, 84, 0.15);
+            --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
+            --radius-md: 20px;
+            --radius-lg: 30px;
+            --transition: all 0.3s ease;
             --gold: #b8860b;
             --gold-light: #d4b15a;
             --gold-soft: rgba(184,134,11,0.1);
@@ -29,7 +43,6 @@
             --white: #ffffff;
             --offwhite: #f9f9f9;
             --text: #333;
-            --card-bg: #fefcf6;
             --risk-high: #dc3545;
             --risk-medium: #ffc107;
             --risk-low: #28a745;
@@ -37,22 +50,39 @@
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-            color: var(--text);
+            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
+            color: var(--text-light);
             line-height: 1.6;
-            overflow-x: hidden;
+            min-height: 100vh;
             position: relative;
         }
 
-        body::before {
-            content: "";
+        /* خلفية متوهجة */
+        .glow-bg {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(184,134,11,0.03) 0px, transparent 20px),
-                radial-gradient(circle at 90% 70%, rgba(184,134,11,0.03) 0px, transparent 25px),
-                repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 1px, transparent 1px, transparent 10px);
-            pointer-events: none; z-index: -1;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .glow-bg span {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: glowMove 20s infinite alternate ease-in-out;
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(180,133,84,0.12) 0%, transparent 70%); }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.1) 0%, transparent 70%); animation-delay: -5s; }
+
+        @keyframes glowMove {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; }
         }
 
         .floating-shape {
@@ -62,8 +92,8 @@
             z-index: 0; pointer-events: none;
         }
 
-        .shape-1 { top: -100px; right: -100px; animation: float 20s infinite ease-in-out; }
-        .shape-2 { bottom: -50px; left: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
+        .shape-1 { top: -100px; left: -100px; animation: float 20s infinite ease-in-out; }
+        .shape-2 { bottom: -50px; right: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
 
         @keyframes float {
             0% { transform: translate(0,0) rotate(0deg); }
@@ -72,49 +102,7 @@
             100% { transform: translate(0,0) rotate(0deg); }
         }
 
-        nav {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo img {
-            height: 50px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .logo h1 {
-            font-family: 'Alexandria', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--gold);
-            letter-spacing: 1px;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: #444;
-            margin: 0 0.8rem;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-        nav a:hover { color: var(--gold); }
-        nav a i { margin-left: 5px; }
+        /* تم إزالة الـ NAV بالكامل */
 
         .hero-mini {
             background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
@@ -124,6 +112,7 @@
             border-bottom: 4px solid var(--gold);
             position: relative;
             overflow: hidden;
+            z-index: 2;
         }
 
         .hero-mini::before {
@@ -162,21 +151,26 @@
 
         .container {
             max-width: 1200px;
-            margin: 4rem auto;
-            padding: 0 1.5rem;
+            margin: 2rem auto;
+            padding: 0 1rem;
             position: relative;
             z-index: 2;
         }
 
         .checklist-card {
-            background: rgba(255,255,255,0.9);
+            background: var(--bg-panel);
             backdrop-filter: blur(15px);
-            border: 2px solid var(--gold);
-            border-radius: 40px;
-            padding: 3rem;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(184,134,11,0.3) inset;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-soft);
             position: relative;
             overflow: hidden;
+        }
+
+        .checklist-card:hover {
+            box-shadow: var(--shadow-glow);
+            border-color: rgba(180,133,84,0.4);
         }
 
         .checklist-card::before {
@@ -188,12 +182,14 @@
         }
 
         .checklist-card h2 {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 900;
-            color: var(--gold);
-            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #f0e6d2, #cfa776);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
             text-align: center;
-            border-bottom: 2px solid var(--gold-soft);
+            border-bottom: 2px solid var(--border-light);
             padding-bottom: 0.5rem;
         }
 
@@ -210,29 +206,29 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 700;
-            color: var(--dark);
+            color: var(--accent-soft);
         }
         .info-item input {
             width: 100%;
             padding: 1rem;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-light);
             border-radius: 30px;
-            font-family: 'Tajawal', sans-serif;
-            font-size: 1rem;
-            background: var(--offwhite);
+            background: rgba(10,14,23,0.7);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
         }
         .info-item input:focus {
             outline: none;
-            border-color: var(--gold);
-            box-shadow: 0 0 0 3px rgba(184,134,11,0.2);
-            background: var(--white);
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.2);
         }
 
         .signature-row {
             display: flex;
             gap: 1.5rem;
             margin-bottom: 2rem;
-            background: var(--gold-soft);
+            background: rgba(180,133,84,0.15);
+            border: 1px solid var(--border-light);
             padding: 1.5rem;
             border-radius: 30px;
         }
@@ -241,24 +237,25 @@
         }
         .signature-item label {
             font-weight: 700;
-            color: var(--dark);
+            color: var(--accent-soft);
         }
         .signature-item input {
             width: 100%;
             padding: 0.8rem;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-light);
             border-radius: 30px;
-            font-family: 'Tajawal', sans-serif;
+            background: rgba(10,14,23,0.7);
+            color: var(--text-light);
         }
 
         .checklist-section {
             margin-bottom: 2rem;
-            border: 2px solid var(--gold-soft);
+            border: 2px solid var(--border-light);
             border-radius: 30px;
             padding: 1.5rem;
         }
         .section-title {
-            color: var(--gold);
+            color: var(--accent-soft);
             font-weight: 900;
             font-size: 1.5rem;
             margin-bottom: 1rem;
@@ -268,7 +265,7 @@
         }
         .checklist-item {
             margin-bottom: 1.5rem;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid rgba(180,133,84,0.2);
             padding-bottom: 1rem;
         }
         .item-row {
@@ -280,12 +277,12 @@
         .item-row input[type="checkbox"] {
             width: 22px;
             height: 22px;
-            accent-color: var(--gold);
+            accent-color: var(--accent-glow);
             cursor: pointer;
         }
         .item-row label {
             font-weight: 700;
-            color: var(--text);
+            color: var(--text-light);
             cursor: pointer;
             flex: 1;
         }
@@ -295,10 +292,9 @@
             border-radius: 50px;
             font-size: 0.8rem;
             font-weight: 700;
-            color: #111;
         }
         .risk-high { background: var(--risk-high); color: white; }
-        .risk-medium { background: var(--risk-medium); }
+        .risk-medium { background: var(--risk-medium); color: #111; }
         .risk-low { background: var(--risk-low); color: white; }
 
         .notes-field {
@@ -309,8 +305,10 @@
         .notes-field textarea {
             width: 100%;
             padding: 0.5rem;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-light);
             border-radius: 15px;
+            background: rgba(10,14,23,0.7);
+            color: var(--text-light);
             font-family: 'Tajawal', sans-serif;
             resize: vertical;
             min-height: 60px;
@@ -321,9 +319,9 @@
             margin-right: 2.2rem;
             padding: 0.8rem;
             border-radius: 15px;
-            background: #fff3cd;
-            border: 1px solid #ffeeba;
-            color: #856404;
+            background: rgba(255,193,7,0.15);
+            border: 1px solid var(--warning);
+            color: #fbbf24;
             font-size: 0.9rem;
         }
         .recommendation-box strong {
@@ -334,7 +332,8 @@
         .result-area {
             margin: 2rem 0;
             padding: 1.5rem;
-            background: var(--gold-soft);
+            background: rgba(180,133,84,0.15);
+            border: 1px solid var(--border-light);
             border-radius: 30px;
             display: flex;
             align-items: center;
@@ -345,11 +344,12 @@
         .score {
             font-size: 2rem;
             font-weight: 900;
-            color: var(--gold);
+            color: var(--accent-soft);
         }
         .evaluation {
             font-size: 1.2rem;
             font-weight: 700;
+            color: var(--text-muted);
         }
         .overall-risk {
             font-size: 1.5rem;
@@ -368,191 +368,212 @@
             margin-top: 2rem;
         }
         .btn-primary {
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            color: #111;
-            border: none;
+            background: rgba(180,133,84,0.2);
+            border: 1px solid var(--border-light);
+            color: var(--accent-soft);
             border-radius: 50px;
             padding: 1rem 2.5rem;
             font-weight: 900;
             font-size: 1.1rem;
             cursor: pointer;
-            transition: 0.3s;
+            transition: var(--transition);
             display: inline-flex;
             align-items: center;
             gap: 0.8rem;
-            box-shadow: 0 5px 20px rgba(184,134,11,0.4);
+            backdrop-filter: blur(10px);
         }
         .btn-primary:hover {
-            background: linear-gradient(135deg, #111, #222);
-            color: var(--gold);
+            background: rgba(180,133,84,0.4);
+            color: #fff;
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 25px rgba(180,133,84,0.3);
             transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(184,134,11,0.6);
         }
         .btn-secondary {
-            background: transparent;
-            border: 2px solid var(--gold);
-            color: var(--gold);
+            background: rgba(30,74,122,0.2);
+            border: 1px solid #1e4a7a;
+            color: #8ab8ff;
             border-radius: 50px;
             padding: 1rem 2.5rem;
             font-weight: 900;
             font-size: 1.1rem;
             cursor: pointer;
-            transition: 0.3s;
+            transition: var(--transition);
             display: inline-flex;
             align-items: center;
             gap: 0.8rem;
         }
         .btn-secondary:hover {
-            background: var(--gold);
-            color: #111;
+            background: rgba(30,74,122,0.4);
+            color: #fff;
+            border-color: #1e4a7a;
             transform: translateY(-3px);
         }
 
-        footer {
-            background: linear-gradient(145deg, #111, #1a1a1a);
-            color: #ddd;
-            padding: 3rem 1rem 2rem;
-            border-top: 3px solid var(--gold);
-            margin-top: 4rem;
+        /* فوتر مبسط */
+        .footer-simple {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            background: rgba(10,14,23,0.5);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid var(--border-light);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .footer-simple span {
+            color: var(--accent-soft);
+            font-weight: 700;
         }
 
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
+        /* الآلة الحاسبة المنبثقة */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
         }
-
-        .footer-content {
+        .modal-content {
+            background: var(--bg-panel);
+            margin: 5% auto;
+            padding: 0;
+            border: 2px solid var(--border-light);
+            border-radius: 30px;
+            width: 90%;
+            max-width: 300px;
+            box-shadow: var(--shadow-glow);
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.15);
+            border-bottom: 2px solid var(--border-light);
+            padding: 10px 15px;
+            border-radius: 28px 28px 0 0;
             display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .footer-row {
-            display: flex;
-            flex-wrap: wrap;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            gap: 2rem;
         }
-
-        .footer-social {
-            display: flex;
-            gap: 1.5rem;
+        .modal-header h2 {
+            margin: 0;
+            color: var(--accent-soft);
+            font-size: 1rem;
+            font-weight: 900;
         }
-
-        .footer-social a {
-            color: var(--gold);
-            font-size: 1.8rem;
-            transition: 0.3s;
-        }
-        .footer-social a:hover {
-            color: var(--gold-light);
-            transform: translateY(-3px);
-        }
-
-        .footer-logo-box {
-            text-align: center;
-        }
-
-        .footer-logo-box h2 {
-            color: var(--gold);
-            font-size: 1.2rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-logo-box div {
-            width: 60px;
-            height: 2px;
-            background: var(--gold);
-            margin: 0 auto;
-        }
-
-        .footer-payment .payment-card {
-            background: rgba(255,255,255,0.05);
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .footer-payment img {
-            height: 25px;
-            filter: brightness(0.9);
-            transition: 0.2s;
-        }
-        .footer-payment img:hover {
-            filter: brightness(1.2);
-        }
-
-        hr {
-            border: none;
-            border-top: 1px solid rgba(184,134,11,0.2);
-        }
-
-        .copyright {
-            text-align: center;
-            font-size: 0.9rem;
-            color: #777;
-        }
-        .copyright span {
-            color: var(--gold);
+        .close {
+            color: var(--text-muted);
+            float: left;
+            font-size: 24px;
             font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover { color: var(--accent-glow); }
+        .modal-body { padding: 15px; }
+        .calc-display {
+            width: 100%;
+            height: 45px;
+            font-size: 1.4rem;
+            text-align: left;
+            padding: 0 10px;
+            border: 2px solid var(--border-light);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            background: rgba(10,14,23,0.8);
+            color: var(--accent-soft);
+            font-family: 'Inter', monospace;
+            direction: ltr;
+        }
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.1);
+            border: 1px solid var(--border-light);
+            border-radius: 15px;
+            padding: 10px 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+        .calc-btn:hover {
+            background: rgba(180,133,84,0.3);
+            border-color: var(--accent-glow);
+        }
+        .calc-btn.operator { color: var(--accent-soft); }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.3);
+            color: white;
+            grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.5); }
+
+        /* زر الآلة الحاسبة العائم */
+        .calc-floating-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(180,133,84,0.2);
+            border: 1px solid var(--border-light);
+            border-radius: 50px;
+            padding: 0.8rem 1.2rem;
+            color: var(--accent-soft);
+            font-size: 1rem;
+            font-weight: 700;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .calc-floating-btn:hover {
+            background: rgba(180,133,84,0.4);
+            color: #fff;
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 15px rgba(180,133,84,0.3);
         }
 
+        /* تحسينات الجوال */
         @media (max-width: 768px) {
-            nav {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.8rem;
-            }
-            .logo {
-                flex-wrap: nowrap;
-                gap: 8px;
-                width: 100%;
-                justify-content: center;
-            }
-            .logo img { height: 35px; }
-            .logo h1 { font-size: 1rem; }
-            nav > div:last-child {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 6px;
-            }
-            nav a {
-                margin: 0;
-                font-size: 0.9rem;
-                padding: 4px 8px;
-                white-space: nowrap;
-            }
+            nav { display: none; }
             .hero-mini h2 { font-size: 2rem; }
             .hero-mini p { font-size: 1rem; }
-            .checklist-card { padding: 2rem 1.5rem; }
-            .footer-row { flex-direction: column; text-align: center; }
-            .footer-social { justify-content: center; }
+            .checklist-card { padding: 1.5rem; }
+            .signature-row { flex-direction: column; }
+            .item-row { flex-direction: column; align-items: flex-start; }
+            .item-row label { width: 100%; }
+            .risk-badge { align-self: flex-start; }
+            .notes-field { margin-right: 0; width: 100%; }
+            .recommendation-box { margin-right: 0; width: 100%; }
+            .btn-group { flex-direction: column; }
+            .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+            .result-area { flex-direction: column; align-items: flex-start; }
+            .calc-floating-btn { padding: 0.6rem 1rem; font-size: 0.9rem; bottom: 15px; left: 15px; }
         }
     </style>
 </head>
 <body>
 
+<!-- خلفية متوهجة -->
+<div class="glow-bg">
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+
 <!-- أشكال هندسية -->
 <div class="floating-shape shape-1"></div>
 <div class="floating-shape shape-2"></div>
 
-<!-- Navigation -->
-<nav>
-    <div class="logo">
-        <img src="https://lh3.googleusercontent.com/d/1e6u-DPTinDJl_Q9wW3QvGgzFbXO_2sXa" alt="FAROUK GRUP LOGO">
-        <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-    </div>
-    <div>
-        <a href="https://www.farouk-grup.com/"><i class="fas fa-home"></i> الرئيسية</a>
-        <a href="https://www.farouk-grup.com/Home/Contact-Us" style="color:var(--gold)"><i class="fas fa-phone-alt"></i> تواصل معنا</a>
-    </div>
-</nav>
+<!-- تم إزالة الـ NAV بالكامل -->
 
 <!-- Hero -->
 <section class="hero-mini">
@@ -1186,39 +1207,48 @@
     </div>
 </div>
 
-<!-- Footer -->
-<footer>
-    <div class="footer-container">
-        <div class="footer-content">
-            <div class="footer-row">
-                <div class="footer-social">
-                    <a href="https://www.instagram.com/faroukazem/" target="_blank"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.facebook.com/profile.php?id=100091571594026&sk=about" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://wa.me/905550196682" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                </div>
+<!-- فوتر مبسط -->
+<footer class="footer-simple">
+    جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
+</footer>
 
-                <div class="footer-logo-box">
-                    <h2>مجموعة فاروق للاستشارات والأعمال</h2>
-                    <div></div>
-                </div>
+<!-- زر الآلة الحاسبة العائم -->
+<div class="calc-floating-btn" id="calculatorBtn">
+    <i class="fas fa-calculator"></i> آلة حاسبة
+</div>
 
-                <div class="footer-payment">
-                    <div class="payment-card">
-                        <img src="https://img.icons8.com/color/48/visa.png" alt="Visa">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
-                    </div>
-                </div>
-            </div>
-
-            <hr>
-
-            <div class="copyright">
-                جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
-                <p>Adnan Kahveci, Beylikdüzü / İstanbul, Türkiye</p>
+<!-- نافذة الآلة الحاسبة المنبثقة -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close">&times;</span>
+            <h2><i class="fas fa-calculator" style="color: var(--accent-soft);"></i> آلة حاسبة</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
+                <button class="calc-btn" onclick="clearCalculator()">C</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
+                <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
+                <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
             </div>
         </div>
     </div>
-</footer>
+</div>
 
 <!-- AOS -->
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -1472,7 +1502,77 @@
 
     // تفعيل التوصيات
     setupRecommendations();
-</script>
 
+    // ------------------ آلة حاسبة منبثقة ------------------
+    const calcDisplay = document.getElementById('calcDisplay');
+    let currentCalcInput = '';
+
+    function safeEvaluate(expression) {
+        let expr = expression.replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/');
+        if (!/^[0-9+\-*/().]+$/.test(expr)) throw new Error('تعبير غير صالح');
+        return new Function('return ' + expr)();
+    }
+
+    window.handleCalculatorInput = function(value) {
+        currentCalcInput += value;
+        calcDisplay.value = currentCalcInput;
+    }
+
+    window.clearCalculator = function() {
+        currentCalcInput = '';
+        calcDisplay.value = '';
+    }
+
+    window.backspaceCalculator = function() {
+        currentCalcInput = currentCalcInput.slice(0, -1);
+        calcDisplay.value = currentCalcInput;
+    }
+
+    window.calculateCalculatorResult = function() {
+        try {
+            let result = safeEvaluate(currentCalcInput);
+            calcDisplay.value = result;
+            currentCalcInput = result.toString();
+        } catch (e) {
+            calcDisplay.value = 'خطأ';
+            currentCalcInput = '';
+        }
+    }
+
+    function handleKeyboard(e) {
+        if (modal.style.display !== 'block') return;
+        const key = e.key;
+        e.preventDefault();
+        e.stopPropagation();
+        if (key >= '0' && key <= '9') handleCalculatorInput(key);
+        else if (key === '.') handleCalculatorInput('.');
+        else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
+        else if (key === 'Enter' || key === '=') calculateCalculatorResult();
+        else if (key === 'Backspace') backspaceCalculator();
+        else if (key === 'Escape') modal.style.display = 'none';
+        else if (key === 'c' || key === 'C') clearCalculator();
+    }
+
+    document.addEventListener('keydown', handleKeyboard);
+
+    const modal = document.getElementById('calculatorModal');
+    const btn = document.getElementById('calculatorBtn');
+    const span = document.getElementsByClassName('close')[0];
+
+    btn.onclick = function(e) {
+        e.preventDefault();
+        modal.style.display = 'block';
+    }
+
+    span.onclick = function() {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
 </body>
 </html>

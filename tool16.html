@@ -14,36 +14,81 @@
         }
 
         :root {
-            /* Corporate Palette */
-            --primary: #0f172a;       /* Slate 900 - كحلي داكن */
-            --secondary: #1e293b;     /* Slate 800 */
-            --accent: #b48554;        /* Corporate Gold */
-            --accent-hover: #9c7246;
-            --bg-main: #f1f5f9;       /* Slate 100 */
-            --surface: #ffffff;
-            --border: #e2e8f0;
-            --text-main: #334155;
-            --text-light: #64748b;
-            --danger: #ef4444;
-            
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-            --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.15);
+            /* الثيم الجديد (داكن + ذهبي) */
+            --bg-dark: #0b0e17;
+            --bg-panel: rgba(18, 24, 36, 0.85);
+            --bg-card: rgba(22, 30, 46, 0.8);
+            --border-light: rgba(180, 133, 84, 0.25);
+            --accent-glow: #b48554;
+            --accent-soft: #cfa776;
+            --text-light: #f0f4fa;
+            --text-muted: #aab7d4;
+            --shadow-soft: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 133, 84, 0.15);
+            --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
             --radius-md: 12px;
             --radius-sm: 8px;
+            --transition: all 0.3s ease;
+            --gold: #b8860b;
+            --gold-light: #d4b15a;
+            --danger: #dc3545;
         }
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-main);
+            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
+            color: var(--text-light);
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            position: relative;
         }
 
-        /* الحاوية الرئيسية تم تصغيرها وتنسيقها */
+        /* خلفية متوهجة */
+        .glow-bg {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .glow-bg span {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: glowMove 20s infinite alternate ease-in-out;
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(180,133,84,0.12) 0%, transparent 70%); }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.1) 0%, transparent 70%); animation-delay: -5s; }
+
+        @keyframes glowMove {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; }
+        }
+
+        .floating-shape {
+            position: absolute;
+            width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%);
+            z-index: 0; pointer-events: none;
+        }
+        .shape-1 { top: -100px; right: -100px; animation: float 20s infinite ease-in-out; }
+        .shape-2 { bottom: -50px; left: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
+        @keyframes float {
+            0% { transform: translate(0,0) rotate(0deg); }
+            33% { transform: translate(30px,-30px) rotate(5deg); }
+            66% { transform: translate(-20px,20px) rotate(-5deg); }
+            100% { transform: translate(0,0) rotate(0deg); }
+        }
+
+        /* الحاوية الرئيسية (بدون تغيير) */
         .calc-container {
             width: 950px;
             max-width: 98vw;
@@ -53,17 +98,19 @@
             justify-content: center;
             align-items: stretch;
             background: transparent;
+            z-index: 2;
+            position: relative;
         }
 
         /* قسم الآلة الحاسبة (اليسار/اليمين) */
         .calculator {
             flex: 0 0 340px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-top: 4px solid var(--accent);
+            background: var(--bg-panel);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--border-light);
             border-radius: var(--radius-md);
             padding: 1.2rem;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-soft);
             display: flex;
             flex-direction: column;
         }
@@ -76,7 +123,7 @@
         }
 
         .calculator-header h2 {
-            color: var(--primary);
+            color: var(--accent-soft);
             font-size: 1.1rem;
             font-weight: 800;
             display: flex;
@@ -84,12 +131,12 @@
             gap: 0.5rem;
         }
 
-        .calculator-header h2 i { color: var(--accent); }
+        .calculator-header h2 i { color: var(--accent-glow); }
 
         /* الشاشة */
         .screen-container {
-            background: var(--bg-main);
-            border: 1px solid var(--border);
+            background: rgba(10,14,23,0.8);
+            border: 2px solid var(--border-light);
             border-radius: var(--radius-sm);
             padding: 0.8rem 1rem;
             margin-bottom: 1rem;
@@ -98,7 +145,7 @@
         }
 
         .history-display {
-            color: var(--text-light);
+            color: var(--text-muted);
             font-size: 0.85rem;
             font-family: 'Inter', monospace;
             min-height: 1.2rem;
@@ -108,7 +155,7 @@
         }
 
         .main-display {
-            color: var(--primary);
+            color: var(--accent-soft);
             font-size: 1.8rem;
             font-weight: 700;
             font-family: 'Inter', monospace;
@@ -118,9 +165,9 @@
         }
 
         .error-message {
-            background-color: #fee2e2;
-            color: var(--danger);
-            border: 1px solid #fca5a5;
+            background-color: rgba(220,53,69,0.2);
+            color: #f9acac;
+            border: 1px solid var(--danger);
             padding: 0.4rem;
             border-radius: var(--radius-sm);
             font-size: 0.8rem;
@@ -139,15 +186,15 @@
         }
 
         .btn {
-            background: var(--surface);
-            border: 1px solid var(--border);
+            background: rgba(180,133,84,0.1);
+            border: 1px solid var(--border-light);
             border-radius: 6px;
             font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
             font-weight: 600;
-            color: var(--text-main);
+            color: var(--text-light);
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -155,52 +202,54 @@
         }
 
         .btn:hover {
-            background: var(--bg-main);
-            border-color: #cbd5e1;
+            background: rgba(180,133,84,0.3);
+            border-color: var(--accent-glow);
+            color: #fff;
         }
 
         .btn:active { transform: scale(0.96); }
 
-        .btn-number { font-weight: 700; font-size: 1.1rem; color: var(--primary); }
+        .btn-number { font-weight: 700; font-size: 1.1rem; color: var(--text-light); }
         
         .btn-operator {
-            background: #fdfaf6;
-            color: var(--accent);
-            border-color: rgba(180, 133, 84, 0.3);
+            background: rgba(180,133,84,0.15);
+            color: var(--accent-soft);
+            border-color: rgba(180,133,84,0.3);
             font-weight: 800;
             font-size: 1.1rem;
         }
-        .btn-operator:hover { background: rgba(180, 133, 84, 0.1); }
+        .btn-operator:hover { background: rgba(180,133,84,0.4); }
 
-        .btn-memory { font-size: 0.8rem; color: var(--text-light); }
+        .btn-memory { font-size: 0.8rem; color: var(--text-muted); }
         
         .btn-action { color: var(--danger); }
         
         .btn-equals {
-            background: var(--primary);
-            color: white;
+            background: var(--accent-glow);
+            color: #111;
             grid-column: span 2;
             border: none;
         }
-        .btn-equals:hover { background: var(--secondary); }
+        .btn-equals:hover { background: var(--gold-light); color: #111; }
 
         .btn-finance {
             font-family: 'Tajawal', sans-serif;
             font-size: 0.8rem;
-            background: var(--secondary);
-            color: white;
-            border: none;
+            background: rgba(30,74,122,0.3);
+            border-color: #1e4a7a;
+            color: #8ab8ff;
         }
-        .btn-finance:hover { background: var(--primary); }
+        .btn-finance:hover { background: rgba(30,74,122,0.5); color: #fff; }
 
         /* قسم السجل (الجدول الاحترافي) */
         .history-panel {
             flex: 1;
-            background: var(--surface);
-            border: 1px solid var(--border);
+            background: var(--bg-panel);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--border-light);
             border-radius: var(--radius-md);
             padding: 1.2rem;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-soft);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -212,11 +261,11 @@
             align-items: center;
             margin-bottom: 1rem;
             padding-bottom: 0.8rem;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--border-light);
         }
 
         .history-header h3 {
-            color: var(--primary);
+            color: var(--accent-soft);
             font-size: 1.1rem;
             font-weight: 800;
             display: flex;
@@ -232,42 +281,48 @@
         .filter-select {
             padding: 0.4rem 0.8rem;
             border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border-light);
             font-family: 'Tajawal', sans-serif;
             font-size: 0.85rem;
             outline: none;
-            background: var(--bg-main);
-            color: var(--text-main);
+            background: rgba(10,14,23,0.7);
+            color: var(--text-light);
         }
+        .filter-select option { background: #0b0e17; color: var(--text-light); }
 
         .btn-export {
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: var(--radius-sm);
-            padding: 0.4rem 0.8rem;
-            font-family: 'Tajawal', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 600;
+            background: rgba(180,133,84,0.15);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            color: var(--accent-soft);
+            font-weight: 700;
             cursor: pointer;
-            display: flex;
+            transition: var(--transition);
+            display: inline-flex;
             align-items: center;
             gap: 0.4rem;
-            transition: 0.2s;
+            font-size: 0.85rem;
         }
-        .btn-export:hover { background: var(--accent-hover); }
+        .btn-export:hover {
+            background: rgba(180,133,84,0.3);
+            color: #fff;
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 15px rgba(180,133,84,0.3);
+        }
 
         /* جدول السجل */
         .table-container {
             flex: 1;
             overflow-y: auto;
-            border: 1px solid var(--border);
+            border: 2px solid var(--border-light);
             border-radius: var(--radius-sm);
+            background: rgba(10,14,23,0.5);
         }
 
         /* Custom Scrollbar */
         .table-container::-webkit-scrollbar { width: 6px; }
-        .table-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+        .table-container::-webkit-scrollbar-thumb { background-color: var(--accent-glow); border-radius: 10px; }
 
         .history-table {
             width: 100%;
@@ -276,25 +331,26 @@
         }
 
         .history-table th {
-            background: var(--bg-main);
-            color: var(--text-light);
+            background: rgba(180,133,84,0.2);
+            color: var(--accent-soft);
             font-size: 0.85rem;
             font-weight: 700;
             padding: 0.6rem 0.8rem;
             position: sticky;
             top: 0;
             z-index: 10;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 2px solid var(--border-light);
         }
 
         .history-table td {
             padding: 0.6rem 0.8rem;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--border-light);
             font-size: 0.9rem;
+            color: var(--text-muted);
             vertical-align: middle;
         }
 
-        .history-table tr:hover { background-color: #f8fafc; }
+        .history-table tr:hover { background: rgba(180,133,84,0.1); }
 
         .badge {
             display: inline-block;
@@ -304,12 +360,12 @@
             font-weight: 700;
             font-family: 'Inter', sans-serif;
         }
-        .badge-math { background: #e0f2fe; color: #0369a1; }
-        .badge-finance { background: #fef3c7; color: #b45309; }
+        .badge-math { background: rgba(0,100,200,0.2); color: #8ab8ff; }
+        .badge-finance { background: rgba(255,193,7,0.2); color: #ffd966; }
 
         .td-operation {
             font-family: 'Inter', monospace;
-            color: var(--text-main);
+            color: var(--text-light);
             direction: ltr;
             text-align: left;
         }
@@ -317,7 +373,7 @@
         .td-result {
             font-family: 'Inter', monospace;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--accent-soft);
             direction: ltr;
             text-align: left;
         }
@@ -331,22 +387,22 @@
         .icon-btn {
             background: transparent;
             border: none;
-            color: var(--text-light);
+            color: var(--text-muted);
             cursor: pointer;
             padding: 0.3rem;
             border-radius: 4px;
             transition: 0.2s;
         }
-        .icon-btn.restore:hover { color: var(--accent); background: #fef3c7; }
-        .icon-btn.delete:hover { color: var(--danger); background: #fee2e2; }
+        .icon-btn.restore:hover { color: var(--accent-glow); background: rgba(180,133,84,0.2); }
+        .icon-btn.delete:hover { color: var(--danger); background: rgba(220,53,69,0.2); }
 
         .btn-clear-all {
             width: 100%;
             margin-top: 1rem;
             padding: 0.6rem;
-            background: var(--bg-main);
-            border: 1px solid var(--border);
-            color: var(--danger);
+            background: rgba(220,53,69,0.1);
+            border: 1px solid var(--danger);
+            color: #f9acac;
             font-weight: 700;
             border-radius: var(--radius-sm);
             cursor: pointer;
@@ -354,8 +410,8 @@
             font-family: 'Tajawal', sans-serif;
         }
         .btn-clear-all:hover {
-            background: #fee2e2;
-            border-color: #fca5a5;
+            background: rgba(220,53,69,0.2);
+            border-color: #f87171;
         }
 
         @media (max-width: 850px) {
@@ -370,6 +426,13 @@
     </style>
 </head>
 <body>
+    <!-- خلفية متوهجة -->
+    <div class="glow-bg">
+        <span></span><span></span><span></span>
+    </div>
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+
     <div class="calc-container">
         <div class="calculator">
             <div class="calculator-header">
@@ -454,7 +517,8 @@
                         </tr>
                     </thead>
                     <tbody id="historyTableBody">
-                        </tbody>
+                        <!-- يتم ملؤها بواسطة JavaScript -->
+                    </tbody>
                 </table>
             </div>
             
@@ -463,7 +527,7 @@
     </div>
 
     <script>
-        // ---------- منطق الآلة الحاسبة ----------
+        // ---------- منطق الآلة الحاسبة (بدون أي تغيير) ----------
         let display = document.getElementById('display');
         let historyDisplay = document.getElementById('historyDisplay');
         let errorMsg = document.getElementById('errorMessage');
@@ -768,7 +832,7 @@
             historyTableBody.innerHTML = '';
             
             if(filteredList.length === 0) {
-                historyTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-light); padding: 2rem 0;">لا توجد عمليات مسجلة حالياً</td></tr>`;
+                historyTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem 0;">لا توجد عمليات مسجلة حالياً</td></tr>`;
                 return;
             }
 

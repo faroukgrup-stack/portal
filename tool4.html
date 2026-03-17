@@ -2,34 +2,38 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
     <title>دراسة الجدوى التسويقية الشاملة | FAROUK GRUP</title>
-
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
     <!-- AOS Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- html2canvas و jsPDF لتصدير PDF -->
+    <!-- html2canvas و jsPDF لتصدير PDF (اختياري) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
     <style>
-        /* الهوية البصرية */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --gold: #b8860b;
+            --bg-dark: #0b0e17;
+            --bg-panel: rgba(18, 24, 36, 0.85);
+            --bg-card: rgba(22, 30, 46, 0.8);
+            --border-light: rgba(180, 133, 84, 0.25);
+            --accent-glow: #b48554;
+            --accent-soft: #cfa776;
+            --text-light: #f0f4fa;
+            --text-muted: #aab7d4;
+            --text-dark: #0b0e17;
+            --shadow-soft: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 133, 84, 0.15);
+            --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
+            --radius-md: 20px;
+            --radius-lg: 30px;
+            --transition: all 0.3s ease;
+            --gold: #b8860b;      /* احتفظ بها للتوافق */
             --gold-light: #d4b15a;
             --gold-soft: rgba(184,134,11,0.1);
             --dark: #0f0f0f;
@@ -37,7 +41,6 @@
             --white: #ffffff;
             --offwhite: #f9f9f9;
             --text: #333;
-            --card-bg: #fefcf6;
             --success: #28a745;
             --warning: #ffc107;
             --danger: #dc3545;
@@ -45,36 +48,49 @@
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-            color: var(--text);
+            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
+            color: var(--text-light);
             line-height: 1.6;
-            overflow-x: hidden;
+            min-height: 100vh;
             position: relative;
         }
 
-        body::before {
-            content: "";
+        /* خلفية متوهجة */
+        .glow-bg {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(184,134,11,0.03) 0px, transparent 20px),
-                radial-gradient(circle at 90% 70%, rgba(184,134,11,0.03) 0px, transparent 25px),
-                repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 1px, transparent 1px, transparent 10px);
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
             pointer-events: none;
-            z-index: -1;
+            z-index: 0;
+        }
+        .glow-bg span {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: glowMove 20s infinite alternate ease-in-out;
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(180,133,84,0.12) 0%, transparent 70%); }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.1) 0%, transparent 70%); animation-delay: -5s; }
+
+        @keyframes glowMove {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; }
         }
 
         .floating-shape {
             position: absolute;
             width: 300px; height: 300px; border-radius: 50%;
             background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%);
-            z-index: 0;
-            pointer-events: none;
+            z-index: 0; pointer-events: none;
         }
-
         .shape-1 { top: -100px; right: -100px; animation: float 20s infinite ease-in-out; }
         .shape-2 { bottom: -50px; left: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
-
         @keyframes float {
             0% { transform: translate(0,0) rotate(0deg); }
             33% { transform: translate(30px,-30px) rotate(5deg); }
@@ -82,49 +98,7 @@
             100% { transform: translate(0,0) rotate(0deg); }
         }
 
-        nav {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo img {
-            height: 50px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .logo h1 {
-            font-family: 'Alexandria', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--gold);
-            letter-spacing: 1px;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: #444;
-            margin: 0 0.8rem;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-        nav a:hover { color: var(--gold); }
-        nav a i { margin-left: 5px; }
+        /* تم إزالة الـ NAV بالكامل */
 
         .hero-mini {
             background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
@@ -134,67 +108,52 @@
             border-bottom: 4px solid var(--gold);
             position: relative;
             overflow: hidden;
+            z-index: 2;
         }
 
         .hero-mini::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
             animation: rotate 40s linear infinite;
         }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .hero-mini h2 {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--gold-light);
-            margin-bottom: 0.5rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-mini p {
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto;
-            opacity: 0.95;
-            position: relative;
-            z-index: 2;
-        }
+        .hero-mini h2 { font-size: 2.5rem; font-weight: 900; color: var(--gold-light); margin-bottom: 0.5rem; position: relative; z-index: 2; }
+        .hero-mini p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; opacity: 0.95; position: relative; z-index: 2; }
 
         .container {
             max-width: 1200px;
-            margin: 4rem auto;
-            padding: 0 1.5rem;
+            margin: 2rem auto;
+            padding: 0 1rem;
             position: relative;
             z-index: 2;
         }
 
         .calculator-card {
-            background: rgba(255,255,255,0.9);
+            background: var(--bg-panel);
             backdrop-filter: blur(15px);
-            border: 2px solid var(--gold);
-            border-radius: 40px;
-            padding: 3rem;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(184,134,11,0.3) inset;
-            margin-bottom: 3rem;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+        }
+
+        .calculator-card:hover {
+            box-shadow: var(--shadow-glow);
+            border-color: rgba(180,133,84,0.4);
         }
 
         .calculator-card h2 {
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             font-weight: 900;
-            color: var(--gold);
-            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #f0e6d2, #cfa776);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
             text-align: center;
-            border-bottom: 2px solid var(--gold-soft);
+            border-bottom: 2px solid var(--border-light);
             padding-bottom: 0.5rem;
         }
 
@@ -202,50 +161,48 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            background: var(--gold-soft);
-            padding: 1rem 1.5rem;
+            background: rgba(180,133,84,0.15);
+            border: 1px solid var(--border-light);
+            padding: 0.8rem 1rem;
             border-radius: 50px;
             margin-bottom: 2rem;
             flex-wrap: wrap;
         }
-        .currency-row label {
-            font-weight: 900;
-            color: var(--dark);
-        }
+        .currency-row label { font-weight: 700; color: var(--accent-soft); margin: 0; }
         .currency-row select, .currency-row input {
             width: 150px;
             padding: 0.5rem 1rem;
-            border: 2px solid var(--gold);
+            border: 2px solid var(--border-light);
             border-radius: 30px;
-            background: white;
+            background: rgba(10,14,23,0.7);
+            color: var(--text-light);
             font-weight: 700;
-            font-family: 'Tajawal', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
-        .currency-row input {
-            width: 250px;
-        }
+        .currency-row input { width: 250px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
 
         .grid-2 {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 1.5rem;
             margin-bottom: 1rem;
         }
 
         .section {
-            background: var(--card-bg);
-            border: 1px solid var(--gold-light);
-            border-radius: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
             padding: 1.5rem;
             margin-bottom: 1rem;
         }
 
         .section h3 {
-            color: var(--gold);
+            color: var(--accent-soft);
             margin-bottom: 1rem;
             font-weight: 900;
-            font-size: 1.4rem;
-            border-bottom: 1px dashed var(--gold-soft);
+            font-size: 1.3rem;
+            border-bottom: 1px dashed var(--border-light);
             padding-bottom: 0.5rem;
         }
 
@@ -257,30 +214,32 @@
             display: block;
             margin-bottom: 0.3rem;
             font-weight: 700;
-            color: var(--dark);
+            color: var(--accent-soft);
+            font-size: 0.9rem;
         }
 
         label i {
-            color: var(--gold);
+            color: var(--accent-soft);
             margin-left: 0.4rem;
         }
 
         input, select, textarea {
             width: 100%;
             padding: 0.8rem 1rem;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-light);
             border-radius: 30px;
+            background: rgba(10,14,23,0.7);
+            color: var(--text-light);
             font-family: 'Tajawal', sans-serif;
             font-size: 1rem;
-            background: var(--offwhite);
-            transition: 0.3s;
+            transition: var(--transition);
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: var(--gold);
-            box-shadow: 0 0 0 3px rgba(184,134,11,0.2);
-            background: var(--white);
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.2);
+            background: rgba(15,20,30,0.9);
         }
 
         textarea {
@@ -302,12 +261,20 @@
             gap: 0.5rem;
             margin-bottom: 0.5rem;
             align-items: center;
-            background: var(--white);
+            background: rgba(10,14,23,0.7);
+            border: 1px solid var(--border-light);
             padding: 0.5rem;
             border-radius: 30px;
-            border: 1px solid var(--gold-light);
+            flex-wrap: wrap;
         }
-        .competitor-row input, .channel-row input { flex: 1; min-width: 80px; }
+        .competitor-row input, .channel-row input {
+            flex: 1;
+            min-width: 120px;
+            background: rgba(10,14,23,0.7);
+            border: 1px solid var(--border-light);
+            color: var(--text-light);
+            padding: 0.6rem 0.8rem;
+        }
 
         .remove-btn {
             background: var(--danger);
@@ -318,12 +285,13 @@
             height: 30px;
             cursor: pointer;
             font-weight: bold;
+            flex-shrink: 0;
         }
 
         .btn-add {
             background: transparent;
-            border: 2px solid var(--gold);
-            color: var(--gold);
+            border: 2px solid var(--border-light);
+            color: var(--accent-soft);
             border-radius: 50px;
             padding: 0.5rem 1.5rem;
             font-weight: 900;
@@ -332,30 +300,33 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            transition: 0.3s;
+            transition: var(--transition);
         }
         .btn-add:hover {
-            background: var(--gold);
-            color: #111;
+            background: rgba(180,133,84,0.3);
+            color: #fff;
+            border-color: var(--accent-glow);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            color: #111;
-            border: none;
+            background: rgba(180,133,84,0.2);
+            border: 1px solid var(--border-light);
+            color: var(--accent-soft);
             border-radius: 50px;
             padding: 1rem 2.5rem;
             font-weight: 900;
             font-size: 1.2rem;
             cursor: pointer;
             width: 100%;
-            margin: 2rem 0;
-            box-shadow: 0 5px 20px rgba(184,134,11,0.4);
-            transition: 0.3s;
+            margin: 1.5rem 0;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
         }
         .btn-primary:hover {
-            background: linear-gradient(135deg, #111, #222);
-            color: var(--gold);
+            background: rgba(180,133,84,0.4);
+            color: #fff;
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 25px rgba(180,133,84,0.3);
             transform: translateY(-3px);
         }
 
@@ -365,32 +336,32 @@
 
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .result-card {
-            background: var(--card-bg);
-            border: 1px solid var(--gold-light);
-            border-radius: 20px;
-            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
             text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: var(--shadow-soft);
         }
         .result-card .label {
-            font-size: 1rem;
-            color: #666;
-            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
         }
         .result-card .value {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 900;
-            color: var(--gold);
+            color: var(--accent-soft);
         }
         .result-card .unit {
-            font-size: 0.9rem;
-            color: #777;
+            font-size: 0.8rem;
+            color: var(--text-muted);
         }
 
         .alert {
@@ -399,36 +370,37 @@
             font-weight: 700;
             margin: 1rem 0;
         }
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert-success { background: rgba(40,167,69,0.2); color: #4ade80; border: 1px solid var(--success); }
+        .alert-warning { background: rgba(255,193,7,0.2); color: #fbbf24; border: 1px solid var(--warning); }
+        .alert-danger { background: rgba(220,53,69,0.2); color: #f87171; border: 1px solid var(--danger); }
 
         .suggestion-box {
-            background: var(--gold-soft);
-            border: 2px solid var(--gold);
-            border-radius: 30px;
+            background: var(--bg-card);
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
             padding: 1.5rem;
             margin: 2rem 0;
         }
         .suggestion-box h4 {
-            color: var(--gold);
+            color: var(--accent-soft);
             margin-bottom: 1rem;
         }
         .suggestion-box ul, .suggestion-box p {
             margin-right: 1.5rem;
+            color: var(--text-muted);
         }
 
         .chart-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1rem;
             margin-top: 1rem;
         }
         .chart-container {
-            background: white;
+            background: var(--bg-card);
             border-radius: 20px;
             padding: 1rem;
-            border: 1px solid var(--gold-light);
+            border: 1px solid var(--border-light);
             height: 250px;
             margin: 0;
         }
@@ -442,169 +414,192 @@
             gap: 1rem;
             justify-content: flex-end;
             margin: 1rem 0;
+            flex-wrap: wrap;
         }
 
         .btn-export {
-            background: #28a745;
-            color: white;
-            border: none;
+            background: rgba(180,133,84,0.15);
+            border: 1px solid var(--border-light);
+            color: var(--accent-soft);
             border-radius: 50px;
             padding: 0.8rem 1.5rem;
             font-weight: 700;
             cursor: pointer;
+            transition: var(--transition);
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            transition: 0.3s;
-        }
-        .btn-export:hover { background: #218838; }
-        .btn-export.word { background: #1e4a7a; }
-        .btn-export.word:hover { background: #0e3a5a; }
-
-        footer {
-            background: linear-gradient(145deg, #111, #1a1a1a);
-            color: #ddd;
-            padding: 3rem 1rem 2rem;
-            border-top: 3px solid var(--gold);
-            margin-top: 4rem;
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .footer-content {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .footer-row {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .footer-social {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        .footer-social a {
-            color: var(--gold);
-            font-size: 1.8rem;
-            transition: 0.3s;
-        }
-        .footer-social a:hover {
-            color: var(--gold-light);
-            transform: translateY(-3px);
-        }
-
-        .footer-logo-box {
-            text-align: center;
-        }
-
-        .footer-logo-box h2 {
-            color: var(--gold);
-            font-size: 1.2rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-logo-box div {
-            width: 60px;
-            height: 2px;
-            background: var(--gold);
-            margin: 0 auto;
-        }
-
-        .footer-payment .payment-card {
-            background: rgba(255,255,255,0.05);
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .footer-payment img {
-            height: 25px;
-            filter: brightness(0.9);
-            transition: 0.2s;
-        }
-        .footer-payment img:hover {
-            filter: brightness(1.2);
-        }
-
-        hr {
-            border: none;
-            border-top: 1px solid rgba(184,134,11,0.2);
-        }
-
-        .copyright {
-            text-align: center;
             font-size: 0.9rem;
-            color: #777;
         }
-        .copyright span {
-            color: var(--gold);
-            font-weight: bold;
+        .btn-export:hover { background: rgba(180,133,84,0.3); color: #fff; border-color: var(--accent-glow); }
+        .btn-export.word { background: rgba(30,74,122,0.2); border-color: #1e4a7a; color: #8ab8ff; }
+        .btn-export.word:hover { background: rgba(30,74,122,0.4); }
+
+        /* فوتر مبسط */
+        .footer-simple {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            background: rgba(10,14,23,0.5);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid var(--border-light);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .footer-simple span {
+            color: var(--accent-soft);
+            font-weight: 700;
         }
 
+        /* الآلة الحاسبة المنبثقة (Modal) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: var(--bg-panel);
+            margin: 5% auto;
+            padding: 0;
+            border: 2px solid var(--border-light);
+            border-radius: 30px;
+            width: 90%;
+            max-width: 300px;
+            box-shadow: var(--shadow-glow);
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.15);
+            border-bottom: 2px solid var(--border-light);
+            padding: 10px 15px;
+            border-radius: 28px 28px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h2 {
+            margin: 0;
+            color: var(--accent-soft);
+            font-size: 1rem;
+            font-weight: 900;
+        }
+        .close {
+            color: var(--text-muted);
+            float: left;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover { color: var(--accent-glow); }
+        .modal-body { padding: 15px; }
+        .calc-display {
+            width: 100%;
+            height: 45px;
+            font-size: 1.4rem;
+            text-align: left;
+            padding: 0 10px;
+            border: 2px solid var(--border-light);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            background: rgba(10,14,23,0.8);
+            color: var(--accent-soft);
+            font-family: 'Inter', monospace;
+            direction: ltr;
+        }
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.1);
+            border: 1px solid var(--border-light);
+            border-radius: 15px;
+            padding: 10px 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+        .calc-btn:hover {
+            background: rgba(180,133,84,0.3);
+            border-color: var(--accent-glow);
+        }
+        .calc-btn.operator { color: var(--accent-soft); }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.3);
+            color: white;
+            grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.5); }
+
+        /* زر الآلة الحاسبة العائم */
+        .calc-floating-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(180,133,84,0.2);
+            border: 1px solid var(--border-light);
+            border-radius: 50px;
+            padding: 0.8rem 1.2rem;
+            color: var(--accent-soft);
+            font-size: 1rem;
+            font-weight: 700;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .calc-floating-btn:hover {
+            background: rgba(180,133,84,0.4);
+            color: #fff;
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 15px rgba(180,133,84,0.3);
+        }
+
+        /* تحسينات الجوال */
         @media (max-width: 768px) {
-            nav {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.8rem;
-            }
-            .logo {
-                flex-wrap: nowrap;
-                gap: 8px;
-                width: 100%;
-                justify-content: center;
-            }
-            .logo img { height: 35px; }
-            .logo h1 { font-size: 1rem; }
-            nav > div:last-child {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 6px;
-            }
-            nav a {
-                margin: 0;
-                font-size: 0.9rem;
-                padding: 4px 8px;
-                white-space: nowrap;
-            }
             .hero-mini h2 { font-size: 2rem; }
             .hero-mini p { font-size: 1rem; }
-            .calculator-card { padding: 2rem 1.5rem; }
-            .footer-row { flex-direction: column; text-align: center; }
-            .footer-social { justify-content: center; }
+            .calculator-card { padding: 1.5rem; }
+            .currency-row select, .currency-row input { width: 100%; }
+            .grid-2 { grid-template-columns: 1fr; gap: 1rem; }
+            .row-2 { flex-direction: column; gap: 0.8rem; }
+            .row-2 > * { width: 100%; }
+            .action-bar { justify-content: center; flex-direction: column; }
+            .action-bar button { width: 100%; justify-content: center; }
+            .competitor-row, .channel-row { flex-wrap: wrap; }
+            .competitor-row input, .channel-row input { min-width: 100%; }
+            .remove-btn { width: 100%; border-radius: 30px; margin-top: 0.3rem; }
+            .btn-add { width: 100%; justify-content: center; }
+            .results-grid { grid-template-columns: 1fr; }
+            .chart-grid { grid-template-columns: 1fr; }
+            .suggestion-box { padding: 1rem; }
+            .section { padding: 1rem; }
+            .section h3 { font-size: 1.2rem; }
+            .calc-floating-btn { padding: 0.6rem 1rem; font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
 
+<!-- خلفية متوهجة -->
+<div class="glow-bg">
+    <span></span><span></span><span></span>
+</div>
 <div class="floating-shape shape-1"></div>
 <div class="floating-shape shape-2"></div>
 
-<!-- Navigation -->
-<nav>
-    <div class="logo">
-        <img src="https://lh3.googleusercontent.com/d/1e6u-DPTinDJl_Q9wW3QvGgzFbXO_2sXa" alt="FAROUK GRUP LOGO">
-        <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-    </div>
-    <div>
-        <a href="https://www.farouk-grup.com/"><i class="fas fa-home"></i> الرئيسية</a>
-        <a href="https://www.farouk-grup.com/Home/Contact-Us" style="color:var(--gold)"><i class="fas fa-phone-alt"></i> تواصل معنا</a>
-    </div>
-</nav>
+<!-- تم إزالة الـ NAV بالكامل -->
 
 <section class="hero-mini">
     <h2>📊 دراسة الجدوى التسويقية الشاملة</h2>
@@ -615,7 +610,7 @@
     <div class="calculator-card" data-aos="fade-up">
         <h2><i class="fas fa-chart-pie"></i> بيانات الدراسة التسويقية</h2>
 
-        <!-- العملة + اسم الشركة (الدولار هو الافتراضي) -->
+        <!-- العملة + اسم الشركة -->
         <div class="currency-row">
             <label><i class="fas fa-coins"></i> العملة:</label>
             <select id="currencySelect">
@@ -743,7 +738,7 @@
                 <button class="btn-export" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
             </div>
 
-            <div id="reportHeader" class="result-card" style="text-align:right; background:var(--gold-soft);"></div>
+            <div id="reportHeader" class="result-card" style="text-align:right;"></div>
 
             <div class="results-grid" id="resultsGrid"></div>
 
@@ -763,34 +758,48 @@
     </div>
 </div>
 
-<footer>
-    <div class="footer-container">
-        <div class="footer-content">
-            <div class="footer-row">
-                <div class="footer-social">
-                    <a href="https://www.instagram.com/faroukazem/" target="_blank"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.facebook.com/profile.php?id=100091571594026&sk=about" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://wa.me/905550196682" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                </div>
-                <div class="footer-logo-box">
-                    <h2>مجموعة فاروق للاستشارات والأعمال</h2>
-                    <div></div>
-                </div>
-                <div class="footer-payment">
-                    <div class="payment-card">
-                        <img src="https://img.icons8.com/color/48/visa.png" alt="Visa">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
-                    </div>
-                </div>
-            </div>
-            <hr>
-            <div class="copyright">
-                جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
-                <p>Adnan Kahveci, Beylikdüzü / İstanbul, Türkiye</p>
+<!-- فوتر مبسط -->
+<footer class="footer-simple">
+    جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
+</footer>
+
+<!-- زر الآلة الحاسبة العائم -->
+<div class="calc-floating-btn" id="calculatorBtn">
+    <i class="fas fa-calculator"></i> آلة حاسبة
+</div>
+
+<!-- نافذة الآلة الحاسبة المنبثقة -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close">&times;</span>
+            <h2><i class="fas fa-calculator" style="color: var(--accent-soft);"></i> آلة حاسبة</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
+                <button class="calc-btn" onclick="clearCalculator()">C</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
+                <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
+                <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
             </div>
         </div>
     </div>
-</footer>
+</div>
 
 <!-- AOS -->
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -904,32 +913,25 @@
         };
     }
 
-    // ------------------ الحساب وعرض النتائج (مصحح مالياً) ------------------
+    // ------------------ الحساب وعرض النتائج (كما هي) ------------------
     let revenueChart, breakEvenChart;
 
     document.getElementById('calculateBtn').addEventListener('click', function() {
         const d = getData();
 
-        // --- حسابات مالية مصححة ---
         const totalChannelCustomers = d.channels.reduce((sum, ch) => sum + ch.customers, 0);
         const totalMarketingBudget = d.channels.reduce((sum, ch) => sum + ch.budget, 0);
         const totalActiveCustomers = totalChannelCustomers + d.walkIn;
-
         const avgOrderValue = d.price; 
-
         const monthlyRevenue = totalActiveCustomers * avgOrderValue * d.purchaseFrequency;
         const annualRevenue = monthlyRevenue * 12;
-
         const annualMarketingCost = totalMarketingBudget * d.planDuration;
         const marketingContribution = annualRevenue - annualMarketingCost;
-
         const cac = totalChannelCustomers > 0 ? totalMarketingBudget / totalChannelCustomers : 0;
         const roas = annualMarketingCost > 0 ? (annualRevenue / annualMarketingCost).toFixed(2) : 0;
         const ltv = (d.price - d.costPerMeal) * d.purchaseFrequency * d.loyaltyMonths;
-
         const breakEvenCustomers = cac > 0 ? annualMarketingCost / (avgOrderValue * d.purchaseFrequency * 12) : 0;
 
-        // تحليل المنافسين
         let compStrengthAvg = 0, compWeaknessAvg = 0;
         d.competitors.forEach(c => {
             compStrengthAvg += c.strength;
@@ -965,7 +967,7 @@
         document.getElementById('resultsSection').style.display = 'block';
 
         document.getElementById('reportHeader').innerHTML = `
-            <h3 style="color:var(--gold);">📌 تقرير: ${d.projectName}</h3>
+            <h3 style="color:var(--accent-soft);">📌 تقرير: ${d.projectName}</h3>
             <p><strong>الجهة:</strong> ${d.companyName} | <strong>الموقع:</strong> ${d.location} | <strong>الوصف:</strong> ${d.projectDesc}</p>
         `;
 
@@ -973,7 +975,7 @@
             <div class="result-card"><div class="label">عملاء نشطين (شهرياً)</div><div class="value">${totalActiveCustomers}</div></div>
             <div class="result-card"><div class="label">الإيرادات السنوية المتوقعة</div><div class="value">${d.currency}${annualRevenue.toLocaleString()}</div></div>
             <div class="result-card"><div class="label">تكاليف التسويق السنوية</div><div class="value">${d.currency}${annualMarketingCost.toLocaleString()}</div></div>
-            <div class="result-card"><div class="label">الهامش التسويقي السنوي*</div><div class="value" style="color:${marketingContribution>=0?'#28a745':'#dc3545'}">${d.currency}${marketingContribution.toLocaleString()}</div></div>
+            <div class="result-card"><div class="label">الهامش التسويقي السنوي*</div><div class="value" style="color:${marketingContribution>=0?'#4ade80':'#f87171'}">${d.currency}${marketingContribution.toLocaleString()}</div></div>
             <div class="result-card"><div class="label">تكلفة الاستحواذ CAC</div><div class="value">${d.currency}${cac.toFixed(2)}</div></div>
             <div class="result-card"><div class="label">القيمة الدائمة LTV</div><div class="value">${d.currency}${ltv.toFixed(2)}</div></div>
             <div class="result-card"><div class="label">العائد على الإنفاق ROAS</div><div class="value">${roas}x</div></div>
@@ -1032,38 +1034,29 @@
         });
     });
 
-    // ------------------ دالة تصدير Word المحسنة والمضمونة ------------------
+    // ------------------ دوال التصدير Word و PDF (كما هي) ------------------
     document.getElementById('exportWordBtn').addEventListener('click', function() {
-        // التأكد من وجود نتائج
         const resultsSection = document.getElementById('resultsSection');
         if (!resultsSection || resultsSection.style.display === 'none') {
-            alert('الرجاء إجراء التحليل أولاً بالضغط على زر "احسب الدراسة الآن"');
+            alert('الرجاء إجراء التحليل أولاً');
             return;
         }
 
         try {
-            // الحصول على البيانات الأساسية
             const d = getData();
             
-            // جمع محتوى التقرير من العناصر المختلفة
             const headerContent = document.getElementById('reportHeader')?.innerHTML || '';
             const resultsGridContent = document.getElementById('resultsGrid')?.innerHTML || '';
             const alertsContent = document.getElementById('alerts')?.innerHTML || '';
             const strategicContent = document.getElementById('strategicAdvice')?.innerHTML || '';
 
-            // تحويل الرسوم البيانية إلى صور Base64
             const chart1Canvas = document.getElementById('revenueChart');
             const chart2Canvas = document.getElementById('breakEvenChart');
             
             let chart1Img = '', chart2Img = '';
-            if (chart1Canvas) {
-                chart1Img = chart1Canvas.toDataURL('image/png');
-            }
-            if (chart2Canvas) {
-                chart2Img = chart2Canvas.toDataURL('image/png');
-            }
+            if (chart1Canvas) chart1Img = chart1Canvas.toDataURL('image/png');
+            if (chart2Canvas) chart2Img = chart2Canvas.toDataURL('image/png');
 
-            // بناء هيكل HTML متوافق مع Word
             const htmlContent = `
                 <!DOCTYPE html>
                 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/1999/xhtml' dir="rtl">
@@ -1111,7 +1104,6 @@
                 </html>
             `;
 
-            // إضافة BOM (Byte Order Mark) لضمان عرض العربية بشكل صحيح
             const blob = new Blob(['\uFEFF' + htmlContent], { type: 'application/msword' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -1123,11 +1115,10 @@
 
         } catch (error) {
             console.error('خطأ في تصدير Word:', error);
-            alert('حدث خطأ أثناء إنشاء ملف Word. يرجى التأكد من إجراء الحساب أولاً.');
+            alert('حدث خطأ أثناء إنشاء ملف Word');
         }
     });
 
-    // ------------------ تصدير PDF (محسن) ------------------
     document.getElementById('exportPdfBtn').addEventListener('click', async function() {
         const resultsSection = document.getElementById('resultsSection');
         if (!resultsSection || resultsSection.style.display === 'none') {
@@ -1204,6 +1195,77 @@
             alert('حدث خطأ أثناء إنشاء ملف PDF: ' + error.message);
         }
     });
+
+    // ------------------ آلة حاسبة منبثقة ------------------
+    const calcDisplay = document.getElementById('calcDisplay');
+    let currentCalcInput = '';
+
+    function safeEvaluate(expression) {
+        let expr = expression.replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/');
+        if (!/^[0-9+\-*/().]+$/.test(expr)) throw new Error('تعبير غير صالح');
+        return new Function('return ' + expr)();
+    }
+
+    window.handleCalculatorInput = function(value) {
+        currentCalcInput += value;
+        calcDisplay.value = currentCalcInput;
+    }
+
+    window.clearCalculator = function() {
+        currentCalcInput = '';
+        calcDisplay.value = '';
+    }
+
+    window.backspaceCalculator = function() {
+        currentCalcInput = currentCalcInput.slice(0, -1);
+        calcDisplay.value = currentCalcInput;
+    }
+
+    window.calculateCalculatorResult = function() {
+        try {
+            let result = safeEvaluate(currentCalcInput);
+            calcDisplay.value = result;
+            currentCalcInput = result.toString();
+        } catch (e) {
+            calcDisplay.value = 'خطأ';
+            currentCalcInput = '';
+        }
+    }
+
+    function handleKeyboard(e) {
+        if (modal.style.display !== 'block') return;
+        const key = e.key;
+        e.preventDefault();
+        e.stopPropagation();
+        if (key >= '0' && key <= '9') handleCalculatorInput(key);
+        else if (key === '.') handleCalculatorInput('.');
+        else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
+        else if (key === 'Enter' || key === '=') calculateCalculatorResult();
+        else if (key === 'Backspace') backspaceCalculator();
+        else if (key === 'Escape') modal.style.display = 'none';
+        else if (key === 'c' || key === 'C') clearCalculator();
+    }
+
+    document.addEventListener('keydown', handleKeyboard);
+
+    const modal = document.getElementById('calculatorModal');
+    const btn = document.getElementById('calculatorBtn');
+    const span = document.getElementsByClassName('close')[0];
+
+    btn.onclick = function(e) {
+        e.preventDefault();
+        modal.style.display = 'block';
+    }
+
+    span.onclick = function() {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
 
     // ------------------ تهيئة أولية ------------------
     renderCompetitors();

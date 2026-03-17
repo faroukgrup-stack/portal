@@ -4,14 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بوابة مجموعة فاروق للاستشارات والأعمال</title>
-    <link rel="manifest" href="manifest.json">
-
-<script>
-  // تسجيل الـ Service Worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
-</script>
     <!-- Fonts: Tajawal للعربية، Inter للأرقام -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome 6 -->
@@ -95,38 +87,64 @@
             transition: opacity 0.4s;
         }
 
-        .login-card {
-            background: rgba(18, 24, 36, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-lg);
-            padding: 3.5rem 3rem;
-            max-width: 440px;
-            width: 90%;
-            text-align: center;
-            box-shadow: var(--shadow-glow);
-        }
+        /* تصغير المربع الرئيسي */
+.login-card {
+    background: var(--bg-panel);
+    backdrop-filter: blur(15px);
+    padding: 1.5rem 2rem; /* تقليل الحشو لتقليل الارتفاع */
+    border-radius: 20px;
+    width: 85%;
+    max-width: 340px; /* جعل العرض أصغر وأكثر تناسقاً */
+    text-align: center;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    /* لضمان عدم الانقطاع في الشاشات الصغيرة */
+    margin: auto;
+}
 
-        .login-icon {
-            font-size: 4rem;
-            color: var(--accent-soft);
-            margin-bottom: 1.5rem;
-            filter: drop-shadow(0 0 15px rgba(180,133,84,0.6));
-        }
+/* تصغير العناوين داخل المربع */
+.login-card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
 
-        .login-card h2 {
-            font-size: 1.6rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #f0e6d2, #cfa776);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.75rem;
-        }
+.login-card p {
+    font-size: 0.85rem;
+    margin-bottom: 1.2rem;
+}
 
-        .login-card p {
-            color: var(--text-muted);
-            margin-bottom: 2.5rem;
-        }
+/* تصغير حقول الإدخال */
+.password-field {
+    width: 100%;
+    padding: 0.7rem 1rem; /* تقليل حجم الحقل */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem; /* حجم خط أنسب */
+    margin-bottom: 10px;
+    outline: none;
+    transition: 0.3s;
+}
+
+/* زر نسيت كلمة المرور (الواتساب) */
+.whatsapp-link {
+    display: block;
+    margin-top: 15px;
+    font-size: 0.8rem;
+    color: var(--accent-gold);
+    text-decoration: none;
+    opacity: 0.8;
+}
+.whatsapp-link:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+.forgot-pass:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
 
         .password-field {
             width: 100%;
@@ -692,15 +710,23 @@
 
     <!-- شاشة الدخول -->
     <div class="login-overlay" id="loginOverlay">
-        <div class="login-card" data-aos="fade-up">
-            <div class="login-icon"><i class="fas fa-lock"></i></div>
-            <h2>بوابة مجموعة فاروق للاستشارات والأعمال</h2>
-            <p>نظام الإدارة والأدوات الاستشارية</p>
-            <input type="password" id="passwordInput" class="password-field" placeholder="******" maxlength="6" inputmode="numeric" pattern="\d*" autofocus>
-            <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> دخول آمن</button>
-            <div class="error-msg" id="errorMsg"></div>
-        </div>
+    <div class="login-card" data-aos="zoom-in">
+        <div class="login-icon" style="font-size: 2rem; margin-bottom: 10px;"><i class="fas fa-shield-halved"></i></div>
+        <h2>دخول المصرح لهم</h2>
+        <p>مجموعة فاروق للاستشارات والأعمال</p>
+        
+        <input type="text" id="usernameInput" class="password-field" placeholder="اسم المستخدم" style="letter-spacing: normal;">
+        <input type="password" id="passwordInput" class="password-field" placeholder="كلمة المرور" style="letter-spacing: normal;">
+        
+        <button class="login-btn" id="loginBtn" style="padding: 0.8rem;"><i class="fas fa-sign-in-alt"></i> دخول</button>
+        
+        <a href="https://wa.me/905550196682" target="_blank" class="whatsapp-link">
+            <i class="fab fa-whatsapp"></i> نسيت كلمة المرور؟ اضغط هنا
+        </a>
+        
+        <div class="error-msg" id="errorMsg" style="font-size: 0.8rem; margin-top: 10px;"></div>
     </div>
+</div>
 
     <!-- المحتوى الرئيسي -->
     <div class="dashboard" id="dashboard">
@@ -792,8 +818,8 @@
         <div class="quick-links-panel">
             <div class="quick-links-title"><i class="fas fa-link"></i> الوصول السريع لمنصات المجموعة</div>
             <div class="links-row">
-                <a href="https://www.farouk-grup.com" target="_blank" class="link-btn">الموقع الرسمي</a>
-                <a href="https://training.farouk-grup.com" target="_blank" class="link-btn">منصة التدريب</a>
+                <a href="https://www.farouk-grup.com/" target="_blank" class="link-btn">الموقع الرسمي</a>
+                <a href="https://training.farouk-grup.com/home/Our-store" class="link-btn">تجديد الإشتراك</a>
                 <a href="https://wa.me/905550196682" target="_blank" class="link-btn"><i class="fab fa-whatsapp"></i> واتساب</a>
                 <a href="mailto:faroukgrup@gmail.com" class="link-btn"><i class="fas fa-envelope"></i> البريد</a>
             </div>
@@ -808,9 +834,12 @@
     <script>
         AOS.init({ duration: 800, once: true });
 
-        const CORRECT_PASSWORD = "123456";
+        // ضع الرابط الذي نسخته من جوجل سكريبت هنا
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyv2wHxY7Sy-DmbXLBJM3204poGkwsUniqUORFzpm3LOv5IsxbD2HLWdLd7lJ9VXUJj/exec"; 
+
         const loginOverlay = document.getElementById('loginOverlay');
         const dashboard = document.getElementById('dashboard');
+        const usernameInput = document.getElementById('usernameInput');
         const passwordInput = document.getElementById('passwordInput');
         const loginBtn = document.getElementById('loginBtn');
         const errorMsg = document.getElementById('errorMsg');
@@ -820,11 +849,17 @@
             if (sessionStorage.getItem('portalLoggedIn') === 'true') {
                 loginOverlay.style.display = 'none';
                 dashboard.style.display = 'block';
+                // استرجاع اسم المستخدم والأيام المتبقية لعرضها فوق
+                const savedName = sessionStorage.getItem('portalUserName');
+                const savedDays = sessionStorage.getItem('portalDaysLeft');
+                if(savedName) {
+                    document.querySelector('.user-name').innerHTML = `<i class="fas fa-user-tie"></i> ${savedName} (متبقي ${savedDays} يوم)`;
+                }
                 loadAllData();
             } else {
                 loginOverlay.style.display = 'flex';
                 dashboard.style.display = 'none';
-                passwordInput?.focus();
+                usernameInput?.focus();
             }
         }
 
@@ -835,22 +870,59 @@
             renderTools();
         }
 
-        function attemptLogin() {
-            const entered = passwordInput.value.trim();
-            if (entered === CORRECT_PASSWORD) {
-                sessionStorage.setItem('portalLoggedIn', 'true');
-                loginOverlay.style.display = 'none';
-                dashboard.style.display = 'block';
-                loadAllData();
-            } else {
-                errorMsg.textContent = '❌ رمز المرور غير صحيح';
-                passwordInput.value = '';
-                passwordInput.focus();
+        async function attemptLogin() {
+    const user = document.getElementById('usernameInput').value.trim();
+    const pass = document.getElementById('passwordInput').value.trim();
+
+            if (!user || !pass) {
+                errorMsg.textContent = '❌ يرجى إدخال اسم المستخدم وكلمة المرور';
+                return;
+            }
+
+            // تغيير حالة الزر أثناء الانتظار
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري التحقق...';
+            loginBtn.disabled = true;
+            errorMsg.textContent = '';
+
+            try {
+                const formData = new FormData();
+                formData.append('username', user);
+                formData.append('password', pass);
+
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    // الدخول ناجح
+                    sessionStorage.setItem('portalLoggedIn', 'true');
+                    sessionStorage.setItem('portalUserName', result.name);
+                    sessionStorage.setItem('portalDaysLeft', result.daysLeft);
+                    
+                    document.querySelector('.user-name').innerHTML = `<i class="fas fa-user-tie"></i> ${result.name} (متبقي ${result.daysLeft} يوم)`;
+                    
+                    loginOverlay.style.display = 'none';
+                    dashboard.style.display = 'block';
+                    loadAllData();
+                } else {
+                    // رسالة الخطأ أو انتهاء الاشتراك القادمة من جوجل
+                    errorMsg.textContent = '❌ ' + result.message;
+                }
+            } catch (error) {
+                errorMsg.textContent = '❌ حدث خطأ في الاتصال بالسيرفر';
+            } finally {
+                // إعادة الزر لشكله الطبيعي
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول آمن';
+                loginBtn.disabled = false;
             }
         }
 
         loginBtn.addEventListener('click', attemptLogin);
         passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') attemptLogin(); });
+        usernameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') passwordInput.focus(); });
 
         logoutBtn.addEventListener('click', () => {
             sessionStorage.removeItem('portalLoggedIn');

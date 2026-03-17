@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
     <title>حاسبة تكلفة العمالة المثالية | FAROUK GRUP</title>
 
     <!-- Fonts & Icons -->
@@ -27,7 +27,21 @@
             box-sizing: border-box;
         }
 
+        /* متغيرات الثيم الداكن (للعرض العادي) */
         :root {
+            --bg-dark: #0b0e17;
+            --bg-panel: rgba(18, 24, 36, 0.85);
+            --bg-card: rgba(22, 30, 46, 0.8);
+            --border-light: rgba(180, 133, 84, 0.25);
+            --accent-glow: #b48554;
+            --accent-soft: #cfa776;
+            --text-light: #f0f4fa;
+            --text-muted: #aab7d4;
+            --shadow-soft: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 133, 84, 0.15);
+            --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
+            --radius-md: 20px;
+            --radius-lg: 30px;
+            --transition: all 0.3s ease;
             --gold: #b8860b;
             --gold-light: #d4b15a;
             --gold-soft: rgba(184,134,11,0.1);
@@ -35,8 +49,7 @@
             --dark-light: #1a1a1a;
             --white: #ffffff;
             --offwhite: #f9f9f9;
-            --text: #333;
-            --card-bg: #fefcf6;
+            --text-dark: #333;
             --success: #28a745;
             --warning: #ffc107;
             --danger: #dc3545;
@@ -44,92 +57,102 @@
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-            color: var(--text);
+            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
+            color: var(--text-light);
             line-height: 1.6;
-            overflow-x: hidden;
+            min-height: 100vh;
             position: relative;
         }
 
-        body::before {
-            content: "";
+        /* خلفية متوهجة */
+        .glow-bg {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(184,134,11,0.03) 0px, transparent 20px),
-                radial-gradient(circle at 90% 70%, rgba(184,134,11,0.03) 0px, transparent 25px),
-                repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 1px, transparent 1px, transparent 10px);
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
             pointer-events: none;
-            z-index: -1;
+            z-index: 0;
+        }
+
+        .glow-bg span {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: glowMove 20s infinite alternate ease-in-out;
+        }
+
+        .glow-bg span:nth-child(1) {
+            top: -100px;
+            right: -100px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.12) 0%, transparent 70%);
+        }
+
+        .glow-bg span:nth-child(2) {
+            bottom: -150px;
+            left: -150px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(100, 150, 200, 0.1) 0%, transparent 70%);
+        }
+
+        .glow-bg span:nth-child(3) {
+            top: 30%;
+            left: 30%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.1) 0%, transparent 70%);
+            animation-delay: -5s;
+        }
+
+        @keyframes glowMove {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; }
         }
 
         .floating-shape {
             position: absolute;
-            width: 300px; height: 300px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%);
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(184, 134, 11, 0.1) 0%, transparent 70%);
             z-index: 0;
             pointer-events: none;
         }
 
-        .shape-1 { top: -100px; right: -100px; animation: float 20s infinite ease-in-out; }
-        .shape-2 { bottom: -50px; left: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
+        .shape-1 {
+            top: -100px;
+            right: -100px;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape-2 {
+            bottom: -50px;
+            left: -50px;
+            width: 200px;
+            height: 200px;
+            animation: float 15s infinite ease-in-out reverse;
+        }
 
         @keyframes float {
-            0% { transform: translate(0,0) rotate(0deg); }
-            33% { transform: translate(30px,-30px) rotate(5deg); }
-            66% { transform: translate(-20px,20px) rotate(-5deg); }
-            100% { transform: translate(0,0) rotate(0deg); }
+            0% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(5deg); }
+            66% { transform: translate(-20px, 20px) rotate(-5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
         }
 
-        nav {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo img {
-            height: 50px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .logo h1 {
-            font-family: 'Alexandria', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--gold);
-            letter-spacing: 1px;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: #444;
-            margin: 0 0.8rem;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-        nav a:hover { color: var(--gold); }
-        nav a i { margin-left: 5px; }
+        /* تم إزالة الـ NAV بالكامل */
 
         .hero-mini {
             background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
             color: white;
             text-align: center;
-            padding: 3rem 1rem;
+            padding: 2.5rem 1rem;
             border-bottom: 4px solid var(--gold);
             position: relative;
             overflow: hidden;
@@ -142,7 +165,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
+            background: radial-gradient(circle, rgba(184, 134, 11, 0.2) 0%, transparent 60%);
             animation: rotate 40s linear infinite;
         }
 
@@ -152,7 +175,7 @@
         }
 
         .hero-mini h2 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 900;
             color: var(--gold-light);
             margin-bottom: 0.5rem;
@@ -161,7 +184,7 @@
         }
 
         .hero-mini p {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             max-width: 700px;
             margin: 0 auto;
             opacity: 0.95;
@@ -171,24 +194,28 @@
 
         .container {
             max-width: 1200px;
-            margin: 4rem auto;
-            padding: 0 1.5rem;
+            margin: 2rem auto;
+            padding: 0 1rem;
             position: relative;
             z-index: 2;
         }
 
         .calculator-card {
-            background: rgba(255,255,255,0.9);
+            background: var(--bg-panel);
             backdrop-filter: blur(15px);
-            border: 2px solid var(--gold);
-            border-radius: 40px;
-            padding: 3rem;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(184,134,11,0.3) inset;
-            margin-bottom: 3rem;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 1.8rem;
+            box-shadow: var(--shadow-soft);
             position: relative;
             overflow: hidden;
         }
-        
+
+        .calculator-card:hover {
+            box-shadow: var(--shadow-glow);
+            border-color: rgba(180, 133, 84, 0.4);
+        }
+
         .calculator-card::before {
             content: '';
             position: absolute;
@@ -196,38 +223,50 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, transparent 0%, rgba(184,134,11,0.05) 100%);
+            background: linear-gradient(135deg, transparent 0%, rgba(184, 134, 11, 0.05) 100%);
             z-index: -1;
         }
-        
+
         .featured-badge {
             position: absolute;
             top: -10px;
             left: -10px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            background: linear-gradient(135deg, var(--accent-glow), var(--gold-light));
             color: #111;
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
             font-weight: 900;
             border: 3px solid white;
             z-index: 10;
         }
-        .featured-badge i { font-size: 2rem; margin-bottom: 0.2rem; }
-        .featured-badge span { font-size: 0.9rem; text-align: center; }
+
+        .featured-badge i {
+            font-size: 1.8rem;
+            margin-bottom: 0.2rem;
+            color: #0b0e17;
+        }
+
+        .featured-badge span {
+            font-size: 0.8rem;
+            text-align: center;
+            color: #0b0e17;
+        }
 
         .calculator-card h2 {
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             font-weight: 900;
-            color: var(--gold);
-            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #f0e6d2, #cfa776);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
             text-align: center;
-            border-bottom: 2px solid var(--gold-soft);
+            border-bottom: 2px solid var(--border-light);
             padding-bottom: 0.5rem;
         }
 
@@ -235,80 +274,91 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            background: var(--gold-soft);
-            padding: 1rem 1.5rem;
+            background: rgba(180, 133, 84, 0.15);
+            border: 1px solid var(--border-light);
+            padding: 0.8rem 1rem;
             border-radius: 50px;
             margin-bottom: 2rem;
             flex-wrap: wrap;
         }
+
         .currency-row label {
-            font-weight: 900;
-            color: var(--dark);
+            font-weight: 700;
+            color: var(--accent-soft);
             margin: 0;
         }
-        .currency-row select {
+
+        .currency-row select,
+        .currency-row input {
             width: 150px;
             padding: 0.5rem 1rem;
-            border: 2px solid var(--gold);
+            border: 2px solid var(--border-light);
             border-radius: 30px;
-            background: white;
+            font-family: 'Tajawal', sans-serif;
             font-weight: 700;
+            background: rgba(10, 14, 23, 0.7);
+            color: var(--text-light);
         }
+
         .currency-row input {
             width: 250px;
-            padding: 0.5rem 1rem;
-            border: 2px solid var(--gold);
-            border-radius: 30px;
-            background: white;
-            font-weight: 400;
-            font-family: 'Tajawal', sans-serif;
+        }
+
+        .currency-row select option {
+            background: #0b0e17;
+            color: #f0f4fa;
         }
 
         .input-section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         label {
-            display: block;
-            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.4rem;
             font-weight: 700;
-            color: var(--dark);
+            color: var(--accent-soft);
+            font-size: 0.95rem;
         }
 
         label i {
-            color: var(--gold);
-            margin-left: 0.5rem;
+            color: var(--accent-soft);
         }
 
-        input, select {
+        input,
+        select {
             width: 100%;
-            padding: 1rem;
-            border: 2px solid #ddd;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--border-light);
             border-radius: 30px;
             font-family: 'Tajawal', sans-serif;
-            font-size: 1rem;
-            background: var(--offwhite);
-            transition: 0.3s;
+            font-size: 0.95rem;
+            background: rgba(10, 14, 23, 0.7);
+            color: var(--text-light);
+            transition: var(--transition);
         }
 
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             outline: none;
-            border-color: var(--gold);
-            box-shadow: 0 0 0 3px rgba(184,134,11,0.2);
-            background: var(--white);
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 0 3px rgba(180, 133, 84, 0.2);
+            background: rgba(15, 20, 30, 0.9);
         }
 
         .shifts-section {
-            background: var(--gold-soft);
-            border: 2px solid var(--gold-light);
-            border-radius: 30px;
+            background: rgba(180, 133, 84, 0.1);
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
             padding: 1.5rem;
             margin: 2rem 0;
         }
@@ -323,8 +373,9 @@
         }
 
         .shifts-header h3 {
-            color: var(--gold);
+            color: var(--accent-soft);
             font-weight: 900;
+            font-size: 1.2rem;
         }
 
         .shift-row {
@@ -332,11 +383,11 @@
             gap: 1rem;
             flex-wrap: wrap;
             align-items: center;
-            background: var(--white);
+            background: rgba(22, 30, 46, 0.7);
             padding: 1rem;
-            border-radius: 30px;
+            border-radius: 40px;
             margin-bottom: 1rem;
-            border: 1px solid var(--gold-light);
+            border: 1px solid var(--border-light);
         }
 
         .shift-row input {
@@ -353,12 +404,13 @@
             height: 40px;
             cursor: pointer;
             font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .btn-add {
             background: transparent;
-            border: 2px solid var(--gold);
-            color: var(--gold);
+            border: 2px solid var(--accent-glow);
+            color: var(--accent-soft);
             border-radius: 50px;
             padding: 0.8rem 2rem;
             font-weight: 900;
@@ -367,77 +419,127 @@
             align-items: center;
             gap: 0.5rem;
             margin: 1rem 0;
-            transition: 0.3s;
+            transition: var(--transition);
         }
+
         .btn-add:hover {
-            background: var(--gold);
-            color: #111;
+            background: rgba(180, 133, 84, 0.3);
+            color: #fff;
+            border-color: var(--accent-glow);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            color: #111;
-            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+            padding: 1.2rem;
             border-radius: 50px;
-            padding: 1rem 2.5rem;
+            background: rgba(180, 133, 84, 0.2);
+            border: 1px solid var(--border-light);
+            color: var(--accent-soft);
             font-weight: 900;
             font-size: 1.2rem;
             cursor: pointer;
-            width: 100%;
-            margin: 1rem 0;
-            box-shadow: 0 5px 20px rgba(184,134,11,0.4);
-            transition: 0.3s;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            margin: 1.5rem 0;
         }
+
         .btn-primary:hover {
-            background: linear-gradient(135deg, #111, #222);
-            color: var(--gold);
+            background: rgba(180, 133, 84, 0.4);
+            color: #fff;
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 25px rgba(180, 133, 84, 0.3);
             transform: translateY(-3px);
         }
 
         .results-section {
-            margin-top: 3rem;
+            margin-top: 2rem;
         }
 
+        .action-bar {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-export {
+            background: rgba(180, 133, 84, 0.15);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            padding: 0.8rem 1.5rem;
+            color: var(--accent-soft);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-export:hover {
+            background: rgba(180, 133, 84, 0.3);
+            color: #fff;
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 15px rgba(180, 133, 84, 0.3);
+        }
+
+        .btn-export.word {
+            background: rgba(30, 74, 122, 0.2);
+            border-color: #1e4a7a;
+            color: #8ab8ff;
+        }
+        .btn-export.word:hover {
+            background: rgba(30, 74, 122, 0.4);
+        }
+
+        /* ========== أنماط النتائج (داكنة للعرض العادي) ========== */
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .result-card {
-            background: linear-gradient(135deg, var(--card-bg) 0%, #fff 100%);
-            border: 1px solid var(--gold-light);
-            border-radius: 20px;
-            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
             text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: 0.3s;
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition);
+            color: var(--text-light);
         }
         .result-card:hover {
             transform: translateY(-5px);
-            border-color: var(--gold);
-            box-shadow: 0 10px 25px rgba(184,134,11,0.15);
+            border-color: var(--accent-glow);
+            box-shadow: var(--shadow-glow);
         }
         .result-card i {
             font-size: 2rem;
-            color: var(--gold);
+            color: var(--accent-soft);
             margin-bottom: 0.5rem;
         }
         .result-card .label {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
-            color: #666;
-            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
         }
         .result-card .value {
-            font-size: 2rem;
+            font-size: 1.6rem;
             font-weight: 900;
-            color: var(--gold);
+            color: var(--accent-soft);
         }
         .result-card .unit {
-            font-size: 0.9rem;
-            color: #777;
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
         .alert {
@@ -446,782 +548,942 @@
             font-weight: 700;
             margin: 1rem 0;
         }
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-
-        .suggestion-box {
-            background: var(--gold-soft);
-            border: 2px solid var(--gold);
-            border-radius: 30px;
-            padding: 1.5rem;
-            margin-top: 2rem;
+        .alert-success {
+            background: rgba(40, 167, 69, 0.2);
+            color: #8fdeb4;
+            border: 1px solid var(--success);
+        }
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffd966;
+            border: 1px solid var(--warning);
+        }
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.2);
+            color: #f9acac;
+            border: 1px solid var(--danger);
         }
 
+        .suggestion-box {
+            background: var(--bg-card);
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            color: var(--text-light);
+        }
         .suggestion-box h4 {
-            color: var(--gold);
+            color: var(--accent-soft);
             margin-bottom: 1rem;
+        }
+        .suggestion-box ul,
+        .suggestion-box p {
+            margin-right: 1.5rem;
+            color: var(--text-muted);
         }
 
         .chart-container {
-            margin-top: 2rem;
-            background: white;
+            background: var(--bg-card);
             border-radius: 20px;
             padding: 1rem;
-            border: 1px solid var(--gold-light);
-            height: 300px;
+            border: 1px solid var(--border-light);
+            height: 250px;
+            margin: 0;
+        }
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
         }
 
-        .action-bar {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-            margin: 1rem 0;
+        /* فوتر مبسط */
+        .footer-simple {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            background: rgba(10, 14, 23, 0.5);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid var(--border-light);
+            color: var(--text-muted);
+            font-size: 0.85rem;
         }
 
-        .btn-export {
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 0.8rem 1.5rem;
+        .footer-simple span {
+            color: var(--accent-soft);
             font-weight: 700;
+        }
+
+        /* الآلة الحاسبة المنبثقة (Modal) - بنفس ترتيب دراسة الجدوى */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: var(--bg-panel);
+            margin: 5% auto;
+            padding: 0;
+            border: 2px solid var(--border-light);
+            border-radius: 30px;
+            width: 90%;
+            max-width: 300px;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .modal-header {
+            background: rgba(180, 133, 84, 0.15);
+            border-bottom: 2px solid var(--border-light);
+            padding: 10px 15px;
+            border-radius: 28px 28px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--accent-soft);
+            font-size: 1rem;
+            font-weight: 900;
+        }
+
+        .close {
+            color: var(--text-muted);
+            float: left;
+            font-size: 24px;
+            font-weight: bold;
             cursor: pointer;
-            display: inline-flex;
+        }
+
+        .close:hover {
+            color: var(--accent-glow);
+        }
+
+        .modal-body {
+            padding: 15px;
+        }
+
+        .calc-display {
+            width: 100%;
+            height: 45px;
+            font-size: 1.4rem;
+            text-align: left;
+            padding: 0 10px;
+            border: 2px solid var(--border-light);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            background: rgba(10, 14, 23, 0.8);
+            color: var(--accent-soft);
+            font-family: 'Inter', monospace;
+            direction: ltr;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+
+        .calc-btn {
+            background: rgba(180, 133, 84, 0.1);
+            border: 1px solid var(--border-light);
+            border-radius: 15px;
+            padding: 10px 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+
+        .calc-btn:hover {
+            background: rgba(180, 133, 84, 0.3);
+            border-color: var(--accent-glow);
+        }
+
+        .calc-btn.operator {
+            color: var(--accent-soft);
+        }
+
+        .calc-btn.equals {
+            background: rgba(180, 133, 84, 0.3);
+            color: white;
+            grid-column: span 2;
+        }
+
+        .calc-btn.equals:hover {
+            background: rgba(180, 133, 84, 0.5);
+        }
+
+        /* زر الآلة الحاسبة العائم */
+        .calc-floating-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(180, 133, 84, 0.2);
+            border: 1px solid var(--border-light);
+            border-radius: 50px;
+            padding: 0.8rem 1.2rem;
+            color: var(--accent-soft);
+            font-size: 1rem;
+            font-weight: 700;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
             align-items: center;
             gap: 0.5rem;
-            transition: 0.3s;
-        }
-        .btn-export:hover { background: #218838; }
-        .btn-export.word { background: #1e4a7a; }
-        .btn-export.word:hover { background: #0e3a5a; }
-
-        footer {
-            background: linear-gradient(145deg, #111, #1a1a1a);
-            color: #ddd;
-            padding: 3rem 1rem 2rem;
-            border-top: 3px solid var(--gold);
-            margin-top: 4rem;
         }
 
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
+        .calc-floating-btn:hover {
+            background: rgba(180, 133, 84, 0.4);
+            color: #fff;
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 15px rgba(180, 133, 84, 0.3);
         }
 
-        .footer-content {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .footer-row {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .footer-social {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        .footer-social a {
-            color: var(--gold);
-            font-size: 1.8rem;
-            transition: 0.3s;
-        }
-        .footer-social a:hover {
-            color: var(--gold-light);
-            transform: translateY(-3px);
-        }
-
-        .footer-logo-box {
-            text-align: center;
-        }
-
-        .footer-logo-box h2 {
-            color: var(--gold);
-            font-size: 1.2rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-logo-box div {
-            width: 60px;
-            height: 2px;
-            background: var(--gold);
-            margin: 0 auto;
-        }
-
-        .footer-payment .payment-card {
-            background: rgba(255,255,255,0.05);
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .footer-payment img {
-            height: 25px;
-            filter: brightness(0.9);
-            transition: 0.2s;
-        }
-        .footer-payment img:hover {
-            filter: brightness(1.2);
-        }
-
-        hr {
-            border: none;
-            border-top: 1px solid rgba(184,134,11,0.2);
-        }
-
-        .copyright {
-            text-align: center;
-            font-size: 0.9rem;
-            color: #777;
-        }
-        .copyright span {
-            color: var(--gold);
-            font-weight: bold;
-        }
-
+        /* تحسينات الجوال */
         @media (max-width: 768px) {
-            nav {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.8rem;
-            }
-            .logo {
-                flex-wrap: nowrap;
-                gap: 8px;
-                width: 100%;
-                justify-content: center;
-            }
-            .logo img { height: 35px; }
-            .logo h1 { font-size: 1rem; }
-            nav > div:last-child {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 6px;
-            }
-            nav a {
-                margin: 0;
-                font-size: 0.9rem;
-                padding: 4px 8px;
-                white-space: nowrap;
-            }
-            .hero-mini h2 { font-size: 2rem; }
+            .hero-mini h2 { font-size: 1.8rem; }
             .hero-mini p { font-size: 1rem; }
-            .calculator-card { padding: 2rem 1.5rem; }
-            .footer-row { flex-direction: column; text-align: center; }
-            .footer-social { justify-content: center; }
+            .calculator-card { padding: 1.5rem; }
             .featured-badge { width: 70px; height: 70px; }
-            .featured-badge i { font-size: 1.5rem; }
-            .featured-badge span { font-size: 0.7rem; }
+            .featured-badge i { font-size: 1.4rem; }
+            .featured-badge span { font-size: 0.6rem; }
+            .currency-row select,
+            .currency-row input { width: 100%; }
+            .shift-row { flex-direction: column; align-items: stretch; }
+            .remove-shift { align-self: flex-end; }
+            .action-bar { flex-direction: column; }
+            .btn-export,
+            .btn-export.word { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
-
-<!-- أشكال هندسية -->
-<div class="floating-shape shape-1"></div>
-<div class="floating-shape shape-2"></div>
-
-<!-- Navigation -->
-<nav>
-    <div class="logo">
-        <img src="https://lh3.googleusercontent.com/d/1e6u-DPTinDJl_Q9wW3QvGgzFbXO_2sXa" alt="FAROUK GRUP LOGO">
-        <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+    <!-- خلفية متوهجة -->
+    <div class="glow-bg">
+        <span></span><span></span><span></span>
     </div>
-    <div>
-        <a href="https://www.farouk-grup.com/"><i class="fas fa-home"></i> الرئيسية</a>
-        <a href="https://www.farouk-grup.com/Home/Contact-Us" style="color:var(--gold)"><i class="fas fa-phone-alt"></i> تواصل معنا</a>
-    </div>
-</nav>
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
 
-<!-- Hero -->
-<section class="hero-mini">
-    <h2>💰 حاسبة تكلفة العمالة المثالية</h2>
-    <p>تحليل متقدم لتكاليف العمالة، الإنتاجية، والكفاءة التشغيلية</p>
-</section>
+    <!-- تم إزالة الـ NAV بالكامل -->
 
-<!-- Main Container -->
-<div class="container">
-    <div class="calculator-card" data-aos="fade-up">
-        <!-- الشارة المميزة -->
-        <div class="featured-badge">
-            <i class="fas fa-users"></i>
-            <span>عمالة</span>
-        </div>
-        
-        <h2><i class="fas fa-calculator"></i> بيانات المشروع والورديات</h2>
+    <!-- Hero -->
+    <section class="hero-mini">
+        <h2>💰 حاسبة تكلفة العمالة المثالية</h2>
+        <p>تحليل متقدم لتكاليف العمالة، الإنتاجية، والكفاءة التشغيلية</p>
+    </section>
 
-        <!-- اختيار العملة واسم الجهة -->
-        <div class="currency-row">
-            <label><i class="fas fa-coins"></i> اختر العملة:</label>
-            <select id="currencySelect">
-                <option value="$" selected>دولار ($)</option>
-                <option value="€">يورو (€)</option>
-                <option value="₺">ليرة تركية (₺)</option>
-                <option value="ج.م">جنيه مصري (ج.م)</option>
-                <option value="د.ك">دينار كويتي (د.ك)</option>
-                <option value="ر.س">ريال سعودي (ر.س)</option>
-            </select>
-            <label><i class="fas fa-building"></i> اسم الجهة:</label>
-            <input type="text" id="companyName" value="شركة النور للتجارة" placeholder="الجهة المستفيدة">
-        </div>
-
-        <!-- المدخلات الأساسية -->
-        <div class="input-section">
-            <div>
-                <div class="form-group">
-                    <label><i class="fas fa-chart-line"></i> المبيعات الشهرية المستهدفة</label>
-                    <input type="number" id="monthlySales" value="50000" step="1000" min="0">
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-receipt"></i> متوسط الفاتورة للعميل</label>
-                    <input type="number" id="avgBill" value="25" step="1" min="0">
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-clock"></i> متوسط الأجر الشهري للموظف (يشمل التأمينات والبدلات)</label>
-                    <input type="number" id="avgMonthlyWage" value="2500" step="100" min="0">
-                </div>
-            </div>
-            <div>
-                <div class="form-group">
-                    <label><i class="fas fa-calendar-week"></i> أيام العمل في الأسبوع</label>
-                    <input type="number" id="workingDays" value="6" min="1" max="7">
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-percent"></i> نسبة العمالة المستهدفة (مثلاً 25%)</label>
-                    <input type="number" id="targetLaborPercent" value="25" step="1" min="0" max="100">
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-moon"></i> عدد الورديات اليومية</label>
-                    <select id="numShifts">
-                        <option value="1">وردية واحدة</option>
-                        <option value="2" selected>ورديتان</option>
-                        <option value="3">ثلاث ورديات</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- قسم الورديات الديناميكي -->
-        <div class="shifts-section">
-            <div class="shifts-header">
-                <h3><i class="fas fa-clock"></i> تفاصيل الورديات</h3>
-                <button class="btn-add" id="addShiftBtn"><i class="fas fa-plus"></i> إضافة وردية</button>
-            </div>
-            <div id="shiftsContainer"></div>
-            <p class="hint" style="color: #666; font-size:0.9rem;"><i class="fas fa-info-circle"></i> أدخل عدد الموظفين في كل وردية وساعات الوردية.</p>
-        </div>
-
-        <!-- توزيع الإجازات -->
-        <div class="form-group" style="max-width:300px;">
-            <label><i class="fas fa-umbrella-beach"></i> توزيع العطل الأسبوعية</label>
-            <select id="vacationDistribution">
-                <option value="same">جميع الموظفين نفس العطلة</option>
-                <option value="staggered" selected>إجازات متداخلة (لضمان التغطية)</option>
-            </select>
-        </div>
-
-        <button class="btn-primary" id="calculateBtn"><i class="fas fa-chart-pie"></i> احسب التكلفة المثالية</button>
-
-        <!-- منطقة عرض النتائج -->
-        <div class="results-section" id="resultsSection" style="display: none;">
-            <div class="action-bar">
-                <button class="btn-export" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
-                <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير Word</button>
+    <!-- Main Container -->
+    <div class="container">
+        <div class="calculator-card" data-aos="fade-up">
+            <!-- الشارة المميزة -->
+            <div class="featured-badge">
+                <i class="fas fa-users"></i>
+                <span>عمالة</span>
             </div>
 
-            <div class="results-grid" id="resultsGrid"></div>
-            <div id="evaluationAlert"></div>
-            <div class="suggestion-box" id="suggestions"></div>
-            <div class="chart-container">
-                <canvas id="laborChart"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
+            <h2><i class="fas fa-calculator"></i> بيانات المشروع والورديات</h2>
 
-<!-- Footer -->
-<footer>
-    <div class="footer-container">
-        <div class="footer-content">
-            <div class="footer-row">
-                <div class="footer-social">
-                    <a href="https://www.instagram.com/faroukazem/" target="_blank"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.facebook.com/profile.php?id=100091571594026&sk=about" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://wa.me/905550196682" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            <!-- اختيار العملة واسم الجهة -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> اختر العملة:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>دولار ($)</option>
+                    <option value="€">يورو (€)</option>
+                    <option value="₺">ليرة تركية (₺)</option>
+                    <option value="ج.م">جنيه مصري (ج.م)</option>
+                    <option value="د.ك">دينار كويتي (د.ك)</option>
+                    <option value="ر.س">ريال سعودي (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> اسم الجهة:</label>
+                <input type="text" id="companyName" value="شركة النور للتجارة" placeholder="الجهة المستفيدة">
+            </div>
+
+            <!-- المدخلات الأساسية -->
+            <div class="input-section">
+                <div>
+                    <div class="form-group">
+                        <label><i class="fas fa-chart-line"></i> المبيعات الشهرية المستهدفة</label>
+                        <input type="number" id="monthlySales" value="50000" step="1000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-receipt"></i> متوسط الفاتورة للعميل</label>
+                        <input type="number" id="avgBill" value="25" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> متوسط الأجر الشهري للموظف (يشمل التأمينات والبدلات)</label>
+                        <input type="number" id="avgMonthlyWage" value="2500" step="100" min="0">
+                    </div>
                 </div>
-                <div class="footer-logo-box">
-                    <h2>مجموعة فاروق للاستشارات والأعمال</h2>
-                    <div></div>
-                </div>
-                <div class="footer-payment">
-                    <div class="payment-card">
-                        <img src="https://img.icons8.com/color/48/visa.png" alt="Visa">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                <div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-week"></i> أيام العمل في الأسبوع</label>
+                        <input type="number" id="workingDays" value="6" min="1" max="7">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-percent"></i> نسبة العمالة المستهدفة (مثلاً 25%)</label>
+                        <input type="number" id="targetLaborPercent" value="25" step="1" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-moon"></i> عدد الورديات اليومية</label>
+                        <select id="numShifts">
+                            <option value="1">وردية واحدة</option>
+                            <option value="2" selected>ورديتان</option>
+                            <option value="3">ثلاث ورديات</option>
+                        </select>
                     </div>
                 </div>
             </div>
-            <hr>
-            <div class="copyright">
-                جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
-                <p>Adnan Kahveci, Beylikdüzü / İstanbul, Türkiye</p>
+
+            <!-- قسم الورديات الديناميكي -->
+            <div class="shifts-section">
+                <div class="shifts-header">
+                    <h3><i class="fas fa-clock"></i> تفاصيل الورديات</h3>
+                    <button class="btn-add" id="addShiftBtn"><i class="fas fa-plus"></i> إضافة وردية</button>
+                </div>
+                <div id="shiftsContainer"></div>
+                <p class="hint" style="color: var(--text-muted); font-size:0.9rem;"><i class="fas fa-info-circle"></i> أدخل عدد الموظفين في كل وردية وساعات الوردية.</p>
+            </div>
+
+            <!-- توزيع الإجازات -->
+            <div class="form-group" style="max-width:300px;">
+                <label><i class="fas fa-umbrella-beach"></i> توزيع العطل الأسبوعية</label>
+                <select id="vacationDistribution">
+                    <option value="same">جميع الموظفين نفس العطلة</option>
+                    <option value="staggered" selected>إجازات متداخلة (لضمان التغطية)</option>
+                </select>
+            </div>
+
+            <button class="btn-primary" id="calculateBtn"><i class="fas fa-chart-pie"></i> احسب التكلفة المثالية</button>
+
+            <!-- منطقة عرض النتائج -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="action-bar">
+                    <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير Word</button>
+                    <button class="btn-export" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
+                </div>
+
+                <div class="results-grid" id="resultsGrid"></div>
+                <div id="evaluationAlert"></div>
+                <div class="suggestion-box" id="suggestions"></div>
+                <div class="chart-container">
+                    <canvas id="laborChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
-</footer>
 
-<!-- AOS -->
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
-    AOS.init({ duration: 800, once: true, offset: 100 });
+    <!-- فوتر مبسط -->
+    <footer class="footer-simple">
+        جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
+    </footer>
 
-    // ------------------ إدارة الورديات الديناميكية ------------------
-    let shiftCount = 2;
+    <!-- زر الآلة الحاسبة العائم -->
+    <div class="calc-floating-btn" id="calculatorBtn">
+        <i class="fas fa-calculator"></i> آلة حاسبة
+    </div>
 
-    function renderShifts() {
-        const container = document.getElementById('shiftsContainer');
-        container.innerHTML = '';
-        for (let i = 1; i <= shiftCount; i++) {
-            const div = document.createElement('div');
-            div.className = 'shift-row';
-            div.innerHTML = `
-                <input type="number" id="shiftEmployees${i}" placeholder="عدد الموظفين" value="${i === 1 ? 3 : 2}" min="0" step="1">
-                <input type="number" id="shiftHours${i}" placeholder="ساعات الوردية" value="${i === 1 ? 8 : 6}" min="1" step="0.5">
-                <span style="color: var(--gold); font-weight:700;">الوردية ${i}</span>
-                ${i > 1 ? '<button class="remove-shift" onclick="removeShift('+i+')"><i class="fas fa-times"></i></button>' : ''}
-            `;
-            container.appendChild(div);
-        }
-    }
-
-    window.removeShift = function(index) {
-        shiftCount--;
-        renderShifts();
-    };
-
-    document.getElementById('addShiftBtn').addEventListener('click', function() {
-        shiftCount++;
-        renderShifts();
-    });
-
-    document.getElementById('numShifts').addEventListener('change', function() {
-        shiftCount = parseInt(this.value);
-        renderShifts();
-    });
-
-    // ------------------ الحساب الرئيسي ------------------
-    let laborChart;
-
-    document.getElementById('calculateBtn').addEventListener('click', function() {
-        const currency = document.getElementById('currencySelect').value;
-        const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
-
-        const monthlySales = parseFloat(document.getElementById('monthlySales').value) || 0;
-        const avgBill = parseFloat(document.getElementById('avgBill').value) || 1;
-        const avgMonthlyWage = parseFloat(document.getElementById('avgMonthlyWage').value) || 0;
-        const workingDays = parseInt(document.getElementById('workingDays').value) || 6;
-        const targetPercent = parseFloat(document.getElementById('targetLaborPercent').value) || 25;
-        const vacationType = document.getElementById('vacationDistribution').value;
-
-        let totalEmployees = 0;
-        let totalShiftHours = 0;
-        for (let i = 1; i <= shiftCount; i++) {
-            const emp = parseInt(document.getElementById(`shiftEmployees${i}`)?.value) || 0;
-            const hours = parseFloat(document.getElementById(`shiftHours${i}`)?.value) || 0;
-            totalEmployees += emp;
-            totalShiftHours += emp * hours;
-        }
-
-        if (totalEmployees === 0 || totalShiftHours === 0) {
-            alert('الرجاء إدخال عدد الموظفين وساعات العمل لكل وردية');
-            return;
-        }
-
-        const weeksPerMonth = 4.33;
-        const daysPerMonth = workingDays * weeksPerMonth;
-
-        const monthlyLaborCost = totalEmployees * avgMonthlyWage;
-        const laborPercent = monthlySales ? (monthlyLaborCost / monthlySales) * 100 : 0;
-
-        const salesPerEmployee = totalEmployees ? monthlySales / totalEmployees : 0;
-        const dailyLaborCost = daysPerMonth ? monthlyLaborCost / daysPerMonth : 0;
-        const avgHoursPerEmployee = totalEmployees ? totalShiftHours / totalEmployees : 0;
-        const expectedCustomers = monthlySales / avgBill;
-        const customersPerEmployee = totalEmployees ? expectedCustomers / totalEmployees : 0;
-
-        const idealMin = targetPercent - 5;
-        const idealMax = targetPercent + 5;
-        let alertClass = '';
-        let alertMessage = '';
-        if (laborPercent < idealMin) {
-            alertClass = 'alert-warning';
-            alertMessage = `⚠️ نسبة العمالة (${laborPercent.toFixed(1)}%) أقل من المستوى المستهدف (${targetPercent}%). قد يكون الموظفون غير كافيين لخدمة المبيعات المتوقعة.`;
-        } else if (laborPercent > idealMax) {
-            alertClass = 'alert-danger';
-            alertMessage = `🔴 نسبة العمالة (${laborPercent.toFixed(1)}%) أعلى من المستوى المثالي (${targetPercent}%). هذا يشير إلى هدر في الرواتب.`;
-        } else {
-            alertClass = 'alert-success';
-            alertMessage = `✅ نسبة العمالة (${laborPercent.toFixed(1)}%) ضمن النطاق المثالي (${idealMin}-${idealMax}%).`;
-        }
-
-        let efficiencyRating = '';
-        if (laborPercent < 20) efficiencyRating = 'ممتاز';
-        else if (laborPercent <= 30) efficiencyRating = 'جيد';
-        else if (laborPercent <= 35) efficiencyRating = 'مرتفع';
-        else efficiencyRating = 'خطر';
-
-        document.getElementById('resultsSection').style.display = 'block';
-        document.getElementById('resultsGrid').innerHTML = `
-            <div class="result-card">
-                <i class="fas fa-user-friends"></i>
-                <div class="label">إجمالي الموظفين</div>
-                <div class="value">${totalEmployees}</div>
-                <div class="unit">موظف</div>
+    <!-- نافذة الآلة الحاسبة المنبثقة (بنفس ترتيب دراسة الجدوى) -->
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2><i class="fas fa-calculator" style="color: var(--accent-soft);"></i> آلة حاسبة</h2>
             </div>
-            <div class="result-card">
-                <i class="fas fa-money-bill-wave"></i>
-                <div class="label">تكلفة العمالة الشهرية</div>
-                <div class="value">${currency}${monthlyLaborCost.toLocaleString()}</div>
-                <div class="unit">تقريباً</div>
-            </div>
-            <div class="result-card">
-                <i class="fas fa-percent"></i>
-                <div class="label">نسبة العمالة</div>
-                <div class="value">${laborPercent.toFixed(1)}%</div>
-                <div class="unit">من المبيعات</div>
-            </div>
-            <div class="result-card">
-                <i class="fas fa-chart-bar"></i>
-                <div class="label">المبيعات لكل موظف</div>
-                <div class="value">${currency}${salesPerEmployee.toFixed(0)}</div>
-                <div class="unit">شهرياً</div>
-            </div>
-            <div class="result-card">
-                <i class="fas fa-sun"></i>
-                <div class="label">تكلفة العمالة اليومية</div>
-                <div class="value">${currency}${dailyLaborCost.toFixed(0)}</div>
-                <div class="unit">يومياً</div>
-            </div>
-            <div class="result-card">
-                <i class="fas fa-hourglass-half"></i>
-                <div class="label">متوسط ساعات العمل</div>
-                <div class="value">${avgHoursPerEmployee.toFixed(1)}</div>
-                <div class="unit">ساعة/موظف/يوم</div>
-            </div>
-            <div class="result-card">
-                <i class="fas fa-users"></i>
-                <div class="label">العملاء المتوقعون</div>
-                <div class="value">${Math.round(expectedCustomers)}</div>
-                <div class="unit">عميل/شهر</div>
-            </div>
-            <div class="result-card">
-                <i class="fas fa-user-check"></i>
-                <div class="label">عملاء لكل موظف</div>
-                <div class="value">${customersPerEmployee.toFixed(0)}</div>
-                <div class="unit">عميل/موظف/شهر</div>
-            </div>
-            <div class="result-card">
-                <i class="fas fa-tachometer-alt"></i>
-                <div class="label">مؤشر الكفاءة</div>
-                <div class="value">${efficiencyRating}</div>
-                <div class="unit">${laborPercent.toFixed(1)}%</div>
-            </div>
-        `;
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <!-- الصف الأول: 9 8 7 ÷ -->
+                    <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
+                    <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
 
-        document.getElementById('evaluationAlert').innerHTML = `<div class="alert ${alertClass}">${alertMessage}</div>`;
+                    <!-- الصف الثاني: 6 5 4 × -->
+                    <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
+                    <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
 
-        let suggestions = '';
-        if (laborPercent > idealMax) {
-            suggestions += '<li>خفض عدد الموظفين في فترات الهدوء (حلل أوقات الذروة).</li>';
-            suggestions += '<li>دمج بعض المهام أو استخدام موظفين متعددي المهارات.</li>';
-            suggestions += '<li>زيادة المبيعات (التسويق) لخفض النسبة دون تغيير عدد الموظفين.</li>';
-        } else if (laborPercent < idealMin) {
-            suggestions += '<li>قد تحتاج إلى زيادة عدد الموظفين لخدمة العملاء بشكل أفضل.</li>';
-            suggestions += '<li>تأكد من أن المبيعات المستهدفة واقعية وقابلة للتحقيق.</li>';
-        } else {
-            suggestions += '<li>التوزيع الحالي جيد. استمر في مراقبة الأداء.</li>';
-        }
+                    <!-- الصف الثالث: 3 2 1 - -->
+                    <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
+                    <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
 
-        if (vacationType === 'staggered') {
-            suggestions += '<li>الإجازات المتداخلة تضمن تغطية جميع الأيام دون هدر. يفضل الاستمرار بهذا النظام.</li>';
-        } else {
-            suggestions += '<li>نظام الإجازات الموحدة قد يسبب نقصاً في التغطية يوم العطلة. فكر في اعتماد إجازات متداخلة.</li>';
-        }
+                    <!-- الصف الرابع: C 0 . + -->
+                    <button class="calc-btn" onclick="clearCalculator()">C</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
+                    <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
 
-        const shiftAnalysis = [];
-        for (let i = 1; i <= shiftCount; i++) {
-            const emp = parseInt(document.getElementById(`shiftEmployees${i}`)?.value) || 0;
-            const hours = parseFloat(document.getElementById(`shiftHours${i}`)?.value) || 0;
-            shiftAnalysis.push(`الوردية ${i}: ${emp} موظفين، ${hours} ساعات.`);
-        }
-        suggestions += '<br><strong>توزيع الورديات الحالي:</strong><br>' + shiftAnalysis.join('<br>');
+                    <!-- الصف الخامس: ⌫ و = (يمتد على 3 أعمدة) -->
+                    <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
+                    <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        document.getElementById('suggestions').innerHTML = `<h4><i class="fas fa-lightbulb"></i> توصيات لتقليل الهدر وتحسين الكفاءة</h4><ul>${suggestions}</ul>`;
+    <!-- AOS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true, offset: 100 });
 
-        const ctx = document.getElementById('laborChart').getContext('2d');
-        if (laborChart) laborChart.destroy();
-        laborChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['المبيعات الشهرية', 'تكلفة العمالة'],
-                datasets: [{
-                    label: `القيمة (${currency})`,
-                    data: [monthlySales, monthlyLaborCost],
-                    backgroundColor: ['#28a745', '#b8860b']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: { y: { beginAtZero: true } }
+        // ------------------ آلة حاسبة منبثقة آمنة ------------------
+        const calcDisplay = document.getElementById('calcDisplay');
+        let currentCalcInput = '';
+
+        function safeEvaluate(expr) {
+            try {
+                if (!/^[0-9+\-*/().\s]+$/.test(expr)) throw new Error('غير مسموح');
+                expr = expr.replace(/÷/g, '/').replace(/×/g, '*');
+                return new Function('return (' + expr + ')')();
+            } catch {
+                return 'خطأ';
             }
+        }
+
+        window.handleCalculatorInput = function(value) {
+            currentCalcInput += value;
+            calcDisplay.value = currentCalcInput;
+        };
+
+        window.clearCalculator = function() {
+            currentCalcInput = '';
+            calcDisplay.value = '';
+        };
+
+        window.backspaceCalculator = function() {
+            currentCalcInput = currentCalcInput.slice(0, -1);
+            calcDisplay.value = currentCalcInput;
+        };
+
+        window.calculateCalculatorResult = function() {
+            if (!currentCalcInput.trim()) return;
+            const result = safeEvaluate(currentCalcInput);
+            calcDisplay.value = result;
+            currentCalcInput = result.toString();
+        };
+
+        // لوحة المفاتيح للمودال
+        const modal = document.getElementById('calculatorModal');
+        const btn = document.getElementById('calculatorBtn');
+        const span = document.querySelector('.close');
+
+        btn.onclick = (e) => {
+            e.preventDefault();
+            modal.style.display = 'block';
+        };
+        span.onclick = () => { modal.style.display = 'none'; };
+        window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+
+        document.addEventListener('keydown', (e) => {
+            if (modal.style.display !== 'block') return;
+            e.preventDefault();
+            const key = e.key;
+            if (key >= '0' && key <= '9') handleCalculatorInput(key);
+            else if (key === '.') handleCalculatorInput('.');
+            else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
+            else if (key === 'Enter' || key === '=') calculateCalculatorResult();
+            else if (key === 'Backspace') backspaceCalculator();
+            else if (key === 'Escape') modal.style.display = 'none';
+            else if (key.toLowerCase() === 'c') clearCalculator();
         });
 
-        // تخزين البيانات للتصدير
-        window.laborData = {
-            currency,
-            companyName,
-            monthlySales,
-            avgBill,
-            avgMonthlyWage,
-            workingDays,
-            targetPercent,
-            vacationType,
-            totalEmployees,
-            totalShiftHours,
-            monthlyLaborCost,
-            laborPercent,
-            salesPerEmployee,
-            dailyLaborCost,
-            avgHoursPerEmployee,
-            expectedCustomers,
-            customersPerEmployee,
-            efficiencyRating,
-            alertMessage,
-            shiftAnalysis,
-            suggestions
-        };
-    });
+        // ------------------ إدارة الورديات الديناميكية ------------------
+        let shiftCount = 2;
 
-    // ------------------ تصدير Word محسّن واحترافي ------------------
-    document.getElementById('exportWordBtn').addEventListener('click', async function() {
-        if (!window.laborData) {
-            alert('الرجاء إجراء التحليل أولاً');
-            return;
-        }
-        const d = window.laborData;
-        const currency = d.currency;
-        const companyName = d.companyName;
-
-        try {
-            // التقاط الرسم البياني
-            const canvas = document.getElementById('laborChart');
-            if (!canvas) return;
-            const chartCanvas = await html2canvas(canvas, { scale: 2, backgroundColor: '#ffffff' });
-            const chartImg = chartCanvas.toDataURL('image/png');
-
-            // جمع بطاقات KPI وتحويلها إلى جدول
-            const kpiCards = document.querySelectorAll('.result-card');
-            let kpiRows = '';
-            let row = '';
-            let count = 0;
-            kpiCards.forEach((card, index) => {
-                const icon = card.querySelector('i') ? card.querySelector('i').outerHTML : '';
-                const label = card.querySelector('.label') ? card.querySelector('.label').innerText : '';
-                const value = card.querySelector('.value') ? card.querySelector('.value').innerText : '';
-                const unit = card.querySelector('.unit') ? card.querySelector('.unit').innerText : '';
-
-                const cell = `
-                    <td style="border:1px solid #b8860b; padding:15px; text-align:center; background:#fefcf6; vertical-align:top;">
-                        ${icon}
-                        <div style="font-weight:700; color:#666; margin:0.3rem 0;">${label}</div>
-                        <div style="font-size:1.8rem; font-weight:900; color:#b8860b;">${value}</div>
-                        <div style="font-size:0.9rem; color:#777;">${unit}</div>
-                    </td>
+        function renderShifts() {
+            const container = document.getElementById('shiftsContainer');
+            container.innerHTML = '';
+            for (let i = 1; i <= shiftCount; i++) {
+                const div = document.createElement('div');
+                div.className = 'shift-row';
+                div.innerHTML = `
+                    <input type="number" id="shiftEmployees${i}" placeholder="عدد الموظفين" value="${i === 1 ? 3 : 2}" min="0" step="1">
+                    <input type="number" id="shiftHours${i}" placeholder="ساعات الوردية" value="${i === 1 ? 8 : 6}" min="1" step="0.5">
+                    <span style="color: var(--accent-soft); font-weight:700;">الوردية ${i}</span>
+                    ${i > 1 ? '<button class="remove-shift" onclick="removeShift(' + i + ')"><i class="fas fa-times"></i></button>' : ''}
                 `;
-                row += cell;
-                count++;
-                if (count % 2 === 0 || index === kpiCards.length - 1) {
-                    kpiRows += `<tr>${row}</tr>`;
-                    row = '';
+                container.appendChild(div);
+            }
+        }
+
+        window.removeShift = function(index) {
+            shiftCount--;
+            renderShifts();
+        };
+
+        document.getElementById('addShiftBtn').addEventListener('click', function() {
+            shiftCount++;
+            renderShifts();
+        });
+
+        document.getElementById('numShifts').addEventListener('change', function() {
+            shiftCount = parseInt(this.value);
+            renderShifts();
+        });
+
+        // ------------------ الحساب الرئيسي ------------------
+        let laborChart;
+
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            const currency = document.getElementById('currencySelect').value;
+            const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+
+            const monthlySales = parseFloat(document.getElementById('monthlySales').value) || 0;
+            const avgBill = parseFloat(document.getElementById('avgBill').value) || 1;
+            const avgMonthlyWage = parseFloat(document.getElementById('avgMonthlyWage').value) || 0;
+            const workingDays = parseInt(document.getElementById('workingDays').value) || 6;
+            const targetPercent = parseFloat(document.getElementById('targetLaborPercent').value) || 25;
+            const vacationType = document.getElementById('vacationDistribution').value;
+
+            let totalEmployees = 0;
+            let totalShiftHours = 0;
+            for (let i = 1; i <= shiftCount; i++) {
+                const emp = parseInt(document.getElementById(`shiftEmployees${i}`)?.value) || 0;
+                const hours = parseFloat(document.getElementById(`shiftHours${i}`)?.value) || 0;
+                totalEmployees += emp;
+                totalShiftHours += emp * hours;
+            }
+
+            if (totalEmployees === 0 || totalShiftHours === 0) {
+                alert('الرجاء إدخال عدد الموظفين وساعات العمل لكل وردية');
+                return;
+            }
+
+            const weeksPerMonth = 4.33;
+            const daysPerMonth = workingDays * weeksPerMonth;
+
+            const monthlyLaborCost = totalEmployees * avgMonthlyWage;
+            const laborPercent = monthlySales ? (monthlyLaborCost / monthlySales) * 100 : 0;
+
+            const salesPerEmployee = totalEmployees ? monthlySales / totalEmployees : 0;
+            const dailyLaborCost = daysPerMonth ? monthlyLaborCost / daysPerMonth : 0;
+            const avgHoursPerEmployee = totalEmployees ? totalShiftHours / totalEmployees : 0;
+            const expectedCustomers = monthlySales / avgBill;
+            const customersPerEmployee = totalEmployees ? expectedCustomers / totalEmployees : 0;
+
+            const idealMin = targetPercent - 5;
+            const idealMax = targetPercent + 5;
+            let alertClass = '';
+            let alertMessage = '';
+            if (laborPercent < idealMin) {
+                alertClass = 'alert-warning';
+                alertMessage = `⚠️ نسبة العمالة (${laborPercent.toFixed(1)}%) أقل من المستوى المستهدف (${targetPercent}%). قد يكون الموظفون غير كافيين لخدمة المبيعات المتوقعة.`;
+            } else if (laborPercent > idealMax) {
+                alertClass = 'alert-danger';
+                alertMessage = `🔴 نسبة العمالة (${laborPercent.toFixed(1)}%) أعلى من المستوى المثالي (${targetPercent}%). هذا يشير إلى هدر في الرواتب.`;
+            } else {
+                alertClass = 'alert-success';
+                alertMessage = `✅ نسبة العمالة (${laborPercent.toFixed(1)}%) ضمن النطاق المثالي (${idealMin}-${idealMax}%).`;
+            }
+
+            let efficiencyRating = '';
+            if (laborPercent < 20) efficiencyRating = 'ممتاز';
+            else if (laborPercent <= 30) efficiencyRating = 'جيد';
+            else if (laborPercent <= 35) efficiencyRating = 'مرتفع';
+            else efficiencyRating = 'خطر';
+
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('resultsGrid').innerHTML = `
+                <div class="result-card">
+                    <i class="fas fa-user-friends"></i>
+                    <div class="label">إجمالي الموظفين</div>
+                    <div class="value">${totalEmployees}</div>
+                    <div class="unit">موظف</div>
+                </div>
+                <div class="result-card">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <div class="label">تكلفة العمالة الشهرية</div>
+                    <div class="value">${currency}${monthlyLaborCost.toLocaleString()}</div>
+                    <div class="unit">تقريباً</div>
+                </div>
+                <div class="result-card">
+                    <i class="fas fa-percent"></i>
+                    <div class="label">نسبة العمالة</div>
+                    <div class="value">${laborPercent.toFixed(1)}%</div>
+                    <div class="unit">من المبيعات</div>
+                </div>
+                <div class="result-card">
+                    <i class="fas fa-chart-bar"></i>
+                    <div class="label">المبيعات لكل موظف</div>
+                    <div class="value">${currency}${salesPerEmployee.toFixed(0)}</div>
+                    <div class="unit">شهرياً</div>
+                </div>
+                <div class="result-card">
+                    <i class="fas fa-sun"></i>
+                    <div class="label">تكلفة العمالة اليومية</div>
+                    <div class="value">${currency}${dailyLaborCost.toFixed(0)}</div>
+                    <div class="unit">يومياً</div>
+                </div>
+                <div class="result-card">
+                    <i class="fas fa-hourglass-half"></i>
+                    <div class="label">متوسط ساعات العمل</div>
+                    <div class="value">${avgHoursPerEmployee.toFixed(1)}</div>
+                    <div class="unit">ساعة/موظف/يوم</div>
+                </div>
+                <div class="result-card">
+                    <i class="fas fa-users"></i>
+                    <div class="label">العملاء المتوقعون</div>
+                    <div class="value">${Math.round(expectedCustomers)}</div>
+                    <div class="unit">عميل/شهر</div>
+                </div>
+                <div class="result-card">
+                    <i class="fas fa-user-check"></i>
+                    <div class="label">عملاء لكل موظف</div>
+                    <div class="value">${customersPerEmployee.toFixed(0)}</div>
+                    <div class="unit">عميل/موظف/شهر</div>
+                </div>
+                <div class="result-card">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <div class="label">مؤشر الكفاءة</div>
+                    <div class="value">${efficiencyRating}</div>
+                    <div class="unit">${laborPercent.toFixed(1)}%</div>
+                </div>
+            `;
+
+            document.getElementById('evaluationAlert').innerHTML = `<div class="alert ${alertClass}">${alertMessage}</div>`;
+
+            let suggestions = '';
+            if (laborPercent > idealMax) {
+                suggestions += '<li>خفض عدد الموظفين في فترات الهدوء (حلل أوقات الذروة).</li>';
+                suggestions += '<li>دمج بعض المهام أو استخدام موظفين متعددي المهارات.</li>';
+                suggestions += '<li>زيادة المبيعات (التسويق) لخفض النسبة دون تغيير عدد الموظفين.</li>';
+            } else if (laborPercent < idealMin) {
+                suggestions += '<li>قد تحتاج إلى زيادة عدد الموظفين لخدمة العملاء بشكل أفضل.</li>';
+                suggestions += '<li>تأكد من أن المبيعات المستهدفة واقعية وقابلة للتحقيق.</li>';
+            } else {
+                suggestions += '<li>التوزيع الحالي جيد. استمر في مراقبة الأداء.</li>';
+            }
+
+            if (vacationType === 'staggered') {
+                suggestions += '<li>الإجازات المتداخلة تضمن تغطية جميع الأيام دون هدر. يفضل الاستمرار بهذا النظام.</li>';
+            } else {
+                suggestions += '<li>نظام الإجازات الموحدة قد يسبب نقصاً في التغطية يوم العطلة. فكر في اعتماد إجازات متداخلة.</li>';
+            }
+
+            const shiftAnalysis = [];
+            for (let i = 1; i <= shiftCount; i++) {
+                const emp = parseInt(document.getElementById(`shiftEmployees${i}`)?.value) || 0;
+                const hours = parseFloat(document.getElementById(`shiftHours${i}`)?.value) || 0;
+                shiftAnalysis.push(`الوردية ${i}: ${emp} موظفين، ${hours} ساعات.`);
+            }
+            suggestions += '<br><strong>توزيع الورديات الحالي:</strong><br>' + shiftAnalysis.join('<br>');
+
+            document.getElementById('suggestions').innerHTML = `<h4><i class="fas fa-lightbulb"></i> توصيات لتقليل الهدر وتحسين الكفاءة</h4><ul>${suggestions}</ul>`;
+
+            const ctx = document.getElementById('laborChart').getContext('2d');
+            if (laborChart) laborChart.destroy();
+            laborChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['المبيعات الشهرية', 'تكلفة العمالة'],
+                    datasets: [{
+                        label: `القيمة (${currency})`,
+                        data: [monthlySales, monthlyLaborCost],
+                        backgroundColor: ['#28a745', '#b8860b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#aab7d4' } },
+                        x: { ticks: { color: '#aab7d4' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#cfa776' } }
+                    }
                 }
             });
 
-            // جدول المعطيات الأساسية
-            const summaryRows = `
-                <tr><th style="background:#fefcf6;">المبيعات الشهرية المستهدفة</th><td>${currency} ${d.monthlySales}</td></tr>
-                <tr><th style="background:#fefcf6;">متوسط الفاتورة للعميل</th><td>${currency} ${d.avgBill}</td></tr>
-                <tr><th style="background:#fefcf6;">متوسط الأجر الشهري للموظف</th><td>${currency} ${d.avgMonthlyWage}</td></tr>
-                <tr><th style="background:#fefcf6;">أيام العمل في الأسبوع</th><td>${d.workingDays}</td></tr>
-                <tr><th style="background:#fefcf6;">نسبة العمالة المستهدفة</th><td>${d.targetPercent}%</td></tr>
-                <tr><th style="background:#fefcf6;">إجمالي الموظفين</th><td>${d.totalEmployees}</td></tr>
-                <tr><th style="background:#fefcf6;">إجمالي ساعات العمل اليومية</th><td>${d.totalShiftHours}</td></tr>
-            `;
+            // تخزين البيانات للتصدير
+            window.laborData = {
+                currency,
+                companyName,
+                monthlySales,
+                avgBill,
+                avgMonthlyWage,
+                workingDays,
+                targetPercent,
+                vacationType,
+                totalEmployees,
+                totalShiftHours,
+                monthlyLaborCost,
+                laborPercent,
+                salesPerEmployee,
+                dailyLaborCost,
+                avgHoursPerEmployee,
+                expectedCustomers,
+                customersPerEmployee,
+                efficiencyRating,
+                alertMessage,
+                shiftAnalysis,
+                suggestions
+            };
+        });
 
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
-
-            const reportHTML = `
-                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                <head>
-                    <meta charset='utf-8'>
-                    <style>
-                        body { font-family: 'Arial', sans-serif; direction: rtl; margin: 2rem; }
-                        .header { text-align: center; border-bottom: 3px solid #b8860b; padding-bottom: 10px; margin-bottom: 20px; }
-                        h2, h3 { color: #b8860b; }
-                        table { width: 100%; border-collapse: collapse; margin: 15px 0; direction: rtl; }
-                        th, td { border: 1px solid #b8860b; padding: 8px; text-align: center; }
-                        th { background: #fefcf6; color: #b8860b; }
-                        .chart-img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 10px; margin: 1rem 0; }
-                        .footer { text-align: center; margin-top: 40px; color: #888; border-top: 1px dashed #b8860b; padding-top: 10px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h1 style="color:#b8860b;">مجموعة فاروق للاستشارات والأعمال</h1>
-                        <p>تقرير تحليل تكلفة العمالة المثالية</p>
-                        <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
-                    </div>
-
-                    <h2>المعطيات الأساسية</h2>
-                    <table>
-                        ${summaryRows}
-                    </table>
-
-                    <h2>مؤشرات الأداء</h2>
-                    <table>${kpiRows}</table>
-
-                    <div style="background:#fefcf6; border:1px solid #b8860b; border-radius:10px; padding:1rem; margin:1rem 0;">
-                        ${document.getElementById('evaluationAlert').innerHTML.replace(/class="alert/g, 'style="background:#d4edda; color:#155724; padding:1rem; border-radius:30px;"')}
-                    </div>
-
-                    <h2>الرسم البياني: المبيعات مقابل تكلفة العمالة</h2>
-                    <div style="text-align:center;"><img src="${chartImg}" class="chart-img" /></div>
-
-                    <h2>توصيات وتحسينات</h2>
-                    <div style="background:#fefcf6; border:1px solid #b8860b; border-radius:10px; padding:1rem;">
-                        ${document.getElementById('suggestions').innerHTML}
-                    </div>
-
-                    <div class="footer">
-                        تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة © ${now.getFullYear()}
-                    </div>
-                </body>
-                </html>
-            `;
-
-            const blob = new Blob(['\uFEFF' + reportHTML], { type: 'application/msword' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `تقرير_عمالة_${companyName}_${now.toISOString().slice(0,10)}.doc`;
-            link.click();
-            URL.revokeObjectURL(link.href);
-
-        } catch (error) {
-            console.error(error);
-            alert('حدث خطأ أثناء إنشاء تقرير Word');
-        }
-    });
-
-    // ------------------ تصدير PDF محسّن ------------------
-    document.getElementById('exportPdfBtn').addEventListener('click', async function() {
-        if (!window.laborData) {
-            alert('الرجاء إجراء التحليل أولاً');
-            return;
-        }
-
-        try {
+        // ------------------ تصدير Word (بخلفيات بيضاء) ------------------
+        document.getElementById('exportWordBtn').addEventListener('click', async function() {
+            if (!window.laborData) {
+                alert('الرجاء إجراء التحليل أولاً');
+                return;
+            }
             const d = window.laborData;
-            const resultsSection = document.getElementById('resultsSection');
-            if (!resultsSection || resultsSection.style.display === 'none') return;
+            const currency = d.currency;
+            const companyName = d.companyName;
 
-            // إنشاء نسخة من منطقة النتائج مع إزالة الأزرار
-            const cloneSection = resultsSection.cloneNode(true);
-            const actionBar = cloneSection.querySelector('.action-bar');
-            if (actionBar) actionBar.remove();
+            try {
+                // التقاط الرسم البياني بخلفية بيضاء
+                const canvas = document.getElementById('laborChart');
+                const chartCanvas = await html2canvas(canvas, { scale: 2, backgroundColor: '#ffffff' });
+                const chartImg = chartCanvas.toDataURL('image/png');
 
-            const allButtons = cloneSection.querySelectorAll('button');
-            allButtons.forEach(btn => btn.style.display = 'none');
+                // الحصول على نسخة HTML من البطاقات مع تغيير الأنماط للخلفية البيضاء
+                const kpiCards = document.querySelectorAll('.result-card');
+                let kpiRows = '';
+                let row = '';
+                let count = 0;
+                kpiCards.forEach((card, index) => {
+                    const icon = card.querySelector('i') ? card.querySelector('i').outerHTML : '';
+                    const label = card.querySelector('.label') ? card.querySelector('.label').innerText : '';
+                    const value = card.querySelector('.value') ? card.querySelector('.value').innerText : '';
+                    const unit = card.querySelector('.unit') ? card.querySelector('.unit').innerText : '';
 
-            // تطبيق أنماط إضافية للطباعة
-            cloneSection.style.backgroundColor = '#ffffff';
-            cloneSection.style.padding = '20px';
-            cloneSection.style.borderRadius = '10px';
-            cloneSection.style.direction = 'rtl';
-            cloneSection.style.fontFamily = 'Tajawal, sans-serif';
+                    const cell = `
+                        <td style="border:1px solid #b8860b; padding:15px; text-align:center; background:#fefcf6; vertical-align:top;">
+                            ${icon}
+                            <div style="font-weight:700; color:#666; margin:0.3rem 0;">${label}</div>
+                            <div style="font-size:1.6rem; font-weight:900; color:#b8860b;">${value}</div>
+                            <div style="font-size:0.9rem; color:#777;">${unit}</div>
+                        </td>
+                    `;
+                    row += cell;
+                    count++;
+                    if (count % 2 === 0 || index === kpiCards.length - 1) {
+                        kpiRows += `<tr>${row}</tr>`;
+                        row = '';
+                    }
+                });
 
-            // إضافة ترويسة باسم الجهة
-            const headerDiv = document.createElement('div');
-            headerDiv.innerHTML = `
-                <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #b8860b; padding-bottom: 10px;">
-                    <h2 style="color: #b8860b; margin:0;">مجموعة فاروق للاستشارات والأعمال</h2>
-                    <p style="color: #666;">تقرير تحليل تكلفة العمالة المثالية</p>
-                    <p style="color: #666;">الجهة: ${d.companyName} | تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG-u-nu-latn')}</p>
-                </div>
-            `;
-            cloneSection.insertBefore(headerDiv, cloneSection.firstChild);
+                // جدول المعطيات الأساسية
+                const summaryRows = `
+                    <tr><th style="background:#fefcf6; color:#b8860b;">المبيعات الشهرية المستهدفة</th><td>${currency} ${d.monthlySales}</td></tr>
+                    <tr><th style="background:#fefcf6; color:#b8860b;">متوسط الفاتورة للعميل</th><td>${currency} ${d.avgBill}</td></tr>
+                    <tr><th style="background:#fefcf6; color:#b8860b;">متوسط الأجر الشهري للموظف</th><td>${currency} ${d.avgMonthlyWage}</td></tr>
+                    <tr><th style="background:#fefcf6; color:#b8860b;">أيام العمل في الأسبوع</th><td>${d.workingDays}</td></tr>
+                    <tr><th style="background:#fefcf6; color:#b8860b;">نسبة العمالة المستهدفة</th><td>${d.targetPercent}%</td></tr>
+                    <tr><th style="background:#fefcf6; color:#b8860b;">إجمالي الموظفين</th><td>${d.totalEmployees}</td></tr>
+                    <tr><th style="background:#fefcf6; color:#b8860b;">إجمالي ساعات العمل اليومية</th><td>${d.totalShiftHours}</td></tr>
+                `;
 
-            // إضافة تذييل
-            const footerDiv = document.createElement('div');
-            footerDiv.innerHTML = `
-                <div style="text-align: center; margin-top: 30px; color: #888; font-size:0.9rem; border-top: 1px dashed #b8860b; padding-top: 10px;">
-                    تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة © ${new Date().getFullYear()}
-                </div>
-            `;
-            cloneSection.appendChild(footerDiv);
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            // إخفاء العنصر خارج الشاشة
-            cloneSection.style.position = 'absolute';
-            cloneSection.style.left = '-9999px';
-            cloneSection.style.top = '0';
-            document.body.appendChild(cloneSection);
+                const reportHTML = `
+                    <html>
+                    <head>
+                        <meta charset='utf-8'>
+                        <style>
+                            body { direction: rtl; font-family: 'Tajawal', Arial, sans-serif; background: #fff; color: #333; padding: 2rem; }
+                            h1, h2, h3 { color: #b8860b; }
+                            table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: #fff; }
+                            th, td { border: 1px solid #b8860b; padding: 10px; text-align: center; }
+                            th { background: #fefcf6; color: #b8860b; }
+                            .kpi-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+                            .kpi-table td { border: 1px solid #b8860b; padding: 15px; text-align: center; background: #fefcf6; }
+                            .chart-container { text-align: center; margin: 2rem 0; }
+                            .chart-container img { max-width: 100%; border: 2px solid #b8860b; border-radius: 10px; background: #fff; }
+                            .footer { margin-top: 2rem; text-align: center; color: #777; border-top: 1px dashed #b8860b; padding-top: 1rem; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+                        <h2>تقرير تحليل تكلفة العمالة المثالية</h2>
+                        <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
 
-            const canvas = await html2canvas(cloneSection, { scale: 2, backgroundColor: '#ffffff' });
-            const imgData = canvas.toDataURL('image/png');
+                        <h3>المعطيات الأساسية</h3>
+                        <table>${summaryRows}</table>
 
-            document.body.removeChild(cloneSection);
+                        <h3>مؤشرات الأداء</h3>
+                        <table class="kpi-table">${kpiRows}</table>
 
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
+                        <h3>التقييم</h3>
+                        <div style="background:#f8f8f8; border:1px solid #b8860b; border-radius:10px; padding:1rem; margin:1rem 0;">
+                            ${d.alertMessage}
+                        </div>
 
-            const imgWidth = pdfWidth;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                        <h3>الرسم البياني: المبيعات مقابل تكلفة العمالة</h3>
+                        <div class="chart-container"><img src="${chartImg}" /></div>
 
-            let heightLeft = imgHeight;
-            let position = 0;
+                        <h3>التوصيات</h3>
+                        <div style="background:#f8f8f8; border:1px solid #b8860b; border-radius:10px; padding:1rem;">
+                            <ul>${d.suggestions.replace(/<br>/g, '<br>')}</ul>
+                        </div>
 
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pdfHeight;
+                        <div class="footer">
+                            تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة © ${now.getFullYear()}
+                        </div>
+                    </body>
+                    </html>
+                `;
 
-            while (heightLeft > 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pdfHeight;
+                const blob = new Blob(['\uFEFF' + reportHTML], { type: 'application/msword' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `تقرير_عمالة_${companyName}_${now.toISOString().slice(0, 10)}.doc`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+            } catch (error) {
+                console.error(error);
+                alert('حدث خطأ أثناء إنشاء تقرير Word');
+            }
+        });
+
+        // ------------------ تصدير PDF (بخلفيات بيضاء) ------------------
+        document.getElementById('exportPdfBtn').addEventListener('click', async function() {
+            if (!window.laborData) {
+                alert('الرجاء إجراء التحليل أولاً');
+                return;
             }
 
-            pdf.save(`تقرير_عمالة_${d.companyName}.pdf`);
-        } catch (error) {
-            console.error(error);
-            alert('حدث خطأ أثناء إنشاء ملف PDF');
-        }
-    });
+            try {
+                const d = window.laborData;
+                const resultsSection = document.getElementById('resultsSection');
+                if (!resultsSection || resultsSection.style.display === 'none') return;
 
-    // تهيئة أولية
-    renderShifts();
-</script>
+                // استنساخ المنطقة مع تغيير الأنماط للأبيض
+                const cloneSection = resultsSection.cloneNode(true);
+                const actionBar = cloneSection.querySelector('.action-bar');
+                if (actionBar) actionBar.remove();
+
+                const allButtons = cloneSection.querySelectorAll('button');
+                allButtons.forEach(btn => btn.style.display = 'none');
+
+                // تعديل أنماط العناصر لتصبح بخلفية بيضاء ونصوص داكنة
+                cloneSection.style.backgroundColor = '#ffffff';
+                cloneSection.style.padding = '20px';
+                cloneSection.style.borderRadius = '10px';
+                cloneSection.style.direction = 'rtl';
+                cloneSection.style.fontFamily = 'Tajawal, sans-serif';
+                cloneSection.style.color = '#333';
+
+                // تعديل كل result-card
+                const resultCards = cloneSection.querySelectorAll('.result-card');
+                resultCards.forEach(card => {
+                    card.style.backgroundColor = '#fefcf6';
+                    card.style.border = '2px solid #b8860b';
+                    card.style.color = '#333';
+                    const label = card.querySelector('.label');
+                    if (label) label.style.color = '#666';
+                    const value = card.querySelector('.value');
+                    if (value) value.style.color = '#b8860b';
+                    const unit = card.querySelector('.unit');
+                    if (unit) unit.style.color = '#777';
+                    const icon = card.querySelector('i');
+                    if (icon) icon.style.color = '#b8860b';
+                });
+
+                // تعديل التنبيهات
+                const alertDiv = cloneSection.querySelector('#evaluationAlert .alert');
+                if (alertDiv) {
+                    alertDiv.style.background = alertDiv.classList.contains('alert-success') ? '#d4edda' : (alertDiv.classList.contains('alert-warning') ? '#fff3cd' : '#f8d7da');
+                    alertDiv.style.color = alertDiv.classList.contains('alert-success') ? '#155724' : (alertDiv.classList.contains('alert-warning') ? '#856404' : '#721c24');
+                    alertDiv.style.border = '1px solid ' + (alertDiv.classList.contains('alert-success') ? '#c3e6cb' : (alertDiv.classList.contains('alert-warning') ? '#ffeeba' : '#f5c6cb'));
+                }
+
+                // تعديل صندوق التوصيات
+                const suggestionBox = cloneSection.querySelector('.suggestion-box');
+                if (suggestionBox) {
+                    suggestionBox.style.backgroundColor = '#f8f8f8';
+                    suggestionBox.style.border = '2px solid #b8860b';
+                    suggestionBox.style.color = '#333';
+                    const h4 = suggestionBox.querySelector('h4');
+                    if (h4) h4.style.color = '#b8860b';
+                    const ul = suggestionBox.querySelector('ul');
+                    if (ul) ul.style.color = '#555';
+                }
+
+                // تعديل الرسم البياني (سيتم التقاطه بخلفية بيضاء لاحقاً)
+                const chartContainer = cloneSection.querySelector('.chart-container');
+                if (chartContainer) {
+                    chartContainer.style.backgroundColor = '#ffffff';
+                    chartContainer.style.border = '2px solid #b8860b';
+                }
+
+                // إضافة ترويسة وتذييل
+                const headerDiv = document.createElement('div');
+                headerDiv.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #b8860b; padding-bottom: 10px;">
+                        <h2 style="color: #b8860b; margin:0;">مجموعة فاروق للاستشارات والأعمال</h2>
+                        <p style="color: #666;">تقرير تحليل تكلفة العمالة المثالية</p>
+                        <p style="color: #666;">الجهة: ${d.companyName} | تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG-u-nu-latn')}</p>
+                    </div>
+                `;
+                cloneSection.insertBefore(headerDiv, cloneSection.firstChild);
+
+                const footerDiv = document.createElement('div');
+                footerDiv.innerHTML = `
+                    <div style="text-align: center; margin-top: 30px; color: #888; font-size:0.9rem; border-top: 1px dashed #b8860b; padding-top: 10px;">
+                        تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة © ${new Date().getFullYear()}
+                    </div>
+                `;
+                cloneSection.appendChild(footerDiv);
+
+                // وضع النسخة خارج الشاشة للتصوير
+                cloneSection.style.position = 'absolute';
+                cloneSection.style.left = '-9999px';
+                cloneSection.style.top = '0';
+                document.body.appendChild(cloneSection);
+
+                // التقاط الصورة بخلفية بيضاء
+                const canvas = await html2canvas(cloneSection, { scale: 2, backgroundColor: '#ffffff' });
+                const imgData = canvas.toDataURL('image/png');
+
+                document.body.removeChild(cloneSection);
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+
+                const imgWidth = pdfWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pdfHeight;
+
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pdfHeight;
+                }
+
+                pdf.save(`تقرير_عمالة_${d.companyName}.pdf`);
+            } catch (error) {
+                console.error(error);
+                alert('حدث خطأ أثناء إنشاء ملف PDF');
+            }
+        });
+
+        // تهيئة أولية
+        renderShifts();
+    </script>
 </body>
 </html>

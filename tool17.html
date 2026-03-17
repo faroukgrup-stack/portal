@@ -14,15 +14,23 @@
 
     <style>
         :root {
+            --bg-dark: #0b0e17;
+            --bg-panel: rgba(18, 24, 36, 0.85);
+            --bg-card: rgba(22, 30, 46, 0.8);
+            --border-light: rgba(180, 133, 84, 0.25);
+            --accent-glow: #b48554;
+            --accent-soft: #cfa776;
+            --text-light: #f0f4fa;
+            --text-muted: #aab7d4;
+            --shadow-soft: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 133, 84, 0.15);
+            --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
+            --radius-md: 12px;
+            --radius-lg: 30px;
+            --transition: all 0.3s ease;
             --gold: #b8860b;
             --gold-light: #d4b15a;
-            --gold-soft: rgba(184,134,11,0.1);
-            --dark: #0f0f0f;
-            --dark-light: #1a1a1a;
-            --white: #ffffff;
-            --offwhite: #f9f9f9;
-            --text: #333;
-            --card-bg: #fefcf6;
+            --gold-soft: rgba(180,133,84,0.15);
+            --danger: #dc3545;
         }
 
         * {
@@ -33,24 +41,40 @@
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-            color: var(--text);
-            line-height: 1.6;
+            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
+            color: var(--text-light);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             position: relative;
         }
 
-        body::before {
-            content: "";
+        /* خلفية متوهجة */
+        .glow-bg {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(184,134,11,0.03) 0px, transparent 20px),
-                radial-gradient(circle at 90% 70%, rgba(184,134,11,0.03) 0px, transparent 25px),
-                repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 1px, transparent 1px, transparent 10px);
-            pointer-events: none; z-index: -1;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .glow-bg span {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: glowMove 20s infinite alternate ease-in-out;
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(180,133,84,0.12) 0%, transparent 70%); }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.1) 0%, transparent 70%); animation-delay: -5s; }
+
+        @keyframes glowMove {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; }
         }
 
         .floating-shape {
@@ -70,19 +94,19 @@
             100% { transform: translate(0,0) rotate(0deg); }
         }
 
-        /* Navigation */
+        /* Navigation (مع تحديث ألوانه) */
         nav {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(10,14,23,0.85);
+            backdrop-filter: blur(15px);
             padding: 1rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 2px solid var(--border-light);
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         .logo {
@@ -101,18 +125,18 @@
             font-family: 'Alexandria', sans-serif;
             font-size: 1.2rem;
             font-weight: 700;
-            color: var(--gold);
+            color: var(--gold-light);
             letter-spacing: 1px;
         }
 
         nav a {
             text-decoration: none;
-            color: #444;
+            color: var(--text-muted);
             margin: 0 0.8rem;
             font-weight: 600;
             transition: 0.3s;
         }
-        nav a:hover { color: var(--gold); }
+        nav a:hover { color: var(--accent-soft); }
         nav a i { margin-left: 5px; }
 
         /* Main Container */
@@ -122,15 +146,17 @@
             margin: 40px auto;
             padding: 0 20px;
             flex: 1;
+            position: relative;
+            z-index: 2;
         }
 
         .tool-card {
-            background: rgba(255,255,255,0.9);
+            background: var(--bg-panel);
             backdrop-filter: blur(15px);
-            border: 2px solid var(--gold);
-            border-radius: 40px;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
             padding: 3rem;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(184,134,11,0.3) inset;
+            box-shadow: var(--shadow-soft);
             position: relative;
             overflow: hidden;
         }
@@ -147,7 +173,7 @@
         }
 
         h2 {
-            color: var(--gold);
+            color: var(--accent-soft);
             text-align: center;
             margin-bottom: 30px;
             font-weight: 900;
@@ -160,27 +186,28 @@
             display: block;
             margin-bottom: 10px;
             font-weight: 700;
-            color: var(--dark);
+            color: var(--accent-soft);
         }
 
-        label i { color: var(--gold); margin-left: 0.5rem; }
+        label i { color: var(--accent-glow); margin-left: 0.5rem; }
 
         input, select, textarea {
             width: 100%;
             padding: 15px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-light);
             border-radius: 30px;
             font-family: 'Tajawal', sans-serif;
             font-size: 1rem;
-            transition: 0.3s;
-            background: var(--offwhite);
+            transition: var(--transition);
+            background: rgba(10,14,23,0.7);
+            color: var(--text-light);
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: var(--gold);
-            box-shadow: 0 0 0 3px rgba(184,134,11,0.2);
-            background: var(--white);
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 0 3px var(--gold-soft);
+            background: rgba(15,20,30,0.9);
         }
 
         textarea {
@@ -191,22 +218,24 @@
         .btn-main {
             width: 100%;
             padding: 18px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            color: #111;
-            border: none;
+            background: rgba(180,133,84,0.2);
+            border: 1px solid var(--border-light);
+            color: var(--accent-soft);
             border-radius: 50px;
             font-size: 1.2rem;
             font-weight: 900;
             cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 5px 20px rgba(184,134,11,0.4);
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
 
         .btn-main:hover {
-            background: linear-gradient(135deg, #111, #222);
-            color: var(--gold);
+            background: rgba(180,133,84,0.4);
+            color: #fff;
+            border-color: var(--accent-glow);
+            box-shadow: 0 10px 30px rgba(180,133,84,0.4);
             transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(184,134,11,0.6);
         }
 
         #outputSection {
@@ -240,44 +269,45 @@
         .bg-word { background: #2b579a; }
 
         .result-container {
-            background: var(--offwhite);
-            border: 2px solid var(--gold);
+            background: var(--bg-card);
+            border: 2px solid var(--border-light);
             border-radius: 30px;
             padding: 2rem;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
             width: 100%;
             min-height: 200px;
         }
 
         .content-card {
-            background: linear-gradient(135deg, var(--card-bg) 0%, #fff 100%);
-            border: 1px solid var(--gold-light);
+            background: rgba(22,30,46,0.6);
+            border: 1px solid var(--border-light);
             border-radius: 20px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: var(--transition);
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
         .content-card:last-child { margin-bottom: 0; }
         .content-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(184,134,11,0.1);
-            border-color: var(--gold);
+            border-color: var(--accent-glow);
+            box-shadow: 0 10px 25px rgba(180,133,84,0.2);
         }
 
         .content-card h3 {
-            color: var(--gold);
+            color: var(--accent-soft);
             margin-bottom: 15px;
             font-size: 1.3rem;
-            border-bottom: 2px solid var(--gold-soft);
+            border-bottom: 2px solid var(--border-light);
             padding-bottom: 10px;
         }
 
         .content-card p {
             margin-bottom: 10px;
             line-height: 1.8;
+            color: var(--text-muted);
         }
         .content-card p:last-child { margin-bottom: 0; }
 
@@ -285,16 +315,17 @@
             text-align: center;
             padding: 40px;
             font-weight: bold;
-            color: var(--gold);
+            color: var(--accent-soft);
             font-size: 1.2rem;
         }
 
-        /* Footer */
+        /* Footer (محدث) */
         footer {
-            background: linear-gradient(145deg, #111, #1a1a1a);
-            color: #ddd;
+            background: rgba(10,14,23,0.8);
+            backdrop-filter: blur(10px);
+            color: var(--text-muted);
             padding: 3rem 1rem 2rem;
-            border-top: 3px solid var(--gold);
+            border-top: 2px solid var(--border-light);
             margin-top: 40px;
         }
 
@@ -323,12 +354,12 @@
         }
 
         .footer-social a {
-            color: var(--gold);
+            color: var(--accent-soft);
             font-size: 1.8rem;
             transition: 0.3s;
         }
         .footer-social a:hover {
-            color: var(--gold-light);
+            color: var(--accent-glow);
             transform: translateY(-3px);
         }
 
@@ -337,7 +368,7 @@
         }
 
         .footer-logo-box h2 {
-            color: var(--gold);
+            color: var(--accent-soft);
             font-size: 1.2rem;
             font-weight: 800;
             margin-bottom: 0.5rem;
@@ -346,7 +377,7 @@
         .footer-logo-box div {
             width: 60px;
             height: 2px;
-            background: var(--gold);
+            background: var(--accent-glow);
             margin: 0 auto;
         }
 
@@ -357,7 +388,7 @@
             display: flex;
             gap: 1.5rem;
             align-items: center;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid var(--border-light);
         }
 
         .footer-payment img {
@@ -371,16 +402,16 @@
 
         hr {
             border: none;
-            border-top: 1px solid rgba(184,134,11,0.2);
+            border-top: 1px solid var(--border-light);
         }
 
         .copyright {
             text-align: center;
             font-size: 0.9rem;
-            color: #777;
+            color: var(--text-muted);
         }
         .copyright span {
-            color: var(--gold);
+            color: var(--accent-soft);
             font-weight: bold;
         }
 
@@ -419,12 +450,14 @@
     </style>
 </head>
 <body>
-
-<!-- أشكال هندسية عائمة -->
+<!-- خلفية متوهجة -->
+<div class="glow-bg">
+    <span></span><span></span><span></span>
+</div>
 <div class="floating-shape shape-1"></div>
 <div class="floating-shape shape-2"></div>
 
-<!-- الهيدر الجديد -->
+<!-- الهيدر الجديد (مع الثيم المحدث) -->
 <nav>
     <div class="logo">
         <img src="https://lh3.googleusercontent.com/d/1e6u-DPTinDJl_Q9wW3QvGgzFbXO_2sXa" alt="FAROUK GRUP LOGO">
@@ -432,13 +465,13 @@
     </div>
     <div>
         <a href="https://www.farouk-grup.com/"><i class="fas fa-home"></i> الرئيسية</a>
-        <a href="https://www.farouk-grup.com/Home/Contact-Us" style="color:var(--gold)"><i class="fas fa-phone-alt"></i> تواصل معنا</a>
+        <a href="https://www.farouk-grup.com/Home/Contact-Us" style="color:var(--accent-soft)"><i class="fas fa-phone-alt"></i> تواصل معنا</a>
     </div>
 </nav>
 
 <div class="container">
     <div class="tool-card">
-        <h2><i class="fas fa-robot" style="color: var(--gold);"></i> أداة التحليل وتوليد المحتوى</h2>
+        <h2><i class="fas fa-robot" style="color: var(--accent-glow);"></i> أداة التحليل وتوليد المحتوى</h2>
         
         <div class="form-group">
             <label><i class="fas fa-user-tie"></i> الاسم الكريم</label>
@@ -483,7 +516,7 @@
     </div>
 </div>
 
-<!-- الفوتر الجديد -->
+<!-- الفوتر الجديد (مع الثيم المحدث) -->
 <footer>
     <div class="footer-container">
         <div class="footer-content">
