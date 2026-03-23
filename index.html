@@ -508,6 +508,45 @@
             a.download = `appointments_faroukgrup_${new Date().toISOString().slice(0,10)}.csv`;
             a.click();
         });
+    // دالة تسجيل الدخول
+async function handleLogin(event) {
+    event.preventDefault(); // منع الصفحة من التحديث
+
+    const user = document.getElementById('username').value; // تأكد أن ID الحقل هو username
+    const pass = document.getElementById('password').value; // تأكد أن ID الحقل هو password
+    const workerURL = "https://farouk-api-proxy.faroukgrup.workers.dev/";
+
+    try {
+        // تجهيز البيانات لإرسالها للوركر
+        const formData = new FormData();
+        formData.append('username', user);
+        formData.append('password', pass);
+
+        const response = await fetch(workerURL, {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+            // --- هذه هي الخطوة الأهم للربط بين الصفحات ---
+            sessionStorage.setItem('username', user); // تخزين الاسم
+            sessionStorage.setItem('userToken', result.token || 'secure_access_granted'); 
+            
+            // الانتقال لصفحة المنصة الرئيسية أو الأداة مباشرة
+            window.location.href = "dashboard.html"; 
+        } else {
+            alert("بيانات الدخول غير صحيحة، يرجى المحاولة مرة أخرى.");
+        }
+    } catch (error) {
+        console.error("خطأ:", error);
+        alert("حدث خطأ في الاتصال بالسيرفر.");
+    }
+}
+
+// ربط الدالة بالنموذج عند تحميل الصفحة
+document.getElementById('loginForm').addEventListener('submit', handleLogin);
     </script>
 </body>
 </html>
