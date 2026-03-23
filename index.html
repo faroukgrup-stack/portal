@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بوابة مجموعة فاروق للاستشارات والأعمال</title>
-<link rel="manifest" href="manifest.json">
-
-<script>
-  // تسجيل الـ Service Worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
-</script>
+    <link rel="manifest" href="manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
     <!-- Fonts: Tajawal للعربية، Inter للأرقام -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome 6 -->
@@ -19,30 +17,27 @@
     <!-- AOS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
+        /* ========== جميع الأنماط كما هي (لم تتغير) ========== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         :root {
-            /* Deep, dark, luxurious palette with soft glow */
-            --bg-dark: #0b0e17;           /* خلفية داكنة جداً */
-            --bg-panel: rgba(18, 24, 36, 0.75); /* بنل شبه شفاف */
+            --bg-dark: #0b0e17;
+            --bg-panel: rgba(18, 24, 36, 0.75);
             --bg-card: rgba(22, 30, 46, 0.7);
-            --border-light: rgba(180, 133, 84, 0.25); /* ذهبي خفيف */
+            --border-light: rgba(180, 133, 84, 0.25);
             --accent-glow: #b48554;
             --accent-soft: #cfa776;
             --text-light: #f0f4fa;
             --text-muted: #aab7d4;
-            --text-dark: #0b0e17;          /* للاستخدام في الأماكن المظلمة */
             --shadow-soft: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 133, 84, 0.15);
             --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
             --radius-md: 20px;
             --radius-lg: 30px;
             --transition: all 0.3s ease;
         }
-
         body {
             font-family: 'Tajawal', sans-serif;
             background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
@@ -53,8 +48,6 @@
             flex-direction: column;
             position: relative;
         }
-
-        /* خلفية متوهجة متحركة */
         .glow-bg {
             position: fixed;
             width: 100%;
@@ -76,13 +69,10 @@
         .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(180,133,84,0.12) 0%, transparent 70%); }
         .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
         .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.1) 0%, transparent 70%); animation-delay: -5s; }
-
         @keyframes glowMove {
             0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
             100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; }
         }
-
-        /* شاشة الدخول بنفس الأجواء الداكنة المتوهجة */
         .login-overlay {
             position: fixed;
             inset: 0;
@@ -94,68 +84,41 @@
             z-index: 2000;
             transition: opacity 0.4s;
         }
-
-        /* تصغير المربع الرئيسي */
-.login-card {
-    background: var(--bg-panel);
-    backdrop-filter: blur(15px);
-    padding: 1.5rem 2rem; /* تقليل الحشو لتقليل الارتفاع */
-    border-radius: 20px;
-    width: 85%;
-    max-width: 340px; /* جعل العرض أصغر وأكثر تناسقاً */
-    text-align: center;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    /* لضمان عدم الانقطاع في الشاشات الصغيرة */
-    margin: auto;
-}
-
-/* تصغير العناوين داخل المربع */
-.login-card h2 {
-    font-size: 1.3rem;
-    margin-bottom: 0.5rem;
-}
-
-.login-card p {
-    font-size: 0.85rem;
-    margin-bottom: 1.2rem;
-}
-
-/* تصغير حقول الإدخال */
-.password-field {
-    width: 100%;
-    padding: 0.7rem 1rem; /* تقليل حجم الحقل */
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    color: white;
-    font-size: 1rem; /* حجم خط أنسب */
-    margin-bottom: 10px;
-    outline: none;
-    transition: 0.3s;
-}
-
-/* زر نسيت كلمة المرور (الواتساب) */
-.whatsapp-link {
-    display: block;
-    margin-top: 15px;
-    font-size: 0.8rem;
-    color: var(--accent-gold);
-    text-decoration: none;
-    opacity: 0.8;
-}
-.whatsapp-link:hover {
-    opacity: 1;
-    text-decoration: underline;
-}
-
-.forgot-pass:hover {
-    opacity: 1;
-    text-decoration: underline;
-}
-
+        .login-card {
+            background: var(--bg-panel);
+            backdrop-filter: blur(15px);
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            width: 85%;
+            max-width: 340px;
+            text-align: center;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            margin: auto;
+        }
+        .login-card h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+        .login-card p { font-size: 0.85rem; margin-bottom: 1.2rem; }
         .password-field {
             width: 100%;
+            padding: 0.7rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            outline: none;
+        }
+        .whatsapp-link {
+            display: block;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: var(--accent-soft);
+            text-decoration: none;
+            opacity: 0.8;
+        }
+        .whatsapp-link:hover { opacity: 1; text-decoration: underline; }
+        .password-field {
             padding: 1.2rem 1.5rem;
             background: rgba(10, 14, 23, 0.8);
             border: 1px solid var(--border-light);
@@ -169,13 +132,11 @@
             color: var(--accent-soft);
             box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
         }
-
         .password-field:focus {
             outline: none;
             border-color: var(--accent-glow);
             box-shadow: 0 0 0 3px rgba(180,133,84,0.3), inset 0 2px 8px black;
         }
-
         .login-btn {
             width: 100%;
             padding: 1.2rem;
@@ -194,7 +155,6 @@
             gap: 0.8rem;
             backdrop-filter: blur(10px);
         }
-
         .login-btn:hover {
             background: rgba(180,133,84,0.3);
             border-color: var(--accent-glow);
@@ -202,14 +162,11 @@
             box-shadow: 0 0 25px rgba(180,133,84,0.4);
             transform: translateY(-3px);
         }
-
         .error-msg {
             color: #f87171;
             margin-top: 1.2rem;
             font-weight: 600;
         }
-
-        /* لوحة التحكم الرئيسية */
         .dashboard {
             max-width: 1500px;
             width: 100%;
@@ -219,8 +176,6 @@
             z-index: 10;
             display: none;
         }
-
-        /* شريط علوي زجاجي داكن */
         .header-bar {
             display: flex;
             justify-content: space-between;
@@ -235,7 +190,6 @@
             gap: 1.5rem;
             box-shadow: var(--shadow-soft);
         }
-
         .datetime {
             display: flex;
             gap: 2rem;
@@ -243,12 +197,7 @@
             font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
         }
-
-        .datetime i {
-            color: var(--accent-soft);
-            margin-left: 0.4rem;
-        }
-
+        .datetime i { color: var(--accent-soft); margin-left: 0.4rem; }
         .header-title {
             text-align: center;
             font-weight: 800;
@@ -257,13 +206,11 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .user-profile {
             display: flex;
             align-items: center;
             gap: 1.5rem;
         }
-
         .user-name {
             font-weight: 700;
             color: var(--text-light);
@@ -271,11 +218,7 @@
             align-items: center;
             gap: 0.5rem;
         }
-
-        .user-name i {
-            color: var(--accent-soft);
-        }
-
+        .user-name i { color: var(--accent-soft); }
         .logout-btn {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(180,133,84,0.3);
@@ -289,14 +232,11 @@
             align-items: center;
             gap: 0.5rem;
         }
-
         .logout-btn:hover {
             background: rgba(180,133,84,0.2);
             color: #fca5a5;
             border-color: #f87171;
         }
-
-        /* الشبكة الرئيسية */
         .main-dashboard {
             display: grid;
             grid-template-columns: 1.2fr 2.3fr 1.2fr;
@@ -304,8 +244,6 @@
             margin-bottom: 2.5rem;
             align-items: start;
         }
-
-        /* البطاقات */
         .dashboard-panel {
             background: var(--bg-card);
             backdrop-filter: blur(15px);
@@ -315,13 +253,11 @@
             box-shadow: var(--shadow-soft);
             transition: var(--transition);
         }
-
         .dashboard-panel:hover {
             box-shadow: var(--shadow-glow);
             border-color: rgba(180,133,84,0.4);
             background: rgba(25, 33, 50, 0.8);
         }
-
         .panel-header {
             display: flex;
             align-items: center;
@@ -335,19 +271,8 @@
             border-bottom: 1px solid rgba(180,133,84,0.3);
             padding-bottom: 0.8rem;
         }
-
-        .panel-header i {
-            color: var(--accent-soft);
-            font-size: 1.4rem;
-        }
-
-        /* عناصر الإدخال */
-        .input-group {
-            display: flex;
-            gap: 0.7rem;
-            margin-bottom: 1.5rem;
-        }
-
+        .panel-header i { color: var(--accent-soft); font-size: 1.4rem; }
+        .input-group { display: flex; gap: 0.7rem; margin-bottom: 1.5rem; }
         input, textarea, select {
             width: 100%;
             padding: 0.9rem 1.2rem;
@@ -358,14 +283,12 @@
             color: var(--text-light);
             transition: var(--transition);
         }
-
         input:focus, textarea:focus {
             outline: none;
             border-color: var(--accent-glow);
             box-shadow: 0 0 0 3px rgba(180,133,84,0.2);
             background: rgba(15, 20, 30, 0.9);
         }
-
         .btn-primary {
             background: rgba(180,133,84,0.2);
             border: 1px solid var(--border-light);
@@ -381,7 +304,6 @@
             font-family: 'Tajawal', sans-serif;
             backdrop-filter: blur(5px);
         }
-
         .btn-primary:hover {
             background: rgba(180,133,84,0.4);
             color: #fff;
@@ -389,7 +311,6 @@
             box-shadow: 0 0 20px rgba(180,133,84,0.3);
             transform: translateY(-2px);
         }
-
         .btn-outline {
             background: transparent;
             border: 1px solid rgba(180,133,84,0.3);
@@ -403,29 +324,19 @@
             align-items: center;
             gap: 0.4rem;
         }
-
         .btn-outline:hover {
             background: rgba(180,133,84,0.15);
             color: var(--accent-soft);
             border-color: var(--accent-glow);
         }
-
-        /* قائمة المهام */
         .todo-list {
             max-height: 240px;
             overflow-y: auto;
             margin-bottom: 1rem;
             padding-left: 0.3rem;
         }
-
-        .todo-list::-webkit-scrollbar {
-            width: 5px;
-        }
-        .todo-list::-webkit-scrollbar-thumb {
-            background: rgba(180,133,84,0.3);
-            border-radius: 10px;
-        }
-
+        .todo-list::-webkit-scrollbar { width: 5px; }
+        .todo-list::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
         .todo-item {
             background: rgba(10, 14, 23, 0.6);
             border: 1px solid rgba(180,133,84,0.15);
@@ -437,39 +348,19 @@
             justify-content: space-between;
             transition: var(--transition);
         }
-
         .todo-item:hover {
             border-color: var(--accent-glow);
             background: rgba(20, 26, 38, 0.9);
         }
-
         .todo-text {
             display: flex;
             align-items: center;
             gap: 0.8rem;
         }
-
-        .todo-text input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--accent-glow);
-        }
-
-        .completed {
-            text-decoration: line-through;
-            color: var(--text-muted);
-        }
-
-        .delete-btn {
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .delete-btn:hover {
-            color: #f87171;
-        }
-
+        .todo-text input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent-glow); }
+        .completed { text-decoration: line-through; color: var(--text-muted); }
+        .delete-btn { color: var(--text-muted); cursor: pointer; transition: var(--transition); }
+        .delete-btn:hover { color: #f87171; }
         .stats-bar {
             display: flex;
             justify-content: space-between;
@@ -478,12 +369,7 @@
             padding-top: 0.8rem;
             border-top: 1px solid rgba(180,133,84,0.2);
         }
-
-        /* الآلة الحاسبة */
-        .calculator-section {
-            margin-top: 2rem;
-        }
-
+        .calculator-section { margin-top: 2rem; }
         #calcDisplay {
             width: 100%;
             padding: 1.2rem;
@@ -498,13 +384,11 @@
             font-family: 'Inter', monospace;
             box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
         }
-
         .calc-buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 0.7rem;
         }
-
         .calc-btn {
             background: rgba(15, 20, 30, 0.8);
             border: 1px solid rgba(180,133,84,0.2);
@@ -516,18 +400,12 @@
             transition: var(--transition);
             color: var(--text-light);
         }
-
         .calc-btn:hover {
             background: rgba(180,133,84,0.2);
             border-color: var(--accent-glow);
             box-shadow: 0 0 15px rgba(180,133,84,0.2);
         }
-
-        .calc-btn.operator {
-            color: var(--accent-soft);
-            font-weight: 800;
-        }
-
+        .calc-btn.operator { color: var(--accent-soft); font-weight: 800; }
         .calc-btn.equals {
             background: rgba(180,133,84,0.25);
             color: white;
@@ -535,18 +413,12 @@
             border-color: var(--accent-glow);
             font-size: 1.6rem;
         }
-
-        .calc-btn.equals:hover {
-            background: rgba(180,133,84,0.4);
-        }
-
-        /* شبكة الأدوات */
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.4); }
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
             gap: 1.2rem;
         }
-
         .tool-card {
             background: rgba(15, 20, 30, 0.6);
             border: 1px solid rgba(180,133,84,0.15);
@@ -557,14 +429,12 @@
             cursor: pointer;
             backdrop-filter: blur(8px);
         }
-
         .tool-card:hover {
             transform: translateY(-8px);
             border-color: var(--accent-glow);
             box-shadow: 0 15px 25px -10px rgba(0,0,0,0.7), 0 0 20px rgba(180,133,84,0.3);
             background: rgba(25, 33, 50, 0.8);
         }
-
         .tool-card i {
             font-size: 2.5rem;
             background: linear-gradient(145deg, #cfa776, #e2c5a3);
@@ -574,40 +444,11 @@
             margin-bottom: 1rem;
             filter: drop-shadow(0 0 10px rgba(180,133,84,0.5));
         }
-
-        .tool-card h4 {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-light);
-        }
-
-        /* الملاحظات والمواعيد */
-        #notesArea {
-            min-height: 120px;
-            resize: vertical;
-            margin-bottom: 1rem;
-        }
-
-        .action-bar {
-            display: flex;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-
-        .appointment-form {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .appointments-list {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 1rem;
-        }
-
+        .tool-card h4 { font-size: 0.95rem; font-weight: 700; color: var(--text-light); }
+        #notesArea { min-height: 120px; resize: vertical; margin-bottom: 1rem; }
+        .action-bar { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 2rem; }
+        .appointment-form { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.2rem; }
+        .appointments-list { max-height: 200px; overflow-y: auto; margin-bottom: 1rem; }
         .appointment-item {
             background: rgba(10, 14, 23, 0.6);
             border-right: 4px solid var(--accent-glow);
@@ -618,25 +459,9 @@
             justify-content: space-between;
             align-items: center;
         }
-
-        .appointment-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-        }
-
-        .appointment-date {
-            font-weight: 800;
-            color: var(--accent-soft);
-            font-size: 0.8rem;
-        }
-
-        .appointment-title {
-            font-weight: 700;
-            color: var(--text-light);
-        }
-
-        /* الروابط السريعة */
+        .appointment-info { display: flex; flex-direction: column; gap: 0.3rem; }
+        .appointment-date { font-weight: 800; color: var(--accent-soft); font-size: 0.8rem; }
+        .appointment-title { font-weight: 700; color: var(--text-light); }
         .quick-links-panel {
             background: rgba(12, 16, 24, 0.8);
             backdrop-filter: blur(15px);
@@ -650,7 +475,6 @@
             gap: 1.8rem;
             box-shadow: var(--shadow-soft);
         }
-
         .quick-links-title {
             font-weight: 800;
             font-size: 1.3rem;
@@ -661,14 +485,12 @@
             align-items: center;
             gap: 0.7rem;
         }
-
         .links-row {
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
             justify-content: center;
         }
-
         .link-btn {
             background: rgba(255,255,255,0.02);
             border: 1px solid rgba(180,133,84,0.3);
@@ -679,7 +501,6 @@
             font-weight: 600;
             transition: var(--transition);
         }
-
         .link-btn:hover {
             background: rgba(180,133,84,0.2);
             color: var(--accent-soft);
@@ -687,15 +508,12 @@
             box-shadow: 0 0 15px rgba(180,133,84,0.2);
             transform: translateY(-3px);
         }
-
         footer {
             text-align: center;
             padding: 2rem;
             color: var(--text-muted);
             font-size: 0.9rem;
         }
-
-        /* التجاوب */
         @media (max-width: 1200px) {
             .main-dashboard { grid-template-columns: 1fr 2fr; }
             .dashboard-panel:nth-child(3) { grid-column: span 2; }
@@ -709,7 +527,6 @@
     </style>
 </head>
 <body>
-    <!-- عناصر الإضاءة الخلفية المتحركة -->
     <div class="glow-bg">
         <span></span>
         <span></span>
@@ -718,23 +535,19 @@
 
     <!-- شاشة الدخول -->
     <div class="login-overlay" id="loginOverlay">
-    <div class="login-card" data-aos="zoom-in">
-        <div class="login-icon" style="font-size: 2rem; margin-bottom: 10px;"><i class="fas fa-shield-halved"></i></div>
-        <h2>دخول المصرح لهم</h2>
-        <p>مجموعة فاروق للاستشارات والأعمال</p>
-        
-        <input type="text" id="usernameInput" class="password-field" placeholder="اسم المستخدم" style="letter-spacing: normal;">
-        <input type="password" id="passwordInput" class="password-field" placeholder="كلمة المرور" style="letter-spacing: normal;">
-        
-        <button class="login-btn" id="loginBtn" style="padding: 0.8rem;"><i class="fas fa-sign-in-alt"></i> دخول</button>
-        
-        <a href="https://wa.me/905550196682" target="_blank" class="whatsapp-link">
-            <i class="fab fa-whatsapp"></i> نسيت كلمة المرور؟ اضغط هنا
-        </a>
-        
-        <div class="error-msg" id="errorMsg" style="font-size: 0.8rem; margin-top: 10px;"></div>
+        <div class="login-card" data-aos="zoom-in">
+            <div class="login-icon" style="font-size: 2rem; margin-bottom: 10px;"><i class="fas fa-shield-halved"></i></div>
+            <h2>دخول المصرح لهم</h2>
+            <p>مجموعة فاروق للاستشارات والأعمال</p>
+            <input type="text" id="usernameInput" class="password-field" placeholder="اسم المستخدم" style="letter-spacing: normal;">
+            <input type="password" id="passwordInput" class="password-field" placeholder="كلمة المرور" style="letter-spacing: normal;">
+            <button class="login-btn" id="loginBtn" style="padding: 0.8rem;"><i class="fas fa-sign-in-alt"></i> دخول</button>
+            <a href="https://wa.me/905550196682" target="_blank" class="whatsapp-link">
+                <i class="fab fa-whatsapp"></i> نسيت كلمة المرور؟ اضغط هنا
+            </a>
+            <div class="error-msg" id="errorMsg" style="font-size: 0.8rem; margin-top: 10px;"></div>
+        </div>
     </div>
-</div>
 
     <!-- المحتوى الرئيسي -->
     <div class="dashboard" id="dashboard">
@@ -842,8 +655,8 @@
     <script>
         AOS.init({ duration: 800, once: true });
 
-        // ضع الرابط الذي نسخته من جوجل سكريبت هنا
-        const GOOGLE_SCRIPT_URL = "https://farouk-api-proxy.faroukgrup.workers.dev/"; 
+        // رابط الـ Worker (الوسيط)
+        const GOOGLE_SCRIPT_URL = "https://farouk-api-proxy.faroukgrup.workers.dev/";
 
         const loginOverlay = document.getElementById('loginOverlay');
         const dashboard = document.getElementById('dashboard');
@@ -853,13 +666,14 @@
         const errorMsg = document.getElementById('errorMsg');
         const logoutBtn = document.getElementById('logoutBtn');
 
+        // التحقق من وجود التوكن عند تحميل الصفحة
         function checkSession() {
-            if (sessionStorage.getItem('portalLoggedIn') === 'true') {
+            const token = sessionStorage.getItem('userToken');
+            if (token && token.length > 0) {
                 loginOverlay.style.display = 'none';
                 dashboard.style.display = 'block';
-                // استرجاع اسم المستخدم والأيام المتبقية لعرضها فوق
-                const savedName = sessionStorage.getItem('portalUserName');
-                const savedDays = sessionStorage.getItem('portalDaysLeft');
+                const savedName = sessionStorage.getItem('userName');
+                const savedDays = sessionStorage.getItem('daysLeft');
                 if(savedName) {
                     document.querySelector('.user-name').innerHTML = `<i class="fas fa-user-tie"></i> ${savedName} (متبقي ${savedDays} يوم)`;
                 }
@@ -879,15 +693,14 @@
         }
 
         async function attemptLogin() {
-    const user = document.getElementById('usernameInput').value.trim();
-    const pass = document.getElementById('passwordInput').value.trim();
+            const user = usernameInput.value.trim();
+            const pass = passwordInput.value.trim();
 
             if (!user || !pass) {
                 errorMsg.textContent = '❌ يرجى إدخال اسم المستخدم وكلمة المرور';
                 return;
             }
 
-            // تغيير حالة الزر أثناء الانتظار
             loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري التحقق...';
             loginBtn.disabled = true;
             errorMsg.textContent = '';
@@ -905,24 +718,25 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    // الدخول ناجح
-                    sessionStorage.setItem('portalLoggedIn', 'true');
-                    sessionStorage.setItem('portalUserName', result.name);
-                    sessionStorage.setItem('portalDaysLeft', result.daysLeft);
+                    // تخزين التوكن وبيانات المستخدم
+                    sessionStorage.setItem('userToken', result.token);
+                    sessionStorage.setItem('userName', result.name);
+                    sessionStorage.setItem('daysLeft', result.daysLeft);
                     
                     document.querySelector('.user-name').innerHTML = `<i class="fas fa-user-tie"></i> ${result.name} (متبقي ${result.daysLeft} يوم)`;
                     
                     loginOverlay.style.display = 'none';
                     dashboard.style.display = 'block';
                     loadAllData();
+                } else if (result.status === 'expired') {
+                    errorMsg.textContent = '❌ انتهى اشتراكك. يرجى التواصل مع الدعم.';
                 } else {
-                    // رسالة الخطأ أو انتهاء الاشتراك القادمة من جوجل
-                    errorMsg.textContent = '❌ ' + result.message;
+                    errorMsg.textContent = '❌ ' + (result.message || 'بيانات الدخول غير صحيحة');
                 }
             } catch (error) {
-                errorMsg.textContent = '❌ حدث خطأ في الاتصال بالسيرفر';
+                console.error('Login error:', error);
+                errorMsg.textContent = '❌ حدث خطأ في الاتصال بالسيرفر. تأكد من اتصالك بالإنترنت.';
             } finally {
-                // إعادة الزر لشكله الطبيعي
                 loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول آمن';
                 loginBtn.disabled = false;
             }
@@ -933,7 +747,9 @@
         usernameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') passwordInput.focus(); });
 
         logoutBtn.addEventListener('click', () => {
-            sessionStorage.removeItem('portalLoggedIn');
+            sessionStorage.removeItem('userToken');
+            sessionStorage.removeItem('userName');
+            sessionStorage.removeItem('daysLeft');
             loginOverlay.style.display = 'flex';
             dashboard.style.display = 'none';
             passwordInput.value = '';
