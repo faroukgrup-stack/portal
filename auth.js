@@ -1,0 +1,16 @@
+// هذا الكود يمنع أي شخص من دخول الصفحة إذا لم يسجل دخوله في index.html
+(function() {
+    const user = sessionStorage.getItem('username');
+    const token = sessionStorage.getItem('userToken');
+
+    // إذا كان المستخدم غير موجود، يتم تحويله فوراً لصفحة الدخول
+    if (!user || !token) {
+        window.location.href = "index.html"; 
+    } else {
+        // إذا كان هناك عنصر في الصفحة لعرض الاسم، سيقوم الكود بوضعه تلقائياً
+        window.addEventListener('DOMContentLoaded', () => {
+            const nameElement = document.getElementById('displayUserName');
+            if (nameElement) nameElement.innerText = user;
+        });
+    }
+})();
