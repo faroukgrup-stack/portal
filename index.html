@@ -212,55 +212,66 @@
             renderTools();
         }
 
-        async function attemptLogin() {
-            const user = usernameInput.value.trim();
-            const pass = passwordInput.value.trim();
+        // --- دالة تسجيل الدخول الموحدة والمصححة ---
+async function attemptLogin() {
+    const user = usernameInput.value.trim();
+    const pass = passwordInput.value.trim();
 
-            if (!user || !pass) {
-                errorMsg.textContent = '❌ يرجى إدخال اسم المستخدم وكلمة المرور';
-                return;
-            }
+    if (!user || !pass) {
+        errorMsg.textContent = '❌ يرجى إدخال اسم المستخدم وكلمة المرور';
+        return;
+    }
 
-            loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري التحقق...';
-            loginBtn.disabled = true;
-            errorMsg.textContent = '';
+    loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري التحقق...';
+    loginBtn.disabled = true;
+    errorMsg.textContent = '';
 
-            try {
-                const formData = new FormData();
-                formData.append('username', user);
-                formData.append('password', pass);
+    try {
+        const formData = new FormData();
+        formData.append('username', user);
+        formData.append('password', pass);
 
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData
-                });
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: formData
+        });
 
-                const result = await response.json();
-                console.log("الرد من السيرفر:", result);
+        const result = await response.json();
 
-                if (result.status === 'success') {
-                    localStorage.setItem('userToken', result.token);
-                    localStorage.setItem('userName', result.name);
-                    localStorage.setItem('daysLeft', result.daysLeft);
-                    
-                    document.querySelector('.user-name').innerHTML = `<i class="fas fa-user-tie"></i> ${result.name} (متبقي ${result.daysLeft} يوم)`;
-                    
-                    loginOverlay.style.display = 'none';
-                    dashboard.style.display = 'block';
-                    loadAllData();
-                } else if (result.status === 'expired') {
-                    errorMsg.textContent = '❌ انتهى اشتراكك. يرجى التواصل مع الدعم.';
-                } else {
-                    errorMsg.textContent = '❌ ' + (result.message || 'بيانات الدخول غير صحيحة');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                errorMsg.textContent = '❌ حدث خطأ في الاتصال بالسيرفر. تأكد من اتصالك بالإنترنت.';
-            } finally {
-                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول آمن';
-                loginBtn.disabled = false;
-            }
+        if (result.status === 'success') {
+            // 1. التخزين الدائم (لبقاء الدخول مفتوحاً في هذه الصفحة)
+            localStorage.setItem('userToken', result.token);
+            localStorage.setItem('userName', result.name);
+            localStorage.setItem('daysLeft', result.daysLeft);
+            
+            // 2. التخزين المؤقت (لكي يراه "الحارس" في الأدوات tool16 و tool17)
+            sessionStorage.setItem('username', result.name);
+            sessionStorage.setItem('userToken', result.token);
+
+            // تحديث الواجهة
+            document.querySelector('.user-name').innerHTML = `<i class="fas fa-user-tie"></i> ${result.name} (متبقي ${result.daysLeft} يوم)`;
+            
+            loginOverlay.style.display = 'none';
+            dashboard.style.display = 'block';
+            loadAllData();
+        } else if (result.status === 'expired') {
+            errorMsg.textContent = '❌ انتهى اشتراكك. يرجى التواصل مع الدعم.';
+        } else {
+            errorMsg.textContent = '❌ ' + (result.message || 'بيانات الدخول غير صحيحة');
         }
+    } catch (error) {
+        console.error('Login error:', error);
+        errorMsg.textContent = '❌ خطأ في الاتصال. تأكد من رفع الملفات على GitHub.';
+    } finally {
+        loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول آمن';
+        loginBtn.disabled = false;
+    }
+}
+
+// ربط الزر بالدالة
+loginBtn.addEventListener('click', attemptLogin);
+
+// حذف الدالة القديمة handleLogin التي كانت في نهاية الملف لأنها تسبب تضارباً
 
         loginBtn.addEventListener('click', attemptLogin);
         passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') attemptLogin(); });
