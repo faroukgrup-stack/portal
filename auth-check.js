@@ -10,7 +10,7 @@
     }
 
     // المفتاح السري يجب أن يكون مطابقاً تماماً لما في Google Apps Script
-    const SECRET_KEY = "F@r0ukGr0up_S3cur3_K3y_2026!";
+    const SECRET_KEY = "F@roukGrup_S3cur3_K3y_2026!";
 
     try {
         const decoded = atob(token);
