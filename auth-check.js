@@ -1,13 +1,17 @@
 (function() {
-    const token = localStorage.getItem('userToken');
-    const userName = localStorage.getItem('userName');
+    const username = sessionStorage.getItem('username');
+    const token = sessionStorage.getItem('userToken');
 
-    if (!token || !userName) {
-        alert("يرجى تسجيل الدخول أولاً للوصول إلى هذه الأداة.");
+    // إذا لم يكن هناك اسم مستخدم أو توكن، اطرده لصفحة الدخول
+    if (!username || !token) {
+        alert("وصول غير مصرح به، يرجى تسجيل الدخول.");
         window.location.href = "index.html";
         return;
     }
 
-    // اختياري: التحقق من أن التوكن ليس فارغاً وأن اسم المستخدم موجود
-    console.log("تم التحقق من الجلسة بنجاح.");
+    // عرض اسم المستخدم في الهيدر (إذا كان لديك عنصر ID="userNameDisplay")
+    window.onload = function() {
+        const display = document.getElementById('userNameDisplay');
+        if (display) display.innerText = "مرحباً، " + username;
+    };
 })();
