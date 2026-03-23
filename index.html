@@ -716,6 +716,9 @@
                 });
 
                 const result = await response.json();
+                
+                // 🔍 طباعة الرد من السيرفر لمعرفة محتواه (للتشخيص)
+                console.log("الرد من السيرفر:", result);
 
                 if (result.status === 'success') {
                     // تخزين التوكن وبيانات المستخدم
