@@ -530,9 +530,9 @@ async function handleLogin(event) {
         const result = await response.json();
 
         if (result.status === "success") {
-            // --- هذه هي الخطوة الأهم للربط بين الصفحات ---
-            sessionStorage.setItem('username', user); // تخزين الاسم
-            sessionStorage.setItem('userToken', result.token || 'secure_access_granted'); 
+            // تأكد من وجود هذين السطرين عند نجاح الدخول
+sessionStorage.setItem('username', user); // 'user' هو المتغير الذي يحتوي الاسم
+sessionStorage.setItem('userToken', 'secure_access_granted'); 
             
             // الانتقال لصفحة المنصة الرئيسية أو الأداة مباشرة
             window.location.href = "dashboard.html"; 
