@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
 <title>دراسة الجدوى الفنية المتقدمة للمطاعم | FAROUK GRUP</title>
+<!-- حماية الصفحة -->
+    <script src="auth-check.js"></script>
 <!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,10 +17,10 @@
 <!-- html2canvas لتصدير Word -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
+/* جميع الأنماط كما هي في الكود الأصلي (لم أغير شيئاً) */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-    /* الهوية الجديدة */
     --bg-dark: #0b0e17;
     --bg-panel: rgba(18, 24, 36, 0.85);
     --bg-card: rgba(22, 30, 46, 0.8);
@@ -33,7 +35,6 @@
     --radius-md: 20px;
     --radius-lg: 30px;
     --transition: all 0.3s ease;
-    /* الاحتفاظ بالألوان القديمة للتوافق مع بعض العناصر */
     --gold: #b8860b;
     --gold-light: #d4b15a;
     --gold-soft: rgba(184,134,11,0.1);
@@ -538,8 +539,10 @@ tr:last-child td { border-bottom: none; }
     .equipment-row input { min-width: 100px; }
 }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
+<body style="overflow-x: hidden;">
 <!-- خلفية متوهجة -->
 <div class="glow-bg">
     <span></span><span></span><span></span>
@@ -574,7 +577,7 @@ tr:last-child td { border-bottom: none; }
                 <option value="ر.س">ريال سعودي (ر.س)</option>
             </select>
             <label><i class="fas fa-building"></i> اسم الجهة:</label>
-            <input type="text" id="companyName" value="شركة الأفق للتجارة" placeholder="الجهة المستفيدة">
+            <input type="text" id="companyName" value="اسم الجهة المستفيدة من التقرير" placeholder="الجهة المستفيدة">
         </div>
 
         <!-- قسم النطاق والمواصفات -->
@@ -934,9 +937,9 @@ function addEquipmentRow(name = '', power = '', cost = '', space = '') {
     equipmentContainer.appendChild(row);
 }
 
-// إضافة صف افتراضي عند تحميل الصفحة
-addEquipmentRow('فرن', '8', '5000', '2.5');
-addEquipmentRow('شواية', '6', '3000', '2');
+// ✅ تم تعديل هذين السطرين: إزالة القيم الافتراضية
+addEquipmentRow('', '', '', '');
+addEquipmentRow('', '', '', '');
 
 document.getElementById('addEquipmentBtn').addEventListener('click', () => addEquipmentRow());
 
@@ -1269,7 +1272,7 @@ async function exportToWord() {
             const cost = row.querySelector('.eq-cost')?.value || 0;
             const space = row.querySelector('.eq-space')?.value || 0;
             if (name) {
-                equipmentHTML += `<tr><td>${name}</td><td>${power} kW</td><td>${currency} ${cost}</td><td>${space} م²</td></tr>`;
+                equipmentHTML += `<tr><td>${name}</td><td>${power} kW</td><td>${currency} ${cost}</td><td>${space} م²</td> </tr>`;
             }
         });
 
@@ -1305,7 +1308,7 @@ async function exportToWord() {
                     <div style="font-size:1.8rem; font-weight:900; color:#b8860b;">${value}</div>
                     ${unit ? `<div style="font-size:0.9rem; color:#777;">${unit}</div>` : ''}
                     ${status ? status.replace(/class="status/g, 'style="margin-top:0.3rem; padding:0.2rem 0.5rem; border-radius:20px; display:inline-block;') : ''}
-                </td>
+                 </td>
             `;
             row += cell;
             count++;
@@ -1350,12 +1353,12 @@ async function exportToWord() {
 
                 <h2>المعطيات الأساسية</h2>
                 <table>
-                    <tr><th>نوع المطبخ</th><td>${kitchenType}</td><th>عدد الكراسي</th><td>${seats}</td></tr>
-                    <tr><th>نموذج الخدمة</th><td>${serviceModel}</td><th>ساعات العمل</th><td>${hoursOpen} ساعة/يوم</td></tr>
-                    <tr><th>فترات التشغيل</th><td>${shifts}</td><th>المساحة الإجمالية</th><td>${totalArea} م²</td></tr>
-                    <tr><th>نسبة المطبخ</th><td>${kitchenPercent}%</td><th>قدرة الكهرباء</th><td>${electricalCapacity} أمبير</td></tr>
-                    <tr><th>المياه</th><td>${water}</td><th>التهوية</th><td>${ventilation}</td></tr>
-                    <tr><th>سهولة التوصيل</th><td>${deliveryAccess}</td><th></th><td></td></tr>
+                    <tr><th>نوع المطبخ</th><td>${kitchenType}</td><th>عدد الكراسي</th><td>${seats}</td> </tr>
+                    <tr><th>نموذج الخدمة</th><td>${serviceModel}</td><th>ساعات العمل</th><td>${hoursOpen} ساعة/يوم</td> </tr>
+                    <tr><th>فترات التشغيل</th><td>${shifts}</td><th>المساحة الإجمالية</th><td>${totalArea} م²</td> </tr>
+                    <tr><th>نسبة المطبخ</th><td>${kitchenPercent}%</td><th>قدرة الكهرباء</th><td>${electricalCapacity} أمبير</td> </tr>
+                    <tr><th>المياه</th><td>${water}</td><th>التهوية</th><td>${ventilation}</td> </tr>
+                    <tr><th>سهولة التوصيل</th><td>${deliveryAccess}</td><th></th><td></td> </tr>
                 </table>
 
                 <h3>المعدات</h3>
@@ -1366,13 +1369,13 @@ async function exportToWord() {
 
                 <h3>الطاقة الإنتاجية والتكاليف</h3>
                 <table>
-                    <tr><th>معدل دوران الطاولة</th><td>${turnoverRate}</td><th>ساعات الذروة</th><td>${peakHours}</td></tr>
-                    <tr><th>نسبة الإشغال</th><td>${occupancyRate}%</td><th>متوسط سعر الوجبة</th><td>${currency} ${avgMealPrice}</td></tr>
-                    <tr><th>تكلفة الطعام (%)</th><td>${foodCostPercent}%</td><th>عدد الموظفين</th><td>${employeesCount}</td></tr>
-                    <tr><th>متوسط الراتب</th><td>${currency} ${avgSalary}</td><th>الإيجار الشهري</th><td>${currency} ${monthlyRent}</td></tr>
-                    <tr><th>مصاريف أخرى</th><td>${currency} ${otherOpCost}</td><th>العمر الإنتاجي للمعدات</th><td>${equipmentLife} سنة</td></tr>
-                    <tr><th>تكلفة الديكور</th><td>${currency} ${constructionCost}</td><th>التراخيص</th><td>${currency} ${licensesCost}</td></tr>
-                    <tr><th>رأس المال العامل</th><td>${currency} ${workingCapital}</td><th></th><td></td></tr>
+                    <tr><th>معدل دوران الطاولة</th><td>${turnoverRate}</td><th>ساعات الذروة</th><td>${peakHours}</td> </tr>
+                    <tr><th>نسبة الإشغال</th><td>${occupancyRate}%</td><th>متوسط سعر الوجبة</th><td>${currency} ${avgMealPrice}</td> </tr>
+                    <tr><th>تكلفة الطعام (%)</th><td>${foodCostPercent}%</td><th>عدد الموظفين</th><td>${employeesCount}</td> </tr>
+                    <tr><th>متوسط الراتب</th><td>${currency} ${avgSalary}</td><th>الإيجار الشهري</th><td>${currency} ${monthlyRent}</td> </tr>
+                    <tr><th>مصاريف أخرى</th><td>${currency} ${otherOpCost}</td><th>العمر الإنتاجي للمعدات</th><td>${equipmentLife} سنة</td> </tr>
+                    <tr><th>تكلفة الديكور</th><td>${currency} ${constructionCost}</td><th>التراخيص</th><td>${currency} ${licensesCost}</td> </tr>
+                    <tr><th>رأس المال العامل</th><td>${currency} ${workingCapital}</td><th></th><td></td> </tr>
                 </table>
 
                 <h2>مؤشرات الأداء الرئيسية</h2>
@@ -1411,5 +1414,28 @@ document.getElementById('exportWordBtn').addEventListener('click', exportToWord)
 // تحديث تحذير الطاقة
 updatePowerAlert();
 </script>
+<!-- زر العودة إلى الرئيسية (عائم في اليمين) -->
+<a href="index.html" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(180,133,84,0.9);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: bold;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';">
+    <i class="fas fa-home"></i> الرئيسية
+</a>
 </body>
 </html>

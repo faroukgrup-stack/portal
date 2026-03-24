@@ -15,9 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
-        /* جميع الأنماط كما هي - لم تتغير (تم حذفها للاختصار، لكن احتفظ بها من ملفك الأصلي) */
-        /* ... ضع هنا كل الأنماط الموجودة في index.html الأصلي ... */
-        /* سأعطي الأنماط مختصرة، لكن يجب عليك نسخها من ملفك السابق */
+        /* جميع الأنماط كما هي - لم تتغير */
         * { margin:0; padding:0; box-sizing:border-box; }
         :root { --bg-dark:#0b0e17; --bg-panel:rgba(18,24,36,0.75); --bg-card:rgba(22,30,46,0.7); --border-light:rgba(180,133,84,0.25); --accent-glow:#b48554; --accent-soft:#cfa776; --text-light:#f0f4fa; --text-muted:#aab7d4; --shadow-soft:0 15px 35px -10px rgba(0,0,0,0.6),0 0 0 1px rgba(180,133,84,0.15); --shadow-glow:0 15px 35px -10px rgba(0,0,0,0.8),0 0 20px rgba(180,133,84,0.3); --radius-md:20px; --radius-lg:30px; --transition:all 0.3s ease; }
         body { font-family:'Tajawal',sans-serif; background:radial-gradient(circle at 70% 30%,#141c2b,#0a0e16); color:var(--text-light); line-height:1.6; min-height:100vh; display:flex; flex-direction:column; position:relative; }
@@ -90,9 +88,10 @@
         .appointment-form { display:flex; flex-direction:column; gap:0.8rem; margin-bottom:1.2rem; }
         .appointments-list { max-height:200px; overflow-y:auto; margin-bottom:1rem; }
         .appointment-item { background:rgba(10,14,23,0.6); border-right:4px solid var(--accent-glow); border-radius:0 30px 30px 0; padding:0.9rem 1.2rem; margin-bottom:0.7rem; display:flex; justify-content:space-between; align-items:center; }
-        .appointment-info { display:flex; flex-direction:column; gap:0.3rem; }
+        .appointment-info { display:flex; flex-direction:column; gap:0.3rem; flex:1; }
         .appointment-date { font-weight:800; color:var(--accent-soft); font-size:0.8rem; }
         .appointment-title { font-weight:700; color:var(--text-light); }
+        .appointment-desc { font-size:0.85rem; color:var(--text-muted); margin-top:0.2rem; line-height:1.4; }
         .quick-links-panel { background:rgba(12,16,24,0.8); backdrop-filter:blur(15px); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:2.5rem; margin-top:2rem; display:flex; flex-direction:column; align-items:center; gap:1.8rem; box-shadow:var(--shadow-soft); }
         .quick-links-title { font-weight:800; font-size:1.3rem; background:linear-gradient(135deg,#f0e6d2,#cfd9ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; display:flex; align-items:center; gap:0.7rem; }
         .links-row { display:flex; flex-wrap:wrap; gap:1rem; justify-content:center; }
@@ -212,66 +211,54 @@
             renderTools();
         }
 
-        // --- دالة تسجيل الدخول الموحدة والمصححة ---
-async function attemptLogin() {
-    const user = usernameInput.value.trim();
-    const pass = passwordInput.value.trim();
+        async function attemptLogin() {
+            const user = usernameInput.value.trim();
+            const pass = passwordInput.value.trim();
 
-    if (!user || !pass) {
-        errorMsg.textContent = '❌ يرجى إدخال اسم المستخدم وكلمة المرور';
-        return;
-    }
+            if (!user || !pass) {
+                errorMsg.textContent = '❌ يرجى إدخال اسم المستخدم وكلمة المرور';
+                return;
+            }
 
-    loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري التحقق...';
-    loginBtn.disabled = true;
-    errorMsg.textContent = '';
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري التحقق...';
+            loginBtn.disabled = true;
+            errorMsg.textContent = '';
 
-    try {
-        const formData = new FormData();
-        formData.append('username', user);
-        formData.append('password', pass);
+            try {
+                const formData = new FormData();
+                formData.append('username', user);
+                formData.append('password', pass);
 
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            body: formData
-        });
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
 
-        const result = await response.json();
+                const result = await response.json();
 
-        if (result.status === 'success') {
-            // 1. التخزين الدائم (لبقاء الدخول مفتوحاً في هذه الصفحة)
-            localStorage.setItem('userToken', result.token);
-            localStorage.setItem('userName', result.name);
-            localStorage.setItem('daysLeft', result.daysLeft);
-            
-            // 2. التخزين المؤقت (لكي يراه "الحارس" في الأدوات tool16 و tool17)
-            sessionStorage.setItem('username', result.name);
-            sessionStorage.setItem('userToken', result.token);
-
-            // تحديث الواجهة
-            document.querySelector('.user-name').innerHTML = `<i class="fas fa-user-tie"></i> ${result.name} (متبقي ${result.daysLeft} يوم)`;
-            
-            loginOverlay.style.display = 'none';
-            dashboard.style.display = 'block';
-            loadAllData();
-        } else if (result.status === 'expired') {
-            errorMsg.textContent = '❌ انتهى اشتراكك. يرجى التواصل مع الدعم.';
-        } else {
-            errorMsg.textContent = '❌ ' + (result.message || 'بيانات الدخول غير صحيحة');
+                if (result.status === 'success') {
+                    localStorage.setItem('userToken', result.token);
+                    localStorage.setItem('userName', result.name);
+                    localStorage.setItem('daysLeft', result.daysLeft);
+                    
+                    document.querySelector('.user-name').innerHTML = `<i class="fas fa-user-tie"></i> ${result.name} (متبقي ${result.daysLeft} يوم)`;
+                    
+                    loginOverlay.style.display = 'none';
+                    dashboard.style.display = 'block';
+                    loadAllData();
+                } else if (result.status === 'expired') {
+                    errorMsg.textContent = '❌ انتهى اشتراكك. يرجى التواصل مع الدعم.';
+                } else {
+                    errorMsg.textContent = '❌ ' + (result.message || 'بيانات الدخول غير صحيحة');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorMsg.textContent = '❌ حدث خطأ في الاتصال بالسيرفر. تأكد من اتصالك بالإنترنت.';
+            } finally {
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول آمن';
+                loginBtn.disabled = false;
+            }
         }
-    } catch (error) {
-        console.error('Login error:', error);
-        errorMsg.textContent = '❌ خطأ في الاتصال. تأكد من رفع الملفات على GitHub.';
-    } finally {
-        loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول آمن';
-        loginBtn.disabled = false;
-    }
-}
-
-// ربط الزر بالدالة
-loginBtn.addEventListener('click', attemptLogin);
-
-// حذف الدالة القديمة handleLogin التي كانت في نهاية الملف لأنها تسبب تضارباً
 
         loginBtn.addEventListener('click', attemptLogin);
         passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') attemptLogin(); });
@@ -293,7 +280,6 @@ loginBtn.addEventListener('click', attemptLogin);
             setInterval(updateDateTime, 1000);
         });
 
-        // الأدوات (17)
         const tools = [
             { name: "دراسة جدوى مالية شاملة", icon: "fa-chart-pie", file: "tool1.html" },
             { name: "حساب التكاليف للمطاعم", icon: "fa-utensils", file: "tool2.html" },
@@ -310,10 +296,11 @@ loginBtn.addEventListener('click', attemptLogin);
             { name: "حاسبة تكلفة العمالة المثالية", icon: "fa-users", file: "tool13.html" },
             { name: "نظام تحليل المخاطر ونقاط التحكم الحرجة", icon: "fa-exclamation-triangle", file: "tool14.html" },
             { name: "إجراءات التشغيل القياسية", icon: "fa-clipboard-list", file: "tool15.html" },
-            { name: "آلة حاسبة", icon: "fa-calculator", file: "tool16.html" }
+            { name: "آلة حاسبة", icon: "fa-calculator", file: "tool16.html" },
+            { name: "اداة توليد محتوى ذكية", icon: "fa-robot", file: "tool17.html" }
         ];
 
-        // قائمة المهام (بقيت كما هي)
+        // قائمة المهام
         const todoInput = document.getElementById('todoInput');
         const addTodoBtn = document.getElementById('addTodoBtn');
         const todoList = document.getElementById('todoList');
@@ -329,67 +316,7 @@ loginBtn.addEventListener('click', attemptLogin);
             localStorage.setItem('employeeTodos', JSON.stringify(todos));
             renderTodos();
         }
-        function renderTodos() { /* كما هي */ }
-        function addTodo() { /* كما هي */ }
-        addTodoBtn.addEventListener('click', addTodo);
-        todoInput.addEventListener('keypress', e => { if (e.key === 'Enter') addTodo(); });
 
-        // الآلة الحاسبة (بقيت كما هي)
-        let calcInput = '0', calcPrev = '', calcOp = null;
-        const display = document.getElementById('calcDisplay');
-        function updateDisplay() { display.value = calcInput; }
-        window.appendCalc = (n) => { /* كما هي */ };
-        window.setCalcOperator = (op) => { /* كما هي */ };
-        window.calculateCalc = () => { /* كما هي */ };
-        window.clearCalc = () => { /* كما هي */ };
-        // دعم الكيبورد (كما هي)
-        document.addEventListener('keydown', (e) => { /* كما هي */ });
-
-        // الملاحظات (بقيت كما هي)
-        const notes = document.getElementById('notesArea');
-        document.getElementById('saveLocal').addEventListener('click', () => { localStorage.setItem('employeeNotes', notes.value); alert('تم حفظ الملاحظات'); });
-        document.getElementById('exportNotes').addEventListener('click', () => { /* كما هي */ });
-        document.getElementById('importNotes').addEventListener('click', () => { /* كما هي */ });
-
-        // المواعيد (بقيت كما هي)
-        let apps = JSON.parse(localStorage.getItem('employeeAppointments') || '[]');
-        const appTitle = document.getElementById('appTitle');
-        const appDate = document.getElementById('appDate');
-        const appDesc = document.getElementById('appDesc');
-        const appList = document.getElementById('appointmentsList');
-
-        function renderApps() { /* كما هي */ }
-        document.getElementById('addAppBtn').addEventListener('click', () => { /* كما هي */ });
-        document.getElementById('exportApps').addEventListener('click', () => { /* كما هي */ });
-        function loadNotes() { const saved = localStorage.getItem('employeeNotes'); if(saved) notes.value = saved; }
-        function loadAppointments() { apps = JSON.parse(localStorage.getItem('employeeAppointments') || '[]'); renderApps(); }
-
-        function renderTools() {
-            const grid = document.getElementById('toolsGrid');
-            grid.innerHTML = '';
-            tools.forEach(t => {
-                const card = document.createElement('div');
-                card.className = 'tool-card';
-                // فتح في نفس التبويب لضمان مشاركة localStorage
-                card.onclick = () => location.href = t.file;
-                card.innerHTML = `<i class="fas ${t.icon}"></i><h4>${t.name}</h4>`;
-                grid.appendChild(card);
-            });
-        }
-
-        const dateSpan = document.getElementById('currentDate');
-        const timeSpan = document.getElementById('currentTime');
-        function updateDateTime() {
-            const now = new Date();
-            dateSpan.textContent = now.toLocaleDateString('ar-EG', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-            timeSpan.textContent = now.toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-        }
-
-        // تأكد من أن دوال renderTodos و renderApps وغيرها موجودة كما في ملفك الأصلي
-        // (لأني اختصرتها هنا للاختصار، لكنك تحتاج إلى نسخها من ملفك القديم)
-        // سأعطي الوظائف الكاملة في الأسفل حتى لا تفقد شيئاً.
-
-        // ---------------- دوال كاملة من ملفك الأصلي ----------------
         function renderTodos() {
             todoList.innerHTML = '';
             const pending = todos.filter(t => !t.completed).length;
@@ -417,11 +344,14 @@ loginBtn.addEventListener('click', attemptLogin);
             document.querySelectorAll('.delete-todo').forEach(btn => {
                 btn.addEventListener('click', e => {
                     const idx = btn.dataset.index;
-                    todos.splice(idx, 1);
-                    saveTodos();
+                    if (confirm("هل أنت متأكد من حذف هذه المهمة؟")) {
+                        todos.splice(idx, 1);
+                        saveTodos();
+                    }
                 });
             });
         }
+
         function addTodo() {
             const text = todoInput.value.trim();
             if (!text) return;
@@ -429,7 +359,13 @@ loginBtn.addEventListener('click', attemptLogin);
             saveTodos();
             todoInput.value = '';
         }
-        // دوال الحاسبة
+        addTodoBtn.addEventListener('click', addTodo);
+        todoInput.addEventListener('keypress', e => { if (e.key === 'Enter') addTodo(); });
+
+        // الآلة الحاسبة
+        let calcInput = '0', calcPrev = '', calcOp = null;
+        const display = document.getElementById('calcDisplay');
+        function updateDisplay() { display.value = calcInput; }
         window.appendCalc = (n) => {
             if (calcInput === '0' && n !== '.') calcInput = n;
             else {
@@ -460,7 +396,7 @@ loginBtn.addEventListener('click', attemptLogin);
             updateDisplay();
         };
         window.clearCalc = () => { calcInput = '0'; calcPrev = ''; calcOp = null; updateDisplay(); };
-        // دعم الكيبورد
+
         document.addEventListener('keydown', (e) => {
             if (loginOverlay.style.display !== 'none' || !dashboard.style.display) return;
             const active = document.activeElement;
@@ -478,17 +414,57 @@ loginBtn.addEventListener('click', attemptLogin);
                 updateDisplay();
             }
         });
-        // دوال المواعيد
+
+        // الملاحظات
+        const notes = document.getElementById('notesArea');
+        document.getElementById('saveLocal').addEventListener('click', () => {
+            localStorage.setItem('employeeNotes', notes.value);
+            alert('تم حفظ الملاحظات بنجاح.');
+        });
+        document.getElementById('exportNotes').addEventListener('click', () => {
+            const blob = new Blob([notes.value], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `notes_faroukgrup_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+        });
+        document.getElementById('importNotes').addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.txt';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (ev) => notes.value = ev.target.result;
+                reader.readAsText(file);
+            };
+            input.click();
+        });
+
+        // المواعيد
+        let apps = JSON.parse(localStorage.getItem('employeeAppointments') || '[]');
+        const appTitle = document.getElementById('appTitle');
+        const appDate = document.getElementById('appDate');
+        const appDesc = document.getElementById('appDesc');
+        const appList = document.getElementById('appointmentsList');
+
+        // دالة عرض المواعيد (تظهر التاريخ والعنوان والتفاصيل)
         function renderApps() {
             appList.innerHTML = '';
             apps.slice().sort((a,b) => a.date.localeCompare(b.date)).forEach((a, idx) => {
                 const d = new Date(a.date).toLocaleDateString('ar-EG', { day:'numeric', month:'short' });
                 const div = document.createElement('div');
                 div.className = 'appointment-item';
+                // بناء HTML لعرض التفاصيل إن وجدت
+                let detailsHtml = '';
+                if (a.desc && a.desc.trim() !== '') {
+                    detailsHtml = `<div class="appointment-desc">📝 ${a.desc}</div>`;
+                }
                 div.innerHTML = `
                     <div class="appointment-info">
                         <span class="appointment-date">${d}</span> 
                         <span class="appointment-title">${a.title}</span>
+                        ${detailsHtml}
                     </div>
                     <span class="delete-btn delete-app" data-idx="${apps.indexOf(a)}"><i class="fas fa-trash-alt"></i></span>
                 `;
@@ -497,12 +473,15 @@ loginBtn.addEventListener('click', attemptLogin);
             document.querySelectorAll('.delete-app').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const idx = btn.dataset.idx;
-                    apps.splice(idx, 1);
-                    localStorage.setItem('employeeAppointments', JSON.stringify(apps));
-                    renderApps();
+                    if (confirm("هل أنت متأكد من حذف هذا الموعد؟")) {
+                        apps.splice(idx, 1);
+                        localStorage.setItem('employeeAppointments', JSON.stringify(apps));
+                        renderApps();
+                    }
                 });
             });
         }
+
         document.getElementById('addAppBtn').addEventListener('click', () => {
             if (!appTitle.value || !appDate.value) return alert('يرجى إدخال العنوان والتاريخ');
             apps.push({ title: appTitle.value, date: appDate.value, desc: appDesc.value });
@@ -518,45 +497,35 @@ loginBtn.addEventListener('click', attemptLogin);
             a.download = `appointments_faroukgrup_${new Date().toISOString().slice(0,10)}.csv`;
             a.click();
         });
-    // دالة تسجيل الدخول
-async function handleLogin(event) {
-    event.preventDefault(); // منع الصفحة من التحديث
 
-    const user = document.getElementById('username').value; // تأكد أن ID الحقل هو username
-    const pass = document.getElementById('password').value; // تأكد أن ID الحقل هو password
-    const workerURL = "https://farouk-api-proxy.faroukgrup.workers.dev/";
-
-    try {
-        // تجهيز البيانات لإرسالها للوركر
-        const formData = new FormData();
-        formData.append('username', user);
-        formData.append('password', pass);
-
-        const response = await fetch(workerURL, {
-            method: "POST",
-            body: formData
-        });
-
-        const result = await response.json();
-
-        if (result.status === "success") {
-            // تأكد من وجود هذين السطرين عند نجاح الدخول
-sessionStorage.setItem('username', user); // 'user' هو المتغير الذي يحتوي الاسم
-sessionStorage.setItem('userToken', 'secure_access_granted'); 
-            
-            // الانتقال لصفحة المنصة الرئيسية أو الأداة مباشرة
-            window.location.href = "dashboard.html"; 
-        } else {
-            alert("بيانات الدخول غير صحيحة، يرجى المحاولة مرة أخرى.");
+        function loadNotes() {
+            const saved = localStorage.getItem('employeeNotes');
+            if (saved) notes.value = saved;
         }
-    } catch (error) {
-        console.error("خطأ:", error);
-        alert("حدث خطأ في الاتصال بالسيرفر.");
-    }
-}
+        function loadAppointments() {
+            apps = JSON.parse(localStorage.getItem('employeeAppointments') || '[]');
+            renderApps();
+        }
 
-// ربط الدالة بالنموذج عند تحميل الصفحة
-document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        function renderTools() {
+            const grid = document.getElementById('toolsGrid');
+            grid.innerHTML = '';
+            tools.forEach(t => {
+                const card = document.createElement('div');
+                card.className = 'tool-card';
+                card.onclick = () => location.href = t.file;
+                card.innerHTML = `<i class="fas ${t.icon}"></i><h4>${t.name}</h4>`;
+                grid.appendChild(card);
+            });
+        }
+
+        const dateSpan = document.getElementById('currentDate');
+        const timeSpan = document.getElementById('currentTime');
+        function updateDateTime() {
+            const now = new Date();
+            dateSpan.textContent = now.toLocaleDateString('ar-EG', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+            timeSpan.textContent = now.toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        }
     </script>
 </body>
 </html>

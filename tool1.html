@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
 <title>دراسة الجدوى المالية الشاملة | FAROUK GRUP</title>
+<!-- حماية الصفحة -->
+    <script src="auth-check.js"></script>
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@700;900&display=swap" rel="stylesheet">
@@ -481,8 +483,10 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
     .charts-container { grid-template-columns: 1fr; }
 }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
+<body style="overflow-x: hidden;">
 <!-- خلفية متوهجة -->
 <div class="glow-bg">
     <span></span><span></span><span></span>
@@ -517,7 +521,7 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
                 <option value="ر.س">ريال سعودي (ر.س)</option>
             </select>
             <label><i class="fas fa-building"></i> اسم الجهة:</label>
-            <input type="text" id="companyName" value="شركة الأفق للتجارة" placeholder="الجهة المستفيدة">
+            <input type="text" id="companyName" value="اسم الجهة المستفيدة من التقرير" placeholder="الجهة المستفيدة">
         </div>
 
         <!-- رأس المال -->
@@ -1154,5 +1158,28 @@ btn.onclick = function(e) { e.preventDefault(); modal.style.display = 'block'; }
 span.onclick = function() { modal.style.display = 'none'; };
 window.onclick = function(event) { if (event.target == modal) modal.style.display = 'none'; };
 </script>
+<!-- زر العودة إلى الرئيسية (عائم في اليمين) -->
+<a href="index.html" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px; /* وضعه في اليمين بدلاً من اليسار */
+    background: rgba(180,133,84,0.9);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: bold;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';">
+    <i class="fas fa-home"></i> الرئيسية
+</a>
 </body>
 </html>
