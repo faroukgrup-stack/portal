@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
     <title>دراسة الجدوى التسويقية الشاملة | FAROUK GRUP</title>
-<!-- حماية الصفحة -->
+    <!-- حماية الصفحة -->
     <script src="auth-check.js"></script>
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
@@ -35,7 +35,7 @@
             --radius-md: 20px;
             --radius-lg: 30px;
             --transition: all 0.3s ease;
-            --gold: #b8860b;      /* احتفظ بها للتوافق */
+            --gold: #b8860b;
             --gold-light: #d4b15a;
             --gold-soft: rgba(184,134,11,0.1);
             --dark: #0f0f0f;
@@ -809,7 +809,7 @@
 <script>
     AOS.init({ duration: 800, once: true, offset: 100 });
 
-    // ------------------ إدارة المنافسين ------------------
+    // ------------------ إدارة المنافسين (بدون قيم افتراضية) ------------------
     let competitorCount = 2;
     function renderCompetitors() {
         const container = document.getElementById('competitorsContainer');
@@ -818,9 +818,9 @@
             const div = document.createElement('div');
             div.className = 'competitor-row';
             div.innerHTML = `
-                <input type="text" class="comp-name" placeholder="اسم المنافس" value="${i===1?'ماكدونالدز':i===2?'برغر كينغ':'منافس '+i}">
-                <input type="number" class="comp-strength" placeholder="القوة (1-10)" value="${i===1?8:7}" min="1" max="10">
-                <input type="number" class="comp-weakness" placeholder="الضعف (1-10)" value="${i===1?4:5}" min="1" max="10">
+                <input type="text" class="comp-name" placeholder="اسم المنافس" value="">
+                <input type="number" class="comp-strength" placeholder="القوة (1-10)" value="" min="1" max="10">
+                <input type="number" class="comp-weakness" placeholder="الضعف (1-10)" value="" min="1" max="10">
                 ${i > 1 ? '<button class="remove-btn" onclick="removeCompetitor(this)">×</button>' : ''}
             `;
             container.appendChild(div);
@@ -835,7 +835,7 @@
         renderCompetitors();
     });
 
-    // ------------------ إدارة القنوات ------------------
+    // ------------------ إدارة القنوات (بدون قيم افتراضية) ------------------
     let channelCount = 2;
     function renderChannels() {
         const container = document.getElementById('channelsContainer');
@@ -844,9 +844,9 @@
             const div = document.createElement('div');
             div.className = 'channel-row';
             div.innerHTML = `
-                <input type="text" class="channel-name" placeholder="القناة" value="${i===1?'Instagram':i===2?'Google Ads':'قناة '+i}">
-                <input type="number" class="channel-budget" placeholder="الميزانية الشهرية" value="${i===1?2000:1500}">
-                <input type="number" class="channel-customers" placeholder="العملاء المتوقعون شهرياً" value="${i===1?300:200}">
+                <input type="text" class="channel-name" placeholder="القناة" value="">
+                <input type="number" class="channel-budget" placeholder="الميزانية الشهرية" value="">
+                <input type="number" class="channel-customers" placeholder="العملاء المتوقعون شهرياً" value="">
                 ${i > 1 ? '<button class="remove-btn" onclick="removeChannel(this)">×</button>' : ''}
             `;
             container.appendChild(div);
@@ -866,8 +866,8 @@
         const competitors = [];
         document.querySelectorAll('.competitor-row').forEach(row => {
             const name = row.querySelector('.comp-name')?.value.trim();
-            const strength = parseFloat(row.querySelector('.comp-strength')?.value) || 5;
-            const weakness = parseFloat(row.querySelector('.comp-weakness')?.value) || 5;
+            const strength = parseFloat(row.querySelector('.comp-strength')?.value) || 0;
+            const weakness = parseFloat(row.querySelector('.comp-weakness')?.value) || 0;
             if (name) competitors.push({ name, strength, weakness });
         });
 
@@ -1085,14 +1085,14 @@
                     <div>${headerContent}</div>
                     
                     <h3>المؤشرات المالية التسويقية</h3>
-                    <table>
+                     <table>
                         ${Array.from(document.querySelectorAll('.result-card')).map(card => {
                             const label = card.querySelector('.label')?.innerText || '';
                             const value = card.querySelector('.value')?.innerText || '';
                             const unit = card.querySelector('.unit')?.innerText || '';
                             return `<tr><td><strong>${label}</strong></td><td>${value} ${unit}</td></tr>`;
                         }).join('')}
-                    </table>
+                     </table>
                     
                     ${alertsContent ? `<div class="alert">${alertsContent}</div>` : ''}
                     
