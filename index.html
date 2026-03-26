@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
-        /* جميع الأنماط كما هي - لم تتغير */
         * { margin:0; padding:0; box-sizing:border-box; }
         :root { --bg-dark:#0b0e17; --bg-panel:rgba(18,24,36,0.75); --bg-card:rgba(22,30,46,0.7); --border-light:rgba(180,133,84,0.25); --accent-glow:#b48554; --accent-soft:#cfa776; --text-light:#f0f4fa; --text-muted:#aab7d4; --shadow-soft:0 15px 35px -10px rgba(0,0,0,0.6),0 0 0 1px rgba(180,133,84,0.15); --shadow-glow:0 15px 35px -10px rgba(0,0,0,0.8),0 0 20px rgba(180,133,84,0.3); --radius-md:20px; --radius-lg:30px; --transition:all 0.3s ease; }
         body { font-family:'Tajawal',sans-serif; background:radial-gradient(circle at 70% 30%,#141c2b,#0a0e16); color:var(--text-light); line-height:1.6; min-height:100vh; display:flex; flex-direction:column; position:relative; }
@@ -29,12 +28,11 @@
         .login-card { background:var(--bg-panel); backdrop-filter:blur(15px); padding:1.5rem 2rem; border-radius:20px; width:85%; max-width:340px; text-align:center; border:1px solid var(--border-light); box-shadow:0 20px 50px rgba(0,0,0,0.5); margin:auto; }
         .login-card h2 { font-size:1.3rem; margin-bottom:0.5rem; }
         .login-card p { font-size:0.85rem; margin-bottom:1.2rem; }
-        .password-field { width:100%; padding:0.7rem 1rem; background:rgba(255,255,255,0.05); border:1px solid var(--border-light); border-radius:12px; color:white; font-size:1rem; margin-bottom:10px; outline:none; }
+        .login-input { width:100%; padding:0.9rem 1rem; background:rgba(10,14,23,0.8); border:1px solid var(--border-light); border-radius:60px; font-family:'Inter',sans-serif; font-size:1rem; text-align:center; direction:ltr; margin-bottom:1rem; color:var(--accent-soft); box-shadow:inset 0 2px 8px rgba(0,0,0,0.6); transition:var(--transition); }
+        .login-input:focus { outline:none; border-color:var(--accent-glow); box-shadow:0 0 0 3px rgba(180,133,84,0.3), inset 0 2px 8px black; }
         .whatsapp-link { display:block; margin-top:15px; font-size:0.8rem; color:var(--accent-soft); text-decoration:none; opacity:0.8; }
         .whatsapp-link:hover { opacity:1; text-decoration:underline; }
-        .password-field { padding:1.2rem 1.5rem; background:rgba(10,14,23,0.8); border:1px solid var(--border-light); border-radius:60px; font-family:'Inter',monospace; font-size:1.8rem; text-align:center; letter-spacing:10px; direction:ltr; margin-bottom:2rem; color:var(--accent-soft); box-shadow:inset 0 2px 8px rgba(0,0,0,0.6); }
-        .password-field:focus { outline:none; border-color:var(--accent-glow); box-shadow:0 0 0 3px rgba(180,133,84,0.3), inset 0 2px 8px black; }
-        .login-btn { width:100%; padding:1.2rem; background:rgba(180,133,84,0.15); border:1px solid var(--border-light); border-radius:60px; font-family:'Tajawal',sans-serif; font-size:1.3rem; font-weight:700; color:var(--accent-soft); cursor:pointer; transition:var(--transition); display:flex; align-items:center; justify-content:center; gap:0.8rem; backdrop-filter:blur(10px); }
+        .login-btn { width:100%; padding:1rem; background:rgba(180,133,84,0.15); border:1px solid var(--border-light); border-radius:60px; font-family:'Tajawal',sans-serif; font-size:1.2rem; font-weight:700; color:var(--accent-soft); cursor:pointer; transition:var(--transition); display:flex; align-items:center; justify-content:center; gap:0.8rem; backdrop-filter:blur(10px); margin-top:0.5rem; }
         .login-btn:hover { background:rgba(180,133,84,0.3); border-color:var(--accent-glow); color:#fff; box-shadow:0 0 25px rgba(180,133,84,0.4); transform:translateY(-3px); }
         .error-msg { color:#f87171; margin-top:1.2rem; font-weight:600; }
         .dashboard { max-width:1500px; width:100%; margin:2rem auto; padding:0 2rem; position:relative; z-index:10; display:none; }
@@ -111,9 +109,10 @@
             <div class="login-icon" style="font-size:2rem; margin-bottom:10px;"><i class="fas fa-shield-halved"></i></div>
             <h2>دخول المصرح لهم</h2>
             <p>مجموعة فاروق للاستشارات والأعمال</p>
-            <input type="text" id="usernameInput" class="password-field" placeholder="اسم المستخدم" style="letter-spacing:normal;">
-            <input type="password" id="passwordInput" class="password-field" placeholder="كلمة المرور" style="letter-spacing:normal;">
-            <button class="login-btn" id="loginBtn" style="padding:0.8rem;"><i class="fas fa-sign-in-alt"></i> دخول</button>
+            <!-- تعديل: حقل بريد إلكتروني بحجم خط مناسب -->
+            <input type="email" id="usernameInput" class="login-input" placeholder="البريد الإلكتروني">
+            <input type="password" id="passwordInput" class="login-input" placeholder="كلمة المرور">
+            <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> دخول</button>
             <a href="https://wa.me/905550196682" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i> نسيت كلمة المرور؟ اضغط هنا</a>
             <div class="error-msg" id="errorMsg" style="font-size:0.8rem; margin-top:10px;"></div>
         </div>
@@ -216,7 +215,12 @@
             const pass = passwordInput.value.trim();
 
             if (!user || !pass) {
-                errorMsg.textContent = '❌ يرجى إدخال اسم المستخدم وكلمة المرور';
+                errorMsg.textContent = '❌ يرجى إدخال البريد الإلكتروني وكلمة المرور';
+                return;
+            }
+
+            if (!user.includes('@') || !user.includes('.')) {
+                errorMsg.textContent = '❌ يرجى إدخال بريد إلكتروني صحيح (مثال: name@domain.com)';
                 return;
             }
 
@@ -255,7 +259,7 @@
                 console.error('Login error:', error);
                 errorMsg.textContent = '❌ حدث خطأ في الاتصال بالسيرفر. تأكد من اتصالك بالإنترنت.';
             } finally {
-                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول آمن';
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
                 loginBtn.disabled = false;
             }
         }
@@ -448,14 +452,12 @@
         const appDesc = document.getElementById('appDesc');
         const appList = document.getElementById('appointmentsList');
 
-        // دالة عرض المواعيد (تظهر التاريخ والعنوان والتفاصيل)
         function renderApps() {
             appList.innerHTML = '';
             apps.slice().sort((a,b) => a.date.localeCompare(b.date)).forEach((a, idx) => {
                 const d = new Date(a.date).toLocaleDateString('ar-EG', { day:'numeric', month:'short' });
                 const div = document.createElement('div');
                 div.className = 'appointment-item';
-                // بناء HTML لعرض التفاصيل إن وجدت
                 let detailsHtml = '';
                 if (a.desc && a.desc.trim() !== '') {
                     detailsHtml = `<div class="appointment-desc">📝 ${a.desc}</div>`;
