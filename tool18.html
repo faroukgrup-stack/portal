@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <title>حاسبة النسب المالية الشاملة | FAROUK GRUP</title>
+    <script src="auth-check.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --bg-dark:#0b0e17; --bg-panel:rgba(18,24,36,0.85); --bg-card:rgba(22,30,46,0.8); --border-light:rgba(180,133,84,0.25); --accent-glow:#b48554; --accent-soft:#cfa776; --text-light:#f0f4fa; --text-muted:#aab7d4; --text-dark:#0b0e17; --shadow-soft:0 15px 35px -10px rgba(0,0,0,0.6),0 0 0 1px rgba(180,133,84,0.15); --shadow-glow:0 15px 35px -10px rgba(0,0,0,0.8),0 0 20px rgba(180,133,84,0.3); --radius-md:20px; --radius-lg:30px; --transition:all 0.3s ease; --gold:#b8860b; --gold-light:#d4b15a; --gold-soft:rgba(184,134,11,0.1); --dark:#0f0f0f; --dark-light:#1a1a1a; --white:#ffffff; --success:#28a745; --warning:#ffc107; --danger:#dc3545; }
+        body { font-family:'Tajawal',sans-serif; background:radial-gradient(circle at 70% 30%,#141c2b,#0a0e16); color:var(--text-light); line-height:1.6; min-height:100vh; position:relative; overflow-x:hidden; }
+        .glow-bg { position:fixed; width:100%; height:100%; top:0; left:0; pointer-events:none; z-index:0; }
+        .glow-bg span { position:absolute; width:400px; height:400px; background:radial-gradient(circle,rgba(180,133,84,0.15) 0%,transparent 70%); border-radius:50%; filter:blur(80px); animation:glowMove 20s infinite alternate ease-in-out; }
+        .glow-bg span:nth-child(1) { top:-100px; right:-100px; width:500px; height:500px; background:radial-gradient(circle,rgba(180,133,84,0.12) 0%,transparent 70%); }
+        .glow-bg span:nth-child(2) { bottom:-150px; left:-150px; width:600px; height:600px; background:radial-gradient(circle,rgba(100,150,200,0.1) 0%,transparent 70%); }
+        .glow-bg span:nth-child(3) { top:30%; left:30%; width:300px; height:300px; background:radial-gradient(circle,rgba(180,133,84,0.1) 0%,transparent 70%); animation-delay:-5s; }
+        @keyframes glowMove { 0%{transform:translate(0,0) scale(1);opacity:0.5;} 100%{transform:translate(40px,-30px) scale(1.2);opacity:0.8;} }
+        .hero-mini { background:linear-gradient(135deg,var(--dark) 0%,var(--dark-light) 100%); color:white; text-align:center; padding:3rem 1rem; border-bottom:4px solid var(--gold); position:relative; overflow:hidden; z-index:2; }
+        .hero-mini::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(circle,rgba(184,134,11,0.2) 0%,transparent 60%); animation:rotate 40s linear infinite; }
+        @keyframes rotate { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+        .hero-mini h2 { font-size:2.5rem; font-weight:900; color:var(--gold-light); margin-bottom:0.5rem; position:relative; z-index:2; }
+        .hero-mini p { font-size:1.2rem; max-width:700px; margin:0 auto; opacity:0.95; position:relative; z-index:2; }
+        .calc-wrapper { max-width:1200px; margin:2rem auto; padding:0 1rem; position:relative; z-index:2; }
+        .calc-box { background:var(--bg-panel); backdrop-filter:blur(15px); border:2px solid var(--border-light); border-radius:var(--radius-lg); padding:1.5rem; box-shadow:var(--shadow-soft); position:relative; overflow:hidden; }
+        .calc-box:hover { box-shadow:var(--shadow-glow); border-color:rgba(180,133,84,0.4); }
+        .calc-box h2 { font-size:1.8rem; font-weight:900; background:linear-gradient(135deg,#f0e6d2,#cfa776); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:1.5rem; text-align:center; }
+        .featured-badge { position: absolute; top: -10px; left: -10px; background: linear-gradient(135deg, var(--accent-glow), var(--gold-light)); color: #111; width: 90px; height: 90px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900; border: 3px solid white; z-index: 10; }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+        .currency-row { display:flex; align-items:center; gap:1rem; background:rgba(180,133,84,0.15); border:1px solid var(--border-light); padding:0.8rem 1rem; border-radius:50px; margin-bottom:2rem; flex-wrap:wrap; }
+        .currency-row label { font-weight:700; color:var(--accent-soft); margin:0; }
+        .currency-row select, .currency-row input { width:150px; padding:0.5rem 1rem; border:2px solid var(--border-light); border-radius:30px; background:rgba(10,14,23,0.7); color:var(--text-light); font-weight:700; font-family:'Inter',sans-serif; }
+        .currency-row input { width:250px; }
+        .section-title-sm { font-size:1.3rem; font-weight:900; background:linear-gradient(135deg,#f0e6d2,#cfd9ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:1.2rem 0 0.8rem 0; border-bottom:2px solid var(--border-light); padding-bottom:0.3rem; }
+        .form-group { margin-bottom:1rem; position:relative; }
+        label { display:block; margin-bottom:0.3rem; font-weight:700; color:var(--accent-soft); font-size:0.9rem; }
+        input, select, textarea { width:100%; padding:0.8rem 1rem; border:2px solid var(--border-light); border-radius:30px; background:rgba(10,14,23,0.7); color:var(--text-light); font-family:'Tajawal',sans-serif; font-size:1rem; transition:var(--transition); }
+        input:focus, select:focus { outline:none; border-color:var(--accent-glow); box-shadow:0 0 0 3px rgba(180,133,84,0.2); background:rgba(15,20,30,0.9); }
+        .tooltip { position:relative; cursor:help; }
+        .tooltip .tooltiptext { visibility:hidden; width:260px; background-color:var(--dark); color:#fff; text-align:center; border-radius:6px; padding:8px; position:absolute; z-index:100; bottom:130%; left:50%; margin-left:-130px; opacity:0; transition:opacity 0.3s; font-size:0.85rem; border:1px solid var(--gold); pointer-events:none; }
+        .tooltip .tooltiptext::after { content:""; position:absolute; top:100%; left:50%; margin-left:-5px; border-width:5px; border-style:solid; border-color:var(--dark) transparent transparent transparent; }
+        .tooltip:hover .tooltiptext { visibility:visible; opacity:1; }
+        .grid-2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:1rem; margin-bottom:1rem; }
+        .readonly-input { background: rgba(10,14,23,0.5); cursor: not-allowed; }
+        .btn-calculate { display:flex; align-items:center; justify-content:center; gap:1rem; width:100%; padding:1.2rem; border-radius:50px; background:rgba(180,133,84,0.2); border:1px solid var(--border-light); color:var(--accent-soft); font-weight:900; font-size:1.2rem; cursor:pointer; transition:var(--transition); backdrop-filter:blur(10px); margin:1.5rem 0; }
+        .btn-calculate:hover { background:rgba(180,133,84,0.4); color:#fff; border-color:var(--accent-glow); box-shadow:0 0 25px rgba(180,133,84,0.3); transform:translateY(-3px); }
+        .results-section { margin-top:2rem; }
+        .results-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+        .result-card { background:var(--bg-card); border:1px solid var(--border-light); border-radius:var(--radius-md); padding:1.2rem; text-align:center; box-shadow:var(--shadow-soft); }
+        .result-card .label { font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem; }
+        .result-card .value { font-size:1.3rem; font-weight:900; color:var(--accent-soft); }
+        .result-card .status { font-size:0.75rem; margin-top:0.3rem; padding:0.2rem 0.5rem; border-radius:20px; display:inline-block; }
+        .status-good { background:var(--success); color:white; }
+        .status-bad { background:var(--danger); color:white; }
+        .status-warning { background:var(--warning); color:#111; }
+        .table-container { overflow-x:auto; margin-top:1rem; border:1px solid var(--border-light); border-radius:var(--radius-md); background:var(--bg-card); padding:0.8rem; }
+        table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+        th { background:rgba(180,133,84,0.2); color:var(--accent-soft); font-weight:900; padding:0.5rem; border-bottom:2px solid var(--border-light); text-align:center; }
+        td { padding:0.5rem; border-bottom:1px solid rgba(180,133,84,0.2); text-align:center; color:var(--text-light); }
+        .chart-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1rem; margin:1.5rem 0; }
+        .chart-container { background:var(--bg-card); border-radius:20px; padding:1rem; border:1px solid var(--border-light); height:280px; }
+        canvas { width:100% !important; height:100% !important; }
+        .action-bar { display:flex; gap:1rem; justify-content:flex-end; margin:1rem 0; flex-wrap:wrap; }
+        .btn-export { background:rgba(180,133,84,0.15); border:1px solid var(--border-light); color:var(--accent-soft); border-radius:50px; padding:0.8rem 1.5rem; font-weight:700; cursor:pointer; transition:var(--transition); display:inline-flex; align-items:center; gap:0.5rem; }
+        .btn-export:hover { background:rgba(180,133,84,0.3); color:#fff; border-color:var(--accent-glow); }
+        .btn-export.word { background:rgba(30,74,122,0.2); border-color:#1e4a7a; color:#8ab8ff; }
+        .footer-simple { text-align:center; padding:1.5rem; margin-top:2rem; background:rgba(10,14,23,0.5); backdrop-filter:blur(5px); border-top:1px solid var(--border-light); color:var(--text-muted); font-size:0.85rem; }
+        .footer-simple span { color:var(--accent-soft); font-weight:700; }
+        .calc-floating-btn { position:fixed; bottom:20px; left:20px; background:rgba(180,133,84,0.2); border:1px solid var(--border-light); border-radius:50px; padding:0.8rem 1.2rem; color:var(--accent-soft); font-size:1rem; font-weight:700; z-index:100; backdrop-filter:blur(10px); cursor:pointer; transition:var(--transition); display:flex; align-items:center; gap:0.5rem; }
+        .calc-floating-btn:hover { background:rgba(180,133,84,0.4); color:#fff; border-color:var(--accent-glow); box-shadow:0 0 15px rgba(180,133,84,0.3); }
+        .modal { display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.8); backdrop-filter:blur(4px); }
+        .modal-content { background:var(--bg-panel); margin:5% auto; padding:0; border:2px solid var(--border-light); border-radius:30px; width:90%; max-width:300px; box-shadow:var(--shadow-glow); }
+        .modal-header { background:rgba(180,133,84,0.15); border-bottom:2px solid var(--border-light); padding:10px 15px; border-radius:28px 28px 0 0; display:flex; align-items:center; justify-content:space-between; }
+        .modal-header h2 { margin:0; color:var(--accent-soft); font-size:1rem; font-weight:900; }
+        .close { color:var(--text-muted); float:left; font-size:24px; font-weight:bold; cursor:pointer; }
+        .close:hover { color:var(--accent-glow); }
+        .modal-body { padding:15px; }
+        .calc-display { width:100%; height:45px; font-size:1.4rem; text-align:left; padding:0 10px; border:2px solid var(--border-light); border-radius:20px; margin-bottom:15px; background:rgba(10,14,23,0.8); color:var(--accent-soft); font-family:'Inter',monospace; direction:ltr; }
+        .calc-buttons { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; }
+        .calc-btn { background:rgba(180,133,84,0.1); border:1px solid var(--border-light); border-radius:15px; padding:10px 0; font-size:1rem; font-weight:700; color:var(--text-light); cursor:pointer; }
+        .calc-btn:hover { background:rgba(180,133,84,0.3); border-color:var(--accent-glow); }
+        .calc-btn.operator { color:var(--accent-soft); }
+        .calc-btn.equals { background:rgba(180,133,84,0.3); color:white; grid-column:span 2; }
+        .calc-btn.equals:hover { background:rgba(180,133,84,0.5); }
+        @media (max-width:768px) { .hero-mini h2 { font-size:2rem; } .featured-badge { width:70px; height:70px; } .featured-badge i { font-size:1.4rem; } .featured-badge span { font-size:0.6rem; } .grid-2 { grid-template-columns:1fr; } .currency-row select, .currency-row input { width:100%; } }
+    </style>
+</head>
+<body style="overflow-x: hidden;">
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<section class="hero-mini">
+    <h2>📊 حاسبة النسب المالية الشاملة</h2>
+    <p>تحليل السيولة، الربحية، الملاءة، والنشاط مع توصيات ذكية</p>
+</section>
+
+<div class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <div class="featured-badge">
+            <i class="fas fa-chart-pie"></i>
+            <span>نسب</span>
+        </div>
+        <h2><i class="fas fa-chart-line"></i> البيانات المالية الأساسية</h2>
+        <div class="currency-row">
+            <div class="tooltip"><label><i class="fas fa-coins"></i> العملة:</label><select id="currencySelect"><option value="$" selected>دولار ($)</option><option value="€">يورو (€)</option><option value="₺">ليرة تركية (₺)</option><option value="ج.م">جنيه مصري (ج.م)</option><option value="د.ك">دينار كويتي (د.ك)</option><option value="ر.س">ريال سعودي (ر.س)</option></select><span class="tooltiptext">العملة المستخدمة في البيانات.</span></div>
+            <div class="tooltip"><label><i class="fas fa-building"></i> اسم الجهة:</label><input type="text" id="companyName" placeholder="اسم الشركة أو المستفيد"><span class="tooltiptext">اسم الجهة المالية.</span></div>
+        </div>
+
+        <div class="grid-2">
+            <!-- الميزانية العمومية -->
+            <div>
+                <div class="section-title-sm">🏦 الميزانية العمومية (قيم سنوية)</div>
+                <div class="form-group tooltip"><label>النقد وما يعادله</label><input type="number" id="cash" placeholder="مثال: 100000"><span class="tooltiptext">الرصيد النقدي والودائع الجارية.</span></div>
+                <div class="form-group tooltip"><label>المخزون</label><input type="number" id="inventory" placeholder="مثال: 200000"><span class="tooltiptext">قيمة المخزون (بضاعة، مواد خام).</span></div>
+                <div class="form-group tooltip"><label>أصول متداولة أخرى</label><input type="number" id="otherCurrentAssets" placeholder="مثال: 100000"><span class="tooltiptext">مدينون، استثمارات قصيرة، إلخ.</span></div>
+                <!-- تم إزالة حقل إجمالي الأصول المتداولة -->
+                <div class="form-group tooltip"><label>الأصول الثابتة</label><input type="number" id="fixedAssets" placeholder="مثال: 500000"><span class="tooltiptext">مباني، آلات، معدات.</span></div>
+                <!-- تم إزالة حقل إجمالي الأصول -->
+                <div class="form-group tooltip"><label>الخصوم المتداولة</label><input type="number" id="currentLiabilities" placeholder="مثال: 300000"><span class="tooltiptext">ديون مستحقة خلال عام.</span></div>
+                <div class="form-group tooltip"><label>الخصوم طويلة الأجل</label><input type="number" id="longTermLiabilities" placeholder="مثال: 200000"><span class="tooltiptext">قروض طويلة الأجل، سندات.</span></div>
+                <!-- تم إزالة حقل إجمالي الخصوم وحقوق الملكية -->
+            </div>
+            <!-- قائمة الدخل والتدفقات -->
+            <div>
+                <div class="section-title-sm">📈 قائمة الدخل والتدفقات</div>
+                <div class="form-group tooltip"><label>الإيرادات (المبيعات)</label><input type="number" id="revenue" placeholder="مثال: 2000000"><span class="tooltiptext">إجمالي المبيعات (نقدي وآجل).</span></div>
+                <div class="form-group tooltip"><label>تكلفة المبيعات</label><input type="number" id="cogs" placeholder="مثال: 1200000"><span class="tooltiptext">تكلفة البضاعة المباعة.</span></div>
+                <div class="form-group tooltip"><label>المصاريف التشغيلية</label><input type="number" id="operatingExpenses" placeholder="مثال: 400000"><span class="tooltiptext">مصاريف البيع، الإدارية، التسويق، إلخ.</span></div>
+                <div class="form-group tooltip"><label>مصروفات الفائدة</label><input type="number" id="interestExpense" placeholder="مثال: 50000"><span class="tooltiptext">الفائدة على القروض.</span></div>
+                <div class="form-group tooltip"><label>نسبة الضريبة (%)</label><input type="number" id="taxRate" placeholder="مثال: 25" value="25"><span class="tooltiptext">نسبة ضريبة الدخل (%).</span></div>
+                <div class="form-group tooltip"><label>المبيعات الآجلة (اختياري)</label><input type="number" id="creditSales" placeholder="اترك فارغاً = الإيرادات"><span class="tooltiptext">المبيعات التي لم تقبض نقداً بعد. إذا ترك فارغاً يفترض الإيرادات.</span></div>
+                <div class="form-group tooltip"><label>حسابات المدينين (Accounts Receivable)</label><input type="number" id="receivables" placeholder="مثال: 150000"><span class="tooltiptext">المبالغ المستحقة على العملاء.</span></div>
+                <div class="form-group tooltip"><label>حسابات الدائنين (Accounts Payable)</label><input type="number" id="payables" placeholder="مثال: 100000"><span class="tooltiptext">المبالغ المستحقة للموردين.</span></div>
+            </div>
+        </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> احسب النسب المالية</button>
+
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="action-bar">
+                <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير Word</button>
+                <button class="btn-export" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel (CSV)</button>
+            </div>
+            <div class="results-grid" id="summaryCards"></div>
+            <div class="table-container" id="ratiosTable"></div>
+            <div class="chart-grid">
+                <div class="chart-container"><canvas id="radarChart"></canvas></div>
+                <div class="chart-container"><canvas id="barsChart"></canvas></div>
+            </div>
+            <div id="recommendations" class="result-card" style="text-align:right;"></div>
+        </div>
+        <div id="initialMessage" style="margin-top:1rem; color:var(--text-muted); text-align:center;"><i class="fas fa-robot" style="color: var(--accent-soft);"></i> سيتم عرض النتائج بعد الضغط على زر الحساب</div>
+    </div>
+</div>
+
+<footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
+
+<div class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> آلة حاسبة</div>
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><span class="close">&times;</span><h2><i class="fas fa-calculator" style="color: var(--accent-soft);"></i> آلة حاسبة</h2></div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button><button class="calc-btn" onclick="handleCalculatorInput('8')">8</button><button class="calc-btn" onclick="handleCalculatorInput('7')">7</button><button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button><button class="calc-btn" onclick="handleCalculatorInput('5')">5</button><button class="calc-btn" onclick="handleCalculatorInput('4')">4</button><button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button><button class="calc-btn" onclick="handleCalculatorInput('2')">2</button><button class="calc-btn" onclick="handleCalculatorInput('1')">1</button><button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
+                <button class="calc-btn" onclick="clearCalculator()">C</button><button class="calc-btn" onclick="handleCalculatorInput('.')">.</button><button class="calc-btn" onclick="handleCalculatorInput('0')">0</button><button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
+                <button class="calc-btn" onclick="backspaceCalculator()">⌫</button><button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+AOS.init({ duration: 800, once: true });
+
+// ------------------ دوال الحساب ------------------
+function getInputs() {
+    let cash = parseFloat(document.getElementById('cash').value) || 0;
+    let inventory = parseFloat(document.getElementById('inventory').value) || 0;
+    let otherCurrent = parseFloat(document.getElementById('otherCurrentAssets').value) || 0;
+    let currentAssets = cash + inventory + otherCurrent;
+    let fixedAssets = parseFloat(document.getElementById('fixedAssets').value) || 0;
+    let totalAssets = currentAssets + fixedAssets;
+    let currentLiabilities = parseFloat(document.getElementById('currentLiabilities').value) || 0;
+    let longTermLiabilities = parseFloat(document.getElementById('longTermLiabilities').value) || 0;
+    let totalLiabilities = currentLiabilities + longTermLiabilities;
+    let equity = totalAssets - totalLiabilities;
+
+    let revenue = parseFloat(document.getElementById('revenue').value) || 0;
+    let cogs = parseFloat(document.getElementById('cogs').value) || 0;
+    let operatingExpenses = parseFloat(document.getElementById('operatingExpenses').value) || 0;
+    let interestExpense = parseFloat(document.getElementById('interestExpense').value) || 0;
+    let taxRate = parseFloat(document.getElementById('taxRate').value) / 100 || 0;
+
+    let creditSales = parseFloat(document.getElementById('creditSales').value) || 0;
+    if (creditSales === 0 && revenue > 0) creditSales = revenue;
+
+    let receivables = parseFloat(document.getElementById('receivables').value) || 0;
+    let payables = parseFloat(document.getElementById('payables').value) || 0;
+
+    let operatingProfit = revenue - cogs - operatingExpenses;
+    let ebit = operatingProfit;
+    let profitBeforeTax = operatingProfit - interestExpense;
+    let netProfit = profitBeforeTax > 0 ? profitBeforeTax * (1 - taxRate) : profitBeforeTax;
+
+    return {
+        currency: document.getElementById('currencySelect').value,
+        companyName: document.getElementById('companyName').value,
+        currentAssets, cash, inventory, currentLiabilities, totalAssets, totalLiabilities, equity,
+        revenue, cogs, operatingExpenses, interestExpense, taxRate,
+        operatingProfit, ebit, netProfit,
+        creditSales, receivables, payables,
+        fixedAssets, longTermLiabilities
+    };
+}
+
+function evaluateRatio(value, thresholds) {
+    if (value === undefined || isNaN(value)) return { status: 'warning', text: 'غير محدد', class: 'status-warning' };
+    if (value >= thresholds.good) return { status: 'good', text: 'جيد', class: 'status-good' };
+    if (value >= thresholds.warning) return { status: 'warning', text: 'مقبول', class: 'status-warning' };
+    return { status: 'bad', text: 'ضعيف', class: 'status-bad' };
+}
+
+function calculateRatios(inputs) {
+    let currentRatio = inputs.currentLiabilities ? inputs.currentAssets / inputs.currentLiabilities : 0;
+    let quickRatio = inputs.currentLiabilities ? (inputs.currentAssets - inputs.inventory) / inputs.currentLiabilities : 0;
+    let cashRatio = inputs.currentLiabilities ? inputs.cash / inputs.currentLiabilities : 0;
+
+    let grossMargin = inputs.revenue ? (inputs.revenue - inputs.cogs) / inputs.revenue : 0;
+    let operatingMargin = inputs.revenue ? inputs.operatingProfit / inputs.revenue : 0;
+    let netMargin = inputs.revenue ? inputs.netProfit / inputs.revenue : 0;
+    let roa = inputs.totalAssets ? inputs.netProfit / inputs.totalAssets : 0;
+    let roe = inputs.equity ? inputs.netProfit / inputs.equity : 0;
+
+    let debtToEquity = inputs.equity ? inputs.totalLiabilities / inputs.equity : 0;
+    let debtToAssets = inputs.totalAssets ? inputs.totalLiabilities / inputs.totalAssets : 0;
+    let interestCoverage = inputs.interestExpense ? inputs.ebit / inputs.interestExpense : 0;
+    let equityRatio = inputs.totalAssets ? inputs.equity / inputs.totalAssets : 0;
+
+    let inventoryTurnover = (inputs.cogs && inputs.inventory) ? inputs.cogs / inputs.inventory : 0;
+    let daysInventory = inventoryTurnover ? 365 / inventoryTurnover : 0;
+    let receivablesTurnover = (inputs.creditSales && inputs.receivables) ? inputs.creditSales / inputs.receivables : 0;
+    let daysSalesOutstanding = receivablesTurnover ? 365 / receivablesTurnover : 0;
+    let payablesTurnover = (inputs.cogs && inputs.payables) ? inputs.cogs / inputs.payables : 0;
+    let daysPayables = payablesTurnover ? 365 / payablesTurnover : 0;
+    let cashConversionCycle = daysInventory + daysSalesOutstanding - daysPayables;
+
+    return {
+        currentRatio, quickRatio, cashRatio,
+        grossMargin, operatingMargin, netMargin, roa, roe,
+        debtToEquity, debtToAssets, interestCoverage, equityRatio,
+        inventoryTurnover, daysInventory, receivablesTurnover, daysSalesOutstanding,
+        payablesTurnover, daysPayables, cashConversionCycle
+    };
+}
+
+function getRecommendation(ratios) {
+    let rec = [];
+    if (ratios.currentRatio < 1) rec.push('⚠️ السيولة متدنية جداً، خطر عسر مالي.');
+    else if (ratios.currentRatio < 1.5) rec.push('🟡 السيولة مقبولة، يفضل زيادة الأصول المتداولة.');
+    else rec.push('✅ السيولة جيدة، قدرة على سداد الالتزامات قصيرة الأجل.');
+    if (ratios.quickRatio < 0.5) rec.push('⚠️ النسبة السريعة منخفضة، الاعتماد على المخزون لسداد الديون.');
+    if (ratios.roe < 0.1) rec.push('⚠️ العائد على حقوق الملكية منخفض، تحسين الربحية.');
+    if (ratios.debtToEquity > 2) rec.push('🔴 نسبة الدين مرتفعة جداً، مخاطر إفلاس عالية.');
+    if (ratios.interestCoverage < 1.5) rec.push('⚠️ تغطية الفائدة ضعيفة، صعوبة في سداد أعباء الدين.');
+    if (ratios.cashConversionCycle < 0) rec.push('✅ دورة التحويل النقدي سالبة (تمويل ممتاز من الموردين).');
+    else if (ratios.cashConversionCycle > 90) rec.push('⚠️ دورة التحويل طويلة جداً، رأس مال عامل محتجز.');
+    return rec;
+}
+
+// ------------------ عرض النتائج ------------------
+let radarChart, barsChart;
+
+function displayResults() {
+    const inputs = getInputs();
+    const ratios = calculateRatios(inputs);
+    const currency = inputs.currency;
+    const company = inputs.companyName || 'الجهة';
+
+    document.getElementById('resultsSection').style.display = 'block';
+    document.getElementById('initialMessage').style.display = 'none';
+
+    // تنسيق الأرقام مع العملة
+    const formatMoney = (num) => `${currency} ${num.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0})}`;
+
+    // بطاقات سريعة + إضافة القيم المالية الأساسية
+    document.getElementById('summaryCards').innerHTML = `
+        <div class="result-card"><div class="label">النسبة المتداولة</div><div class="value">${ratios.currentRatio.toFixed(2)}</div><div class="status ${evaluateRatio(ratios.currentRatio,{good:1.5,warning:1}).class}">${evaluateRatio(ratios.currentRatio,{good:1.5,warning:1}).text}</div></div>
+        <div class="result-card"><div class="label">هامش الربح الصافي</div><div class="value">${(ratios.netMargin*100).toFixed(1)}%</div><div class="status ${evaluateRatio(ratios.netMargin,{good:0.15,warning:0.05}).class}">${evaluateRatio(ratios.netMargin,{good:0.15,warning:0.05}).text}</div></div>
+        <div class="result-card"><div class="label">العائد على الأصول (ROA)</div><div class="value">${(ratios.roa*100).toFixed(1)}%</div><div class="status ${evaluateRatio(ratios.roa,{good:0.1,warning:0.05}).class}">${evaluateRatio(ratios.roa,{good:0.1,warning:0.05}).text}</div></div>
+        <div class="result-card"><div class="label">العائد على حقوق الملكية (ROE)</div><div class="value">${(ratios.roe*100).toFixed(1)}%</div><div class="status ${evaluateRatio(ratios.roe,{good:0.2,warning:0.1}).class}">${evaluateRatio(ratios.roe,{good:0.2,warning:0.1}).text}</div></div>
+        <div class="result-card"><div class="label">الدين إلى حقوق الملكية</div><div class="value">${ratios.debtToEquity.toFixed(2)}</div><div class="status ${evaluateRatio(ratios.debtToEquity,{good:1,warning:2}).class}">${evaluateRatio(ratios.debtToEquity,{good:1,warning:2}).text}</div></div>
+        <div class="result-card"><div class="label">دورة التحويل النقدي (يوم)</div><div class="value">${ratios.cashConversionCycle.toFixed(0)}</div><div class="status ${ratios.cashConversionCycle<0?'status-good':(ratios.cashConversionCycle<60?'status-warning':'status-bad')}">${ratios.cashConversionCycle<0?'ممتاز':(ratios.cashConversionCycle<60?'مقبول':'طويل')}</div></div>
+        <div class="result-card"><div class="label">إجمالي الأصول المتداولة</div><div class="value">${formatMoney(inputs.currentAssets)}</div><div class="status status-warning"> </div></div>
+        <div class="result-card"><div class="label">إجمالي الأصول</div><div class="value">${formatMoney(inputs.totalAssets)}</div><div class="status status-warning"> </div></div>
+        <div class="result-card"><div class="label">إجمالي الخصوم</div><div class="value">${formatMoney(inputs.totalLiabilities)}</div><div class="status status-warning"> </div></div>
+        <div class="result-card"><div class="label">حقوق الملكية (أصول – خصوم)</div><div class="value">${formatMoney(inputs.equity)}</div><div class="status ${inputs.equity<0?'status-bad':'status-good'}">${inputs.equity<0?'سالب':'إيجابي'}</div></div>
+    `;
+
+    // جدول مفصل
+    let tableHtml = `<thead> <th>الفئة</th><th>النسبة</th><th>القيمة</th><th>التقييم</th> </thead><tbody>`;
+    const addRow = (cat, name, value, ev) => { tableHtml += ` <td>${cat}</td><td>${name}</td><td>${value}</td><td class="${ev.class}">${ev.text}</td> </tr>`; };
+    addRow('السيولة','النسبة المتداولة', ratios.currentRatio.toFixed(2), evaluateRatio(ratios.currentRatio,{good:1.5,warning:1}));
+    addRow('السيولة','النسبة السريعة', ratios.quickRatio.toFixed(2), evaluateRatio(ratios.quickRatio,{good:1,warning:0.5}));
+    addRow('السيولة','النسبة النقدية', ratios.cashRatio.toFixed(2), evaluateRatio(ratios.cashRatio,{good:0.5,warning:0.2}));
+    addRow('الربحية','هامش الربح الإجمالي', (ratios.grossMargin*100).toFixed(1)+'%', evaluateRatio(ratios.grossMargin,{good:0.4,warning:0.2}));
+    addRow('الربحية','هامش الربح التشغيلي', (ratios.operatingMargin*100).toFixed(1)+'%', evaluateRatio(ratios.operatingMargin,{good:0.2,warning:0.1}));
+    addRow('الربحية','هامش الربح الصافي', (ratios.netMargin*100).toFixed(1)+'%', evaluateRatio(ratios.netMargin,{good:0.15,warning:0.05}));
+    addRow('الربحية','العائد على الأصول (ROA)', (ratios.roa*100).toFixed(1)+'%', evaluateRatio(ratios.roa,{good:0.1,warning:0.05}));
+    addRow('الربحية','العائد على حقوق الملكية (ROE)', (ratios.roe*100).toFixed(1)+'%', evaluateRatio(ratios.roe,{good:0.2,warning:0.1}));
+    addRow('الملاءة','الدين إلى حقوق الملكية', ratios.debtToEquity.toFixed(2), evaluateRatio(ratios.debtToEquity,{good:1,warning:2}));
+    addRow('الملاءة','الدين إلى الأصول', ratios.debtToAssets.toFixed(2), evaluateRatio(ratios.debtToAssets,{good:0.5,warning:0.7}));
+    addRow('الملاءة','تغطية الفائدة', ratios.interestCoverage.toFixed(2), evaluateRatio(ratios.interestCoverage,{good:3,warning:1.5}));
+    addRow('الملاءة','نسبة حقوق الملكية', (ratios.equityRatio*100).toFixed(1)+'%', evaluateRatio(ratios.equityRatio,{good:0.5,warning:0.3}));
+    addRow('النشاط','دوران المخزون', ratios.inventoryTurnover.toFixed(2), {text:'مرات', class:'status-warning'});
+    addRow('النشاط','أيام المخزون', ratios.daysInventory.toFixed(0)+' يوم', {text:'', class:'status-warning'});
+    addRow('النشاط','دوران المدينين', ratios.receivablesTurnover.toFixed(2), {text:'مرات', class:'status-warning'});
+    addRow('النشاط','أيام تحصيل المدينين', ratios.daysSalesOutstanding.toFixed(0)+' يوم', {text:'', class:'status-warning'});
+    addRow('النشاط','دوران الدائنين', ratios.payablesTurnover.toFixed(2), {text:'مرات', class:'status-warning'});
+    addRow('النشاط','أيام سداد الدائنين', ratios.daysPayables.toFixed(0)+' يوم', {text:'', class:'status-warning'});
+    addRow('النشاط','دورة التحويل النقدي', ratios.cashConversionCycle.toFixed(0)+' يوم', {text:'', class:ratios.cashConversionCycle<0?'status-good':'status-warning'});
+    tableHtml += `</tbody>`;
+    document.getElementById('ratiosTable').innerHTML = `<table>${tableHtml}</table>`;
+
+    // توصيات
+    let recs = getRecommendation(ratios);
+    document.getElementById('recommendations').innerHTML = `<strong><i class="fas fa-lightbulb"></i> التوصيات والتحليل:</strong><br>${recs.map(r=>'• '+r).join('<br>')}`;
+
+    // الرسوم البيانية
+    const radarData = {
+        labels: ['السيولة','الربحية','الملاءة','النشاط'],
+        datasets: [{
+            label: 'النتيجة (0-100)',
+            data: [
+                Math.min(100, ratios.currentRatio * 50),
+                Math.min(100, ratios.netMargin * 400),
+                Math.min(100, (1-ratios.debtToAssets)*100),
+                Math.min(100, (ratios.inventoryTurnover/10)*100)
+            ],
+            backgroundColor: 'rgba(180,133,84,0.2)',
+            borderColor: '#b8860b',
+            borderWidth: 2
+        }]
+    };
+    if (radarChart) radarChart.destroy();
+    const ctxRadar = document.getElementById('radarChart').getContext('2d');
+    radarChart = new Chart(ctxRadar, { type: 'radar', data: radarData, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { stepSize: 20 } } } } });
+
+    const barData = {
+        labels: ['ROA', 'ROE', 'هامش الربح الصافي'],
+        datasets: [{
+            label: 'نسبة (%)',
+            data: [ratios.roa*100, ratios.roe*100, ratios.netMargin*100],
+            backgroundColor: '#b8860b'
+        }]
+    };
+    if (barsChart) barsChart.destroy();
+    const ctxBars = document.getElementById('barsChart').getContext('2d');
+    barsChart = new Chart(ctxBars, { type: 'bar', data: barData, options: { responsive: true, maintainAspectRatio: false } });
+}
+
+// ------------------ دوال التصدير ------------------
+function exportToExcel() {
+    const table = document.querySelector('#ratiosTable table');
+    if (!table) { alert('الرجاء إجراء التحليل أولاً'); return; }
+    const rows = [];
+    const headers = [];
+    table.querySelectorAll('thead th').forEach(th => headers.push(th.innerText));
+    rows.push(headers);
+    table.querySelectorAll('tbody tr').forEach(tr => {
+        const row = [];
+        tr.querySelectorAll('td').forEach(td => row.push(td.innerText));
+        rows.push(row);
+    });
+    let csv = rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `نسب_مالية_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+}
+
+async function exportToWord() {
+    const resultsSection = document.getElementById('resultsSection');
+    if (!resultsSection || resultsSection.style.display === 'none') { alert('الرجاء إجراء التحليل أولاً'); return; }
+    const companyName = document.getElementById('companyName').value || 'الجهة';
+    const dateStr = new Date().toLocaleDateString('ar-EG', { year:'numeric', month:'long', day:'numeric' });
+    const radarCanvas = document.getElementById('radarChart');
+    const barsCanvas = document.getElementById('barsChart');
+    const [radarImg, barsImg] = await Promise.all([
+        html2canvas(radarCanvas, { scale: 2, backgroundColor: '#ffffff' }),
+        html2canvas(barsCanvas, { scale: 2, backgroundColor: '#ffffff' })
+    ]);
+    const radarDataUrl = radarImg.toDataURL('image/png');
+    const barsDataUrl = barsImg.toDataURL('image/png');
+    const tableHtml = document.querySelector('#ratiosTable')?.innerHTML || '';
+    const cardsHtml = document.querySelector('#summaryCards')?.innerHTML || '';
+    const recHtml = document.getElementById('recommendations')?.innerHTML || '';
+    const htmlContent = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>تقرير النسب المالية</title><style>body{font-family:Arial;direction:rtl;margin:2rem;} .header{text-align:center;border-bottom:2px solid #b8860b;} .sub-title{color:#b8860b;margin-top:25px;} table{width:100%;border-collapse:collapse;margin:1rem 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;} .result-card{background:#fefcf6;border:1px solid #b8860b;border-radius:10px;padding:1rem;margin:1rem 0;} .chart-img{border:1px solid #ccc;padding:10px;}</style></head><body>
+        <div class="header"><h1>مجموعة فاروق للاستشارات والأعمال</h1><p>تقرير النسب المالية الشاملة</p><p>الجهة: ${companyName} | التاريخ: ${dateStr}</p></div>
+        <div class="sub-title">📊 ملخص النتائج</div><div class="result-card">${cardsHtml}</div>
+        <div class="sub-title">📋 التفصيل المالي</div>${tableHtml}
+        <div class="sub-title">📈 التحليل البياني</div><div class="chart-container"><img src="${radarDataUrl}" width="400" /><br/><img src="${barsDataUrl}" width="400" /></div>
+        <div class="sub-title">💡 التوصيات</div><div class="result-card">${recHtml}</div>
+        <div style="text-align:center;margin-top:40px;">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال</div>
+    </body></html>`;
+    const blob = new Blob(['\uFEFF' + htmlContent], { type: 'application/msword' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `تقرير_نسب_مالية_${companyName}.doc`;
+    a.click();
+}
+
+// ------------------ الآلة الحاسبة ------------------
+let currentCalcInput = '';
+const calcDisplay = document.getElementById('calcDisplay');
+const modal = document.getElementById('calculatorModal');
+const btnCalc = document.getElementById('calculatorBtn');
+const spanClose = document.getElementsByClassName('close')[0];
+window.handleCalculatorInput = (v) => { currentCalcInput += v; calcDisplay.value = currentCalcInput; };
+window.clearCalculator = () => { currentCalcInput = ''; calcDisplay.value = ''; };
+window.backspaceCalculator = () => { currentCalcInput = currentCalcInput.slice(0,-1); calcDisplay.value = currentCalcInput; };
+window.calculateCalculatorResult = () => { try { let expr = currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/'); let res = eval(expr); calcDisplay.value = res; currentCalcInput = res.toString(); } catch(e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; } };
+function handleKeyboard(e) { if (modal.style.display !== 'block') return; const key = e.key; e.preventDefault(); e.stopPropagation(); if (key >= '0' && key <= '9') handleCalculatorInput(key); else if (key === '.') handleCalculatorInput('.'); else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key); else if (key === 'Enter' || key === '=') calculateCalculatorResult(); else if (key === 'Backspace') backspaceCalculator(); else if (key === 'Escape') modal.style.display = 'none'; else if (key === 'c' || key === 'C') clearCalculator(); }
+document.addEventListener('keydown', handleKeyboard);
+btnCalc.onclick = () => { modal.style.display = 'block'; calcDisplay.value = currentCalcInput; };
+spanClose.onclick = () => modal.style.display = 'none';
+window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; };
+
+document.getElementById('calculateBtn').addEventListener('click', displayResults);
+document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+</script>
+<a href="index.html" style="position: fixed; bottom: 20px; right: 20px; background: rgba(180,133,84,0.9); color: white; padding: 12px 20px; border-radius: 50px; text-decoration: none; font-family: 'Tajawal', sans-serif; font-weight: bold; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 9999; display: flex; align-items: center; gap: 8px; transition: 0.3s;" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';"><i class="fas fa-home"></i> الرئيسية</a>
+</body>
+</html>
