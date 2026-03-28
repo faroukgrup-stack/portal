@@ -40,8 +40,11 @@
 
     <form id="registrationForm">
         <input type="text" name="fullName" placeholder="الاسم الكامل" required>
-        <input type="text" name="username" placeholder="اسم المستخدم (بالإنجليزي)" required>
-        <input type="password" name="password" placeholder="كلمة المرور" required>
+        
+        <!-- حقل البريد الإلكتروني بدلاً من اسم المستخدم العادي -->
+        <input type="email" name="username" placeholder="البريد الإلكتروني الذي تم تسجيله عند دفع الاشتراك mo....@gmail.com" required inputmode="email">
+        
+        <input type="password" name="password" placeholder="كلمة المرور بالانجليزي" required>
         
         <label style="display:block; text-align:right; font-size: 0.8rem; margin-top: 10px; color: #d4af37;">تاريخ انتهاء الاشتراك (تلقائي):</label>
         <input type="text" id="expiryDisplay" readonly>
@@ -73,7 +76,7 @@
         .then(() => {
             document.getElementById('msg').style.display = 'block';
             setTimeout(() => {
-                window.location.href = 'index.html'; // رابط صفحة الدخول الرئيسية
+                window.location.href = 'https://portal.farouk-grup.com/';
             }, 3000);
         })
         .catch(error => {
