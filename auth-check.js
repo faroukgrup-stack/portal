@@ -1,24 +1,26 @@
 /**
  * auth-check.js — مجموعة فاروق للاستشارات والأعمال
- * الإصدار 4.0 — مطابق للتوكن الحقيقي من السيرفر
+ * الإصدار 5.0 — مطابق للتوكن الحقيقي من السيرفر
  * صيغة التوكن: btoa(SECRET_KEY + "|" + email + "|" + expiryDate)
  */
 (function () {
     "use strict";
 
-    /* ─── المفتاح الحقيقي كما يرسله السيرفر ─── */
+    /* ─── الإعدادات ─── */
     const SECRET_KEY = "F@r0ukGr0up_S3cur3_K3y_2026!";
     const LOGIN_PAGE = "index.html";
 
     /* ─── جلب البيانات ─── */
-    const token    = localStorage.getItem("userToken");
-    const userName = localStorage.getItem("userName");
-    const daysLeft = localStorage.getItem("daysLeft");
+    const token     = localStorage.getItem("userToken");
+    const userName  = localStorage.getItem("userName");  // الاسم الكامل
+    const userEmail = localStorage.getItem("userEmail"); // البريد الإلكتروني
+    const daysLeft  = localStorage.getItem("daysLeft");
 
     /* ─── دالة الطرد الكاملة ─── */
     function reject(reason) {
         localStorage.removeItem("userToken");
         localStorage.removeItem("userName");
+        localStorage.removeItem("userEmail");
         localStorage.removeItem("daysLeft");
         localStorage.removeItem("sessionStart");
         console.warn("🚫 Access denied:", reason);
@@ -32,17 +34,23 @@
     }
 
     /* ─── 2. التحقق الصارم من التوكن ─── */
-    // الصيغة الحقيقية: btoa(SECRET_KEY + "|" + email + "|" + expiryDate)
     let isValid = false;
+    let tokenEmail = "";
     try {
         const decoded = atob(token);
         const parts   = decoded.split("|");
 
         if (parts.length === 3) {
             const keyMatch    = parts[0] === SECRET_KEY;
-            const userMatch   = parts[1] === userName;
-            const validExpiry = parts[2].trim().length > 0; // تاريخ انتهاء الاشتراك
-            isValid = keyMatch && userMatch && validExpiry;
+            const validExpiry = parts[2].trim().length > 0;
+            tokenEmail        = parts[1]; // البريد من التوكن
+
+            // إذا كان userEmail محفوظاً نقارنه، وإلا نقبل أي بريد صحيح
+            const emailMatch = userEmail
+                ? parts[1] === userEmail
+                : parts[1].includes("@");
+
+            isValid = keyMatch && emailMatch && validExpiry;
         }
     } catch (e) {
         isValid = false;
@@ -55,19 +63,15 @@
 
     /* ─── 3. التحقق من تاريخ انتهاء الاشتراك ─── */
     try {
-        const decoded    = atob(token);
-        const expiryDate = decoded.split("|")[2]; // مثال: 2026-12-31
+        const expiryDate = atob(token).split("|")[2];
         const expiry     = new Date(expiryDate);
         const today      = new Date();
         today.setHours(0, 0, 0, 0);
-
         if (expiry < today) {
             reject("subscription expired on " + expiryDate);
             return;
         }
-    } catch (e) {
-        // إذا فشل التحقق من التاريخ نتجاوزه
-    }
+    } catch (e) {}
 
     /* ─── 4. التحقق من daysLeft ─── */
     if (daysLeft !== null) {
