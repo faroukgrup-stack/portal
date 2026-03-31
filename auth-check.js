@@ -1,14 +1,14 @@
 /**
  * auth-check.js — مجموعة فاروق للاستشارات والأعمال
- * حماية الوصول لجميع الأدوات — الإصدار 3.0 (صارم)
+ * الإصدار 4.0 — مطابق للتوكن الحقيقي من السيرفر
+ * صيغة التوكن: btoa(SECRET_KEY + "|" + email + "|" + expiryDate)
  */
 (function () {
     "use strict";
 
-    /* ─── الإعدادات ─── */
-    const SECRET_KEY    = "F@roukGrup_S3cur3_K3y_2026!";
-    const LOGIN_PAGE    = "index.html";
-    const SESSION_HOURS = 24;
+    /* ─── المفتاح الحقيقي كما يرسله السيرفر ─── */
+    const SECRET_KEY = "F@r0ukGr0up_S3cur3_K3y_2026!";
+    const LOGIN_PAGE = "index.html";
 
     /* ─── جلب البيانات ─── */
     const token    = localStorage.getItem("userToken");
@@ -32,17 +32,17 @@
     }
 
     /* ─── 2. التحقق الصارم من التوكن ─── */
-    // الصيغة المعتمدة من السيرفر: btoa(SECRET_KEY + "|" + name + "|" + timestamp)
+    // الصيغة الحقيقية: btoa(SECRET_KEY + "|" + email + "|" + expiryDate)
     let isValid = false;
     try {
         const decoded = atob(token);
         const parts   = decoded.split("|");
 
         if (parts.length === 3) {
-            const keyMatch       = parts[0] === SECRET_KEY;
-            const userMatch      = parts[1] === userName;
-            const validTimestamp = !isNaN(parseInt(parts[2], 10)) && parseInt(parts[2], 10) > 0;
-            isValid = keyMatch && userMatch && validTimestamp;
+            const keyMatch    = parts[0] === SECRET_KEY;
+            const userMatch   = parts[1] === userName;
+            const validExpiry = parts[2].trim().length > 0; // تاريخ انتهاء الاشتراك
+            isValid = keyMatch && userMatch && validExpiry;
         }
     } catch (e) {
         isValid = false;
@@ -53,25 +53,27 @@
         return;
     }
 
-    /* ─── 3. انتهاء صلاحية الجلسة (24 ساعة) ─── */
-    const sessionStart = parseInt(localStorage.getItem("sessionStart") || "0", 10);
-    const now          = Date.now();
+    /* ─── 3. التحقق من تاريخ انتهاء الاشتراك ─── */
+    try {
+        const decoded    = atob(token);
+        const expiryDate = decoded.split("|")[2]; // مثال: 2026-12-31
+        const expiry     = new Date(expiryDate);
+        const today      = new Date();
+        today.setHours(0, 0, 0, 0);
 
-    if (sessionStart === 0) {
-        localStorage.setItem("sessionStart", now.toString());
-    } else {
-        const hoursElapsed = (now - sessionStart) / (1000 * 60 * 60);
-        if (hoursElapsed > SESSION_HOURS) {
-            reject("session expired after " + SESSION_HOURS + "h");
+        if (expiry < today) {
+            reject("subscription expired on " + expiryDate);
             return;
         }
+    } catch (e) {
+        // إذا فشل التحقق من التاريخ نتجاوزه
     }
 
-    /* ─── 4. التحقق من انتهاء الاشتراك ─── */
+    /* ─── 4. التحقق من daysLeft ─── */
     if (daysLeft !== null) {
         const days = parseInt(daysLeft, 10);
         if (!isNaN(days) && days <= 0) {
-            reject("subscription expired");
+            reject("subscription expired (daysLeft=0)");
             return;
         }
     }
