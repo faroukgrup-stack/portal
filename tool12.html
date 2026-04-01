@@ -506,6 +506,18 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
     .currency-row select, .currency-row input { width: 100%; }
     .charts-container { grid-template-columns: 1fr; }
 }
+/* إصلاح ظهور العناوين التي تختفي */
+.section-title-sm,
+.panel-header,
+.collapsible span,
+.result-card h4,
+.hero-mini h2 {
+    -webkit-text-fill-color: initial !important;
+    color: var(--accent-soft) !important;
+    background: none !important;
+    background-image: none !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
