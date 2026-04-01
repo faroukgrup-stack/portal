@@ -89,6 +89,18 @@
         .calc-btn.equals { background:rgba(180,133,84,0.3); color:white; grid-column:span 2; }
         .calc-btn.equals:hover { background:rgba(180,133,84,0.5); }
         @media (max-width:768px) { .hero-mini h2 { font-size:2rem; } .featured-badge { width:70px; height:70px; } .featured-badge i { font-size:1.4rem; } .featured-badge span { font-size:0.6rem; } .grid-2 { grid-template-columns:1fr; } .currency-row select, .currency-row input { width:100%; } }
+    /* إصلاح ظهور العناوين التي تختفي */
+.section-title-sm,
+.panel-header,
+.collapsible span,
+.result-card h4,
+.hero-mini h2 {
+    -webkit-text-fill-color: initial !important;
+    color: var(--accent-soft) !important;
+    background: none !important;
+    background-image: none !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
     </style>
 </head>
 <body style="overflow-x: hidden;">
