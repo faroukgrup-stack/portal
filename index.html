@@ -34,7 +34,9 @@
         .whatsapp-link:hover { opacity:1; text-decoration:underline; }
         .login-btn { width:100%; padding:1rem; background:rgba(180,133,84,0.15); border:1px solid var(--border-light); border-radius:60px; font-family:'Tajawal',sans-serif; font-size:1.2rem; font-weight:700; color:var(--accent-soft); cursor:pointer; transition:var(--transition); display:flex; align-items:center; justify-content:center; gap:0.8rem; backdrop-filter:blur(10px); margin-top:0.5rem; }
         .login-btn:hover { background:rgba(180,133,84,0.3); border-color:var(--accent-glow); color:#fff; box-shadow:0 0 25px rgba(180,133,84,0.4); transform:translateY(-3px); }
-        .error-msg { color:#f87171; margin-top:1.2rem; font-weight:600; }
+        .error-msg { color:#f87171; margin-top:1.2rem; font-weight:600; font-size:0.85rem; }
+        .error-msg a { color:var(--accent-soft); text-decoration:underline; transition:var(--transition); }
+        .error-msg a:hover { color:#fff; text-shadow:0 0 4px var(--accent-glow); }
         .dashboard { max-width:1500px; width:100%; margin:2rem auto; padding:0 2rem; position:relative; z-index:10; display:none; }
         .header-bar { display:flex; justify-content:space-between; align-items:center; background:var(--bg-panel); backdrop-filter:blur(18px); border:1px solid var(--border-light); border-radius:80px; padding:0.8rem 2rem; margin-bottom:2rem; flex-wrap:wrap; gap:1.5rem; box-shadow:var(--shadow-soft); }
         .datetime { display:flex; gap:2rem; color:var(--text-muted); font-family:'Inter',sans-serif; font-size:0.95rem; }
@@ -114,7 +116,7 @@
             <input type="password" id="passwordInput" class="login-input" placeholder="كلمة المرور">
             <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> دخول</button>
             <a href="https://wa.me/905550196682" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i> نسيت كلمة المرور؟ اضغط هنا</a>
-            <div class="error-msg" id="errorMsg" style="font-size:0.8rem; margin-top:10px;"></div>
+            <div class="error-msg" id="errorMsg" style="margin-top:10px;"></div>
         </div>
     </div>
 
@@ -226,7 +228,7 @@
 
             loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري التحقق...';
             loginBtn.disabled = true;
-            errorMsg.textContent = '';
+            errorMsg.innerHTML = ''; // استخدام innerHTML لمسح أي محتوى سابق
 
             try {
                 const formData = new FormData();
@@ -251,13 +253,14 @@
                     dashboard.style.display = 'block';
                     loadAllData();
                 } else if (result.status === 'expired') {
-                    errorMsg.textContent = '❌ انتهى اشتراكك. يرجى التواصل مع الدعم.';
+                    // إضافة الرابط "من هنا" كما هو مطلوب
+                    errorMsg.innerHTML = '❌ انتهى اشتراكك. يرجى تجديد الإشتراك. <a href="https://training.farouk-grup.com/home/Our-store" target="_blank" style="color: #cfa776; text-decoration: underline; font-weight: bold;">من هنا</a>';
                 } else {
-                    errorMsg.textContent = '❌ ' + (result.message || 'بيانات الدخول غير صحيحة');
+                    errorMsg.innerHTML = '❌ ' + (result.message || 'بيانات الدخول غير صحيحة');
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                errorMsg.textContent = '❌ حدث خطأ في الاتصال بالسيرفر. تأكد من اتصالك بالإنترنت.';
+                errorMsg.innerHTML = '❌ حدث خطأ في الاتصال بالسيرفر. تأكد من اتصالك بالإنترنت.';
             } finally {
                 loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
                 loginBtn.disabled = false;
@@ -275,7 +278,7 @@
             loginOverlay.style.display = 'flex';
             dashboard.style.display = 'none';
             passwordInput.value = '';
-            errorMsg.textContent = '';
+            errorMsg.innerHTML = '';
         });
 
         window.addEventListener('load', () => {
