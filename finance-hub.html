@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المنصة الشاملة | 19 أداة مالية وتشغيلية لرواد الأعمال والمدراء</title>
+    <meta name="description" content="المنصة الشاملة لرواد الأعمال والمدراء: 19 أداة مالية متكاملة مع رسوم بيانية وتقارير وتوصيات لاتخاذ قرارات مالية صحيحة.">
+    <meta name="keywords" content="دراسة جدوى, حاسبة مالية, تعادل, تدفق نقدي, تحليل مخاطر, HACCP, تكاليف, استثمار, جدولة قروض, منصة مطاعم">
+    <meta name="author" content="Farouk Azem">
+
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --navy-900: #0a1628;
+            --navy-800: #0f1f3a;
+            --navy-700: #15294d;
+            --navy-600: #1b3360;
+            --blue-500: #2563eb;
+            --blue-400: #3b82f6;
+            --blue-300: #60a5fa;
+            --blue-100: #dbeafe;
+            --blue-50: #eff6ff;
+            --gold: #ca8a04;
+            --gold-light: #eab308;
+            --gold-pale: #fef9c3;
+            --teal-500: #14b8a6;
+            --teal-400: #2dd4bf;
+            --teal-100: #ccfbf1;
+            --red-500: #ef4444;
+            --red-100: #fee2e2;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-500: #64748b;
+            --gray-700: #334155;
+            --gray-900: #0f172a;
+            --light: #ffffff;
+            --shadow-card: 0 4px 24px rgba(10,22,40,0.08);
+            --shadow-card-hover: 0 12px 40px rgba(10,22,40,0.14);
+            --shadow-btn: 0 6px 20px rgba(37,99,235,0.35);
+            --shadow-btn-hover: 0 10px 30px rgba(37,99,235,0.5);
+            --radius-sm: 12px;
+            --radius: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --radius-full: 50px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        .container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+        /* ========== TYPOGRAPHY ========== */
+        .section-label {
+            display: inline-block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--blue-500);
+            background: var(--blue-50);
+            padding: 6px 18px;
+            border-radius: var(--radius-full);
+            margin-bottom: 16px;
+        }
+        .section-heading {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: var(--navy-900);
+            margin-bottom: 18px;
+            line-height: 1.35;
+        }
+        .section-heading span { color: var(--blue-500); }
+        .section-subtitle {
+            font-size: 1.15rem;
+            color: var(--gray-500);
+            max-width: 680px;
+            margin: 0 auto 48px;
+        }
+        .text-center { text-align: center; }
+
+        /* ========== HEADER ========== */
+        .site-header {
+            background: var(--navy-900);
+            padding: 18px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(12px);
+        }
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--blue-500), var(--teal-500));
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #fff;
+        }
+        .brand-text {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #fff;
+        }
+        .brand-text span { color: var(--gold-light); }
+        .header-cta {
+            background: var(--blue-500);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-full);
+            padding: 10px 24px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .header-cta:hover {
+            background: var(--blue-400);
+            box-shadow: var(--shadow-btn);
+            transform: translateY(-2px);
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            background: linear-gradient(170deg, var(--navy-900) 0%, var(--navy-700) 60%, #0f1f3a 100%);
+            padding: 72px 0 80px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: -120px;
+            left: -120px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .hero-grid {
+            display: flex;
+            align-items: center;
+            gap: 56px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-content { flex: 1.1; min-width: 320px; }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            padding: 8px 22px;
+            border-radius: var(--radius-full);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--blue-300);
+            backdrop-filter: blur(8px);
+        }
+        .hero-badge i { color: var(--gold-light); }
+        .hero-content h1 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            line-height: 1.35;
+            margin-bottom: 20px;
+        }
+        .hero-content h1 span { color: var(--gold-light); }
+        .hero-content .hero-desc {
+            font-size: 1.15rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 32px;
+            line-height: 1.8;
+        }
+        .hero-stats {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+        .hero-stat { text-align: center; }
+        .hero-stat .stat-num {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--gold-light);
+        }
+        .hero-stat .stat-lbl { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+        .hero-price-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 18px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-lg);
+            padding: 18px 28px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(8px);
+        }
+        .hero-price {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff;
+        }
+        .hero-price small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.55);
+        }
+        .hero-price-old {
+            font-size: 1rem;
+            text-decoration: line-through;
+            color: rgba(255,255,255,0.4);
+        }
+        .hero-badge-sub {
+            background: var(--teal-500);
+            color: #000;
+            font-weight: 800;
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+        }
+        .hero-trust {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+        }
+        .hero-trust span { display: flex; align-items: center; gap: 7px; }
+        .hero-trust i { color: var(--teal-400); }
+        .hero-visual {
+            flex: 0.9;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .hero-visual img {
+            width: 100%;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .hero-visual-row {
+            display: flex;
+            gap: 14px;
+        }
+        .hero-visual-row img {
+            width: 50%;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            border-radius: var(--radius-full);
+            padding: 16px 36px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: var(--blue-500);
+            color: #fff;
+            box-shadow: var(--shadow-btn);
+        }
+        .btn-primary:hover {
+            background: var(--blue-400);
+            box-shadow: var(--shadow-btn-hover);
+            transform: translateY(-3px);
+        }
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #1e1e1e;
+            box-shadow: 0 6px 22px rgba(202,138,4,0.4);
+        }
+        .btn-gold:hover {
+            box-shadow: 0 10px 32px rgba(202,138,4,0.55);
+            transform: translateY(-3px);
+        }
+        .btn-outline-light {
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.3);
+            color: #fff;
+        }
+        .btn-outline-light:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        /* ========== PROBLEM SECTION ========== */
+        .problem-section {
+            padding: 80px 0;
+            background: var(--light);
+        }
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+        .problem-card {
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 30px 26px;
+            transition: var(--transition);
+            border-top: 4px solid transparent;
+        }
+        .problem-card:hover {
+            border-top-color: var(--red-500);
+            box-shadow: var(--shadow-card-hover);
+        }
+        .problem-card .icon-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--red-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: var(--red-500);
+            margin-bottom: 18px;
+        }
+        .problem-card h4 { font-size: 1.15rem; color: var(--navy-900); margin-bottom: 10px; }
+        .problem-card p { color: var(--gray-500); font-size: 0.95rem; }
+
+        /* ========== SOLUTION / VALUE SECTION ========== */
+        .value-section {
+            padding: 80px 0;
+            background: var(--gray-50);
+        }
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 28px;
+            margin-top: 32px;
+        }
+        .value-card {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 32px 24px;
+            text-align: center;
+            border: 1px solid var(--gray-200);
+            transition: var(--transition);
+        }
+        .value-card:hover {
+            box-shadow: var(--shadow-card-hover);
+            border-color: var(--blue-300);
+            transform: translateY(-6px);
+        }
+        .value-card .vc-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--blue-50);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--blue-500);
+            margin: 0 auto 20px;
+        }
+        .value-card h4 { font-size: 1.15rem; color: var(--navy-900); margin-bottom: 10px; }
+        .value-card p { color: var(--gray-500); font-size: 0.95rem; }
+
+        /* ========== TOOLS GRID ========== */
+        .tools-section {
+            padding: 80px 0;
+            background: var(--light);
+        }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 18px;
+            margin-top: 32px;
+        }
+        .tool-card {
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: var(--transition);
+        }
+        .tool-card:hover {
+            box-shadow: var(--shadow-card-hover);
+            border-color: var(--blue-300);
+            transform: translateY(-3px);
+        }
+        .tool-num {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--blue-50);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: var(--blue-500);
+            flex-shrink: 0;
+        }
+        .tool-card:nth-child(2n) .tool-num {
+            background: var(--teal-100);
+            color: var(--teal-500);
+        }
+        .tool-card:nth-child(3n) .tool-num {
+            background: var(--gold-pale);
+            color: var(--gold);
+        }
+        .tool-card h5 { font-size: 1rem; color: var(--navy-900); margin-bottom: 4px; }
+        .tool-card .tool-tag {
+            font-size: 0.78rem;
+            color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tool-card .tool-tag i { font-size: 0.7rem; color: var(--blue-500); }
+
+        /* ========== OUTPUTS SECTION ========== */
+        .outputs-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-700) 100%);
+            color: #fff;
+        }
+        .outputs-section .section-heading { color: #fff; }
+        .outputs-section .section-heading span { color: var(--gold-light); }
+        .outputs-section .section-label {
+            background: rgba(255,255,255,0.08);
+            color: var(--blue-300);
+        }
+        .outputs-section .section-subtitle { color: rgba(255,255,255,0.6); }
+        .outputs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 28px;
+            margin: 40px 0 48px;
+        }
+        .output-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius);
+            padding: 30px 24px;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            transition: var(--transition);
+        }
+        .output-card:hover { background: rgba(255,255,255,0.08); }
+        .output-card .oc-icon {
+            font-size: 2.4rem;
+            margin-bottom: 18px;
+        }
+        .output-card h4 { font-size: 1.2rem; margin-bottom: 10px; }
+        .output-card p { color: rgba(255,255,255,0.6); font-size: 0.95rem; }
+        .output-gallery {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .output-gallery img {
+            width: 30%;
+            min-width: 260px;
+            border-radius: var(--radius);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+
+        /* ========== SCREENSHOTS SECTION ========== */
+        .screenshots-section {
+            padding: 80px 0;
+            background: var(--gray-50);
+        }
+        .screenshots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+        .screenshot-card {
+            background: #fff;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-card);
+            transition: var(--transition);
+        }
+        .screenshot-card:hover {
+            box-shadow: var(--shadow-card-hover);
+            transform: translateY(-4px);
+        }
+        .screenshot-card img {
+            width: 100%;
+            display: block;
+        }
+        .screenshot-card .sc-caption {
+            padding: 14px 18px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--navy-800);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .screenshot-card .sc-caption i { color: var(--blue-500); }
+
+        /* ========== AUDIENCE SECTION ========== */
+        .audience-section {
+            padding: 80px 0;
+            background: var(--light);
+        }
+        .audience-grid {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 32px;
+        }
+        .audience-card {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+            text-align: center;
+            padding: 36px 24px;
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+        .audience-card:hover {
+            border-color: var(--blue-300);
+            box-shadow: var(--shadow-card-hover);
+            transform: translateY(-6px);
+        }
+        .audience-icon {
+            font-size: 2.8rem;
+            margin-bottom: 18px;
+        }
+        .audience-card h4 { font-size: 1.2rem; color: var(--navy-900); margin-bottom: 8px; }
+        .audience-card p { color: var(--gray-500); font-size: 0.9rem; }
+
+        /* ========== FAQ ========== */
+        .faq-section {
+            padding: 80px 0;
+            background: var(--gray-50);
+        }
+        .faq-grid {
+            max-width: 800px;
+            margin: 32px auto 0;
+        }
+        .faq-item {
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .faq-q {
+            padding: 20px 24px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            color: var(--navy-900);
+            transition: var(--transition);
+            user-select: none;
+        }
+        .faq-q i { transition: transform 0.3s; color: var(--blue-500); }
+        .faq-item.active .faq-q i { transform: rotate(180deg); }
+        .faq-a {
+            padding: 0 24px 20px;
+            color: var(--gray-500);
+            display: none;
+        }
+        .faq-item.active .faq-a { display: block; }
+
+        /* ========== CTA ========== */
+        .cta-section {
+            padding: 72px 0;
+            background: linear-gradient(150deg, #0a1628 0%, #15294d 100%);
+            color: #fff;
+            text-align: center;
+        }
+        .cta-section h3 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin-bottom: 16px;
+        }
+        .cta-section p { max-width: 600px; margin: 0 auto 32px; opacity: 0.8; font-size: 1.1rem; }
+        .cta-price-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .cta-price {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: var(--gold-light);
+        }
+        .cta-price small { font-size: 1rem; color: rgba(255,255,255,0.5); }
+        .cta-old {
+            font-size: 1.1rem;
+            text-decoration: line-through;
+            color: rgba(255,255,255,0.35);
+        }
+
+        /* ========== FOOTER ========== */
+        .site-footer {
+            background: var(--navy-900);
+            color: rgba(255,255,255,0.55);
+            padding: 36px 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .site-footer span { color: var(--gold-light); }
+
+        /* ========== MODAL ========== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10,22,40,0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            visibility: hidden;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-card {
+            background: #fff;
+            padding: 28px;
+            border-radius: var(--radius-lg);
+            width: 92%;
+            max-width: 850px;
+            max-height: 92vh;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            overflow-y: auto;
+        }
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--gray-500);
+            transition: var(--transition);
+            z-index: 10;
+        }
+        .modal-close:hover { color: var(--navy-900); }
+        .modal-card h2 {
+            text-align: center;
+            margin-bottom: 22px;
+            color: var(--navy-900);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.6rem;
+        }
+        #paymentIframe {
+            width: 100%;
+            height: 580px;
+            border: none;
+            border-radius: var(--radius);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .section-heading { font-size: 1.8rem; }
+            .hero-content h1 { font-size: 2rem; }
+            .hero-grid { gap: 36px; }
+            .hero-stats { gap: 18px; }
+            .hero-visual-row { flex-direction: column; }
+            .hero-visual-row img { width: 100%; }
+            .output-gallery img { width: 100%; min-width: 0; }
+            .tools-grid { grid-template-columns: 1fr; }
+            .cta-section h3 { font-size: 1.8rem; }
+            .header-cta { font-size: 0.85rem; padding: 8px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="#" class="brand">
+            <div class="brand-icon"><i class="fas fa-chart-pie"></i></div>
+            <div class="brand-text">المنصة <span>المالية الشاملة</span></div>
+        </a>
+        <button class="header-cta" id="openModalBtnHeader">
+            <i class="fas fa-rocket"></i> ابدأ الاشتراك
+        </button>
+    </div>
+</header>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+    <div class="container hero-grid">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-crown"></i> المنصة المالية الشاملة
+            </div>
+            <h1>19 أداة مالية متكاملة <span>لاتخاذ قرارات ذكية</span> بثقة وأرقام</h1>
+            <p class="hero-desc">
+                المنصة الأولى من نوعها التي تمنح رجال الأعمال والمدراء ورواد الأعمال
+                أدوات مالية وتشغيلية شاملة مع <strong>رسوم بيانية وتقارير تحليلية وتوصيات</strong>
+                قابلة للتنفيذ الفوري.
+            </p>
+            <div class="hero-stats">
+                <div class="hero-stat"><div class="stat-num">19</div><div class="stat-lbl">أداة متخصصة</div></div>
+                <div class="hero-stat"><div class="stat-num">4</div><div class="stat-lbl">أنواع تقارير</div></div>
+                <div class="hero-stat"><div class="stat-num">24/7</div><div class="stat-lbl">متاحة دائماً</div></div>
+            </div>
+            <div class="hero-price-box">
+                <span class="hero-price-old">$19.99</span>
+                <span class="hero-price">$7<small>/شهرياً</small></span>
+                <span class="hero-badge-sub">توفير 65%</span>
+            </div>
+            <button class="btn btn-gold" id="openModalBtn"><i class="fas fa-rocket"></i> اشترك الآن بـ 7$ شهرياً</button>
+            <div class="hero-trust" style="margin-top:20px;">
+                <span><i class="fas fa-shield-alt"></i> لا يتجدد تلقائياً</span>
+                <span><i class="fas fa-undo-alt"></i> ضمان الإستفادة</span>
+                <span><i class="fas fa-lock"></i> دفع آمن </span>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <img src="https://lh3.googleusercontent.com/d/1VjYS7D9h69CUHmpAvZjsLXdY_GUOgIuT" alt="المنصة الشاملة" loading="lazy">
+            <div class="hero-visual-row">
+                <img src="https://lh3.googleusercontent.com/d/1kwa8L_-8x8uIw43dl5oHqqDLs-91uWPf" alt="الرسوم البيانية" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1n7H4U0st_J6mTNvznEvFpzP6-l1XxvN_" alt="التحليل المالي" loading="lazy">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== PROBLEM ==================== -->
+<section class="problem-section">
+    <div class="container text-center">
+        <span class="section-label">التحدي</span>
+        <h2 class="section-heading">هل تواجه صعوبة في <span>اتخاذ القرارات المالية</span> لمشروعك؟</h2>
+        <p class="section-subtitle">بدون أدوات دقيقة، تصبح القرارات المالية مجازفة قد تكلفك الكثير. المنصة تمنحك الرؤية الواضحة التي تحتاجها.</p>
+        <div class="problem-grid">
+            <div class="problem-card">
+                <div class="icon-circle"><i class="fas fa-file-excel"></i></div>
+                <h4>جداول بيانات مرهقة وغير دقيقة</h4>
+                <p>تقضي ساعات في بناء نماذج مالية معقدة على Excel دون ضمان دقة النتائج أو خلوها من الأخطاء البشرية.</p>
+            </div>
+            <div class="problem-card">
+                <div class="icon-circle"><i class="fas fa-chart-simple"></i></div>
+                <h4>غياب الرسوم البيانية التوضيحية</h4>
+                <p>الأرقام وحدها لا تكفي. تحتاج إلى رسوم بيانية تفاعلية تكشف لك الاتجاهات والأنماط الخفية في أدائك المالي.</p>
+            </div>
+            <div class="problem-card">
+                <div class="icon-circle"><i class="fas fa-circle-question"></i></div>
+                <h4>افتقار التوصيات العملية</h4>
+                <p>معظم الأدوات تعطيك أرقاماً فقط. أنت تحتاج إلى توصيات واضحة وقابلة للتنفيذ لتحسين أداء مشروعك.</p>
+            </div>
+            <div class="problem-card">
+                <div class="icon-circle"><i class="fas fa-triangle-exclamation"></i></div>
+                <h4>تعدد الأدوات وتشتت البيانات</h4>
+                <p>تضطر لاستخدام عدة منصات منفصلة لكل دراسة أو حاسبة، مما يشتت بياناتك ويصعّب عليك الرؤية الشاملة.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== VALUE ==================== -->
+<section class="value-section">
+    <div class="container text-center">
+        <span class="section-label">الحل</span>
+        <h2 class="section-heading">منصة واحدة <span>شاملة</span> تغنيك عن كل الأدوات المنفصلة</h2>
+        <p class="section-subtitle">19 أداة مالية وتشغيلية في منصة واحدة تمنحك كل ما تحتاجه لاتخاذ قرارات مالية صحيحة مبنية على بيانات دقيقة ورسوم بيانية وتوصيات.</p>
+        <div class="value-grid">
+            <div class="value-card">
+                <div class="vc-icon"><i class="fas fa-chart-line"></i></div>
+                <h4>رسوم بيانية تفاعلية</h4>
+                <p>تصور كامل لبياناتك المالية يسهّل عليك فهم الأداء واتخاذ القرار بسرعة.</p>
+            </div>
+            <div class="value-card">
+                <div class="vc-icon"><i class="fas fa-file-invoice"></i></div>
+                <h4>تقارير شاملة</h4>
+                <p>تقارير مالية وتحليلية جاهزة للطباعة والعرض على المستثمرين وأصحاب القرار.</p>
+            </div>
+            <div class="value-card">
+                <div class="vc-icon"><i class="fas fa-lightbulb"></i></div>
+                <h4>توصيات عامة</h4>
+                <p>تحصل على توصيات استرشادية مبنية على نتائج تحليلاتك تساعدك في توجيه قراراتك.</p>
+            </div>
+            <div class="value-card">
+                <div class="vc-icon"><i class="fas fa-cloud"></i></div>
+                <h4>سحابية بالكامل</h4>
+                <p>لا تحتاج تثبيت أي برامج. كل الأدوات تعمل مباشرة من متصفحك على أي جهاز.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== TOOLS ==================== -->
+<section class="tools-section">
+    <div class="container text-center">
+        <span class="section-label">الأدوات</span>
+        <h2 class="section-heading">19 أداة مالية <span>وتشغيلية</span> في منصة واحدة</h2>
+        <p class="section-subtitle">كل أداة صُممت بعناية لتخدم جانباً محدداً من احتياجاتك المالية والإدارية والتشغيلية.</p>
+        <div class="tools-grid">
+            <div class="tool-card"><div class="tool-num">01</div><div><h5>دراسة جدوى مالية شاملة</h5><div class="tool-tag"><i class="fas fa-chart-pie"></i> تحليل مالي</div></div></div>
+            <div class="tool-card"><div class="tool-num">02</div><div><h5>حساب التكاليف للمطاعم</h5><div class="tool-tag"><i class="fas fa-calculator"></i> تكاليف</div></div></div>
+            <div class="tool-card"><div class="tool-num">03</div><div><h5>دراسة الجدوى الفنية المتقدمة للمطاعم</h5><div class="tool-tag"><i class="fas fa-microchip"></i> فنية</div></div></div>
+            <div class="tool-card"><div class="tool-num">04</div><div><h5>دراسة الجدوى التسويقية الشاملة</h5><div class="tool-tag"><i class="fas fa-bullhorn"></i> تسويقية</div></div></div>
+            <div class="tool-card"><div class="tool-num">05</div><div><h5>حساب العائد على الاستثمار للعقاري</h5><div class="tool-tag"><i class="fas fa-building"></i> عقاري</div></div></div>
+            <div class="tool-card"><div class="tool-num">06</div><div><h5>محاكاة المخاطر</h5><div class="tool-tag"><i class="fas fa-shield-virus"></i> مخاطر</div></div></div>
+            <div class="tool-card"><div class="tool-num">07</div><div><h5>حاسبة نقطة التعادل</h5><div class="tool-tag"><i class="fas fa-balance-scale"></i> تعادل</div></div></div>
+            <div class="tool-card"><div class="tool-num">08</div><div><h5>حاسبة التدفق النقدي</h5><div class="tool-tag"><i class="fas fa-money-bill-wave"></i> نقدي</div></div></div>
+            <div class="tool-card"><div class="tool-num">09</div><div><h5>حاسبة الإهلاك</h5><div class="tool-tag"><i class="fas fa-arrow-trend-down"></i> أصول</div></div></div>
+            <div class="tool-card"><div class="tool-num">10</div><div><h5>متوسط تكلفة رأس المال المرجح</h5><div class="tool-tag"><i class="fas fa-percent"></i> WACC</div></div></div>
+            <div class="tool-card"><div class="tool-num">11</div><div><h5>حاسبة العائد على الاستثمار</h5><div class="tool-tag"><i class="fas fa-chart-simple"></i> ROI</div></div></div>
+            <div class="tool-card"><div class="tool-num">12</div><div><h5>حاسبة جدولة القروض</h5><div class="tool-tag"><i class="fas fa-calendar-alt"></i> تمويل</div></div></div>
+            <div class="tool-card"><div class="tool-num">13</div><div><h5>حاسبة تكلفة العمالة المثالية</h5><div class="tool-tag"><i class="fas fa-users"></i> موارد بشرية</div></div></div>
+            <div class="tool-card"><div class="tool-num">14</div><div><h5>نظام تحليل المخاطر ونقاط التحكم الحرجة</h5><div class="tool-tag"><i class="fas fa-temperature-high"></i> HACCP</div></div></div>
+            <div class="tool-card"><div class="tool-num">15</div><div><h5>إجراءات التشغيل القياسية</h5><div class="tool-tag"><i class="fas fa-clipboard-list"></i> SOP</div></div></div>
+            <div class="tool-card"><div class="tool-num">16</div><div><h5>آلة حاسبة إدارية</h5><div class="tool-tag"><i class="fas fa-gear"></i> إدارية</div></div></div>
+            <div class="tool-card"><div class="tool-num">17</div><div><h5>تحليل نقطة التعادل متعددة المنتجات</h5><div class="tool-tag"><i class="fas fa-layer-group"></i> متعدد</div></div></div>
+            <div class="tool-card"><div class="tool-num">18</div><div><h5>حاسبة النسب المالية الشاملة</h5><div class="tool-tag"><i class="fas fa-scale-balanced"></i> نسب مالية</div></div></div>
+            <div class="tool-card"><div class="tool-num">19</div><div><h5>التنبؤ المالي المتقدم</h5><div class="tool-tag"><i class="fas fa-crystal-ball"></i> تنبؤ</div></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== OUTPUTS ==================== -->
+<section class="outputs-section">
+    <div class="container text-center">
+        <span class="section-label">المخرجات</span>
+        <h2 class="section-heading">رسوم بيانية <span>وتقارير وتوصيات</span> في متناول يدك</h2>
+        <p class="section-subtitle">كل أداة تمنحك مخرجات احترافية: رسوم بيانية تفاعلية، تقارير شاملة، وتوصيات عامة يمكنك الاستفادة منها فوراً.</p>
+        <div class="outputs-grid">
+            <div class="output-card">
+                <div class="oc-icon">📊</div>
+                <h4>رسوم بيانية تفاعلية</h4>
+                <p>مخططات ديناميكية توضح التدفقات النقدية ونقاط التعادل والعوائد بشكل بصري سهل الفهم.</p>
+            </div>
+            <div class="output-card">
+                <div class="oc-icon">📋</div>
+                <h4>تقارير تحليلية شاملة</h4>
+                <p>تقارير مالية كاملة يمكن تصديرها ومشاركتها مع الشركاء والمستثمرين وأصحاب القرار.</p>
+            </div>
+            <div class="output-card">
+                <div class="oc-icon">💡</div>
+                <h4>توصيات عامة قابلة للتنفيذ</h4>
+                <p>تحصل على توصيات استرشادية عملية مبنية على نتائج تحليلاتك لتتخذ قراراتك بثقة.</p>
+            </div>
+        </div>
+        <div class="output-gallery">
+            <img src="https://lh3.googleusercontent.com/d/1kwa8L_-8x8uIw43dl5oHqqDLs-91uWPf" alt="الرسوم البيانية" loading="lazy">
+            <img src="https://lh3.googleusercontent.com/d/1p6dxYtdNbVM-1kBAbWvZ9CDkEP3h03-R" alt="التدفقات النقدية" loading="lazy">
+            <img src="https://lh3.googleusercontent.com/d/1n7H4U0st_J6mTNvznEvFpzP6-l1XxvN_" alt="التحليل المالي" loading="lazy">
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SCREENSHOTS ==================== -->
+<section class="screenshots-section">
+    <div class="container text-center">
+        <span class="section-label">معاينة</span>
+        <h2 class="section-heading">لمحة من داخل <span>المنصة</span></h2>
+        <p class="section-subtitle">شاهد كيف تبدو الأدوات والتقارير والرسوم البيانية داخل المنصة.</p>
+        <div class="screenshots-grid">
+            <div class="screenshot-card">
+                <img src="https://lh3.googleusercontent.com/d/1kwa8L_-8x8uIw43dl5oHqqDLs-91uWPf" alt="الرسوم البيانية التفاعلية" loading="lazy">
+                <div class="sc-caption"><i class="fas fa-chart-bar"></i> الرسوم البيانية التفاعلية</div>
+            </div>
+            <div class="screenshot-card">
+                <img src="https://lh3.googleusercontent.com/d/1n7H4U0st_J6mTNvznEvFpzP6-l1XxvN_" alt="التحليل المالي المفصل" loading="lazy">
+                <div class="sc-caption"><i class="fas fa-magnifying-glass-chart"></i> التحليل المالي المفصل</div>
+            </div>
+            <div class="screenshot-card">
+                <img src="https://lh3.googleusercontent.com/d/1p6dxYtdNbVM-1kBAbWvZ9CDkEP3h03-R" alt="التدفقات النقدية" loading="lazy">
+                <div class="sc-caption"><i class="fas fa-water"></i> التدفقات النقدية والجداول</div>
+            </div>
+            <div class="screenshot-card">
+                <img src="https://lh3.googleusercontent.com/d/1JUgqA6ZiUH1JD6M2Wu3VK1l73XTFiv6I" alt="المنصة الشاملة" loading="lazy">
+                <div class="sc-caption"><i class="fas fa-desktop"></i> لوحة التحكم الرئيسية</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== AUDIENCE ==================== -->
+<section class="audience-section">
+    <div class="container text-center">
+        <span class="section-label">الجمهور</span>
+        <h2 class="section-heading">صُممت <span>لكل</span> من يحتاج قرارات مالية دقيقة</h2>
+        <p class="section-subtitle">سواء كنت تبدأ مشروعك الأول أو تدير سلسلة مطاعم، المنصة تمنحك الأدوات التي تحتاجها.</p>
+        <div class="audience-grid">
+            <div class="audience-card">
+                <div class="audience-icon">🚀</div>
+                <h4>رواد الأعمال</h4>
+                <p>أدرس جدوى فكرتك واحسب تكاليفك وتدفقاتك النقدية قبل أن تنفق أول دولار.</p>
+            </div>
+            <div class="audience-card">
+                <div class="audience-icon">📈</div>
+                <h4>المدراء التنفيذيون</h4>
+                <p>راقب أداء مشروعك، وحلل نقطة التعادل، واحصل على توصيات لتحسين الربحية.</p>
+            </div>
+            <div class="audience-card">
+                <div class="audience-icon">🏢</div>
+                <h4>رجال الأعمال والمستثمرون</h4>
+                <p>قيم الفرص الاستثمارية بدقة، واحسب العوائد المتوقعة، وقارن بين السيناريوهات.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ==================== FAQ ==================== -->
+<section class="faq-section">
+    <div class="container text-center">
+        <span class="section-label">الأسئلة الشائعة</span>
+        <h2 class="section-heading">كل ما تريد <span>معرفته</span> عن المنصة</h2>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <div class="faq-q"><span>هل المنصة مناسبة للمبتدئين في عالم المال والأعمال؟</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">نعم بالتأكيد. المنصة صُممت لتكون سهلة الاستخدام وتناسب جميع المستويات. كل أداة تأتي مع شرح واضح للمدخلات والمخرجات، بالإضافة إلى توصيات عامة تساعدك على فهم النتائج واتخاذ القرار حتى لو لم تكن خبيراً مالياً.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q"><span>ما الذي أحصل عليه بالضبط مقابل الاشتراك الشهري؟</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">تحصل على وصول كامل لجميع الأدوات الـ 19 دون استثناء، مع إمكانية استخدام كل أداة بعدد غير محدود من المرات. كل أداة تمنحك رسوماً بيانية تفاعلية وتقارير شاملة وتوصيات عامة. الاشتراك شهري ولا يتجدد تلقائياً.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q"><span>هل يمكنني تصدير التقارير والرسوم البيانية؟</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">نعم، المنصة تتيح لك تصدير التقارير بصيغة وورد أو أكسل ومشاركتها مع فريق العمل أو المستثمرين أو الشركاء.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q"><span>هل يوجد ضمان أو فترة تجربة مجانية؟</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">لا يوجد فترة مجانية ولكن ثقتنا كبيرة في قيمة الأدوات التي نقدمها ويمكنك التواصل معنا لأي استفسار.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q"><span>هل أحتاج إلى تثبيت أي برامج على جهازي؟</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">لا تحتاج إلى أي تثبيت. المنصة سحابية بالكامل وتعمل مباشرة من متصفحك على أي جهاز: حاسوب، جهاز لوحي، أو هاتف ذكي. كل ما تحتاجه هو اتصال بالإنترنت.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== CTA ==================== -->
+<section class="cta-section">
+    <div class="container">
+        <h3>لا تترك قراراتك المالية للتخمين</h3>
+        <p>انضم إلى مئات من رواد الأعمال والمدراء ورجال الأعمال الذين يستخدمون المنصة لاتخاذ قرارات مالية صحيحة مبنية على بيانات دقيقة ورسوم بيانية وتوصيات.</p>
+        <div class="cta-price-row">
+            <span class="cta-old">$19.99</span>
+            <span class="cta-price">$7<small>/شهرياً</small></span>
+        </div>
+        <button class="btn btn-gold" id="openModalBtn2"><i class="fas fa-rocket"></i> اشترك الآن وابدأ التحليل</button>
+        <p style="margin-top:18px; font-size:0.9rem; opacity:0.65;"><i class="fas fa-lock"></i> دفع آمن  – وصول فوري لجميع الأدوات</p>
+    </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="site-footer">
+    <div class="container">
+        <p>© 2026 مجموعة فاروق للاستشارات والأعمال. جميع الحقوق محفوظة.</p>
+        <p style="margin-top:10px;"><span>المنصة المالية الشاملة</span> – 19 أداة مالية وتشغيلية لرواد الأعمال والمدراء.</p>
+    </div>
+</footer>
+
+<!-- ==================== MODAL ==================== -->
+<div class="modal-overlay" id="paymentModal">
+    <div class="modal-card">
+        <span class="modal-close" id="closeModalBtn">&times;</span>
+        <h2><i class="fas fa-lock" style="margin-left: 8px;"></i> إتمام الاشتراك الشهري – 7$</h2>
+        <iframe id="paymentIframe" src="" allow="payment" allowfullscreen title="نافذة الدفع"></iframe>
+        <p style="text-align:center; margin-top:14px; color:var(--gray-500); font-size:0.9rem;">
+            بعد الدفع بنجاح، ستحصل على وصول فوري لجميع الأدوات الـ 19.
+        </p>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const PAYMENT_LINK = "https://alfan.link/faroukazem?digital=dgnbcq";
+        const modal = document.getElementById('paymentModal');
+        const iframe = document.getElementById('paymentIframe');
+        const openBtns = document.querySelectorAll('#openModalBtn, #openModalBtn2, #openModalBtnHeader');
+        const closeBtn = document.getElementById('closeModalBtn');
+
+        function openModal() {
+            iframe.src = PAYMENT_LINK;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        openBtns.forEach(btn => btn.addEventListener('click', openModal));
+
+        function closeModal() {
+            modal.classList.remove('active');
+            iframe.src = '';
+            document.body.style.overflow = '';
+        }
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+        });
+
+        // FAQ accordion
+        document.querySelectorAll('.faq-q').forEach(q => {
+            q.addEventListener('click', () => {
+                const item = q.closest('.faq-item');
+                document.querySelectorAll('.faq-item').forEach(f => {
+                    if (f !== item) f.classList.remove('active');
+                });
+                item.classList.toggle('active');
+            });
+        });
+    })();
+</script>
+
+</body>
+</html>
