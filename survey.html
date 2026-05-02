@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>استبيان سريع | FAROUK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #0B1C2F;
+            padding: 15px;
+            direction: rtl;
+        }
+        .card {
+            background: #0a1a2a;
+            border-radius: 30px;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 2px solid #C4A747;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: white;
+            font-size: 2rem;
+        }
+        .header h1 span { color: #C4A747; }
+        .header .sub {
+            background: #1e2a3a;
+            color: #ccc;
+            padding: 5px 15px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 5px;
+            border: 1px solid #C4A747;
+        }
+        .section {
+            background: #102433;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #C4A74740;
+        }
+        .section-title {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #C4A747;
+            padding-bottom: 5px;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .question p {
+            color: white;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        /* شريط التمرير */
+        .slider-container {
+            direction: ltr; /* عشان يكون من اليسار إلى اليمين */
+            text-align: left;
+            margin-top: 5px;
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #f1c40f, #2ecc71, #27ae60);
+            border-radius: 10px;
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            background: #C4A747;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            color: #aaa;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            direction: rtl;
+        }
+        .slider-labels span { width: 40px; text-align: center; }
+
+        /* الخيارات (أزرار) */
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .option-btn {
+            background: #1e2f3f;
+            border: 1px solid #3a4a5a;
+            border-radius: 30px;
+            padding: 8px 15px;
+            color: white;
+            cursor: pointer;
+            flex: 1 0 auto;
+            text-align: center;
+        }
+        .option-btn input {
+            display: none;
+        }
+        .option-btn input:checked + span {
+            background: #C4A747;
+            color: #0B1C2F;
+            padding: 8px 15px;
+            border-radius: 30px;
+            margin: -8px -15px;
+        }
+        .option-btn span {
+            display: block;
+        }
+        .input-field {
+            margin-bottom: 15px;
+        }
+        .input-field label {
+            color: #ddd;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-field input, .input-field textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: #1e2f3f;
+            border: 1px solid #3a4a5a;
+            border-radius: 30px;
+            color: white;
+        }
+        .submit-btn {
+            background: #C4A747;
+            border: none;
+            border-radius: 40px;
+            padding: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+        }
+        #thankYouArea {
+            display: none;
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+        }
+        #thankYouArea div { font-size: 4rem; color: #2ecc71; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1><span>★</span> رأيك يهمنا <span>★</span></h1>
+        <div class="sub">دقيقة واحدة</div>
+    </div>
+
+    <form id="feedbackForm" 
+          action="https://script.google.com/macros/s/AKfycbwh-Ir-9pkTmEIw5Mi88TY6eCgK8n1mdVP3H_jvX7bGeqIRqTXXHhh0NNKE4X1Nc1aQ/exec" 
+          method="POST" 
+          target="hidden_iframe">
+
+        <input type="hidden" name="التقييم_العام" id="hidden_avg">
+        <input type="hidden" name="تصنيف_العميل" id="hidden_status">
+
+        <!-- الاسم (اختياري) -->
+        <div class="section">
+            <div class="section-title">معلومات التواصل (اختياري)</div>
+            <div class="input-field">
+                <label>👤 الاسم</label>
+                <input type="text" name="الاسم" placeholder="اختياري">
+            </div>
+        </div>
+
+        <!-- أسئلة التقييم (باستخدام السلايدر) -->
+        <div class="section">
+            <div class="section-title">قيّم تجربتك </div>
+
+            <div class="question">
+                <p>1. انطباعك عن تصميم الموقع</p>
+                <div class="slider-container">
+                    <input type="range" name="تجربة المستخدم" min="1" max="5" value="3" step="1" id="q1">
+                </div>
+                <div class="slider-labels">
+                    <span>رائع</span><span>ممتاز</span><span>جيد</span><span>مقبول</span><span>سئ</span>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>2. سهولة التعامل مع الأدوات</p>
+                <div class="slider-container">
+                    <input type="range" name="سهولة التعامل مع الأدوات" min="1" max="5" value="3" step="1">
+                </div>
+                <div class="slider-labels">
+                    <span>رائع</span><span>ممتاز</span><span>جيد</span><span>مقبول</span><span>سئ</span>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>3. سرعة تحميل الموقع</p>
+                <div class="slider-container">
+                    <input type="range" name="السرعة" min="1" max="5" value="3" step="1">
+                </div>
+                <div class="slider-labels">
+                    <span>رائع</span><span>ممتاز</span><span>جيد</span><span>مقبول</span><span>سئ</span>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>4. تجربة الموقع على الجوال</p>
+                <div class="slider-container">
+                    <input type="range" name="مريحة" min="1" max="5" value="3" step="1">
+                </div>
+                <div class="slider-labels">
+                    <span>رائع</span><span>ممتاز</span><span>جيد</span><span>مقبول</span><span>سئ</span>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>5. دقة نتائج الحاسبات</p>
+                <div class="slider-container">
+                    <input type="range" name="دقيقة" min="1" max="5" value="3" step="1">
+                </div>
+                <div class="slider-labels">
+                    <span>رائع</span><span>ممتاز</span><span>جيد</span><span>مقبول</span><span>سئ</span>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>6. وضوح شرح المصطلحات (ROI, P&L)</p>
+                <div class="slider-container">
+                    <input type="range" name="المصطلحات" min="1" max="5" value="3" step="1">
+                </div>
+                <div class="slider-labels">
+                    <span>رائع</span><span>ممتاز</span><span>جيد</span><span>مقبول</span><span>سئ</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- أسئلة إضافية -->
+        <div class="section">
+            <div class="section-title">أسئلة سريعة</div>
+
+            <div class="question">
+                <p>هل قمت بتثبيت الموقع كـ "تطبيق"؟</p>
+                <div class="options">
+                    <label class="option-btn"><input type="radio" name="تثبيت_التطبيق" value="نعم"><span>نعم</span></label>
+                    <label class="option-btn"><input type="radio" name="تثبيت_التطبيق" value="لا"><span>لا</span></label>
+                    <label class="option-btn"><input type="radio" name="تثبيت_التطبيق" value="لم يظهر"><span>لم يظهر</span></label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>إذا قمت بالتثبيت، هل تظهر الأيقونة بوضوح؟</p>
+                <div class="options">
+                    <label class="option-btn"><input type="radio" name="الايقونة" value="نعم"><span>نعم</span></label>
+                    <label class="option-btn"><input type="radio" name="الايقونة" value="لا"><span>لا</span></label>
+                    <label class="option-btn"><input type="radio" name="الايقونة" value="لم اثبت"><span>لم أثبت</span></label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>هل تنصح زملاءك باستخدام هذه الأدوات؟</p>
+                <div class="options">
+                    <label class="option-btn"><input type="radio" name="نصيحة" value="نعم"><span>نعم</span></label>
+                    <label class="option-btn"><input type="radio" name="نصيحة" value="لا"><span>لا</span></label>
+                    <label class="option-btn"><input type="radio" name="نصيحة" value="ربما"><span>ربما</span></label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>هل تفضل إضافة دروس فيديو؟</p>
+                <div class="options">
+                    <label class="option-btn"><input type="radio" name="دروس" value="نعم"><span>نعم</span></label>
+                    <label class="option-btn"><input type="radio" name="دروس" value="لا"><span>لا</span></label>
+                </div>
+            </div>
+
+            <div class="input-field">
+                <label>✍️ اقتراحات إضافية</label>
+                <textarea name="الاقتراحات" rows="2" placeholder="اكتب هنا..."></textarea>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">إرسال التقييم</button>
+    </form>
+
+    <iframe name="hidden_iframe" style="display:none;"></iframe>
+
+    <div id="thankYouArea">
+        <div>✓</div>
+        <h2 style="color:white;">شكراً جزيلاً!</h2>
+        <p style="color:#ccc;">تم استلام تقييمك بنجاح</p>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const form = document.getElementById('feedbackForm');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // حساب المتوسط من السلايدرات (كلها حقل من 1 إلى 5)
+            const sliders = ['تجربة المستخدم', 'سهولة التعامل مع الأدوات', 'السرعة', 'مريحة', 'دقيقة', 'المصطلحات'];
+            let sum = 0, count = 0;
+            sliders.forEach(name => {
+                const slider = form.querySelector(`input[name="${name}"]`);
+                if (slider) {
+                    sum += parseInt(slider.value);
+                    count++;
+                }
+            });
+            if (count > 0) {
+                const avg = (sum / count).toFixed(1);
+                let status = avg <= 2.5 ? 'غير راضي ❌' : avg <= 3.5 ? 'محايد ⚠️' : 'راضي ✅';
+                document.getElementById('hidden_avg').value = avg;
+                document.getElementById('hidden_status').value = status;
+            }
+
+            // إرسال النموذج
+            form.submit();
+
+            // إخفاء وإظهار الشكر
+            setTimeout(() => {
+                form.style.display = 'none';
+                document.querySelector('.header').style.display = 'none';
+                document.getElementById('thankYouArea').style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 200);
+        });
+    })();
+</script>
+</body>
+</html>
