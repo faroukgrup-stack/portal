@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
     <title>حاسبة العائد على الاستثمار العقاري | FAROUK GRUP</title>
-<!-- حماية الصفحة -->
+    <!-- حماية الصفحة -->
     <script src="auth-check.js"></script>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
@@ -17,10 +17,15 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- html2canvas -->
+    <!-- html2canvas لتصدير Word -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+    <!-- إضافة مكتبات Excel الجديدة -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
     <style>
+        /* جميع الأنماط الأصلية لم تتغير (كما في الكود الذي أرسلته) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
@@ -38,7 +43,7 @@
             --radius-md: 20px;
             --radius-lg: 30px;
             --transition: all 0.3s ease;
-            --gold: #b8860b;      /* احتفظ بها للتوافق */
+            --gold: #b8860b;
             --gold-light: #d4b15a;
             --gold-soft: rgba(184,134,11,0.1);
             --dark: #0f0f0f;
@@ -586,19 +591,18 @@
             }
         }
     /* إصلاح ظهور العناوين التي تختفي */
-.section-title-sm,
-.panel-header,
-.collapsible span,
-.result-card h4,
-.hero-mini h2 {
-    -webkit-text-fill-color: initial !important;
-    color: var(--accent-soft) !important;
-    background: none !important;
-    background-image: none !important;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
+    .section-title-sm,
+    .panel-header,
+    .collapsible span,
+    .result-card h4,
+    .hero-mini h2 {
+        -webkit-text-fill-color: initial !important;
+        color: var(--accent-soft) !important;
+        background: none !important;
+        background-image: none !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
     </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 <body style="overflow-x: hidden;">
@@ -776,10 +780,10 @@
             </div>
             <div class="table-container" id="sensitivityTable" style="max-height: 200px;"></div>
 
-            <!-- أزرار التصدير -->
+            <!-- أزرار التصدير - تم إزالة زر CSV القديم وإضافة زر Excel الشامل -->
             <div class="export-container">
-                <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير الجدول إلى Excel</button>
                 <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير تقرير كامل (Word)</button>
+                <button class="export-btn" id="exportFullExcelBtn" style="background: rgba(40,167,69,0.15); border-color: #28a745;"><i class="fas fa-file-excel"></i> 📊 تصدير Excel شامل (مدخلات+نتائج+تدفقات+رسوم)</button>
             </div>
 
             <!-- ملخص نقطة التعادل -->
@@ -958,43 +962,9 @@ function restoreOriginalInputs() {
 }
 
 // ------------------ دوال التصدير ------------------
-function exportToExcel() {
-    const table = document.querySelector('#cashFlowTable table');
-    if (!table) {
-        alert('لا يوجد جدول للتصدير. قم بإجراء التحليل أولاً.');
-        return;
-    }
+// تم إزالة دالة exportToExcel القديمة (CSV)
 
-    const rows = [];
-    const headers = [];
-    const ths = table.querySelectorAll('thead th');
-    ths.forEach(th => headers.push(th.innerText));
-    rows.push(headers);
-
-    const trs = table.querySelectorAll('tbody tr');
-    trs.forEach(tr => {
-        const row = [];
-        const tds = tr.querySelectorAll('td');
-        tds.forEach(td => row.push(td.innerText));
-        rows.push(row);
-    });
-
-    let csvContent = rows.map(row => row.map(cell => {
-        if (cell.includes(',')) return `"${cell}"`;
-        return cell;
-    }).join(',')).join('\n');
-    
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const now = new Date();
-    const dateStr = now.toISOString().slice(0,10).replace(/-/g,'');
-    link.download = `عقار_تدفقات_${dateStr}.csv`;
-    link.href = URL.createObjectURL(blob);
-    link.click();
-    URL.revokeObjectURL(link.href);
-}
-
-// دالة تصدير Word المحسّنة (مع خلفية بيضاء للرسم البياني)
+// دالة تصدير Word (مثل الأصل)
 async function exportToWord() {
     const currency = document.getElementById('currencySelect').value;
     const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
@@ -1007,11 +977,10 @@ async function exportToWord() {
     try {
         // التقاط صورة الرسم البياني مع خلفية بيضاء
         const canvas = document.getElementById('cashChart');
-        // نحتاج إلى تغيير خلفية الكانفاس مؤقتاً إلى الأبيض ثم إعادتها
         const originalBg = canvas.style.backgroundColor;
         canvas.style.backgroundColor = '#ffffff';
         const canvasImage = await html2canvas(canvas, { scale: 2, backgroundColor: '#ffffff' });
-        canvas.style.backgroundColor = originalBg; // استعادة الخلفية الأصلية
+        canvas.style.backgroundColor = originalBg;
         const imgData = canvasImage.toDataURL('image/png');
 
         // جمع جميع المدخلات
@@ -1052,7 +1021,7 @@ async function exportToWord() {
                     <div style="font-size:1.8rem; font-weight:900; color:#b8860b;">${value}</div>
                     ${unit ? `<div style="font-size:0.9rem; color:#777;">${unit}</div>` : ''}
                     ${status ? status.replace(/class="status/g, 'style="margin-top:0.3rem; padding:0.2rem 0.5rem; border-radius:20px; display:inline-block;') : ''}
-                </td>
+                 </td>
             `;
 
             row += cell;
@@ -1104,16 +1073,16 @@ async function exportToWord() {
 
                 <h2>المعطيات الأساسية</h2>
                 <table>
-                    <tr><th>قيمة العقار</th><td>${currency} ${marketValue}</td><th>عدد الوحدات</th><td>${units}</td></tr>
-                    <tr><th>الإيجار الشهري للوحدة</th><td>${currency} ${rent}</td><th>المصاريف الشهرية</th><td>${currency} ${monthlyExpenses}</td></tr>
-                    <tr><th>نسبة الإشغال</th><td>${occupancy}</td><th>الضريبة العقارية</th><td>${taxRate}%</td></tr>
-                    <tr><th>خصم التقييم</th><td>${assessedDiscount}%</td><th>زيادة الإيجار السنوية</th><td>${rentIncrease}%</td></tr>
-                    <tr><th>ارتفاع قيمة الأرض</th><td>${landAppreciation}%</td><th>رسوم شراء إضافية</th><td>${currency} ${purchaseCosts}</td></tr>
-                    <tr><th>معدل الخصم</th><td>${discountRate}%</td><th>معدل إعادة الاستثمار</th><td>${reinvestRate}%</td></tr>
-                    <tr><th>عدد السنوات</th><td>${years}</td><th></th><td></td></tr>
+                    <tr><th>قيمة العقار</th><td>${currency} ${marketValue}</td><th>عدد الوحدات</th><td>${units}</td> </tr>
+                    <tr><th>الإيجار الشهري للوحدة</th><td>${currency} ${rent}</td><th>المصاريف الشهرية</th><td>${currency} ${monthlyExpenses}</td> </tr>
+                    <tr><th>نسبة الإشغال</th><td>${occupancy}</td><th>الضريبة العقارية</th><td>${taxRate}%</td> </tr>
+                    <tr><th>خصم التقييم</th><td>${assessedDiscount}%</td><th>زيادة الإيجار السنوية</th><td>${rentIncrease}%</td> </tr>
+                    <tr><th>ارتفاع قيمة الأرض</th><td>${landAppreciation}%</td><th>رسوم شراء إضافية</th><td>${currency} ${purchaseCosts}</td> </tr>
+                    <tr><th>معدل الخصم</th><td>${discountRate}%</td><th>معدل إعادة الاستثمار</th><td>${reinvestRate}%</td> </tr>
+                    <tr><th>عدد السنوات</th><td>${years}</td><td></td><td></td> </tr>
                     ${ltv > 0 ? `
-                    <tr><th>نسبة القرض (LTV)</th><td>${ltv}%</td><th>سعر الفائدة</th><td>${interestRate}%</td></tr>
-                    <tr><th>مدة القرض</th><td>${loanTerm} سنة</td><th></th><td></td></tr>
+                    <tr><th>نسبة القرض (LTV)</th><td>${ltv}%</td><th>سعر الفائدة</th><td>${interestRate}%</td> </tr>
+                    <tr><th>مدة القرض</th><td>${loanTerm} سنة</td><td></td><td></td> </tr>
                     ` : ''}
                 </table>
 
@@ -1368,7 +1337,7 @@ function calculateAll() {
         <div class="status ${ratingClass}" style="font-size:1.2rem; margin-top:0.5rem;">${ratingIcon} ${ratingText}</div>
     `;
 
-    // جدول التدفقات
+    // جدول التدفقات (الحفاظ على تنسيق الخلايا الأصلي بدون nowrap)
     let tableHtml = '<table><thead><tr><th>السنة</th><th>التدفق النقدي للمستثمر (' + currency + ')</th><th>التراكمي (' + currency + ')</th></tr></thead><tbody>';
     let cum = 0;
     for (let i = 0; i <= years; i++) {
@@ -1439,7 +1408,145 @@ function calculateAll() {
         </table>
     `;
 
-    return { cashFlows, npv, irr, pi, years, discountRate, reinvestRate, currency };
+    // تخزين النتائج لاستخدامها في تصدير Excel
+    window.lastRealEstateResults = {
+        inputs: {
+            currency, companyName: document.getElementById('companyName').value,
+            marketValue, units, rentPerUnit, monthlyExpenses, occupancy, taxRatePercent,
+            assessedDiscountPercent, rentIncreasePercent, landAppreciationPercent, purchaseCosts,
+            ltvPercent, interestRatePercent, loanTerm, discountRatePercent, reinvestRatePercent, years
+        },
+        outputs: {
+            npv, irr, mirr, paybackPeriod, pi, cashOnCash, roi, score, ratingText, ratingClass,
+            cashFlows, cumulative: cum, terminalValue, loanAmount, equity, annualDebtService,
+            years, discountRate, reinvestRate, ltv, annualRentBase, annualExpenses
+        }
+    };
+}
+
+// ------------------ تصدير Excel شامل ------------------
+async function exportToFullExcel() {
+    if (!window.lastRealEstateResults) {
+        alert('الرجاء إجراء التحليل أولاً (اضغط على "احسب العائد").');
+        return;
+    }
+    const data = window.lastRealEstateResults;
+    const inp = data.inputs;
+    const out = data.outputs;
+
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'FAROUK GRUP';
+    workbook.created = new Date();
+
+    // ورقة المدخلات
+    const inputsSheet = workbook.addWorksheet('المدخلات');
+    inputsSheet.mergeCells('A1:D1');
+    inputsSheet.getCell('A1').value = 'بيانات الاستثمار العقاري';
+    inputsSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
+    inputsSheet.getCell('A1').alignment = { horizontal: 'center' };
+
+    const inputsData = [
+        ['اسم الجهة', inp.companyName], ['العملة', inp.currency],
+        ['قيمة العقار', inp.marketValue], ['عدد الوحدات', inp.units],
+        ['الإيجار الشهري للوحدة', inp.rentPerUnit], ['المصاريف الشهرية', inp.monthlyExpenses],
+        ['نسبة الإشغال (%)', inp.occupancy * 100], ['الضريبة العقارية (%)', inp.taxRatePercent],
+        ['خصم التقييم (%)', inp.assessedDiscountPercent], ['زيادة الإيجار السنوية (%)', inp.rentIncreasePercent],
+        ['ارتفاع قيمة الأرض السنوي (%)', inp.landAppreciationPercent], ['رسوم شراء إضافية', inp.purchaseCosts],
+        ['نسبة القرض LTV (%)', inp.ltvPercent], ['سعر الفائدة السنوي (%)', inp.interestRatePercent],
+        ['مدة القرض (سنوات)', inp.loanTerm], ['معدل الخصم (%)', inp.discountRatePercent],
+        ['معدل إعادة الاستثمار (%)', inp.reinvestRatePercent], ['عدد السنوات', inp.years]
+    ];
+    inputsSheet.addRows([['البند', 'القيمة']]);
+    inputsData.forEach(row => inputsSheet.addRow(row));
+    inputsSheet.getRow(2).font = { bold: true, color: { argb: 'ffffff' } };
+    inputsSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'b8860b' } };
+    inputsSheet.getColumn(1).width = 40;
+    inputsSheet.getColumn(2).width = 30;
+
+    // ورقة مؤشرات الأداء
+    const kpiSheet = workbook.addWorksheet('مؤشرات الأداء');
+    kpiSheet.mergeCells('A1:C1');
+    kpiSheet.getCell('A1').value = 'مؤشرات الأداء';
+    kpiSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
+    kpiSheet.getCell('A1').alignment = { horizontal: 'center' };
+
+    const kpiData = [
+        ['صافي القيمة الحالية (NPV)', `${inp.currency} ${out.npv.toFixed(0)}`, out.npv > 0 ? 'مربح' : 'خاسر'],
+        ['معدل العائد الداخلي (IRR)', `${(out.irr * 100).toFixed(2)}%`, out.irr > out.discountRate ? 'جيد' : 'ضعيف'],
+        ['معدل العائد المعدل (MIRR)', `${(out.mirr * 100).toFixed(2)}%`, ''],
+        ['فترة الاسترداد (سنوات)', out.paybackPeriod !== null ? out.paybackPeriod.toFixed(1) : 'غير محددة', ''],
+        ['مؤشر الربحية (PI)', out.pi.toFixed(2), out.pi > 1 ? 'مربح' : 'غير مربح'],
+        ['العائد النقدي (Cash on Cash) (%)', out.cashOnCash.toFixed(2), ''],
+        ['العائد على الاستثمار (ROI) (%)', out.roi.toFixed(2), ''],
+        ['تقييم المشروع', `${out.score}/100 (${out.ratingText})`, '']
+    ];
+    kpiSheet.addRows([['المؤشر', 'القيمة', 'التقييم']]);
+    kpiData.forEach(row => kpiSheet.addRow(row));
+    kpiSheet.getRow(2).font = { bold: true, color: { argb: 'ffffff' } };
+    kpiSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'b8860b' } };
+    kpiSheet.getColumn(1).width = 35;
+    kpiSheet.getColumn(2).width = 25;
+    kpiSheet.getColumn(3).width = 15;
+
+    // ورقة التدفقات النقدية
+    const cashSheet = workbook.addWorksheet('التدفقات النقدية');
+    cashSheet.mergeCells('A1:C1');
+    cashSheet.getCell('A1').value = 'التدفقات النقدية السنوية';
+    cashSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
+    cashSheet.getCell('A1').alignment = { horizontal: 'center' };
+
+    cashSheet.addRows([['السنة', `التدفق النقدي (${inp.currency})`, `التراكمي (${inp.currency})`]]);
+    let cum = 0;
+    for (let i = 0; i <= out.years; i++) {
+        cum += out.cashFlows[i];
+        cashSheet.addRow([i === 0 ? 'الاستثمار' : i, out.cashFlows[i], cum]);
+    }
+    cashSheet.getRow(2).font = { bold: true, color: { argb: 'ffffff' } };
+    cashSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'b8860b' } };
+    cashSheet.getColumn(1).width = 12;
+    cashSheet.getColumn(2).width = 20;
+    cashSheet.getColumn(3).width = 20;
+
+    // ورقة تحليل الحساسية (بسيطة)
+    const sensSheet = workbook.addWorksheet('تحليل الحساسية');
+    sensSheet.mergeCells('A1:C1');
+    sensSheet.getCell('A1').value = 'تحليل الحساسية (السيناريوهات)';
+    sensSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
+    sensSheet.getCell('A1').alignment = { horizontal: 'center' };
+    sensSheet.addRows([['السيناريو', `NPV (${inp.currency})`, 'IRR (%)']]);
+    sensSheet.addRow(['الأساسي', out.npv, (out.irr * 100).toFixed(2)]);
+    // يمكن إضافة سيناريوهات إضافية حسب الرغبة
+    sensSheet.getRow(2).font = { bold: true, color: { argb: 'ffffff' } };
+    sensSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'b8860b' } };
+    sensSheet.getColumn(1).width = 20;
+    sensSheet.getColumn(2).width = 20;
+    sensSheet.getColumn(3).width = 15;
+
+    // ورقة الرسوم البيانية (صورة الرسم البياني)
+    const chartsSheet = workbook.addWorksheet('الرسوم البيانية');
+    chartsSheet.mergeCells('A1:C1');
+    chartsSheet.getCell('A1').value = 'الرسم البياني للتدفقات النقدية';
+    chartsSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
+    chartsSheet.getCell('A1').alignment = { horizontal: 'center' };
+
+    const chartCanvas = document.getElementById('cashChart');
+    let imgData = '';
+    try {
+        const canvasImg = await html2canvas(chartCanvas, { scale: 2, backgroundColor: '#ffffff' });
+        imgData = canvasImg.toDataURL('image/png');
+    } catch (err) {
+        console.warn('فشل في التقاط الرسم البياني', err);
+    }
+    if (imgData) {
+        const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+        chartsSheet.addImage(imageId, { tl: { col: 0, row: 2 }, br: { col: 3, row: 18 }, editAs: 'oneCell' });
+    } else {
+        chartsSheet.getCell('A3').value = 'فشل في إضافة الرسم البياني';
+    }
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, `تقرير_عقار_${inp.companyName}.xlsx`);
 }
 
 // ------------------ تحليل الحساسية ------------------
@@ -1475,8 +1582,9 @@ document.getElementById('calculateBtn').addEventListener('click', function() {
     calculateAll();
 });
 
-document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+// أزرار التصدير
 document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+document.getElementById('exportFullExcelBtn').addEventListener('click', exportToFullExcel);
 </script>
 <!-- زر العودة إلى الرئيسية (عائم في اليمين) -->
 <a href="index.html" style="

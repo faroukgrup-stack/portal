@@ -98,6 +98,15 @@
         .link-btn { background:rgba(255,255,255,0.02); border:1px solid rgba(180,133,84,0.3); border-radius:50px; padding:0.7rem 2rem; color:var(--text-muted); text-decoration:none; font-weight:600; transition:var(--transition); }
         .link-btn:hover { background:rgba(180,133,84,0.2); color:var(--accent-soft); border-color:var(--accent-glow); box-shadow:0 0 15px rgba(180,133,84,0.2); transform:translateY(-3px); }
         footer { text-align:center; padding:2rem; color:var(--text-muted); font-size:0.9rem; }
+        /* رسالة انتهاء الجلسة */
+        .session-expired-overlay { position: fixed; inset: 0; background: rgba(6,9,15,0.92); backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 3000; }
+        .session-expired-card { background: var(--bg-panel); backdrop-filter: blur(15px); padding: 2rem; border-radius: 20px; width: 85%; max-width: 420px; text-align: center; border: 2px solid #f87171; box-shadow: 0 20px 50px rgba(0,0,0,0.7), 0 0 30px rgba(248,113,113,0.3); }
+        .session-expired-card h2 { color: #fca5a5; margin-bottom: 1rem; font-size: 1.4rem; }
+        .session-expired-card p { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.95rem; line-height: 1.7; }
+        .renew-link { display: inline-block; background: rgba(180,133,84,0.25); border: 1px solid var(--accent-glow); border-radius: 50px; padding: 0.9rem 2rem; color: var(--accent-soft); text-decoration: none; font-weight: 700; font-size: 1.1rem; transition: var(--transition); margin: 0.5rem; }
+        .renew-link:hover { background: rgba(180,133,84,0.4); color: #fff; box-shadow: 0 0 25px rgba(180,133,84,0.4); }
+        .relogin-btn { display: inline-block; background: transparent; border: 1px solid rgba(255,255,255,0.3); border-radius: 50px; padding: 0.9rem 2rem; color: var(--text-light); cursor: pointer; font-weight: 600; transition: var(--transition); margin: 0.5rem; font-family: 'Tajawal', sans-serif; }
+        .relogin-btn:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
         @media (max-width:1200px) { .main-dashboard { grid-template-columns:1fr 2fr; } .dashboard-panel:nth-child(3) { grid-column:span 2; } }
         @media (max-width:900px) { .main-dashboard { grid-template-columns:1fr; } .dashboard-panel:nth-child(3) { grid-column:span 1; } .header-bar { flex-direction:column; text-align:center; } .user-profile { justify-content:center; width:100%; } }
     </style>
@@ -111,12 +120,26 @@
             <div class="login-icon" style="font-size:2rem; margin-bottom:10px;"><i class="fas fa-shield-halved"></i></div>
             <h2>دخول المصرح لهم</h2>
             <p>مجموعة فاروق للاستشارات والأعمال</p>
-            <!-- تعديل: حقل بريد إلكتروني بحجم خط مناسب -->
             <input type="email" id="usernameInput" class="login-input" placeholder="البريد الإلكتروني">
             <input type="password" id="passwordInput" class="login-input" placeholder="كلمة المرور">
             <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> دخول</button>
             <a href="https://wa.me/905550196682" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i> نسيت كلمة المرور؟ اضغط هنا</a>
             <div class="error-msg" id="errorMsg" style="margin-top:10px;"></div>
+        </div>
+    </div>
+
+    <!-- رسالة انتهاء الجلسة (24 ساعة أو انتهاء اشتراك) -->
+    <div class="session-expired-overlay" id="sessionExpiredOverlay" style="display:none;">
+        <div class="session-expired-card" data-aos="zoom-in">
+            <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:#fbbf24; margin-bottom:1rem;"></i>
+            <h2 id="sessionExpiredTitle">⚠️ انتهت صلاحية الجلسة</h2>
+            <p id="sessionExpiredMsg">انتهت مدة الجلسة (24 ساعة). الرجاء تسجيل الدخول مجدداً.</p>
+            <a href="https://alfan.link/faroukazem?digital=r89RJK" target="_blank" class="renew-link" id="renewLinkBtn" style="display:none;">
+                <i class="fas fa-sync-alt"></i> تجديد الإشتراك
+            </a>
+            <button class="relogin-btn" id="reloginBtn">
+                <i class="fas fa-sign-in-alt"></i> العودة لشاشة الدخول
+            </button>
         </div>
     </div>
 
@@ -167,8 +190,8 @@
         </div>
 
         <div class="quick-links-panel">
-            <div class="quick-links-title"><i class="fas fa-link"></i> الوصول السريع لمنصات المجموعة (الإصدار 4)</div>
-            <div class="links-row"><a href="https://www.farouk-grup.com/" target="_blank" class="link-btn">الموقع الرسمي</a><a href="https://alfan.link/faroukazem?digital=dgnbcq" class="link-btn">تجديد الإشتراك</a><a href="survey.html" target="_blank" class="link-btn"></i>★تقييم المنصة</a><a href="mailto:faroukgrup@gmail.com" class="link-btn"><i class="fas fa-envelope"></i> البريد</a></div>
+            <div class="quick-links-title"><i class="fas fa-link"></i> الوصول السريع لمنصات المجموعة (الإصدار 5)</div>
+            <div class="links-row"><a href="https://www.farouk-grup.com/" target="_blank" class="link-btn">الموقع الرسمي</a><a href="https://alfan.link/faroukazem?digital=dgnbcq" class="link-btn">تجديد الإشتراك</a><a href="survey.html" target="_blank" class="link-btn">★تقييم المنصة</a><a href="mailto:faroukgrup@gmail.com" class="link-btn"><i class="fas fa-envelope"></i> البريد</a></div>
         </div>
         <footer><p>© 2026 FAROUK GRUP · جميع الحقوق محفوظة</p></footer>
     </div>
@@ -178,6 +201,7 @@
         AOS.init({ duration: 800, once: true });
 
         const GOOGLE_SCRIPT_URL = "https://farouk-api-proxy.faroukgrup.workers.dev/";
+        const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 ساعة
 
         const loginOverlay = document.getElementById('loginOverlay');
         const dashboard = document.getElementById('dashboard');
@@ -186,32 +210,126 @@
         const loginBtn = document.getElementById('loginBtn');
         const errorMsg = document.getElementById('errorMsg');
         const logoutBtn = document.getElementById('logoutBtn');
+        const sessionExpiredOverlay = document.getElementById('sessionExpiredOverlay');
+        const sessionExpiredTitle = document.getElementById('sessionExpiredTitle');
+        const sessionExpiredMsg = document.getElementById('sessionExpiredMsg');
+        const renewLinkBtn = document.getElementById('renewLinkBtn');
+        const reloginBtn = document.getElementById('reloginBtn');
 
-        function checkSession() {
-            const token = localStorage.getItem('userToken');
-            if (token && token.length > 0) {
-                loginOverlay.style.display = 'none';
-                dashboard.style.display = 'block';
-                const savedName = localStorage.getItem('userName');
-                const savedDays = localStorage.getItem('daysLeft');
-                if(savedName) {
-                    document.querySelector('.user-name').innerHTML = `<i class="fas fa-user-tie"></i> ${savedName} (متبقي ${savedDays} يوم)`;
-                }
-                loadAllData();
+        let logoutTimer = null; // مؤقت الـ 24 ساعة
+
+        // ========== دوال مساعدة للوقت ==========
+        function getRemainingSessionTime() {
+            const loginTs = localStorage.getItem('loginTimestamp');
+            if (!loginTs) return 0;
+            const elapsed = Date.now() - parseInt(loginTs);
+            return Math.max(0, SESSION_DURATION_MS - elapsed);
+        }
+
+        function isSessionExpired() {
+            const remaining = getRemainingSessionTime();
+            return remaining <= 0;
+        }
+
+        // ========== تسجيل الخروج القسري ==========
+        function forceLogout(reason, isSubscriptionExpired = false) {
+            // إخفاء لوحة التحكم
+            dashboard.style.display = 'none';
+            
+            // إيقاف المؤقتات
+            if (logoutTimer) {
+                clearTimeout(logoutTimer);
+                logoutTimer = null;
+            }
+            
+            // مسح بيانات الجلسة
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('daysLeft');
+            localStorage.removeItem('loginTimestamp');
+            
+            // عرض رسالة مناسبة
+            if (isSubscriptionExpired) {
+                sessionExpiredTitle.textContent = '⚠️ انتهى الاشتراك';
+                sessionExpiredMsg.textContent = reason;
+                renewLinkBtn.style.display = 'inline-block';
             } else {
-                loginOverlay.style.display = 'flex';
-                dashboard.style.display = 'none';
-                usernameInput?.focus();
+                sessionExpiredTitle.textContent = '⏰ انتهت الجلسة';
+                sessionExpiredMsg.textContent = reason;
+                renewLinkBtn.style.display = 'none';
+            }
+            sessionExpiredOverlay.style.display = 'flex';
+            AOS.refresh();
+        }
+
+        // ========== بدء مؤقت الـ 24 ساعة ==========
+        function startSessionTimer() {
+            if (logoutTimer) clearTimeout(logoutTimer);
+            const remaining = getRemainingSessionTime();
+            if (remaining > 0) {
+                logoutTimer = setTimeout(() => {
+                    forceLogout('انتهت مدة الجلسة المحددة بـ 24 ساعة. يرجى تسجيل الدخول مجدداً.', false);
+                }, remaining);
+            } else {
+                // انتهت بالفعل
+                forceLogout('انتهت مدة الجلسة المحددة بـ 24 ساعة. يرجى تسجيل الدخول مجدداً.', false);
             }
         }
 
-        function loadAllData() {
-            loadTodos();
-            loadNotes();
-            loadAppointments();
-            renderTools();
+        // ========== فحص الجلسة عند التحميل ==========
+        async function checkSession() {
+            const token = localStorage.getItem('userToken');
+            if (!token || token.length === 0) {
+                showLoginScreen();
+                return;
+            }
+
+            // التحقق من انتهاء مدة الـ 24 ساعة
+            if (isSessionExpired()) {
+                forceLogout('انتهت مدة الجلسة المحددة بـ 24 ساعة. يرجى تسجيل الدخول مجدداً.', false);
+                return;
+            }
+
+            // (اختياري) التحقق من السيرفر بخصوص الاشتراك إن أردت
+            try {
+                const formData = new FormData();
+                formData.append('action', 'validate');
+                formData.append('token', token);
+                const resp = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
+                const result = await resp.json();
+                if (result.status === 'expired') {
+                    forceLogout('انتهى اشتراكك. يرجى تجديد الإشتراك.', true);
+                    return;
+                }
+                if (result.status === 'success') {
+                    localStorage.setItem('daysLeft', result.daysLeft);
+                }
+            } catch (e) {
+                console.warn('تعذر التحقق من السيرفر، الاعتماد على الفحص المحلي للـ 24 ساعة.');
+            }
+            
+            // الجلسة سارية
+            loginOverlay.style.display = 'none';
+            sessionExpiredOverlay.style.display = 'none';
+            dashboard.style.display = 'block';
+            
+            const savedName = localStorage.getItem('userName') || 'مدير العمليات';
+            const savedDays = localStorage.getItem('daysLeft') || '?';
+            document.querySelector('.user-name').innerHTML = `<i class="fas fa-user-tie"></i> ${savedName} (متبقي ${savedDays} يوم)`;
+            
+            startSessionTimer();
+            loadAllData();
         }
 
+        function showLoginScreen() {
+            loginOverlay.style.display = 'flex';
+            dashboard.style.display = 'none';
+            sessionExpiredOverlay.style.display = 'none';
+            if (logoutTimer) clearTimeout(logoutTimer);
+            usernameInput?.focus();
+        }
+
+        // ========== تسجيل الدخول ==========
         async function attemptLogin() {
             const user = usernameInput.value.trim();
             const pass = passwordInput.value.trim();
@@ -220,65 +338,77 @@
                 errorMsg.textContent = '❌ يرجى إدخال البريد الإلكتروني وكلمة المرور';
                 return;
             }
-
             if (!user.includes('@') || !user.includes('.')) {
-                errorMsg.textContent = '❌ يرجى إدخال بريد إلكتروني صحيح (مثال: name@domain.com)';
+                errorMsg.textContent = '❌ يرجى إدخال بريد إلكتروني صحيح';
                 return;
             }
 
             loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري التحقق...';
             loginBtn.disabled = true;
-            errorMsg.innerHTML = ''; // استخدام innerHTML لمسح أي محتوى سابق
+            errorMsg.innerHTML = '';
 
             try {
                 const formData = new FormData();
+                formData.append('action', 'login');
                 formData.append('username', user);
                 formData.append('password', pass);
-
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-
+                const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
                 const result = await response.json();
 
                 if (result.status === 'success') {
                     localStorage.setItem('userToken', result.token);
                     localStorage.setItem('userName', result.name);
                     localStorage.setItem('daysLeft', result.daysLeft);
+                    localStorage.setItem('loginTimestamp', Date.now().toString());
                     
-                    document.querySelector('.user-name').innerHTML = `<i class="fas fa-user-tie"></i> ${result.name} (متبقي ${result.daysLeft} يوم)`;
+                    document.querySelector('.user-name').innerHTML = 
+                        `<i class="fas fa-user-tie"></i> ${result.name} (متبقي ${result.daysLeft} يوم)`;
                     
                     loginOverlay.style.display = 'none';
+                    sessionExpiredOverlay.style.display = 'none';
                     dashboard.style.display = 'block';
+                    
+                    startSessionTimer();
                     loadAllData();
                 } else if (result.status === 'expired') {
-                    // إضافة الرابط "من هنا" كما هو مطلوب
-                    errorMsg.innerHTML = '❌ انتهى اشتراكك. يرجى تجديد الإشتراك. <a href="https://alfan.link/faroukazem?digital=r89RJK" target="_blank" style="color: #cfa776; text-decoration: underline; font-weight: bold;">من هنا</a>';
+                    errorMsg.innerHTML = '❌ انتهى اشتراكك. يرجى تجديد الإشتراك. <a href="https://alfan.link/faroukazem?digital=r89RJK" target="_blank" style="color:#cfa776;">من هنا</a>';
                 } else {
                     errorMsg.innerHTML = '❌ ' + (result.message || 'بيانات الدخول غير صحيحة');
                 }
             } catch (error) {
-                console.error('Login error:', error);
-                errorMsg.innerHTML = '❌ حدث خطأ في الاتصال بالسيرفر. تأكد من اتصالك بالإنترنت.';
+                errorMsg.innerHTML = '❌ فشل الاتصال بالسيرفر. تأكد من اتصالك بالإنترنت.';
             } finally {
                 loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
                 loginBtn.disabled = false;
             }
         }
 
+        // ========== الأحداث ==========
         loginBtn.addEventListener('click', attemptLogin);
         passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') attemptLogin(); });
         usernameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') passwordInput.focus(); });
 
         logoutBtn.addEventListener('click', () => {
+            if (logoutTimer) clearTimeout(logoutTimer);
             localStorage.removeItem('userToken');
             localStorage.removeItem('userName');
             localStorage.removeItem('daysLeft');
-            loginOverlay.style.display = 'flex';
-            dashboard.style.display = 'none';
-            passwordInput.value = '';
-            errorMsg.innerHTML = '';
+            localStorage.removeItem('loginTimestamp');
+            showLoginScreen();
+        });
+
+        reloginBtn.addEventListener('click', () => {
+            sessionExpiredOverlay.style.display = 'none';
+            showLoginScreen();
+        });
+
+        // عند الرجوع للتبويب
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && dashboard.style.display === 'block') {
+                if (isSessionExpired()) {
+                    forceLogout('انتهت مدة الجلسة (24 ساعة) أثناء غيابك.', false);
+                }
+            }
         });
 
         window.addEventListener('load', () => {
@@ -287,6 +417,7 @@
             setInterval(updateDateTime, 1000);
         });
 
+        // ========== باقي الدوال (الأدوات، المهام، الملاحظات، المواعيد) بدون تغيير ==========
         const tools = [
             { name: "دراسة جدوى مالية شاملة", icon: "fa-chart-pie", file: "tool1.html" },
             { name: "حساب التكاليف للمطاعم", icon: "fa-utensils", file: "tool2.html" },
@@ -309,230 +440,79 @@
             { name: "آلة حاسبة", icon: "fa-calculator", file: "tool16.html" }
         ];
 
-        // قائمة المهام
+        // المهام
         const todoInput = document.getElementById('todoInput');
         const addTodoBtn = document.getElementById('addTodoBtn');
         const todoList = document.getElementById('todoList');
         const pendingSpan = document.getElementById('pendingCount');
         const totalSpan = document.getElementById('totalCount');
         let todos = [];
-
-        function loadTodos() {
-            todos = JSON.parse(localStorage.getItem('employeeTodos') || '[]');
-            renderTodos();
-        }
-        function saveTodos() {
-            localStorage.setItem('employeeTodos', JSON.stringify(todos));
-            renderTodos();
-        }
-
+        function loadTodos() { todos = JSON.parse(localStorage.getItem('employeeTodos') || '[]'); renderTodos(); }
+        function saveTodos() { localStorage.setItem('employeeTodos', JSON.stringify(todos)); renderTodos(); }
         function renderTodos() {
             todoList.innerHTML = '';
             const pending = todos.filter(t => !t.completed).length;
-            pendingSpan.textContent = pending;
-            totalSpan.textContent = todos.length;
+            pendingSpan.textContent = pending; totalSpan.textContent = todos.length;
             todos.forEach((todo, idx) => {
-                const div = document.createElement('div');
-                div.className = 'todo-item';
-                div.innerHTML = `
-                    <div class="todo-text">
-                        <input type="checkbox" ${todo.completed ? 'checked' : ''} data-index="${idx}">
-                        <span class="${todo.completed ? 'completed' : ''}">${todo.text}</span>
-                    </div>
-                    <span class="delete-btn delete-todo" data-index="${idx}"><i class="fas fa-trash-alt"></i></span>
-                `;
+                const div = document.createElement('div'); div.className = 'todo-item';
+                div.innerHTML = `<div class="todo-text"><input type="checkbox" ${todo.completed ? 'checked' : ''} data-index="${idx}"><span class="${todo.completed ? 'completed' : ''}">${todo.text}</span></div><span class="delete-btn delete-todo" data-index="${idx}"><i class="fas fa-trash-alt"></i></span>`;
                 todoList.appendChild(div);
             });
-            document.querySelectorAll('.todo-text input[type=checkbox]').forEach(cb => {
-                cb.addEventListener('change', e => {
-                    const idx = e.target.dataset.index;
-                    todos[idx].completed = e.target.checked;
-                    saveTodos();
-                });
-            });
-            document.querySelectorAll('.delete-todo').forEach(btn => {
-                btn.addEventListener('click', e => {
-                    const idx = btn.dataset.index;
-                    if (confirm("هل أنت متأكد من حذف هذه المهمة؟")) {
-                        todos.splice(idx, 1);
-                        saveTodos();
-                    }
-                });
-            });
+            document.querySelectorAll('.todo-text input[type=checkbox]').forEach(cb => cb.addEventListener('change', e => { todos[e.target.dataset.index].completed = e.target.checked; saveTodos(); }));
+            document.querySelectorAll('.delete-todo').forEach(btn => btn.addEventListener('click', e => { if(confirm('حذف المهمة؟')) { todos.splice(btn.dataset.index,1); saveTodos(); } }));
         }
-
-        function addTodo() {
-            const text = todoInput.value.trim();
-            if (!text) return;
-            todos.push({ text, completed: false });
-            saveTodos();
-            todoInput.value = '';
-        }
+        function addTodo() { const text = todoInput.value.trim(); if(!text) return; todos.push({ text, completed: false }); saveTodos(); todoInput.value = ''; }
         addTodoBtn.addEventListener('click', addTodo);
-        todoInput.addEventListener('keypress', e => { if (e.key === 'Enter') addTodo(); });
+        todoInput.addEventListener('keypress', e => { if(e.key==='Enter') addTodo(); });
 
-        // الآلة الحاسبة
+        // الحاسبة
         let calcInput = '0', calcPrev = '', calcOp = null;
         const display = document.getElementById('calcDisplay');
         function updateDisplay() { display.value = calcInput; }
-        window.appendCalc = (n) => {
-            if (calcInput === '0' && n !== '.') calcInput = n;
-            else {
-                if (n === '.' && calcInput.includes('.')) return;
-                calcInput += n;
-            }
-            updateDisplay();
-        };
-        window.setCalcOperator = (op) => {
-            if (calcOp !== null) calculateCalc();
-            calcPrev = calcInput;
-            calcInput = '0';
-            calcOp = op;
-        };
-        window.calculateCalc = () => {
-            if (!calcOp || calcPrev === '') return;
-            const a = parseFloat(calcPrev), b = parseFloat(calcInput);
-            let res;
-            switch (calcOp) {
-                case '+': res = a + b; break;
-                case '-': res = a - b; break;
-                case '*': res = a * b; break;
-                case '/': if (b === 0) { alert('خطأ'); return; } res = a / b; break;
-                default: return;
-            }
-            calcInput = res.toString();
-            calcOp = null; calcPrev = '';
-            updateDisplay();
-        };
-        window.clearCalc = () => { calcInput = '0'; calcPrev = ''; calcOp = null; updateDisplay(); };
-
-        document.addEventListener('keydown', (e) => {
-            if (loginOverlay.style.display !== 'none' || !dashboard.style.display) return;
-            const active = document.activeElement;
-            if (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA') return;
-            const k = e.key;
-            if (k >= '0' && k <= '9') { e.preventDefault(); appendCalc(k); }
-            else if (k === '.') { e.preventDefault(); appendCalc('.'); }
-            else if (k === '+' || k === '-' || k === '*' || k === '/') { e.preventDefault(); setCalcOperator(k); }
-            else if (k === 'Enter' || k === '=') { e.preventDefault(); calculateCalc(); }
-            else if (k === 'Escape') { e.preventDefault(); clearCalc(); }
-            else if (k === 'Backspace') {
-                e.preventDefault();
-                if (calcInput.length > 1) calcInput = calcInput.slice(0, -1);
-                else calcInput = '0';
-                updateDisplay();
-            }
+        window.appendCalc = (n) => { if(calcInput==='0' && n!=='.') calcInput=n; else { if(n==='.' && calcInput.includes('.')) return; calcInput+=n; } updateDisplay(); };
+        window.setCalcOperator = (op) => { if(calcOp!==null) calculateCalc(); calcPrev=calcInput; calcInput='0'; calcOp=op; };
+        window.calculateCalc = () => { if(!calcOp||calcPrev==='') return; const a=parseFloat(calcPrev), b=parseFloat(calcInput); let res; switch(calcOp){ case'+':res=a+b;break; case'-':res=a-b;break; case'*':res=a*b;break; case'/':if(b===0){alert('خطأ');return;} res=a/b;break; } calcInput=res.toString(); calcOp=null;calcPrev=''; updateDisplay(); };
+        window.clearCalc = () => { calcInput='0';calcPrev='';calcOp=null;updateDisplay(); };
+        document.addEventListener('keydown', e => {
+            if(loginOverlay.style.display!=='none'||!dashboard.style.display) return;
+            const active = document.activeElement; if(active.tagName==='INPUT'||active.tagName==='TEXTAREA') return;
+            const k=e.key; if(k>='0'&&k<='9'){e.preventDefault();appendCalc(k);} else if(k==='.'){e.preventDefault();appendCalc('.');} 
+            else if(k==='+'||k==='-'||k==='*'||k==='/'){e.preventDefault();setCalcOperator(k);} 
+            else if(k==='Enter'||k==='='){e.preventDefault();calculateCalc();} else if(k==='Escape'){e.preventDefault();clearCalc();}
+            else if(k==='Backspace'){e.preventDefault(); if(calcInput.length>1) calcInput=calcInput.slice(0,-1); else calcInput='0'; updateDisplay();}
         });
 
         // الملاحظات
         const notes = document.getElementById('notesArea');
-        document.getElementById('saveLocal').addEventListener('click', () => {
-            localStorage.setItem('employeeNotes', notes.value);
-            alert('تم حفظ الملاحظات بنجاح.');
-        });
-        document.getElementById('exportNotes').addEventListener('click', () => {
-            const blob = new Blob([notes.value], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `notes_faroukgrup_${new Date().toISOString().slice(0,10)}.txt`;
-            a.click();
-        });
-        document.getElementById('importNotes').addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.txt';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = (ev) => notes.value = ev.target.result;
-                reader.readAsText(file);
-            };
-            input.click();
-        });
+        document.getElementById('saveLocal').addEventListener('click', ()=>{ localStorage.setItem('employeeNotes', notes.value); alert('تم حفظ الملاحظات.'); });
+        document.getElementById('exportNotes').addEventListener('click', ()=>{ const blob=new Blob([notes.value],{type:'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`notes_faroukgrup_${new Date().toISOString().slice(0,10)}.txt`; a.click(); });
+        document.getElementById('importNotes').addEventListener('click', ()=>{ const input=document.createElement('input'); input.type='file'; input.accept='.txt'; input.onchange=e=>{ const file=e.target.files[0]; const reader=new FileReader(); reader.onload=ev=>notes.value=ev.target.result; reader.readAsText(file); }; input.click(); });
 
         // المواعيد
         let apps = JSON.parse(localStorage.getItem('employeeAppointments') || '[]');
-        const appTitle = document.getElementById('appTitle');
-        const appDate = document.getElementById('appDate');
-        const appDesc = document.getElementById('appDesc');
-        const appList = document.getElementById('appointmentsList');
-
+        const appTitle = document.getElementById('appTitle'), appDate = document.getElementById('appDate'), appDesc = document.getElementById('appDesc'), appList = document.getElementById('appointmentsList');
         function renderApps() {
             appList.innerHTML = '';
-            apps.slice().sort((a,b) => a.date.localeCompare(b.date)).forEach((a, idx) => {
-                const d = new Date(a.date).toLocaleDateString('ar-EG', { day:'numeric', month:'short' });
-                const div = document.createElement('div');
-                div.className = 'appointment-item';
-                let detailsHtml = '';
-                if (a.desc && a.desc.trim() !== '') {
-                    detailsHtml = `<div class="appointment-desc">📝 ${a.desc}</div>`;
-                }
-                div.innerHTML = `
-                    <div class="appointment-info">
-                        <span class="appointment-date">${d}</span> 
-                        <span class="appointment-title">${a.title}</span>
-                        ${detailsHtml}
-                    </div>
-                    <span class="delete-btn delete-app" data-idx="${apps.indexOf(a)}"><i class="fas fa-trash-alt"></i></span>
-                `;
+            apps.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(a => {
+                const d = new Date(a.date).toLocaleDateString('ar-EG',{day:'numeric',month:'short'});
+                const div = document.createElement('div'); div.className='appointment-item';
+                let descHtml = a.desc && a.desc.trim() ? `<div class="appointment-desc">📝 ${a.desc}</div>` : '';
+                div.innerHTML = `<div class="appointment-info"><span class="appointment-date">${d}</span> <span class="appointment-title">${a.title}</span>${descHtml}</div><span class="delete-btn delete-app" data-idx="${apps.indexOf(a)}"><i class="fas fa-trash-alt"></i></span>`;
                 appList.appendChild(div);
             });
-            document.querySelectorAll('.delete-app').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const idx = btn.dataset.idx;
-                    if (confirm("هل أنت متأكد من حذف هذا الموعد؟")) {
-                        apps.splice(idx, 1);
-                        localStorage.setItem('employeeAppointments', JSON.stringify(apps));
-                        renderApps();
-                    }
-                });
-            });
+            document.querySelectorAll('.delete-app').forEach(btn => btn.addEventListener('click', e => { if(confirm('حذف الموعد؟')) { apps.splice(btn.dataset.idx,1); localStorage.setItem('employeeAppointments', JSON.stringify(apps)); renderApps(); } }));
         }
+        document.getElementById('addAppBtn').addEventListener('click', ()=>{ if(!appTitle.value||!appDate.value) return alert('يرجى إدخال العنوان والتاريخ'); apps.push({title:appTitle.value, date:appDate.value, desc:appDesc.value}); localStorage.setItem('employeeAppointments', JSON.stringify(apps)); renderApps(); appTitle.value=''; appDate.value=''; appDesc.value=''; });
+        document.getElementById('exportApps').addEventListener('click', ()=>{ const lines = apps.map(a=>`${a.date},${a.title},${a.desc}`).join('\n'); const blob=new Blob(['التاريخ,العنوان,الوصف\n'+lines],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`appointments_faroukgrup_${new Date().toISOString().slice(0,10)}.csv`; a.click(); });
 
-        document.getElementById('addAppBtn').addEventListener('click', () => {
-            if (!appTitle.value || !appDate.value) return alert('يرجى إدخال العنوان والتاريخ');
-            apps.push({ title: appTitle.value, date: appDate.value, desc: appDesc.value });
-            localStorage.setItem('employeeAppointments', JSON.stringify(apps));
-            renderApps();
-            appTitle.value = ''; appDate.value = ''; appDesc.value = '';
-        });
-        document.getElementById('exportApps').addEventListener('click', () => {
-            const lines = apps.map(a => `${a.date},${a.title},${a.desc}`).join('\n');
-            const blob = new Blob(['التاريخ,العنوان,الوصف\n' + lines], { type: 'text/csv' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `appointments_faroukgrup_${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-        });
+        function loadNotes() { const saved = localStorage.getItem('employeeNotes'); if(saved) notes.value = saved; }
+        function loadAppointments() { apps = JSON.parse(localStorage.getItem('employeeAppointments') || '[]'); renderApps(); }
+        function renderTools() { const grid = document.getElementById('toolsGrid'); grid.innerHTML = ''; tools.forEach(t => { const card = document.createElement('div'); card.className='tool-card'; card.onclick = () => location.href = t.file; card.innerHTML = `<i class="fas ${t.icon}"></i><h4>${t.name}</h4>`; grid.appendChild(card); }); }
 
-        function loadNotes() {
-            const saved = localStorage.getItem('employeeNotes');
-            if (saved) notes.value = saved;
-        }
-        function loadAppointments() {
-            apps = JSON.parse(localStorage.getItem('employeeAppointments') || '[]');
-            renderApps();
-        }
+        function loadAllData() { loadTodos(); loadNotes(); loadAppointments(); renderTools(); }
 
-        function renderTools() {
-            const grid = document.getElementById('toolsGrid');
-            grid.innerHTML = '';
-            tools.forEach(t => {
-                const card = document.createElement('div');
-                card.className = 'tool-card';
-                card.onclick = () => location.href = t.file;
-                card.innerHTML = `<i class="fas ${t.icon}"></i><h4>${t.name}</h4>`;
-                grid.appendChild(card);
-            });
-        }
-
-        const dateSpan = document.getElementById('currentDate');
-        const timeSpan = document.getElementById('currentTime');
-        function updateDateTime() {
-            const now = new Date();
-            dateSpan.textContent = now.toLocaleDateString('ar-EG', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-            timeSpan.textContent = now.toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-        }
+        const dateSpan = document.getElementById('currentDate'), timeSpan = document.getElementById('currentTime');
+        function updateDateTime() { const now = new Date(); dateSpan.textContent = now.toLocaleDateString('ar-EG', { weekday:'long', year:'numeric', month:'long', day:'numeric' }); timeSpan.textContent = now.toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
     </script>
 </body>
 </html>

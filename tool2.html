@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
 <title>حاسبة تكاليف المطاعم الشاملة | FAROUK GRUP</title>
 <!-- حماية الصفحة -->
-    <script src="auth-check.js"></script>
+<script src="auth-check.js"></script>
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@700;900&display=swap" rel="stylesheet">
@@ -14,6 +14,9 @@
 <!-- Chart.js & html2canvas -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- إضافة مكتبات Excel -->
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -31,8 +34,8 @@
     --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
     --radius-md: 20px;
     --radius-lg: 30px;
-    --transition: all 0.3s ease;
-    --gold: #b8860b;      /* احتفظ بها للتوافق */
+    --transition: all 0.2s ease;
+    --gold: #b8860b;
     --gold-light: #d4b15a;
     --gold-soft: rgba(184,134,11,0.1);
     --dark: #0f0f0f;
@@ -52,6 +55,33 @@ body {
     line-height: 1.6;
     min-height: 100vh;
     position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========== تحسينات الأداء ومنع الاهتزاز ========== */
+.calc-box, .result-card, .chart-container, canvas, .table-container, .btn-calculate,
+.chart-card, .scenario-card, .collapsible, .hero-mini, .currency-row {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: transform, opacity;
+}
+
+.result-card, .table-container, .chart-container, .chart-card {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.calc-box {
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+}
+
+.no-transition, .no-transition * {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
 }
 
 /* خلفية متوهجة */
@@ -97,8 +127,6 @@ body {
     100% { transform: translate(0,0) rotate(0deg); }
 }
 
-/* تم إزالة الـ NAV بالكامل */
-
 .hero-mini {
     background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
     color: white; text-align: center; padding: 3rem 1rem;
@@ -113,177 +141,84 @@ body {
 .hero-mini h2 { font-size: 2.5rem; font-weight: 900; color: var(--gold-light); margin-bottom: 0.5rem; position: relative; z-index: 2; }
 .hero-mini p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; opacity: 0.95; position: relative; z-index: 2; }
 
-.calc-wrapper {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    position: relative;
-    z-index: 2;
-}
+.calc-wrapper { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; position: relative; z-index: 2; }
 
-/* البطاقة الرئيسية */
 .calc-box {
-    background: var(--bg-panel);
-    backdrop-filter: blur(15px);
-    border: 2px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    box-shadow: var(--shadow-soft);
-    position: relative;
-    overflow: hidden;
+    background: var(--bg-panel); border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-soft); position: relative; overflow: hidden;
 }
-.calc-box:hover {
-    box-shadow: var(--shadow-glow);
-    border-color: rgba(180,133,84,0.4);
-}
+.calc-box:hover { box-shadow: var(--shadow-glow); border-color: rgba(180,133,84,0.4); }
 .calc-box h2 {
-    font-size: 1.8rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, #f0e6d2, #cfa776);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 1.5rem;
-    text-align: center;
+    font-size: 1.8rem; font-weight: 900; background: linear-gradient(135deg, #f0e6d2, #cfa776);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1.5rem; text-align: center;
 }
 .featured-badge {
-    position: absolute;
-    top: -10px;
-    left: -10px;
-    background: linear-gradient(135deg, var(--accent-glow), var(--gold-light));
-    color: #111;
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-    font-weight: 900;
-    border: 3px solid white;
-    z-index: 10;
+    position: absolute; top: -10px; left: -10px; background: linear-gradient(135deg, var(--accent-glow), var(--gold-light));
+    color: #111; width: 90px; height: 90px; border-radius: 50%; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900; border: 3px solid white; z-index: 10;
 }
 .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
 .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
 
 .currency-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(180,133,84,0.15);
-    border: 1px solid var(--border-light);
-    padding: 0.8rem 1rem;
-    border-radius: 50px;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
+    display: flex; align-items: center; gap: 1rem; background: rgba(180,133,84,0.15);
+    border: 1px solid var(--border-light); padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 2rem; flex-wrap: wrap;
 }
 .currency-row label { font-weight: 700; color: var(--accent-soft); margin: 0; }
 .currency-row select, .currency-row input {
-    width: 150px;
-    padding: 0.5rem 1rem;
-    border: 2px solid var(--border-light);
-    border-radius: 30px;
-    font-family: 'Tajawal', sans-serif;
-    font-weight: 700;
-    background: rgba(10,14,23,0.7);
-    color: var(--text-light);
+    width: 150px; padding: 0.5rem 1rem; border: 2px solid var(--border-light); border-radius: 30px;
+    font-family: 'Tajawal', sans-serif; font-weight: 700; background: rgba(10,14,23,0.7); color: var(--text-light);
 }
 .currency-row input { width: 250px; }
 .currency-row select option { background: #0b0e17; color: #f0f4fa; }
 
 .section-title-sm {
-    font-size: 1.3rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, #f0e6d2, #cfd9ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin: 1.2rem 0 0.8rem 0;
-    border-bottom: 2px solid var(--border-light);
-    padding-bottom: 0.3rem;
+    font-size: 1.3rem; font-weight: 900; background: linear-gradient(135deg, #f0e6d2, #cfd9ff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 1.2rem 0 0.8rem 0;
+    border-bottom: 2px solid var(--border-light); padding-bottom: 0.3rem;
 }
 .form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
 .form-group { flex: 1 1 200px; margin-bottom: 0.8rem; position: relative; }
 label { display: block; margin-bottom: 0.3rem; font-weight: 700; color: var(--accent-soft); font-size: 0.9rem; }
 label i { color: var(--accent-soft); margin-left: 0.3rem; }
 input, select {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    border: 2px solid var(--border-light);
-    border-radius: 30px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.95rem;
-    transition: var(--transition);
-    background: rgba(10,14,23,0.7);
-    color: var(--text-light);
+    width: 100%; padding: 0.8rem 1rem; border: 2px solid var(--border-light); border-radius: 30px;
+    font-family: 'Inter', sans-serif; font-size: 0.95rem; transition: var(--transition);
+    background: rgba(10,14,23,0.7); color: var(--text-light);
 }
 input:focus, select:focus {
-    outline: none;
-    border-color: var(--accent-glow);
-    box-shadow: 0 0 0 3px rgba(180,133,84,0.2);
+    outline: none; border-color: var(--accent-glow); box-shadow: 0 0 0 3px rgba(180,133,84,0.2);
     background: rgba(15,20,30,0.9);
 }
-.tooltip {
-    position: relative;
-    cursor: help;
-}
+.tooltip { position: relative; cursor: help; }
 .tooltip .tooltiptext {
-    visibility: hidden;
-    width: 220px;
-    background-color: var(--dark);
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 8px;
-    position: absolute;
-    z-index: 100;
-    bottom: 130%; left: 50%;
-    margin-left: -110px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    font-size: 0.85rem;
-    border: 1px solid var(--gold);
+    visibility: hidden; width: 220px; background-color: var(--dark); color: #fff; text-align: center;
+    border-radius: 6px; padding: 8px; position: absolute; z-index: 100; bottom: 130%; left: 50%;
+    margin-left: -110px; opacity: 0; transition: opacity 0.3s; font-size: 0.85rem; border: 1px solid var(--gold);
     pointer-events: none;
 }
 .tooltip .tooltiptext::after {
     content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
     border-width: 5px; border-style: solid; border-color: var(--dark) transparent transparent transparent;
 }
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
+.tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
 .btn-calculate {
-    display: flex; align-items: center; justify-content: center; gap: 1rem;
-    width: 100%; padding: 1.2rem; border-radius: 50px;
-    background: rgba(180,133,84,0.2);
-    border: 1px solid var(--border-light);
-    color: var(--accent-soft);
-    font-weight: 900; font-size: 1.2rem; cursor: pointer;
-    transition: var(--transition); backdrop-filter: blur(10px); margin: 1.5rem 0;
+    display: flex; align-items: center; justify-content: center; gap: 1rem; width: 100%; padding: 1.2rem;
+    border-radius: 50px; background: rgba(180,133,84,0.2); border: 1px solid var(--border-light);
+    color: var(--accent-soft); font-weight: 900; font-size: 1.2rem; cursor: pointer; transition: var(--transition);
+    backdrop-filter: blur(10px); margin: 1.5rem 0;
 }
 .btn-calculate:hover {
-    background: rgba(180,133,84,0.4);
-    color: #fff; border-color: var(--accent-glow);
-    box-shadow: 0 0 25px rgba(180,133,84,0.3);
-    transform: translateY(-3px);
+    background: rgba(180,133,84,0.4); color: #fff; border-color: var(--accent-glow);
+    box-shadow: 0 0 25px rgba(180,133,84,0.3); transform: translateY(-3px);
 }
 .results-section { margin-top: 2rem; }
-.results-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem; margin-bottom: 1.5rem;
-}
+.results-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
 .result-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
-    padding: 1.2rem; text-align: center;
-    box-shadow: var(--shadow-soft); transition: var(--transition);
+    background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-md);
+    padding: 1.2rem; text-align: center; box-shadow: var(--shadow-soft); transition: var(--transition);
 }
-.result-card:hover {
-    transform: translateY(-5px); border-color: var(--accent-glow);
-    box-shadow: var(--shadow-glow);
-}
+.result-card:hover { transform: translateY(-5px); border-color: var(--accent-glow); box-shadow: var(--shadow-glow); }
 .result-card i { font-size: 1.8rem; color: var(--accent-soft); margin-bottom: 0.5rem; }
 .result-card h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem; }
 .result-card .value { font-size: 1.4rem; font-weight: 900; color: var(--accent-soft); }
@@ -300,47 +235,29 @@ input:focus, select:focus {
     border-radius: var(--radius-md); background: var(--bg-card); padding: 0.8rem;
 }
 table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-th {
-    background: rgba(180,133,84,0.2); color: var(--accent-soft);
-    font-weight: 900; padding: 0.5rem; border-bottom: 2px solid var(--border-light);
-}
+th { background: rgba(180,133,84,0.2); color: var(--accent-soft); font-weight: 900; padding: 0.5rem; border-bottom: 2px solid var(--border-light); }
 td { padding: 0.5rem; border-bottom: 1px solid rgba(180,133,84,0.2); text-align: center; color: var(--text-light); }
 tr:last-child td { border-bottom: none; }
 .positive { color: #4ade80; font-weight: 700; }
 .negative { color: #f87171; font-weight: 700; }
 
-.export-container {
-    display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; margin: 1.5rem 0;
+.export-container { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; margin: 1.5rem 0; }
+.export-btn, .export-word-btn, .export-excel-full-btn {
+    background: rgba(180,133,84,0.15); border: 1px solid var(--border-light); border-radius: 40px;
+    padding: 0.8rem 1.5rem; color: var(--accent-soft); font-weight: 700; cursor: pointer;
+    transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;
 }
-.export-btn, .export-word-btn {
-    background: rgba(180,133,84,0.15);
-    border: 1px solid var(--border-light); border-radius: 40px; padding: 0.8rem 1.5rem;
-    color: var(--accent-soft); font-weight: 700; cursor: pointer; transition: var(--transition);
-    display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;
-}
-.export-btn:hover, .export-word-btn:hover {
-    background: rgba(180,133,84,0.3); color: #fff;
-    border-color: var(--accent-glow); box-shadow: 0 0 15px rgba(180,133,84,0.3);
+.export-btn:hover, .export-word-btn:hover, .export-excel-full-btn:hover {
+    background: rgba(180,133,84,0.3); color: #fff; border-color: var(--accent-glow); box-shadow: 0 0 15px rgba(180,133,84,0.3);
 }
 
-.charts-container {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem; margin: 2rem 0;
-}
-.chart-card {
-    background: var(--bg-card); border: 1px solid var(--border-light);
-    border-radius: var(--radius-md); padding: 1rem;
-}
+.charts-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+.chart-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1rem; }
 .chart-card h3 { color: var(--accent-soft); font-size: 1rem; margin-bottom: 0.8rem; text-align: center; }
 canvas { width: 100% !important; height: auto !important; max-height: 250px; }
 
-.scenario-container {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem; margin: 1rem 0;
-}
-.scenario-card {
-    background: var(--bg-card); border: 2px solid; border-radius: var(--radius-md); padding: 1rem; text-align: center;
-}
+.scenario-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1rem 0; }
+.scenario-card { background: var(--bg-card); border: 2px solid; border-radius: var(--radius-md); padding: 1rem; text-align: center; }
 .scenario-card.pessimistic { border-color: var(--danger); }
 .scenario-card.expected { border-color: var(--warning); }
 .scenario-card.optimistic { border-color: var(--success); }
@@ -348,168 +265,88 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
 .scenario-card .value { font-size: 1.2rem; font-weight: 900; color: var(--accent-soft); }
 .scenario-card .label { color: var(--text-muted); font-size: 0.8rem; }
 
-/* ========== أنماط الأزرار القابلة للطي ========== */
 .collapsible {
-    background: rgba(180,133,84,0.15);
-    color: var(--accent-soft);
-    cursor: pointer;
-    padding: 18px;
-    width: 100%;
-    border: 1px solid var(--border-light);
-    text-align: right;
-    outline: none;
-    font-size: 1.2rem;
-    font-weight: 900;
-    border-radius: 30px;
-    margin-top: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    background: rgba(180,133,84,0.15); color: var(--accent-soft); cursor: pointer; padding: 18px; width: 100%;
+    border: 1px solid var(--border-light); text-align: right; outline: none; font-size: 1.2rem; font-weight: 900;
+    border-radius: 30px; margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;
     transition: var(--transition);
 }
-.collapsible:hover {
-    background: rgba(180,133,84,0.25);
-    border-color: var(--accent-glow);
-}
-.collapsible i {
-    transition: transform 0.3s;
-}
-.collapsible.active i {
-    transform: rotate(180deg);
-}
+.collapsible:hover { background: rgba(180,133,84,0.25); border-color: var(--accent-glow); }
+.collapsible i { transition: transform 0.3s; }
+.collapsible.active i { transform: rotate(180deg); }
 .collapsible-content {
-    padding: 0 18px;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-    background-color: rgba(0,0,0,0.2);
-    border-radius: 0 0 20px 20px;
+    padding: 0 18px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out;
+    background-color: rgba(0,0,0,0.2); border-radius: 0 0 20px 20px;
 }
 
-/* فوتر مبسط */
+/* شاشة تحميل التصدير */
+.export-loading {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center;
+    flex-direction: column; backdrop-filter: blur(6px);
+}
+.export-loading.show { display: flex; }
+.export-loading-box {
+    background: var(--bg-panel); border: 2px solid var(--border-light); border-radius: 24px;
+    padding: 2rem 3rem; text-align: center; box-shadow: var(--shadow-glow);
+}
+.export-loading-box i {
+    font-size: 3rem; color: var(--accent-soft); animation: spin 1s linear infinite;
+    display: block; margin-bottom: 1rem;
+}
+.export-loading-box h3 { color: var(--accent-soft); margin-bottom: 0.5rem; font-size: 1.2rem; }
+.export-loading-box p { color: var(--text-muted); font-size: 0.9rem; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
 .footer-simple {
-    text-align: center; padding: 1.5rem; margin-top: 2rem;
-    background: rgba(10,14,23,0.5); backdrop-filter: blur(5px);
-    border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.85rem;
+    text-align: center; padding: 1.5rem; margin-top: 2rem; background: rgba(10,14,23,0.5);
+    backdrop-filter: blur(5px); border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.85rem;
 }
 .footer-simple span { color: var(--accent-soft); font-weight: 700; }
 
-/* الآلة الحاسبة المنبثقة (تتناسق مع الهوية) */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.8);
-    backdrop-filter: blur(4px);
+    display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+    overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
 }
 .modal-content {
-    background: var(--bg-panel);
-    margin: 5% auto;
-    padding: 0;
-    border: 2px solid var(--border-light);
-    border-radius: 30px;
-    width: 90%;
-    max-width: 300px;
-    box-shadow: var(--shadow-glow);
+    background: var(--bg-panel); margin: 5% auto; padding: 0; border: 2px solid var(--border-light);
+    border-radius: 30px; width: 90%; max-width: 300px; box-shadow: var(--shadow-glow);
 }
 .modal-header {
-    background: rgba(180,133,84,0.15);
-    border-bottom: 2px solid var(--border-light);
-    padding: 10px 15px;
-    border-radius: 28px 28px 0 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    background: rgba(180,133,84,0.15); border-bottom: 2px solid var(--border-light); padding: 10px 15px;
+    border-radius: 28px 28px 0 0; display: flex; align-items: center; justify-content: space-between;
 }
-.modal-header h2 {
-    margin: 0;
-    color: var(--accent-soft);
-    font-size: 1rem;
-    font-weight: 900;
-}
-.close {
-    color: var(--text-muted);
-    float: left;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
-}
+.modal-header h2 { margin: 0; color: var(--accent-soft); font-size: 1rem; font-weight: 900; }
+.close { color: var(--text-muted); float: left; font-size: 24px; font-weight: bold; cursor: pointer; }
 .close:hover { color: var(--accent-glow); }
 .modal-body { padding: 15px; }
 .calc-display {
-    width: 100%;
-    height: 45px;
-    font-size: 1.4rem;
-    text-align: left;
-    padding: 0 10px;
-    border: 2px solid var(--border-light);
-    border-radius: 20px;
-    margin-bottom: 15px;
-    background: rgba(10,14,23,0.8);
-    color: var(--accent-soft);
-    font-family: 'Inter', monospace;
-    direction: ltr;
+    width: 100%; height: 45px; font-size: 1.4rem; text-align: left; padding: 0 10px;
+    border: 2px solid var(--border-light); border-radius: 20px; margin-bottom: 15px;
+    background: rgba(10,14,23,0.8); color: var(--accent-soft); font-family: 'Inter', monospace; direction: ltr;
 }
-.calc-buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 5px;
-}
+.calc-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
 .calc-btn {
-    background: rgba(180,133,84,0.1);
-    border: 1px solid var(--border-light);
-    border-radius: 15px;
-    padding: 10px 0;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text-light);
-    cursor: pointer;
+    background: rgba(180,133,84,0.1); border: 1px solid var(--border-light); border-radius: 15px;
+    padding: 10px 0; font-size: 1rem; font-weight: 700; color: var(--text-light); cursor: pointer;
 }
-.calc-btn:hover {
-    background: rgba(180,133,84,0.3);
-    border-color: var(--accent-glow);
-}
+.calc-btn:hover { background: rgba(180,133,84,0.3); border-color: var(--accent-glow); }
 .calc-btn.operator { color: var(--accent-soft); }
-.calc-btn.equals {
-    background: rgba(180,133,84,0.3);
-    color: white;
-    grid-column: span 2;
-}
+.calc-btn.equals { background: rgba(180,133,84,0.3); color: white; grid-column: span 2; }
 .calc-btn.equals:hover { background: rgba(180,133,84,0.5); }
 
-/* زر الآلة الحاسبة العائم */
 .calc-floating-btn {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    background: rgba(180,133,84,0.2);
-    border: 1px solid var(--border-light);
-    border-radius: 50px;
-    padding: 0.8rem 1.2rem;
-    color: var(--accent-soft);
-    font-size: 1rem;
-    font-weight: 700;
-    z-index: 100;
-    backdrop-filter: blur(10px);
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    position: fixed; bottom: 20px; left: 20px; background: rgba(180,133,84,0.2);
+    border: 1px solid var(--border-light); border-radius: 50px; padding: 0.8rem 1.2rem;
+    color: var(--accent-soft); font-size: 1rem; font-weight: 700; z-index: 100;
+    backdrop-filter: blur(10px); cursor: pointer; transition: var(--transition);
+    display: flex; align-items: center; gap: 0.5rem;
 }
 .calc-floating-btn:hover {
-    background: rgba(180,133,84,0.4);
-    color: #fff;
-    border-color: var(--accent-glow);
+    background: rgba(180,133,84,0.4); color: #fff; border-color: var(--accent-glow);
     box-shadow: 0 0 15px rgba(180,133,84,0.3);
 }
 
-/* تحسينات الجوال */
 @media (max-width: 768px) {
     .hero-mini h2 { font-size: 2rem; }
     .hero-mini p { font-size: 1rem; }
@@ -520,31 +357,28 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
     .currency-row select, .currency-row input { width: 100%; }
     .charts-container { grid-template-columns: 1fr; }
 }
-/* إصلاح ظهور العناوين التي تختفي */
-.section-title-sm,
-.panel-header,
-.collapsible span,
-.result-card h4,
-.hero-mini h2 {
+.section-title-sm, .result-card h4, .hero-mini h2 {
     -webkit-text-fill-color: initial !important;
     color: var(--accent-soft) !important;
     background: none !important;
-    background-image: none !important;
     text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body>
 <body style="overflow-x: hidden;">
 <!-- خلفية متوهجة -->
-<div class="glow-bg">
-    <span></span><span></span><span></span>
-</div>
+<div class="glow-bg"><span></span><span></span><span></span></div>
 <div class="floating-shape shape-1"></div>
 <div class="floating-shape shape-2"></div>
 
-<!-- تم إزالة الـ NAV بالكامل -->
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">جاري إنشاء التقرير الاحترافي...</h3>
+        <p id="loadingMsg">يرجى الانتظار — قد يستغرق ذلك لحظات</p>
+    </div>
+</div>
 
 <section class="hero-mini">
     <h2>حاسبة تكاليف المطاعم الشاملة</h2>
@@ -553,10 +387,7 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
 
 <section class="calc-wrapper">
     <div class="calc-box" data-aos="fade-up">
-        <div class="featured-badge">
-            <i class="fas fa-utensils"></i>
-            <span>مطاعم</span>
-        </div>
+        <div class="featured-badge"><i class="fas fa-utensils"></i><span>مطاعم</span></div>
         <h2>تحليل تكاليف المطعم</h2>
 
         <!-- اختيار العملة واسم الجهة -->
@@ -757,14 +588,10 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
             <div class="section-title-sm">📊 تحليل بياني</div>
             <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
                 <div style="flex: 1; min-width: 300px;">
-                    <div class="chart-container">
-                        <canvas id="costPieChart"></canvas>
-                    </div>
+                    <div class="chart-container"><canvas id="costPieChart"></canvas></div>
                 </div>
                 <div style="flex: 1; min-width: 300px;">
-                    <div class="chart-container">
-                        <canvas id="breakevenChart"></canvas>
-                    </div>
+                    <div class="chart-container"><canvas id="breakevenChart"></canvas></div>
                 </div>
             </div>
 
@@ -833,8 +660,8 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
 
             <!-- أزرار التصدير -->
             <div class="export-container">
-                <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير الجدول إلى Excel</button>
                 <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير تقرير كامل (Word)</button>
+                <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> تصدير إلى Excel شامل (مدخلات + نتائج + رسوم)</button>
             </div>
 
             <!-- نقطة التعادل (بسيطة) -->
@@ -881,8 +708,8 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
                 <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
                 <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
                 <button class="calc-btn" onclick="clearCalculator()">C</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
                 <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
                 <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
                 <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
                 <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
@@ -891,814 +718,522 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
     </div>
 </div>
 
-<!-- AOS JS -->
+<a href="index.html" style="position: fixed; bottom: 20px; right: 20px; background: rgba(180,133,84,0.9); color: white; padding: 12px 20px; border-radius: 50px; text-decoration: none; font-family: 'Tajawal', sans-serif; font-weight: bold; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 9999; display: flex; align-items: center; gap: 8px; transition: 0.3s;" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';"><i class="fas fa-home"></i> الرئيسية</a>
+
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
     AOS.init({ duration: 800, once: true, offset: 100 });
-</script>
 
-<script>
-// ------------------ آلة حاسبة منبثقة ------------------
-const calcDisplay = document.getElementById('calcDisplay');
-let currentCalcInput = '';
-
-window.handleCalculatorInput = function(value) {
-    currentCalcInput += value;
-    calcDisplay.value = currentCalcInput;
-}
-
-window.clearCalculator = function() {
-    currentCalcInput = '';
-    calcDisplay.value = '';
-}
-
-window.backspaceCalculator = function() {
-    currentCalcInput = currentCalcInput.slice(0, -1);
-    calcDisplay.value = currentCalcInput;
-}
-
-window.calculateCalculatorResult = function() {
-    try {
-        let expression = currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/');
-        let result = eval(expression);
-        calcDisplay.value = result;
-        currentCalcInput = result.toString();
-    } catch (e) {
-        calcDisplay.value = 'خطأ';
-        currentCalcInput = '';
+    // دوال مساعدة للتحميل
+    function showLoading(title, msg) {
+        document.getElementById('loadingTitle').textContent = title;
+        document.getElementById('loadingMsg').textContent = msg;
+        document.getElementById('exportLoading').classList.add('show');
     }
-}
-
-function handleKeyboard(e) {
-    if (modal.style.display !== 'block') return;
-    const key = e.key;
-    e.preventDefault();
-    e.stopPropagation();
-    if (key >= '0' && key <= '9') handleCalculatorInput(key);
-    else if (key === '.') handleCalculatorInput('.');
-    else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
-    else if (key === 'Enter' || key === '=') calculateCalculatorResult();
-    else if (key === 'Backspace') backspaceCalculator();
-    else if (key === 'Escape') modal.style.display = 'none';
-    else if (key === 'c' || key === 'C') clearCalculator();
-}
-
-document.addEventListener('keydown', handleKeyboard);
-
-const modal = document.getElementById('calculatorModal');
-const btn = document.getElementById('calculatorBtn');
-const span = document.getElementsByClassName('close')[0];
-
-btn.onclick = function(e) {
-    e.preventDefault();
-    modal.style.display = 'block';
-}
-
-span.onclick = function() {
-    modal.style.display = 'none';
-}
-
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = 'none';
-    }
-}
-
-// ------------------ عناصر قابلة للطي ------------------
-const coll = document.getElementsByClassName('collapsible');
-for (let i = 0; i < coll.length; i++) {
-    coll[i].addEventListener('click', function() {
-        this.classList.toggle('active');
-        const content = this.nextElementSibling;
-        if (content.style.maxHeight) {
-            content.style.maxHeight = null;
-        } else {
-            content.style.maxHeight = content.scrollHeight + 'px';
-        }
-    });
-}
-
-// ------------------ دوال التصدير ------------------
-function exportToExcel() {
-    const table = document.querySelector('#costBreakdownTable table');
-    if (!table) {
-        alert('لا يوجد جدول للتصدير. قم بإجراء التحليل أولاً.');
-        return;
+    function hideLoading() {
+        document.getElementById('exportLoading').classList.remove('show');
     }
 
-    const rows = [];
-    const headers = [];
-    table.querySelectorAll('thead th').forEach(th => headers.push(th.innerText));
-    rows.push(headers);
-
-    const trs = table.querySelectorAll('tbody tr');
-    trs.forEach(tr => {
-        const row = [];
-        tr.querySelectorAll('td').forEach(td => row.push(td.innerText));
-        rows.push(row);
+    // ------------------ آلة حاسبة منبثقة ------------------
+    const calcDisplay = document.getElementById('calcDisplay');
+    let currentCalcInput = '';
+    window.handleCalculatorInput = (v) => { currentCalcInput += v; calcDisplay.value = currentCalcInput; };
+    window.clearCalculator = () => { currentCalcInput = ''; calcDisplay.value = ''; };
+    window.backspaceCalculator = () => { currentCalcInput = currentCalcInput.slice(0,-1); calcDisplay.value = currentCalcInput; };
+    window.calculateCalculatorResult = () => {
+        try { let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/')); calcDisplay.value = r; currentCalcInput = r.toString(); }
+        catch(e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
+    };
+    const modal = document.getElementById('calculatorModal');
+    document.getElementById('calculatorBtn').onclick = () => { modal.style.display = 'block'; calcDisplay.value = currentCalcInput; };
+    document.querySelector('.close').onclick = () => modal.style.display = 'none';
+    window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; };
+    document.addEventListener('keydown', (e) => {
+        if (modal.style.display !== 'block') return;
+        e.preventDefault();
+        const k = e.key;
+        if (k>='0'&&k<='9') handleCalculatorInput(k);
+        else if (k=='.') handleCalculatorInput('.');
+        else if (k=='+'||k=='-'||k=='*'||k=='/') handleCalculatorInput(k);
+        else if (k=='Enter'||k=='=') calculateCalculatorResult();
+        else if (k=='Backspace') backspaceCalculator();
+        else if (k=='Escape') modal.style.display = 'none';
+        else if (k.toLowerCase()=='c') clearCalculator();
     });
 
-    let csvContent = rows.map(row => row.map(cell => {
-        if (cell.includes(',')) return `"${cell}"`;
-        return cell;
-    }).join(',')).join('\n');
-    
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const now = new Date();
-    const dateStr = now.toISOString().slice(0,10).replace(/-/g,'');
-    link.download = `تكاليف_مطعم_${dateStr}.csv`;
-    link.href = URL.createObjectURL(blob);
-    link.click();
-    URL.revokeObjectURL(link.href);
-}
-
-// دالة تصدير Word محسّنة مع تضمين كل شيء واسم الجهة
-async function exportToWord() {
-    const currency = document.getElementById('currencySelect').value;
-    const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
-    const resultsSection = document.getElementById('resultsSection');
-    if (resultsSection.style.display === 'none') {
-        alert('الرجاء إجراء التحليل أولاً.');
-        return;
-    }
-
-    try {
-        // جمع بطاقات KPI وتحويلها إلى جدول
-        const kpiCards = document.querySelectorAll('.result-card');
-        let kpiTableRows = '';
-        let row = '';
-        let count = 0;
-
-        kpiCards.forEach((card, index) => {
-            // استخراج المحتوى من كل بطاقة
-            const icon = card.querySelector('i') ? card.querySelector('i').outerHTML : '';
-            const title = card.querySelector('h4') ? card.querySelector('h4').innerText : '';
-            const value = card.querySelector('.value') ? card.querySelector('.value').innerText : '';
-            const unit = card.querySelector('.unit') ? card.querySelector('.unit').innerText : '';
-            const status = card.querySelector('.status') ? card.querySelector('.status').outerHTML : '';
-
-            // بناء خلية الجدول
-            const cell = `
-                <td style="border: 1px solid #b8860b; padding: 15px; text-align: center; background-color: #fefcf6; width: 50%;">
-                    ${icon}
-                    <h4 style="margin: 0.5rem 0; color: #666;">${title}</h4>
-                    <div class="value" style="font-size: 1.8rem; font-weight: 900; color: #b8860b;">${value}</div>
-                    <div class="unit" style="font-size: 0.9rem; color: #777;">${unit}</div>
-                    ${status ? status.replace(/class="status/g, 'style="margin-top:0.3rem; padding:0.2rem 0.5rem; border-radius:20px; display:inline-block;') : ''}
-                </td>
-            `;
-
-            row += cell;
-            count++;
-
-            // كل بطاقتين في صف واحد
-            if (count % 2 === 0 || index === kpiCards.length - 1) {
-                kpiTableRows += `<tr>${row}</tr>`;
-                row = '';
-            }
+    // ------------------ عناصر قابلة للطي ------------------
+    document.querySelectorAll('.collapsible').forEach(coll => {
+        coll.addEventListener('click', function() {
+            this.classList.toggle('active');
+            const content = this.nextElementSibling;
+            if (content.style.maxHeight) content.style.maxHeight = null;
+            else content.style.maxHeight = content.scrollHeight + 'px';
         });
-
-        // باقي العناصر
-        const smartAlertsHTML = document.getElementById('smartAlerts').innerHTML;
-        const tableHTML = document.querySelector('#costBreakdownTable').innerHTML;
-        const breakevenHTML = document.getElementById('breakevenSummary').innerHTML;
-        const paybackHTML = document.getElementById('paybackCard').innerHTML;
-        const sensitivityHTML = document.getElementById('sensitivityTable').innerHTML;
-        const healthScoreHTML = document.getElementById('healthScoreCard').innerHTML;
-        const valuationHTML = document.getElementById('valuationCard').innerHTML;
-        const shutdownHTML = document.getElementById('shutdownCard').innerHTML;
-        const leverageHTML = document.getElementById('operatingLeverageCard').innerHTML;
-        const marginHTML = document.getElementById('marginOfSafetyCard').innerHTML;
-        const capacityHTML = document.getElementById('capacityCard').innerHTML;
-        const efficiencyHTML = document.getElementById('efficiencyCard').innerHTML;
-        const monteCarloResults = document.getElementById('monteCarloResults').innerHTML;
-
-        // التقاط صور للرسوم البيانية
-        const pieCanvas = document.getElementById('costPieChart');
-        const lineCanvas = document.getElementById('breakevenChart');
-        
-        const [pieImg, lineImg] = await Promise.all([
-            html2canvas(pieCanvas, { scale: 2, backgroundColor: '#ffffff' }),
-            html2canvas(lineCanvas, { scale: 2, backgroundColor: '#ffffff' })
-        ]);
-        const pieData = pieImg.toDataURL('image/png');
-        const lineData = lineImg.toDataURL('image/png');
-
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
-
-        // بناء التقرير النهائي مع جدول KPI
-        const reportHTML = `
-            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-            <head>
-                <meta charset='utf-8'>
-                <title>تقرير تكاليف المطعم - FAROUK GRUP</title>
-                <style>
-                    body { font-family: 'Arial', sans-serif; direction: rtl; margin: 2rem; }
-                    .header { text-align: center; border-bottom: 3px solid #b8860b; padding-bottom: 10px; margin-bottom: 20px; }
-                    h2, h3 { color: #b8860b; }
-                    table { width: 100%; border-collapse: collapse; margin: 15px 0; direction: rtl; }
-                    th, td { border: 1px solid #b8860b; padding: 8px; text-align: center; }
-                    th { background: #fefcf6; color: #b8860b; }
-                    .result-card { background: #f9f9f9; border: 1px solid #b8860b; border-radius: 10px; padding: 1rem; margin: 1rem 0; }
-                    .status-good { background: #28a745; color: white; padding: 0.2rem 0.5rem; border-radius: 20px; display: inline-block; }
-                    .status-bad { background: #dc3545; color: white; padding: 0.2rem 0.5rem; border-radius: 20px; display: inline-block; }
-                    .status-warning { background: #ffc107; color: #111; padding: 0.2rem 0.5rem; border-radius: 20px; display: inline-block; }
-                    .chart-container { text-align: center; margin: 20px 0; }
-                    .chart-container img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 10px; }
-                    .footer { text-align: center; margin-top: 40px; color: #888; border-top: 1px dashed #b8860b; padding-top: 10px; }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h1 style="color:#b8860b; margin:0;">مجموعة فاروق للاستشارات والأعمال</h1>
-                    <p>تقرير تكاليف المطعم الشامل</p>
-                    <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
-                </div>
-
-                <h2>مؤشرات الأداء الرئيسية</h2>
-                <table style="width:100%; border-collapse: collapse;" dir="rtl">
-                    ${kpiTableRows}
-                </table>
-
-                <h2>تحذيرات ذكية</h2>
-                <div class="result-card">${smartAlertsHTML}</div>
-
-                <h2>الرسوم البيانية</h2>
-                <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
-                    <div style="flex:1; min-width:300px;">
-                        <h3>توزيع التكاليف</h3>
-                        <div class="chart-container"><img src="${pieData}" /></div>
-                    </div>
-                    <div style="flex:1; min-width:300px;">
-                        <h3>نقطة التعادل</h3>
-                        <div class="chart-container"><img src="${lineData}" /></div>
-                    </div>
-                </div>
-
-                <h2>تفصيل التكاليف الشهرية</h2>
-                ${tableHTML}
-
-                <h2>فترة استرداد الاستثمار</h2>
-                <div class="result-card">${paybackHTML}</div>
-
-                <h2>تحليل الحساسية</h2>
-                ${sensitivityHTML}
-
-                <h2>مؤشر صحة المطعم</h2>
-                <div class="result-card">${healthScoreHTML}</div>
-
-                <h2>تقدير قيمة المطعم</h2>
-                <div class="result-card">${valuationHTML}</div>
-
-                <h2>تحليلات متقدمة</h2>
-                <div class="result-card">
-                    <h3>محاكاة مونت كارلو</h3>
-                    ${monteCarloResults || '<p>لم يتم تشغيل المحاكاة بعد.</p>'}
-                </div>
-                <div class="result-card">
-                    <h3>نقطة الإغلاق</h3>
-                    ${shutdownHTML}
-                </div>
-                <div class="result-card">
-                    <h3>الرافعة التشغيلية</h3>
-                    ${leverageHTML}
-                </div>
-                <div class="result-card">
-                    <h3>هامش الأمان</h3>
-                    ${marginHTML}
-                </div>
-                <div class="result-card">
-                    <h3>تحليل القدرة والإشغال</h3>
-                    ${capacityHTML}
-                </div>
-                <div class="result-card">
-                    <h3>مؤشرات كفاءة التشغيل</h3>
-                    ${efficiencyHTML}
-                </div>
-
-                <h2>نقطة التعادل</h2>
-                <div class="result-card">${breakevenHTML}</div>
-
-                <div class="footer">
-                    تم استخراج هذا التقرير بواسطة مجموعة فاروق للاستشارات والأعمال - www.farouk-grup.com
-                </div>
-            </body>
-            </html>
-        `;
-
-        const blob = new Blob(['\uFEFF' + reportHTML], { type: 'application/msword' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `تقرير_مطعم_${companyName}_${now.toISOString().slice(0,10)}.doc`;
-        link.click();
-        URL.revokeObjectURL(link.href);
-
-    } catch (error) {
-        console.error('خطأ في تصدير Word:', error);
-        alert('حدث خطأ أثناء إنشاء التقرير. يرجى المحاولة مرة أخرى.');
-    }
-}
-
-// ------------------ حدث الحساب الرئيسي ------------------
-document.getElementById('calculateBtn').addEventListener('click', function() {
-    const currency = document.getElementById('currencySelect').value;
-
-    // قراءة المدخلات الأساسية
-    const dailyCustomers = parseFloat(document.getElementById('dailyCustomers').value) || 0;
-    const avgBill = parseFloat(document.getElementById('avgBill').value) || 0;
-    const workingDays = parseFloat(document.getElementById('workingDays').value) || 26;
-
-    const rent = parseFloat(document.getElementById('rent').value) || 0;
-    const salaries = parseFloat(document.getElementById('salaries').value) || 0;
-    const employeeBurden = parseFloat(document.getElementById('employeeBurden').value) / 100 || 0;
-    const utilities = parseFloat(document.getElementById('utilities').value) || 0;
-    const internet = parseFloat(document.getElementById('internet').value) || 0;
-    const maintenance = parseFloat(document.getElementById('maintenance').value) || 0;
-    const marketing = parseFloat(document.getElementById('marketing').value) || 0;
-    const otherFixed = parseFloat(document.getElementById('otherFixed').value) || 0;
-
-    const foodCostPct = parseFloat(document.getElementById('foodCostPct').value) / 100 || 0;
-    const drinkCostPct = parseFloat(document.getElementById('drinkCostPct').value) / 100 || 0;
-    const packagingPct = parseFloat(document.getElementById('packagingPct').value) / 100 || 0;
-    const deliveryPct = parseFloat(document.getElementById('deliveryPct').value) / 100 || 0;
-    const deliverySalesPct = parseFloat(document.getElementById('deliverySalesPct').value) / 100 || 0;
-    const wastePct = parseFloat(document.getElementById('wastePct').value) / 100 || 0;
-
-    const vatPct = parseFloat(document.getElementById('vatPct').value) / 100 || 0;
-    const initialInvestment = parseFloat(document.getElementById('initialInvestment').value) || 0;
-
-    // قراءة بيانات الموقع
-    const footTraffic = parseFloat(document.getElementById('footTraffic').value) || 0;
-    const entryRate = parseFloat(document.getElementById('entryRate').value) / 100 || 0;
-    const purchaseRate = parseFloat(document.getElementById('purchaseRate').value) / 100 || 0;
-    const tables = parseFloat(document.getElementById('tables').value) || 0;
-    const seatsPerTable = parseFloat(document.getElementById('seatsPerTable').value) || 4;
-    const sessionMinutes = parseFloat(document.getElementById('sessionMinutes').value) || 60;
-    const hoursOpen = parseFloat(document.getElementById('hoursOpen').value) || 10;
-
-    // حساب الإيرادات
-    const monthlyCustomers = dailyCustomers * workingDays;
-    const totalRevenueBeforeVAT = monthlyCustomers * avgBill;
-    const vatAmount = totalRevenueBeforeVAT * vatPct;
-    const netRevenue = totalRevenueBeforeVAT; // الإيرادات قبل الضريبة
-
-    // توزيع المبيعات
-    const foodSales = netRevenue * 0.7;
-    const drinkSales = netRevenue * 0.3;
-    const deliverySales = netRevenue * deliverySalesPct;
-    const dineInSales = netRevenue - deliverySales;
-
-    // التكاليف المتغيرة
-    const foodCost = foodSales * foodCostPct;
-    const drinkCost = drinkSales * drinkCostPct;
-    const packagingCost = netRevenue * packagingPct;
-    const deliveryCommission = deliverySales * deliveryPct;
-    const wasteCost = (foodCost + drinkCost) * wastePct;
-
-    // التكاليف الثابتة
-    const totalSalaryCost = salaries * (1 + employeeBurden);
-    const fixedCosts = rent + totalSalaryCost + utilities + internet + maintenance + marketing + otherFixed;
-
-    const totalVariableCost = foodCost + drinkCost + packagingCost + deliveryCommission + wasteCost;
-    const totalOperatingCost = fixedCosts + totalVariableCost;
-    const profitBeforeTax = netRevenue - totalOperatingCost;
-    const incomeTax = profitBeforeTax > 0 ? profitBeforeTax * 0.25 : 0; // افتراض ضريبة دخل 25%
-    const netProfit = profitBeforeTax - incomeTax;
-    const profitMargin = (netProfit / netRevenue) * 100;
-
-    // نقطة التعادل
-    const contributionMargin = netRevenue - totalVariableCost;
-    const contributionMarginRatio = contributionMargin / netRevenue;
-    const breakevenRevenue = fixedCosts / contributionMarginRatio;
-    const breakevenCustomers = fixedCosts / (avgBill * contributionMarginRatio);
-    const breakevenDays = breakevenCustomers / dailyCustomers;
-
-    // فترة استرداد الاستثمار
-    const annualProfit = netProfit * 12;
-    const paybackYears = initialInvestment / annualProfit;
-    const paybackMonths = paybackYears * 12;
-
-    // ------------------ تحليل الحساسية ------------------
-    const scenarios = [
-        { name: 'متفائل', multiplier: 1.4 },
-        { name: 'واقعي', multiplier: 1.0 },
-        { name: 'متشائم', multiplier: 0.6 }
-    ];
-    let sensitivityRows = '';
-    scenarios.forEach(s => {
-        const cust = dailyCustomers * s.multiplier;
-        const rev = cust * workingDays * avgBill;
-        const food = rev * 0.7 * foodCostPct;
-        const drink = rev * 0.3 * drinkCostPct;
-        const pack = rev * packagingPct;
-        const deliv = rev * deliverySalesPct * deliveryPct;
-        const waste = (food + drink) * wastePct;
-        const varCost = food + drink + pack + deliv + waste;
-        const profitBeforeTax = rev - fixedCosts - varCost;
-        const tax = profitBeforeTax > 0 ? profitBeforeTax * 0.25 : 0;
-        const profit = profitBeforeTax - tax;
-        const margin = (profit / rev) * 100;
-        sensitivityRows += `<tr>
-            <td>${s.name}</td>
-            <td>${cust.toFixed(0)}</td>
-            <td>${currency}${rev.toFixed(0)}</td>
-            <td class="${profit >= 0 ? 'positive' : 'negative'}">${currency}${profit.toFixed(0)}</td>
-            <td>${margin.toFixed(1)}%</td>
-        </tr>`;
     });
-    document.getElementById('sensitivityTable').innerHTML = `
-        <table>
-            <thead><tr><th>السيناريو</th><th>العملاء اليومي</th><th>الإيرادات الشهرية</th><th>صافي الربح</th><th>هامش الربح</th></tr></thead>
-            <tbody>${sensitivityRows}</tbody>
-        </table>
-    `;
 
-    // ------------------ مؤشر صحة المطعم ------------------
-    const foodCostRatio = foodCost / netRevenue;
-    const laborCostRatio = totalSalaryCost / netRevenue;
-    const rentRatio = rent / netRevenue;
-    let healthScore = 0;
-    healthScore += foodCostRatio <= 0.3 ? 25 : (foodCostRatio <= 0.35 ? 20 : 10);
-    healthScore += laborCostRatio <= 0.25 ? 25 : (laborCostRatio <= 0.3 ? 20 : 10);
-    healthScore += rentRatio <= 0.08 ? 25 : (rentRatio <= 0.12 ? 20 : 10);
-    healthScore += profitMargin >= 15 ? 25 : (profitMargin >= 10 ? 20 : 10);
-    let healthStatus = '';
-    let healthColor = '';
-    if (healthScore >= 80) { healthStatus = 'ممتاز 🟢'; healthColor = 'status-good'; }
-    else if (healthScore >= 60) { healthStatus = 'جيد 🟡'; healthColor = 'status-warning'; }
-    else { healthStatus = 'ضعيف 🔴'; healthColor = 'status-bad'; }
-    document.getElementById('healthScoreCard').innerHTML = `
-    <table style="width:100%; border-collapse: collapse; text-align: center;">
-        <thead>
-            <tr>
-                <th style="text-align: center; padding: 8px;">المؤشر</th>
-                <th style="text-align: center; padding: 8px;">القيمة</th>
-                <th style="text-align: center; padding: 8px;">التقييم</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="text-align: center; padding: 6px;">Food Cost</td>
-                <td style="text-align: center; padding: 6px;">${(foodCostRatio*100).toFixed(1)}%</td>
-                <td style="text-align: center; padding: 6px;">${foodCostRatio <= 0.3 ? '✅ جيد' : (foodCostRatio <= 0.35 ? '⚠️ متوسط' : '❌ مرتفع')}</td>
-            </tr>
-            <tr>
-                <td style="text-align: center; padding: 6px;">Labor Cost</td>
-                <td style="text-align: center; padding: 6px;">${(laborCostRatio*100).toFixed(1)}%</td>
-                <td style="text-align: center; padding: 6px;">${laborCostRatio <= 0.25 ? '✅ جيد' : (laborCostRatio <= 0.3 ? '⚠️ متوسط' : '❌ مرتفع')}</td>
-            </tr>
-            <tr>
-                <td style="text-align: center; padding: 6px;">Rent Ratio</td>
-                <td style="text-align: center; padding: 6px;">${(rentRatio*100).toFixed(1)}%</td>
-                <td style="text-align: center; padding: 6px;">${rentRatio <= 0.08 ? '✅ جيد' : (rentRatio <= 0.12 ? '⚠️ متوسط' : '❌ مرتفع')}</td>
-            </tr>
-            <tr>
-                <td style="text-align: center; padding: 6px;">Net Profit</td>
-                <td style="text-align: center; padding: 6px;">${profitMargin.toFixed(1)}%</td>
-                <td style="text-align: center; padding: 6px;">${profitMargin >= 15 ? '✅ جيد' : (profitMargin >= 10 ? '⚠️ متوسط' : '❌ ضعيف')}</td>
-            </tr>
-            <tr style="background: rgba(180,133,84,0.2); font-weight: bold;">
-                <td colspan="2" style="text-align: center; padding: 8px;">الدرجة الصحية</td>
-                <td style="text-align: center; padding: 8px;">
-                    <span class="status ${healthColor}">${healthScore} / 100 (${healthStatus})</span>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-`;
+    // متغيرات عامة للتخزين
+    let currentResults = null;
+    let currentInputs = null;
 
-    // ------------------ تحليلات متقدمة ------------------
-    // نقطة الإغلاق
-    const avgVarCostPerCustomer = totalVariableCost / monthlyCustomers;
-    let shutdownText = '';
-    if (avgBill < avgVarCostPerCustomer) {
-        shutdownText = `⚠️ المطعم يجب أن يغلق مؤقتاً لأن متوسط الفاتورة (${currency}${avgBill.toFixed(2)}) أقل من التكلفة المتغيرة للعميل (${currency}${avgVarCostPerCustomer.toFixed(2)}).`;
-    } else {
-        shutdownText = `✅ متوسط الفاتورة أعلى من التكلفة المتغيرة للعميل، لا يوجد خطر إغلاق فوري.`;
-    }
-    document.getElementById('shutdownCard').innerHTML = `<span>${shutdownText}</span>`;
+    // ------------------ دوال الرسم البياني (محسنة لمنع الاهتزاز) ------------------
+    function renderCharts(currency, netRevenue, fixedCosts, totalVariableCost, netProfit, monthlyCustomers, avgBill, breakevenCustomers, contributionMarginRatio) {
+        // تدمير المخططات القديمة
+        if (window.pieChart) { window.pieChart.destroy(); window.pieChart = null; }
+        if (window.lineChart) { window.lineChart.destroy(); window.lineChart = null; }
 
-    // الرافعة التشغيلية
-    const operatingLeverage = contributionMargin / (profitBeforeTax); // هامش المساهمة / الربح التشغيلي
-    const leverageInterpretation = !isNaN(operatingLeverage) && isFinite(operatingLeverage) ? `إذا زادت المبيعات 10%، سيزيد الربح ${(operatingLeverage * 10).toFixed(1)}%.` : 'غير قابلة للحساب';
-    document.getElementById('operatingLeverageCard').innerHTML = `<span>الرافعة التشغيلية: ${!isNaN(operatingLeverage) && isFinite(operatingLeverage) ? operatingLeverage.toFixed(2) : 'غير محددة'}<br>${leverageInterpretation}</span>`;
-
-    // هامش الأمان
-    const marginOfSafety = ((netRevenue - breakevenRevenue) / netRevenue) * 100;
-    const marginInterpretation = marginOfSafety > 0 ? `يمكن أن تنخفض المبيعات ${marginOfSafety.toFixed(1)}% قبل الوصول لنقطة التعادل.` : 'المبيعات أقل من نقطة التعادل';
-    document.getElementById('marginOfSafetyCard').innerHTML = `<span>هامش الأمان: ${marginOfSafety.toFixed(1)}%<br>${marginInterpretation}</span>`;
-
-    // تحليل القدرة القصوى والإشغال (محسن)
-    const totalSeats = tables * seatsPerTable;
-    const sessionsPerDay = hoursOpen * 60 / sessionMinutes;
-    const maxDailyCustomers = totalSeats * sessionsPerDay;
-    const occupancyRate = (dailyCustomers / maxDailyCustomers) * 100;
-    let capacityMessage = '';
-    if (dailyCustomers > maxDailyCustomers) {
-        capacityMessage = `🔴 المطعم يعمل فوق طاقته القصوى بنسبة ${((dailyCustomers / maxDailyCustomers) * 100).toFixed(1)}% (الطاقة القصوى ${maxDailyCustomers.toFixed(0)} عميل)`;
-    } else if (occupancyRate > 80) {
-        capacityMessage = `⚠️ المطعم يقترب من طاقته القصوى (${occupancyRate.toFixed(1)}%)`;
-    } else if (occupancyRate < 30) {
-        capacityMessage = `⚠️ المطعم يعمل بطاقة منخفضة جداً (${occupancyRate.toFixed(1)}%)`;
-    } else {
-        capacityMessage = `✅ إشغال مناسب (${occupancyRate.toFixed(1)}%)`;
-    }
-    document.getElementById('capacityCard').innerHTML = `
-        <span>الطاقة القصوى اليومية: ${maxDailyCustomers.toFixed(0)} عميل</span><br>
-        <span>الإشغال الفعلي: ${dailyCustomers} عميل (${occupancyRate.toFixed(1)}%)</span><br>
-        <span>${capacityMessage}</span>
-    `;
-
-    // مؤشرات كفاءة التشغيل
-    const estEmployees = Math.max(1, Math.ceil(salaries / 3000)); // تقدير عدد الموظفين
-    document.getElementById('efficiencyCard').innerHTML = `
-        <span>الإيراد لكل كرسي: ${currency}${(netRevenue / totalSeats).toFixed(0)}</span><br>
-        <span>الإيراد لكل موظف: ${currency}${(netRevenue / estEmployees).toFixed(0)}</span><br>
-        <span>الإيراد لكل طاولة: ${currency}${(netRevenue / tables).toFixed(0)}</span>
-    `;
-
-    // محاكاة مونت كارلو
-    document.getElementById('monteCarloResults').innerHTML = `اضغط على زر "تشغيل المحاكاة" للحصول على نتائج مونت كارلو.`;
-
-    // إضافة تحذير من تحليل الموقع (الخيار 1)
-    const customersFromLocation = footTraffic * entryRate * purchaseRate;
-    let locationAlert = '';
-    if (footTraffic > 0 && entryRate > 0 && purchaseRate > 0) {
-        const diffPercent = ((dailyCustomers - customersFromLocation) / customersFromLocation) * 100;
-        if (Math.abs(diffPercent) > 30) {
-            locationAlert = `⚠️ تباين كبير بين عدد العملاء المدخل (${dailyCustomers}) والعدد المتوقع من حركة المشاة (${customersFromLocation.toFixed(0)}).`;
-        } else {
-            locationAlert = `✅ عدد العملاء المدخل يتوافق مع تحليل الموقع.`;
-        }
-    }
-
-    // إظهار النتائج
-    document.getElementById('initialMessage').style.display = 'none';
-    document.getElementById('resultsSection').style.display = 'block';
-
-    // بطاقات KPI
-    document.getElementById('kpiCards').innerHTML = `
-        <div class="result-card">
-            <i class="fas fa-dollar-sign"></i>
-            <h4>الإيرادات الشهرية</h4>
-            <div class="value">${currency}${netRevenue.toFixed(0)}</div>
-            <div class="unit">(قبل الضريبة)</div>
-        </div>
-        <div class="result-card">
-            <i class="fas fa-file-invoice"></i>
-            <h4>التكاليف الثابتة</h4>
-            <div class="value">${currency}${fixedCosts.toFixed(0)}</div>
-        </div>
-        <div class="result-card">
-            <i class="fas fa-boxes"></i>
-            <h4>التكاليف المتغيرة</h4>
-            <div class="value">${currency}${totalVariableCost.toFixed(0)}</div>
-            <div class="unit">${((totalVariableCost/netRevenue)*100).toFixed(1)}%</div>
-        </div>
-        <div class="result-card">
-            <i class="fas fa-chart-line"></i>
-            <h4>صافي الربح</h4>
-            <div class="value">${currency}${netProfit.toFixed(0)}</div>
-            <div class="status ${netProfit > 0 ? 'status-good' : netProfit < 0 ? 'status-bad' : 'status-warning'}">
-                ${netProfit > 0 ? 'مربح' : netProfit < 0 ? 'خاسر' : 'محايد'}
-            </div>
-        </div>
-        <div class="result-card">
-            <i class="fas fa-percent"></i>
-            <h4>هامش الربح</h4>
-            <div class="value">${profitMargin.toFixed(1)}%</div>
-        </div>
-    `;
-
-    // مؤشرات ذكية (تتضمن تحذير الموقع)
-    const alerts = [];
-    if (foodCostRatio > 0.35) alerts.push('⚠️ نسبة تكلفة الطعام مرتفعة (>35%)');
-    if (laborCostRatio > 0.30) alerts.push('⚠️ نسبة تكلفة العمالة مرتفعة (>30%)');
-    if (wastePct > 0.05) alerts.push(`⚠️ نسبة الهدر مرتفعة (${(wastePct*100).toFixed(1)}%)`);
-    if (profitMargin < 10) alerts.push('⚠️ هامش الربح منخفض (<10%)');
-    if (profitMargin < 0) alerts.push('🔴 المشروع خاسر');
-    if (occupancyRate < 30) alerts.push('⚠️ نسبة الإشغال منخفضة جداً (<30%)');
-    if (marginOfSafety < 10) alerts.push('⚠️ هامش الأمان ضيق (<10%)');
-    if (locationAlert) alerts.push(locationAlert);
-    if (alerts.length === 0) alerts.push('✅ المؤشرات جيدة');
-    document.getElementById('smartAlerts').innerHTML = `<strong><i class="fas fa-exclamation-triangle" style="color:var(--accent-soft);"></i> تحذيرات ذكية:</strong><br> ${alerts.join('<br>')}`;
-
-    // جدول تفصيلي
-    document.getElementById('costBreakdownTable').innerHTML = `
-        <table>
-            <thead><tr><th>البند</th><th>القيمة (${currency})</th><th>نسبة من الإيرادات</th></tr></thead>
-            <tbody>
-                <tr><td>إيجار</td><td>${currency}${rent.toFixed(0)}</td><td>${((rent/netRevenue)*100).toFixed(1)}%</td></tr>
-                <tr><td>رواتب (بعد التحميل)</td><td>${currency}${totalSalaryCost.toFixed(0)}</td><td>${((totalSalaryCost/netRevenue)*100).toFixed(1)}%</td></tr>
-                <tr><td>فواتير</td><td>${currency}${utilities.toFixed(0)}</td><td>${((utilities/netRevenue)*100).toFixed(1)}%</td></tr>
-                <tr><td>إنترنت واشتراكات</td><td>${currency}${internet.toFixed(0)}</td><td>${((internet/netRevenue)*100).toFixed(1)}%</td></tr>
-                <tr><td>صيانة ونظافة</td><td>${currency}${maintenance.toFixed(0)}</td><td>${((maintenance/netRevenue)*100).toFixed(1)}%</td></tr>
-                <tr><td>تسويق</td><td>${currency}${marketing.toFixed(0)}</td><td>${((marketing/netRevenue)*100).toFixed(1)}%</td></tr>
-                <tr><td>مصاريف أخرى</td><td>${currency}${otherFixed.toFixed(0)}</td><td>${((otherFixed/netRevenue)*100).toFixed(1)}%</td></tr>
-                <tr><td>تكلفة الطعام</td><td>${currency}${foodCost.toFixed(0)}</td><td>${((foodCost/netRevenue)*100).toFixed(1)}%</td></tr>
-                <tr><td>تكلفة المشروبات</td><td>${currency}${drinkCost.toFixed(0)}</td><td>${((drinkCost/netRevenue)*100).toFixed(1)}%</td></tr>
-                <tr><td>تغليف</td><td>${currency}${packagingCost.toFixed(0)}</td><td>${((packagingCost/netRevenue)*100).toFixed(1)}%</td></tr>
-                <tr><td>عمولات التوصيل</td><td>${currency}${deliveryCommission.toFixed(0)}</td><td>${((deliveryCommission/netRevenue)*100).toFixed(1)}%</td></tr>
-                <tr><td>الهدر (Food Waste)</td><td>${currency}${wasteCost.toFixed(0)}</td><td>${((wasteCost/netRevenue)*100).toFixed(1)}%</td></tr>
-                <tr style="background:rgba(180,133,84,0.2); font-weight:900;"><td>الإجمالي</td><td>${currency}${totalOperatingCost.toFixed(0)}</td><td>${((totalOperatingCost/netRevenue)*100).toFixed(1)}%</td></tr>
-            </tbody>
-        </table>
-    `;
-
-    // فترة الاسترداد
-    document.getElementById('paybackCard').innerHTML = `
-        <span><i class="fas fa-clock" style="color:var(--accent-soft);"></i> فترة استرداد الاستثمار: <strong>${paybackYears.toFixed(1)} سنة</strong> (حوالي ${paybackMonths.toFixed(0)} شهراً).</span>
-    `;
-
-    // نقطة التعادل
-    document.getElementById('breakevenSummary').innerHTML = `
-        <span><i class="fas fa-chart-line" style="color:var(--accent-soft);"></i> تحتاج لتحقيق إيرادات شهرية <strong>${currency}${breakevenRevenue.toFixed(0)}</strong> لتغطية التكاليف.</span>
-        <span><i class="fas fa-users" style="color:var(--accent-soft);"></i> أي ما يعادل <strong>${breakevenCustomers.toFixed(0)}</strong> عميل شهرياً (حوالي <strong>${breakevenDays.toFixed(1)}</strong> يوم عمل).</span>
-    `;
-
-    // رسم بياني دائري
-    const pieCtx = document.getElementById('costPieChart').getContext('2d');
-    if (window.pieChart) window.pieChart.destroy();
-    window.pieChart = new Chart(pieCtx, {
-        type: 'pie',
-        data: {
-            labels: ['تكاليف ثابتة', 'تكاليف متغيرة', 'صافي الربح'],
-            datasets: [{
-                data: [fixedCosts, totalVariableCost, netProfit > 0 ? netProfit : 0],
-                backgroundColor: ['#dc3545', '#ffc107', '#28a745'],
-                borderColor: 'white',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: (ctx) => `${ctx.label}: ${currency}${ctx.raw.toFixed(0)}`
+        // إنشاء مخططات جديدة بعد تأخير بسيط
+        setTimeout(() => {
+            const pieCtx = document.getElementById('costPieChart')?.getContext('2d');
+            if (pieCtx) {
+                window.pieChart = new Chart(pieCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['تكاليف ثابتة', 'تكاليف متغيرة', 'صافي الربح'],
+                        datasets: [{
+                            data: [fixedCosts, totalVariableCost, netProfit > 0 ? netProfit : 0],
+                            backgroundColor: ['#dc3545', '#ffc107', '#28a745']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 300 },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => `${ctx.label}: ${currency}${ctx.raw.toFixed(0)}`
+                                }
+                            }
+                        }
                     }
+                });
+            }
+
+            const lineCtx = document.getElementById('breakevenChart')?.getContext('2d');
+            if (lineCtx) {
+                const maxX = Math.max(monthlyCustomers, breakevenCustomers) * 1.5;
+                const xVals = [], revLine = [], costLine = [];
+                for (let i = 0; i <= 20; i++) {
+                    let c = (i / 20) * maxX;
+                    xVals.push(c.toFixed(0));
+                    revLine.push(c * avgBill);
+                    costLine.push(fixedCosts + c * avgBill * (1 - contributionMarginRatio));
                 }
+                window.lineChart = new Chart(lineCtx, {
+                    type: 'line',
+                    data: {
+                        labels: xVals,
+                        datasets: [
+                            { label: 'الإيرادات', data: revLine, borderColor: '#28a745', tension: 0.1 },
+                            { label: 'التكاليف الكلية', data: costLine, borderColor: '#dc3545', tension: 0.1 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 300 },
+                        scales: {
+                            x: { title: { display: true, text: 'عدد العملاء' } },
+                            y: { title: { display: true, text: currency } }
+                        }
+                    }
+                });
             }
-        }
-    });
-
-    // رسم بياني خطي
-    const lineCtx = document.getElementById('breakevenChart').getContext('2d');
-    if (window.lineChart) window.lineChart.destroy();
-    const maxX = Math.max(monthlyCustomers, breakevenCustomers) * 1.5;
-    const points = 20;
-    const xValues = [];
-    const revenueLine = [];
-    const costLine = [];
-    for (let i = 0; i <= points; i++) {
-        let customers = (i / points) * maxX;
-        xValues.push(customers.toFixed(0));
-        revenueLine.push(customers * avgBill);
-        costLine.push(fixedCosts + customers * avgBill * (1 - contributionMarginRatio));
+        }, 20);
     }
-    window.lineChart = new Chart(lineCtx, {
-        type: 'line',
-        data: {
-            labels: xValues,
-            datasets: [
-                { label: 'الإيرادات', data: revenueLine, borderColor: '#28a745', fill: false, tension: 0.1 },
-                { label: 'التكاليف الكلية', data: costLine, borderColor: '#dc3545', fill: false, tension: 0.1 }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { title: { display: true, text: 'عدد العملاء' } },
-                y: { title: { display: true, text: currency } }
-            }
-        }
-    });
-});
 
-// حساب قيمة المطعم
-document.getElementById('calcValuationBtn').addEventListener('click', function() {
-    const currency = document.getElementById('currencySelect').value;
-    // استخراج صافي الربح الشهري من بطاقة KPI (الرابعة)
-    const profitElement = document.querySelector('#kpiCards .result-card:nth-child(4) .value');
-    let monthlyProfit = 0;
-    if (profitElement) {
-        const text = profitElement.innerText.replace(/[^0-9.-]/g, '');
-        monthlyProfit = parseFloat(text);
-    }
-    const annualProfit = monthlyProfit * 12;
-    const multiple = parseFloat(document.getElementById('valuationMultiple').value) || 3;
-    const valuation = annualProfit * multiple;
-    document.getElementById('valuationCard').innerHTML = `
-        <span><i class="fas fa-store" style="color:var(--accent-soft);"></i> القيمة التقديرية للمطعم: <strong>${currency}${valuation.toFixed(0)}</strong></span><br>
-        <span class="unit">(بناءً على صافي الربح السنوي ${currency}${annualProfit.toFixed(0)} ومضاعف ${multiple})</span>
-    `;
-});
+    // ------------------ الحساب الرئيسي ------------------
+    document.getElementById('calculateBtn').addEventListener('click', function() {
+        const currency = document.getElementById('currencySelect').value;
+        const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
 
-// محاكاة مونت كارلو (معدلة لتكون واقعية)
-document.getElementById('runMonteCarloBtn').addEventListener('click', function() {
-    const dailyCustomersBase = parseFloat(document.getElementById('dailyCustomers').value) || 50;
-    const avgBillBase = parseFloat(document.getElementById('avgBill').value) || 15;
-    const workingDays = parseFloat(document.getElementById('workingDays').value) || 26;
-    const foodCostPct = parseFloat(document.getElementById('foodCostPct').value) / 100 || 0.3;
-    const drinkCostPct = parseFloat(document.getElementById('drinkCostPct').value) / 100 || 0.2;
-    const packagingPct = parseFloat(document.getElementById('packagingPct').value) / 100 || 0.05;
-    const deliveryPct = parseFloat(document.getElementById('deliveryPct').value) / 100 || 0.15;
-    const deliverySalesPct = parseFloat(document.getElementById('deliverySalesPct').value) / 100 || 0.3;
-    const wastePct = parseFloat(document.getElementById('wastePct').value) / 100 || 0.03;
+        // قراءة المدخلات
+        const dailyCustomers = parseFloat(document.getElementById('dailyCustomers').value) || 0;
+        const avgBill = parseFloat(document.getElementById('avgBill').value) || 0;
+        const workingDays = parseFloat(document.getElementById('workingDays').value) || 26;
+        const rent = parseFloat(document.getElementById('rent').value) || 0;
+        const salaries = parseFloat(document.getElementById('salaries').value) || 0;
+        const employeeBurden = parseFloat(document.getElementById('employeeBurden').value) / 100 || 0;
+        const utilities = parseFloat(document.getElementById('utilities').value) || 0;
+        const internet = parseFloat(document.getElementById('internet').value) || 0;
+        const maintenance = parseFloat(document.getElementById('maintenance').value) || 0;
+        const marketing = parseFloat(document.getElementById('marketing').value) || 0;
+        const otherFixed = parseFloat(document.getElementById('otherFixed').value) || 0;
+        const foodCostPct = parseFloat(document.getElementById('foodCostPct').value) / 100 || 0;
+        const drinkCostPct = parseFloat(document.getElementById('drinkCostPct').value) / 100 || 0;
+        const packagingPct = parseFloat(document.getElementById('packagingPct').value) / 100 || 0;
+        const deliveryPct = parseFloat(document.getElementById('deliveryPct').value) / 100 || 0;
+        const deliverySalesPct = parseFloat(document.getElementById('deliverySalesPct').value) / 100 || 0;
+        const wastePct = parseFloat(document.getElementById('wastePct').value) / 100 || 0;
+        const vatPct = parseFloat(document.getElementById('vatPct').value) / 100 || 0;
+        const initialInvestment = parseFloat(document.getElementById('initialInvestment').value) || 0;
+        const footTraffic = parseFloat(document.getElementById('footTraffic').value) || 0;
+        const entryRate = parseFloat(document.getElementById('entryRate').value) / 100 || 0;
+        const purchaseRate = parseFloat(document.getElementById('purchaseRate').value) / 100 || 0;
+        const tables = parseFloat(document.getElementById('tables').value) || 0;
+        const seatsPerTable = parseFloat(document.getElementById('seatsPerTable').value) || 4;
+        const sessionMinutes = parseFloat(document.getElementById('sessionMinutes').value) || 60;
+        const hoursOpen = parseFloat(document.getElementById('hoursOpen').value) || 10;
 
-    // التكاليف الثابتة (محسوبة مسبقاً)
-    const rent = parseFloat(document.getElementById('rent').value) || 0;
-    const salaries = parseFloat(document.getElementById('salaries').value) || 0;
-    const employeeBurden = parseFloat(document.getElementById('employeeBurden').value) / 100 || 0;
-    const utilities = parseFloat(document.getElementById('utilities').value) || 0;
-    const internet = parseFloat(document.getElementById('internet').value) || 0;
-    const maintenance = parseFloat(document.getElementById('maintenance').value) || 0;
-    const marketing = parseFloat(document.getElementById('marketing').value) || 0;
-    const otherFixed = parseFloat(document.getElementById('otherFixed').value) || 0;
-    const totalSalaryCost = salaries * (1 + employeeBurden);
-    const fixedCosts = rent + totalSalaryCost + utilities + internet + maintenance + marketing + otherFixed;
+        // تخزين المدخلات
+        currentInputs = { dailyCustomers, avgBill, workingDays, rent, salaries, employeeBurden, utilities, internet, maintenance, marketing, otherFixed, foodCostPct, drinkCostPct, packagingPct, deliveryPct, deliverySalesPct, wastePct, vatPct, initialInvestment, footTraffic, entryRate, purchaseRate, tables, seatsPerTable, sessionMinutes, hoursOpen, currency, companyName };
 
-    const numSimulations = 1000;
-    let profits = [];
+        // حسابات
+        const monthlyCustomers = dailyCustomers * workingDays;
+        const netRevenue = monthlyCustomers * avgBill;
+        const totalSalaryCost = salaries * (1 + employeeBurden);
+        const fixedCosts = rent + totalSalaryCost + utilities + internet + maintenance + marketing + otherFixed;
 
-    for (let i = 0; i < numSimulations; i++) {
-        // نطاقات عشوائية واقعية حول القيم الأساسية (انحراف معياري 15%)
-        const custFactor = 0.7 + Math.random() * 0.6; // 0.7 - 1.3 (أوسع قليلاً)
-        const billFactor = 0.85 + Math.random() * 0.3; // 0.85 - 1.15
-        const foodFactor = 0.9 + Math.random() * 0.2; // 0.9 - 1.1
-        const drinkFactor = 0.9 + Math.random() * 0.2;
-
-        const cust = dailyCustomersBase * custFactor;
-        const bill = avgBillBase * billFactor;
-        const revenue = cust * workingDays * bill;
-
-        // تكاليف متغيرة
-        const foodSales = revenue * 0.7;
-        const drinkSales = revenue * 0.3;
-        const deliverySales = revenue * deliverySalesPct;
-        const foodCost = foodSales * foodCostPct * foodFactor;
-        const drinkCost = drinkSales * drinkCostPct * drinkFactor;
-        const packagingCost = revenue * packagingPct;
+        const foodSales = netRevenue * 0.7;
+        const drinkSales = netRevenue * 0.3;
+        const deliverySales = netRevenue * deliverySalesPct;
+        const foodCost = foodSales * foodCostPct;
+        const drinkCost = drinkSales * drinkCostPct;
+        const packagingCost = netRevenue * packagingPct;
         const deliveryCommission = deliverySales * deliveryPct;
         const wasteCost = (foodCost + drinkCost) * wastePct;
-        const totalVar = foodCost + drinkCost + packagingCost + deliveryCommission + wasteCost;
+        const totalVariableCost = foodCost + drinkCost + packagingCost + deliveryCommission + wasteCost;
+        const totalOperatingCost = fixedCosts + totalVariableCost;
+        const profitBeforeTax = netRevenue - totalOperatingCost;
+        const incomeTax = profitBeforeTax > 0 ? profitBeforeTax * 0.25 : 0;
+        const netProfit = profitBeforeTax - incomeTax;
+        const profitMargin = (netProfit / netRevenue) * 100;
 
-        const profitBeforeTax = revenue - fixedCosts - totalVar;
-        const tax = profitBeforeTax > 0 ? profitBeforeTax * 0.25 : 0;
-        const netProfit = profitBeforeTax - tax;
-        profits.push(netProfit);
+        const contributionMargin = netRevenue - totalVariableCost;
+        const contributionMarginRatio = contributionMargin / netRevenue;
+        const breakevenRevenue = fixedCosts / contributionMarginRatio;
+        const breakevenCustomers = fixedCosts / (avgBill * contributionMarginRatio);
+        const breakevenDays = breakevenCustomers / dailyCustomers;
+
+        const annualProfit = netProfit * 12;
+        const paybackYears = initialInvestment / annualProfit;
+        const paybackMonths = paybackYears * 12;
+
+        const foodCostRatio = foodCost / netRevenue;
+        const laborCostRatio = totalSalaryCost / netRevenue;
+        const rentRatio = rent / netRevenue;
+
+        const totalSeats = tables * seatsPerTable;
+        const sessionsPerDay = hoursOpen * 60 / sessionMinutes;
+        const maxDailyCustomers = totalSeats * sessionsPerDay;
+        const occupancyRate = (dailyCustomers / maxDailyCustomers) * 100;
+        const marginOfSafety = ((netRevenue - breakevenRevenue) / netRevenue) * 100;
+        const operatingLeverage = contributionMargin / profitBeforeTax;
+
+        const avgVarCostPerCustomer = totalVariableCost / monthlyCustomers;
+        const customersFromLocation = footTraffic * entryRate * purchaseRate;
+
+        // تخزين النتائج
+        currentResults = { netRevenue, fixedCosts, totalVariableCost, netProfit, profitMargin, foodCost, drinkCost, packagingCost, deliveryCommission, wasteCost, totalOperatingCost, foodCostRatio, laborCostRatio, rentRatio, totalSalaryCost, rent, utilities, internet, maintenance, marketing, otherFixed, breakevenRevenue, breakevenCustomers, breakevenDays, paybackYears, paybackMonths, annualProfit, marginOfSafety, operatingLeverage, occupancyRate, maxDailyCustomers, customersFromLocation, avgVarCostPerCustomer, totalSeats, sessionsPerDay, monthlyCustomers, contributionMarginRatio };
+
+        // عرض النتائج
+        document.getElementById('initialMessage').style.display = 'none';
+        document.getElementById('resultsSection').style.display = 'block';
+
+        // بطاقات KPI
+        document.getElementById('kpiCards').innerHTML = `
+            <div class="result-card"><i class="fas fa-dollar-sign"></i><h4>الإيرادات الشهرية</h4><div class="value">${currency}${netRevenue.toFixed(0)}</div><div class="unit">(قبل الضريبة)</div></div>
+            <div class="result-card"><i class="fas fa-file-invoice"></i><h4>التكاليف الثابتة</h4><div class="value">${currency}${fixedCosts.toFixed(0)}</div></div>
+            <div class="result-card"><i class="fas fa-boxes"></i><h4>التكاليف المتغيرة</h4><div class="value">${currency}${totalVariableCost.toFixed(0)}</div><div class="unit">${((totalVariableCost/netRevenue)*100).toFixed(1)}%</div></div>
+            <div class="result-card"><i class="fas fa-chart-line"></i><h4>صافي الربح</h4><div class="value">${currency}${netProfit.toFixed(0)}</div><div class="status ${netProfit>0?'status-good':netProfit<0?'status-bad':'status-warning'}">${netProfit>0?'مربح':netProfit<0?'خاسر':'محايد'}</div></div>
+            <div class="result-card"><i class="fas fa-percent"></i><h4>هامش الربح</h4><div class="value">${profitMargin.toFixed(1)}%</div></div>
+        `;
+
+        // تحذيرات ذكية
+        const alerts = [];
+        if (foodCostRatio > 0.35) alerts.push('⚠️ نسبة تكلفة الطعام مرتفعة (>35%)');
+        if (laborCostRatio > 0.30) alerts.push('⚠️ نسبة تكلفة العمالة مرتفعة (>30%)');
+        if (wastePct > 0.05) alerts.push(`⚠️ نسبة الهدر مرتفعة (${(wastePct*100).toFixed(1)}%)`);
+        if (profitMargin < 10) alerts.push('⚠️ هامش الربح منخفض (<10%)');
+        if (profitMargin < 0) alerts.push('🔴 المشروع خاسر');
+        if (occupancyRate < 30) alerts.push('⚠️ نسبة الإشغال منخفضة جداً (<30%)');
+        if (marginOfSafety < 10) alerts.push('⚠️ هامش الأمان ضيق (<10%)');
+        if (footTraffic > 0 && Math.abs((dailyCustomers - customersFromLocation)/customersFromLocation) > 0.3) alerts.push(`⚠️ تباين كبير بين العملاء المدخل والمتوقع من الموقع`);
+        if (alerts.length === 0) alerts.push('✅ المؤشرات جيدة');
+        document.getElementById('smartAlerts').innerHTML = `<strong><i class="fas fa-exclamation-triangle" style="color:var(--accent-soft);"></i> تحذيرات ذكية:</strong><br> ${alerts.join('<br>')}`;
+
+        // جدول تفصيلي
+        document.getElementById('costBreakdownTable').innerHTML = `
+            <table><thead><tr><th>البند</th><th>القيمة (${currency})</th><th>نسبة من الإيرادات</th></tr></thead><tbody>
+                <tr><td>إيجار</td><td>${currency}${rent.toFixed(0)}</td><td>${(rent/netRevenue*100).toFixed(1)}%</td></tr>
+                <tr><td>رواتب (بعد التحميل)</td><td>${currency}${totalSalaryCost.toFixed(0)}</td><td>${(totalSalaryCost/netRevenue*100).toFixed(1)}%</td></tr>
+                <tr><td>فواتير</td><td>${currency}${utilities.toFixed(0)}</td><td>${(utilities/netRevenue*100).toFixed(1)}%</td></tr>
+                <tr><td>إنترنت واشتراكات</td><td>${currency}${internet.toFixed(0)}</td><td>${(internet/netRevenue*100).toFixed(1)}%</td></tr>
+                <tr><td>صيانة ونظافة</td><td>${currency}${maintenance.toFixed(0)}</td><td>${(maintenance/netRevenue*100).toFixed(1)}%</td></tr>
+                <tr><td>تسويق</td><td>${currency}${marketing.toFixed(0)}</td><td>${(marketing/netRevenue*100).toFixed(1)}%</td></tr>
+                <tr><td>مصاريف أخرى</td><td>${currency}${otherFixed.toFixed(0)}</td><td>${(otherFixed/netRevenue*100).toFixed(1)}%</td></tr>
+                <tr><td>تكلفة الطعام</td><td>${currency}${foodCost.toFixed(0)}</td><td>${(foodCost/netRevenue*100).toFixed(1)}%</td></tr>
+                <tr><td>تكلفة المشروبات</td><td>${currency}${drinkCost.toFixed(0)}</td><td>${(drinkCost/netRevenue*100).toFixed(1)}%</td></tr>
+                <tr><td>تغليف</td><td>${currency}${packagingCost.toFixed(0)}</td><td>${(packagingCost/netRevenue*100).toFixed(1)}%</td></tr>
+                <tr><td>عمولات التوصيل</td><td>${currency}${deliveryCommission.toFixed(0)}</td><td>${(deliveryCommission/netRevenue*100).toFixed(1)}%</td></tr>
+                <tr><td>الهدر</td><td>${currency}${wasteCost.toFixed(0)}</td><td>${(wasteCost/netRevenue*100).toFixed(1)}%</td></tr>
+                <tr style="background:rgba(180,133,84,0.2); font-weight:900;"><td>الإجمالي</td><td>${currency}${totalOperatingCost.toFixed(0)}</td><td>${(totalOperatingCost/netRevenue*100).toFixed(1)}%</td></tr>
+            </tbody></table>
+        `;
+
+        // فترة الاسترداد
+        document.getElementById('paybackCard').innerHTML = `<span><i class="fas fa-clock"></i> فترة استرداد الاستثمار: <strong>${paybackYears.toFixed(1)} سنة</strong> (حوالي ${paybackMonths.toFixed(0)} شهراً).</span>`;
+
+        // تحليل الحساسية
+        const scenarios = [{ name: 'متفائل', mult: 1.4 }, { name: 'واقعي', mult: 1.0 }, { name: 'متشائم', mult: 0.6 }];
+        let sensRows = '';
+        scenarios.forEach(s => {
+            const cust = dailyCustomers * s.mult;
+            const rev = cust * workingDays * avgBill;
+            const food = rev * 0.7 * foodCostPct;
+            const drink = rev * 0.3 * drinkCostPct;
+            const pack = rev * packagingPct;
+            const deliv = rev * deliverySalesPct * deliveryPct;
+            const waste = (food + drink) * wastePct;
+            const varCost = food + drink + pack + deliv + waste;
+            const pbt = rev - fixedCosts - varCost;
+            const tax = pbt > 0 ? pbt * 0.25 : 0;
+            const profit = pbt - tax;
+            sensRows += `<tr><td>${s.name}</td><td>${cust.toFixed(0)}</td><td>${currency}${rev.toFixed(0)}</td><td class="${profit>=0?'positive':'negative'}">${currency}${profit.toFixed(0)}</td><td>${(profit/rev*100).toFixed(1)}%</td></tr>`;
+        });
+        document.getElementById('sensitivityTable').innerHTML = `<table><thead><tr><th>السيناريو</th><th>العملاء اليومي</th><th>الإيرادات</th><th>صافي الربح</th><th>هامش الربح</th></tr></thead><tbody>${sensRows}</tbody></table>`;
+
+        // مؤشر صحة المطعم
+        let healthScore = 0;
+        healthScore += foodCostRatio <= 0.3 ? 25 : (foodCostRatio <= 0.35 ? 20 : 10);
+        healthScore += laborCostRatio <= 0.25 ? 25 : (laborCostRatio <= 0.3 ? 20 : 10);
+        healthScore += rentRatio <= 0.08 ? 25 : (rentRatio <= 0.12 ? 20 : 10);
+        healthScore += profitMargin >= 15 ? 25 : (profitMargin >= 10 ? 20 : 10);
+        let healthStatus = '', healthColor = '';
+        if (healthScore >= 80) { healthStatus = 'ممتاز 🟢'; healthColor = 'status-good'; }
+        else if (healthScore >= 60) { healthStatus = 'جيد 🟡'; healthColor = 'status-warning'; }
+        else { healthStatus = 'ضعيف 🔴'; healthColor = 'status-bad'; }
+        document.getElementById('healthScoreCard').innerHTML = `
+            <table style="width:100%"><thead><tr><th>المؤشر</th><th>القيمة</th><th>التقييم</th></tr></thead><tbody>
+                <tr><td>Food Cost</td><td>${(foodCostRatio*100).toFixed(1)}%</td><td>${foodCostRatio<=0.3?'✅ جيد':(foodCostRatio<=0.35?'⚠️ متوسط':'❌ مرتفع')}</td></tr>
+                <tr><td>Labor Cost</td><td>${(laborCostRatio*100).toFixed(1)}%</td><td>${laborCostRatio<=0.25?'✅ جيد':(laborCostRatio<=0.3?'⚠️ متوسط':'❌ مرتفع')}</td></tr>
+                <tr><td>Rent Ratio</td><td>${(rentRatio*100).toFixed(1)}%</td><td>${rentRatio<=0.08?'✅ جيد':(rentRatio<=0.12?'⚠️ متوسط':'❌ مرتفع')}</td></tr>
+                <tr><td>Net Profit</td><td>${profitMargin.toFixed(1)}%</td><td>${profitMargin>=15?'✅ جيد':(profitMargin>=10?'⚠️ متوسط':'❌ ضعيف')}</td></tr>
+                <tr style="background:rgba(180,133,84,0.2);"><td colspan="2">الدرجة الصحية</td><td><span class="status ${healthColor}">${healthScore}/100 (${healthStatus})</span></td></tr>
+            </tbody></table>
+        `;
+
+        // تحليلات متقدمة
+        document.getElementById('shutdownCard').innerHTML = avgBill < avgVarCostPerCustomer ? `⚠️ يجب الإغلاق مؤقتاً` : `✅ لا خطر إغلاق فوري`;
+        document.getElementById('operatingLeverageCard').innerHTML = `الرافعة التشغيلية: ${!isNaN(operatingLeverage)&&isFinite(operatingLeverage)?operatingLeverage.toFixed(2):'غير محددة'}<br>${!isNaN(operatingLeverage)?`إذا زادت المبيعات 10% يزيد الربح ${(operatingLeverage*10).toFixed(1)}%`:''}`;
+        document.getElementById('marginOfSafetyCard').innerHTML = `هامش الأمان: ${marginOfSafety.toFixed(1)}%<br>${marginOfSafety>0?`يمكن خفض المبيعات ${marginOfSafety.toFixed(1)}% قبل التعادل`:'المبيعات أقل من التعادل'}`;
+        document.getElementById('capacityCard').innerHTML = `الطاقة القصوى: ${maxDailyCustomers.toFixed(0)} عميل/يوم<br>الإشغال: ${occupancyRate.toFixed(1)}% ${occupancyRate>80?'(يقترب من الطاقة القصوى)':occupancyRate<30?'(منخفض جداً)':'(مناسب)'}`;
+        document.getElementById('efficiencyCard').innerHTML = `الإيراد لكل كرسي: ${currency}${(netRevenue/totalSeats).toFixed(0)}<br>الإيراد لكل موظف: ${currency}${(netRevenue/Math.max(1,Math.ceil(salaries/3000))).toFixed(0)}`;
+
+        document.getElementById('monteCarloResults').innerHTML = `اضغط "تشغيل المحاكاة" للحصول على نتائج مونت كارلو.`;
+        document.getElementById('breakevenSummary').innerHTML = `<span>🎯 إيرادات التعادل: ${currency}${breakevenRevenue.toFixed(0)}</span><span>👥 عملاء التعادل: ${breakevenCustomers.toFixed(0)} شهرياً</span>`;
+
+        // استدعاء دالة الرسم البياني المحسنة
+        renderCharts(currency, netRevenue, fixedCosts, totalVariableCost, netProfit, monthlyCustomers, avgBill, breakevenCustomers, contributionMarginRatio);
+    });
+
+    // حساب قيمة المطعم
+    document.getElementById('calcValuationBtn').addEventListener('click', function() {
+        if (!currentResults) { alert('الرجاء الحساب أولاً'); return; }
+        const currency = currentInputs.currency;
+        const multiple = parseFloat(document.getElementById('valuationMultiple').value) || 3;
+        const valuation = currentResults.annualProfit * multiple;
+        document.getElementById('valuationCard').innerHTML = `<span>القيمة التقديرية: <strong>${currency}${valuation.toFixed(0)}</strong> (بناءً على مضاعف ${multiple})</span>`;
+    });
+
+    // محاكاة مونت كارلو
+    document.getElementById('runMonteCarloBtn').addEventListener('click', function() {
+        if (!currentInputs) { alert('الرجاء الحساب أولاً'); return; }
+        const i = currentInputs;
+        const fixedCosts = i.rent + i.salaries*(1+i.employeeBurden) + i.utilities + i.internet + i.maintenance + i.marketing + i.otherFixed;
+        const profits = [];
+        for (let s=0; s<1000; s++) {
+            const custF = 0.7 + Math.random()*0.6;
+            const billF = 0.85 + Math.random()*0.3;
+            const cust = i.dailyCustomers * custF;
+            const bill = i.avgBill * billF;
+            const rev = cust * i.workingDays * bill;
+            const food = rev*0.7 * i.foodCostPct * (0.9+Math.random()*0.2);
+            const drink = rev*0.3 * i.drinkCostPct * (0.9+Math.random()*0.2);
+            const pack = rev * i.packagingPct;
+            const deliv = rev * i.deliverySalesPct * i.deliveryPct;
+            const waste = (food+drink) * i.wastePct;
+            const varCost = food+drink+pack+deliv+waste;
+            const pbt = rev - fixedCosts - varCost;
+            const tax = pbt>0 ? pbt*0.25 : 0;
+            profits.push(pbt - tax);
+        }
+        profits.sort((a,b)=>a-b);
+        const mean = profits.reduce((a,b)=>a+b,0)/1000;
+        const p5 = profits[50], p95 = profits[950];
+        const probProfit = (profits.filter(p=>p>0).length/10).toFixed(1);
+        document.getElementById('monteCarloResults').innerHTML = `
+            <table><tr><td>متوسط الربح</td><td>${i.currency}${mean.toFixed(0)}</td></tr>
+            <tr><td>أسوأ 5%</td><td>${i.currency}${p5.toFixed(0)}</td></tr>
+            <tr><td>أفضل 5%</td><td>${i.currency}${p95.toFixed(0)}</td></tr>
+            <tr><td>احتمال الربح</td><td>${probProfit}%</td></tr></table>
+        `;
+    });
+
+    // ========== تصدير Excel احترافي (مع إيقاف التحولات) ==========
+    async function exportToFullExcel() {
+        if (!currentResults || !currentInputs) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+        document.body.classList.add('no-transition');
+        showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والرسوم البيانية');
+        try {
+            const R = currentResults, I = currentInputs;
+            const currency = I.currency, companyName = I.companyName;
+
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'FAROUK GRUP';
+            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035';
+            const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A';
+
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+
+            // غلاف
+            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true }] });
+            [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+            cv.getRow(2).height=80; cv.getRow(4).height=60;
+            cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+            bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
+            mh(cv,1,4,4,`تقرير تحليل تكاليف المطعم\n${companyName}`,DB,GL,18);
+            const inf=[['📋 الجهة',companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',currency],['📊 صافي الربح',`${currency} ${R.netProfit.toFixed(0)}`],['📈 هامش الربح',`${R.profitMargin.toFixed(1)}%`]];
+            let ir=6;
+            inf.forEach(([l,v],idx)=>{
+                cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+                const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+                const bg=idx%2===0?AR:'FFFEFCF6';
+                lc.font={name:'Arial',bold:true,size:11,color:{argb:'00695C'}}; lc.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; lc.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                vc.font={name:'Arial',size:11,color:{argb:DT}}; vc.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; vc.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
+                cv.getRow(ir).height=28; ir++;
+            });
+
+            // مدخلات
+            const inputsSheet = workbook.addWorksheet('المدخلات', { views: [{ rightToLeft: true }] });
+            inputsSheet.getColumn(1).width=35; inputsSheet.getColumn(2).width=20;
+            mh(inputsSheet,1,2,1,'المدخلات الأساسية',DB,GL,14);
+            const inputFields = [
+                ['عدد العملاء اليومي', I.dailyCustomers], ['متوسط الفاتورة', I.avgBill], ['أيام العمل', I.workingDays],
+                ['الإيجار', I.rent], ['الرواتب (صافي)', I.salaries], ['معامل تكلفة الموظف', (I.employeeBurden*100)+'%'],
+                ['فواتير', I.utilities], ['إنترنت', I.internet], ['صيانة', I.maintenance], ['تسويق', I.marketing], ['مصاريف أخرى', I.otherFixed],
+                ['تكلفة الطعام', (I.foodCostPct*100)+'%'], ['تكلفة المشروبات', (I.drinkCostPct*100)+'%'], ['تغليف', (I.packagingPct*100)+'%'],
+                ['عمولة التوصيل', (I.deliveryPct*100)+'%'], ['نسبة مبيعات التوصيل', (I.deliverySalesPct*100)+'%'], ['نسبة الهدر', (I.wastePct*100)+'%'],
+                ['ضريبة القيمة المضافة', (I.vatPct*100)+'%'], ['الاستثمار الأولي', I.initialInvestment]
+            ];
+            inputFields.forEach(([l,v])=> inputsSheet.addRow([l, v]));
+            inputsSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFF' } }; inputsSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+
+            // مؤشرات الأداء
+            const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true }] });
+            kpiSheet.getColumn(1).width=30; kpiSheet.getColumn(2).width=20;
+            mh(kpiSheet,1,2,1,'مؤشرات الأداء',DB,GL,14);
+            const kpis = [
+                ['الإيرادات الشهرية', `${currency} ${R.netRevenue.toFixed(0)}`], ['التكاليف الثابتة', `${currency} ${R.fixedCosts.toFixed(0)}`],
+                ['التكاليف المتغيرة', `${currency} ${R.totalVariableCost.toFixed(0)}`], ['صافي الربح', `${currency} ${R.netProfit.toFixed(0)}`],
+                ['هامش الربح', `${R.profitMargin.toFixed(1)}%`], ['نقطة التعادل (إيرادات)', `${currency} ${R.breakevenRevenue.toFixed(0)}`],
+                ['فترة الاسترداد', `${R.paybackYears.toFixed(1)} سنة`], ['هامش الأمان', `${R.marginOfSafety.toFixed(1)}%`]
+            ];
+            kpis.forEach(k => kpiSheet.addRow(k));
+            kpiSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFF' } }; kpiSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+
+            // تفصيل التكاليف
+            const costSheet = workbook.addWorksheet('تفصيل التكاليف', { views: [{ rightToLeft: true }] });
+            costSheet.getColumn(1).width=30; costSheet.getColumn(2).width=20; costSheet.getColumn(3).width=20;
+            mh(costSheet,1,3,1,'تفصيل التكاليف',DB,GL,14);
+            const costs = [
+                ['إيجار', R.rent, (R.rent/R.netRevenue*100).toFixed(1)+'%'], ['رواتب', R.totalSalaryCost, (R.totalSalaryCost/R.netRevenue*100).toFixed(1)+'%'],
+                ['فواتير', I.utilities, (I.utilities/R.netRevenue*100).toFixed(1)+'%'], ['إنترنت', I.internet, (I.internet/R.netRevenue*100).toFixed(1)+'%'],
+                ['صيانة', I.maintenance, (I.maintenance/R.netRevenue*100).toFixed(1)+'%'], ['تسويق', I.marketing, (I.marketing/R.netRevenue*100).toFixed(1)+'%'],
+                ['أخرى', I.otherFixed, (I.otherFixed/R.netRevenue*100).toFixed(1)+'%'], ['طعام', R.foodCost, (R.foodCost/R.netRevenue*100).toFixed(1)+'%'],
+                ['مشروبات', R.drinkCost, (R.drinkCost/R.netRevenue*100).toFixed(1)+'%'], ['تغليف', R.packagingCost, (R.packagingCost/R.netRevenue*100).toFixed(1)+'%'],
+                ['توصيل', R.deliveryCommission, (R.deliveryCommission/R.netRevenue*100).toFixed(1)+'%'], ['هدر', R.wasteCost, (R.wasteCost/R.netRevenue*100).toFixed(1)+'%']
+            ];
+            costs.forEach(c => costSheet.addRow(c));
+            costSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFF' } }; costSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+
+            // رسوم بيانية
+            const chartsSheet = workbook.addWorksheet('الرسوم البيانية', { views: [{ rightToLeft: true }] });
+            mh(chartsSheet,1,3,1,'الرسوم البيانية',DB,GL,14);
+            const pieCanvas = document.getElementById('costPieChart');
+            const lineCanvas = document.getElementById('breakevenChart');
+            if (pieCanvas) {
+                const img = await html2canvas(pieCanvas, { scale: 2, backgroundColor: '#ffffff' });
+                const imgId = workbook.addImage({ base64: img.toDataURL('image/png'), extension: 'png' });
+                chartsSheet.addImage(imgId, { tl: { col: 0, row: 2 }, br: { col: 3, row: 14 } });
+            }
+            if (lineCanvas) {
+                const img = await html2canvas(lineCanvas, { scale: 2, backgroundColor: '#ffffff' });
+                const imgId = workbook.addImage({ base64: img.toDataURL('image/png'), extension: 'png' });
+                chartsSheet.addImage(imgId, { tl: { col: 0, row: 16 }, br: { col: 3, row: 28 } });
+            }
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, `تقرير_مطعم_${companyName}_${new Date().toISOString().slice(0,10)}.xlsx`);
+        } catch(err) { alert('خطأ Excel: '+err.message); }
+        finally { hideLoading(); document.body.classList.remove('no-transition'); }
     }
 
-    // تحليل النتائج
-    profits.sort((a,b) => a - b);
-    const mean = profits.reduce((a,b) => a + b, 0) / numSimulations;
-    const p5 = profits[Math.floor(numSimulations * 0.05)];
-    const p95 = profits[Math.floor(numSimulations * 0.95)];
-    const probProfit = (profits.filter(p => p > 0).length / numSimulations * 100).toFixed(1);
-    const probLoss = (profits.filter(p => p < 0).length / numSimulations * 100).toFixed(1);
+    // ========== تصدير Word احترافي (مع إيقاف التحولات) ==========
+    async function exportToWord() {
+        if (!currentResults || !currentInputs) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+        document.body.classList.add('no-transition');
+        showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات والرسوم');
+        try {
+            const R = currentResults, I = currentInputs;
+            const currency = I.currency, companyName = I.companyName;
 
-    const currency = document.getElementById('currencySelect').value;
-    document.getElementById('monteCarloResults').innerHTML = `
-        <table style="width:100%;">
-            <tr><td>متوسط الربح</td><td>${currency}${mean.toFixed(0)}</td></tr>
-            <tr><td>أسوأ 5% (VaR 95%)</td><td>${currency}${p5.toFixed(0)}</td></tr>
-            <tr><td>أفضل 5%</td><td>${currency}${p95.toFixed(0)}</td></tr>
-            <tr><td>احتمال الربح</td><td>${probProfit}%</td></tr>
-            <tr><td>احتمال الخسارة</td><td>${probLoss}%</td></tr>
-        </table>
-    `;
-});
+            // التقاط صور للمخططات
+            const pieCanvas = document.getElementById('costPieChart');
+            const lineCanvas = document.getElementById('breakevenChart');
+            let pieImg = '', lineImg = '';
+            if (pieCanvas) { const c = await html2canvas(pieCanvas, { scale: 2, backgroundColor: '#ffffff' }); pieImg = c.toDataURL('image/png'); }
+            if (lineCanvas) { const c = await html2canvas(lineCanvas, { scale: 2, backgroundColor: '#ffffff' }); lineImg = c.toDataURL('image/png'); }
 
-// ربط أزرار التصدير
-document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
-document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+            const kpiRows = `
+                <tr><td style="border:1px solid #b8860b;padding:10px;background:#fefcf6;"><i class="fas fa-dollar-sign"></i><h4>الإيرادات الشهرية</h4><div style="font-size:1.5rem;color:#b8860b;">${currency}${R.netRevenue.toFixed(0)}</div></td>
+                <td style="border:1px solid #b8860b;padding:10px;background:#fefcf6;"><i class="fas fa-file-invoice"></i><h4>التكاليف الثابتة</h4><div style="font-size:1.5rem;color:#b8860b;">${currency}${R.fixedCosts.toFixed(0)}</div></td></tr>
+                <tr><td style="border:1px solid #b8860b;padding:10px;background:#fefcf6;"><i class="fas fa-boxes"></i><h4>التكاليف المتغيرة</h4><div style="font-size:1.5rem;color:#b8860b;">${currency}${R.totalVariableCost.toFixed(0)}</div></td>
+                <td style="border:1px solid #b8860b;padding:10px;background:#fefcf6;"><i class="fas fa-chart-line"></i><h4>صافي الربح</h4><div style="font-size:1.5rem;color:#b8860b;">${currency}${R.netProfit.toFixed(0)}</div></td></tr>
+            `;
+
+            let costRows = '';
+            ['إيجار', 'رواتب', 'فواتير', 'إنترنت', 'صيانة', 'تسويق', 'أخرى', 'طعام', 'مشروبات', 'تغليف', 'توصيل', 'هدر'].forEach((n,i)=>{
+                const vals = [R.rent, R.totalSalaryCost, I.utilities, I.internet, I.maintenance, I.marketing, I.otherFixed, R.foodCost, R.drinkCost, R.packagingCost, R.deliveryCommission, R.wasteCost];
+                costRows += `<tr><td>${n}</td><td>${currency}${vals[i].toFixed(0)}</td><td>${(vals[i]/R.netRevenue*100).toFixed(1)}%</td></tr>`;
+            });
+
+            const fullHtml = `<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><style>
+                body{font-family:'Tajawal',sans-serif;margin:2rem;background:#fff;color:#333;}
+                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                .cover h1{color:#b8860b;font-size:32px;}.cover h2{color:#b48554;}
+                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                th{background:#fefcf6;color:#b8860b;} .chart-img{max-width:100%;border:1px solid #b8860b;margin:10px;}
+                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;}
+            </style></head><body>
+            <div class="cover"><h1>مجموعة فاروق للاستشارات والأعمال</h1><h2>تقرير تحليل تكاليف المطعم</h2>
+            <p>الجهة: ${companyName} | ${new Date().toLocaleDateString('ar-EG')}</p></div>
+            <h2>مؤشرات الأداء</h2><table>${kpiRows}</table>
+            <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;">
+                ${pieImg ? `<div style="flex:1;min-width:300px;"><h3>توزيع التكاليف</h3><img src="${pieImg}" class="chart-img"/></div>` : ''}
+                ${lineImg ? `<div style="flex:1;min-width:300px;"><h3>نقطة التعادل</h3><img src="${lineImg}" class="chart-img"/></div>` : ''}
+            </div>
+            <h2>تفصيل التكاليف</h2><table><thead><tr><th>البند</th><th>القيمة</th><th>%</th></tr></thead><tbody>${costRows}</tbody></table>
+            <h2>نقطة التعادل</h2><p>إيرادات التعادل: ${currency}${R.breakevenRevenue.toFixed(0)} (${R.breakevenCustomers.toFixed(0)} عميل)</p>
+            <h2>فترة الاسترداد</h2><p>${R.paybackYears.toFixed(1)} سنة (${R.paybackMonths.toFixed(0)} شهر)</p>
+            <h2>مؤشر صحة المطعم</h2><p>هامش الأمان: ${R.marginOfSafety.toFixed(1)}% | الإشغال: ${R.occupancyRate.toFixed(1)}%</p>
+            <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${new Date().getFullYear()}</div>
+            </body></html>`;
+
+            const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `تقرير_مطعم_${companyName}_${new Date().toISOString().slice(0,10)}.doc`;
+            link.click(); URL.revokeObjectURL(link.href);
+        } catch(err) { alert('خطأ Word: '+err.message); }
+        finally { hideLoading(); document.body.classList.remove('no-transition'); }
+    }
+
+    document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+    document.getElementById('exportFullExcelBtn').addEventListener('click', exportToFullExcel);
 </script>
-<!-- زر العودة إلى الرئيسية (عائم في اليمين) -->
-<a href="index.html" style="
-    position: fixed;
-    bottom: 20px;
-    right: 20px; /* وضعه في اليمين بدلاً من اليسار */
-    background: rgba(180,133,84,0.9);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-family: 'Tajawal', sans-serif;
-    font-weight: bold;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.3s;
-" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';">
-    <i class="fas fa-home"></i> الرئيسية
-</a>
 </body>
 </html>

@@ -21,6 +21,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+    <!-- مكتبات Excel احترافية -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -596,6 +600,53 @@
             height: 100% !important;
         }
 
+        /* شاشة تحميل التصدير */
+        .export-loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(6px);
+        }
+        .export-loading.show {
+            display: flex;
+        }
+        .export-loading-box {
+            background: var(--bg-panel);
+            border: 2px solid var(--border-light);
+            border-radius: 24px;
+            padding: 2rem 3rem;
+            text-align: center;
+            box-shadow: var(--shadow-glow);
+        }
+        .export-loading-box i {
+            font-size: 3rem;
+            color: var(--accent-soft);
+            animation: spin 1s linear infinite;
+            display: block;
+            margin-bottom: 1rem;
+        }
+        .export-loading-box h3 {
+            color: var(--accent-soft);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+        .export-loading-box p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         /* فوتر مبسط */
         .footer-simple {
             text-align: center;
@@ -763,13 +814,10 @@
             .shift-row { flex-direction: column; align-items: stretch; }
             .remove-shift { align-self: flex-end; }
             .action-bar { flex-direction: column; }
-            .btn-export,
-            .btn-export.word { width: 100%; justify-content: center; }
+            .btn-export { width: 100%; justify-content: center; }
         }
     </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body>
 <body style="overflow-x: hidden;">
     <!-- خلفية متوهجة -->
     <div class="glow-bg">
@@ -778,13 +826,20 @@
     <div class="floating-shape shape-1"></div>
     <div class="floating-shape shape-2"></div>
 
-    <!-- تم إزالة الـ NAV بالكامل -->
-
     <!-- Hero -->
     <section class="hero-mini">
         <h2>💰 حاسبة تكلفة العمالة المثالية</h2>
         <p>تحليل متقدم لتكاليف العمالة، الإنتاجية، والكفاءة التشغيلية</p>
     </section>
+
+    <!-- شاشة تحميل التصدير -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">جاري إنشاء التقرير الاحترافي...</h3>
+            <p id="loadingMsg">يرجى الانتظار — قد يستغرق ذلك لحظات</p>
+        </div>
+    </div>
 
     <!-- Main Container -->
     <div class="container">
@@ -872,7 +927,8 @@
             <!-- منطقة عرض النتائج -->
             <div class="results-section" id="resultsSection" style="display: none;">
                 <div class="action-bar">
-                    <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير Word</button>
+                    <button class="btn-export" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel احترافي</button>
+                    <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> تقرير Word كامل</button>
                     <button class="btn-export" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
                 </div>
 
@@ -906,37 +962,30 @@
             <div class="modal-body">
                 <input type="text" id="calcDisplay" class="calc-display" readonly>
                 <div class="calc-buttons">
-                    <!-- الصف الأول: 9 8 7 ÷ -->
                     <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
                     <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
                     <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
                     <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
-
-                    <!-- الصف الثاني: 6 5 4 × -->
                     <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
                     <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
                     <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
                     <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
-
-                    <!-- الصف الثالث: 3 2 1 - -->
                     <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
                     <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
                     <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
                     <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
-
-                    <!-- الصف الرابع: C 0 . + -->
                     <button class="calc-btn" onclick="clearCalculator()">C</button>
                     <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
                     <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
                     <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
-
-                    <!-- الصف الخامس: ⌫ و = (يمتد على 3 أعمدة) -->
                     <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
                     <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <a href="index.html" style="position:fixed;bottom:20px;right:20px;background:rgba(180,133,84,0.9);color:white;padding:12px 20px;border-radius:50px;text-decoration:none;font-family:'Tajawal',sans-serif;font-weight:bold;backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,0.2);box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:9999;display:flex;align-items:center;gap:8px;transition:0.3s;" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';"><i class="fas fa-home"></i> الرئيسية</a>
 
     <!-- AOS -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -961,17 +1010,14 @@
             currentCalcInput += value;
             calcDisplay.value = currentCalcInput;
         };
-
         window.clearCalculator = function() {
             currentCalcInput = '';
             calcDisplay.value = '';
         };
-
         window.backspaceCalculator = function() {
             currentCalcInput = currentCalcInput.slice(0, -1);
             calcDisplay.value = currentCalcInput;
         };
-
         window.calculateCalculatorResult = function() {
             if (!currentCalcInput.trim()) return;
             const result = safeEvaluate(currentCalcInput);
@@ -979,18 +1025,10 @@
             currentCalcInput = result.toString();
         };
 
-        // لوحة المفاتيح للمودال
         const modal = document.getElementById('calculatorModal');
-        const btn = document.getElementById('calculatorBtn');
-        const span = document.querySelector('.close');
-
-        btn.onclick = (e) => {
-            e.preventDefault();
-            modal.style.display = 'block';
-        };
-        span.onclick = () => { modal.style.display = 'none'; };
+        document.getElementById('calculatorBtn').onclick = (e) => { e.preventDefault(); modal.style.display = 'block'; };
+        document.querySelector('.close').onclick = () => { modal.style.display = 'none'; };
         window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
-
         document.addEventListener('keydown', (e) => {
             if (modal.style.display !== 'block') return;
             e.preventDefault();
@@ -1004,16 +1042,24 @@
             else if (key.toLowerCase() === 'c') clearCalculator();
         });
 
-        // ------------------ إدارة الورديات الديناميكية (تم إزالة القيم الافتراضية) ------------------
-        let shiftCount = 2;
+        // ------------------ دوال التحميل ------------------
+        function showLoading(title, msg) {
+            document.getElementById('loadingTitle').textContent = title;
+            document.getElementById('loadingMsg').textContent = msg;
+            document.getElementById('exportLoading').classList.add('show');
+        }
+        function hideLoading() {
+            document.getElementById('exportLoading').classList.remove('show');
+        }
 
+        // ------------------ إدارة الورديات الديناميكية ------------------
+        let shiftCount = 2;
         function renderShifts() {
             const container = document.getElementById('shiftsContainer');
             container.innerHTML = '';
             for (let i = 1; i <= shiftCount; i++) {
                 const div = document.createElement('div');
                 div.className = 'shift-row';
-                // إزالة القيم الافتراضية وترك placeholder فقط
                 div.innerHTML = `
                     <input type="number" id="shiftEmployees${i}" placeholder="عدد الموظفين" value="" min="0" step="1">
                     <input type="number" id="shiftHours${i}" placeholder="ساعات الوردية" value="" min="1" step="0.5">
@@ -1023,17 +1069,14 @@
                 container.appendChild(div);
             }
         }
-
         window.removeShift = function(index) {
             shiftCount--;
             renderShifts();
         };
-
         document.getElementById('addShiftBtn').addEventListener('click', function() {
             shiftCount++;
             renderShifts();
         });
-
         document.getElementById('numShifts').addEventListener('change', function() {
             shiftCount = parseInt(this.value);
             renderShifts();
@@ -1041,6 +1084,7 @@
 
         // ------------------ الحساب الرئيسي ------------------
         let laborChart;
+        let globalLaborData = null;
 
         document.getElementById('calculateBtn').addEventListener('click', function() {
             const currency = document.getElementById('currencySelect').value;
@@ -1055,11 +1099,13 @@
 
             let totalEmployees = 0;
             let totalShiftHours = 0;
+            const shiftsDetail = [];
             for (let i = 1; i <= shiftCount; i++) {
                 const emp = parseInt(document.getElementById(`shiftEmployees${i}`)?.value) || 0;
                 const hours = parseFloat(document.getElementById(`shiftHours${i}`)?.value) || 0;
                 totalEmployees += emp;
                 totalShiftHours += emp * hours;
+                shiftsDetail.push({ shift: i, employees: emp, hours: hours });
             }
 
             if (totalEmployees === 0 || totalShiftHours === 0) {
@@ -1178,13 +1224,8 @@
                 suggestions += '<li>نظام الإجازات الموحدة قد يسبب نقصاً في التغطية يوم العطلة. فكر في اعتماد إجازات متداخلة.</li>';
             }
 
-            const shiftAnalysis = [];
-            for (let i = 1; i <= shiftCount; i++) {
-                const emp = parseInt(document.getElementById(`shiftEmployees${i}`)?.value) || 0;
-                const hours = parseFloat(document.getElementById(`shiftHours${i}`)?.value) || 0;
-                shiftAnalysis.push(`الوردية ${i}: ${emp} موظفين، ${hours} ساعات.`);
-            }
-            suggestions += '<br><strong>توزيع الورديات الحالي:</strong><br>' + shiftAnalysis.join('<br>');
+            const shiftAnalysis = shiftsDetail.map(s => `الوردية ${s.shift}: ${s.employees} موظفين، ${s.hours} ساعات.`).join('<br>');
+            suggestions += '<br><strong>توزيع الورديات الحالي:</strong><br>' + shiftAnalysis;
 
             document.getElementById('suggestions').innerHTML = `<h4><i class="fas fa-lightbulb"></i> توصيات لتقليل الهدر وتحسين الكفاءة</h4><ul>${suggestions}</ul>`;
 
@@ -1214,7 +1255,7 @@
             });
 
             // تخزين البيانات للتصدير
-            window.laborData = {
+            globalLaborData = {
                 currency,
                 companyName,
                 monthlySales,
@@ -1222,7 +1263,7 @@
                 avgMonthlyWage,
                 workingDays,
                 targetPercent,
-                vacationType,
+                vacationType: vacationType === 'staggered' ? 'إجازات متداخلة' : 'جميع الموظفين نفس العطلة',
                 totalEmployees,
                 totalShiftHours,
                 monthlyLaborCost,
@@ -1234,28 +1275,197 @@
                 customersPerEmployee,
                 efficiencyRating,
                 alertMessage,
-                shiftAnalysis,
-                suggestions
+                suggestionsHtml: suggestions,
+                shiftsDetail,
+                idealMin,
+                idealMax
             };
         });
 
-        // ------------------ تصدير Word (بخلفيات بيضاء) ------------------
-        document.getElementById('exportWordBtn').addEventListener('click', async function() {
-            if (!window.laborData) {
-                alert('الرجاء إجراء التحليل أولاً');
-                return;
-            }
-            const d = window.laborData;
-            const currency = d.currency;
-            const companyName = d.companyName;
-
+        // ------------------ تصدير Excel احترافي ------------------
+        async function exportToFullExcel() {
+            if (!globalLaborData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+            showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'يرجى الانتظار');
             try {
-                // التقاط الرسم البياني بخلفية بيضاء
-                const canvas = document.getElementById('laborChart');
-                const chartCanvas = await html2canvas(canvas, { scale: 2, backgroundColor: '#ffffff' });
-                const chartImg = chartCanvas.toDataURL('image/png');
+                const D = globalLaborData;
+                const currency = D.currency;
+                const companyName = D.companyName;
 
-                // الحصول على نسخة HTML من البطاقات مع تغيير الأنماط للخلفية البيضاء
+                const workbook = new ExcelJS.Workbook();
+                workbook.creator = 'FAROUK GRUP';
+                workbook.created = new Date();
+
+                const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+                const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
+                const PT = 'FF155724', NT = 'FF721C24', GB = 'FFFFF3CD';
+                const nc = '#,##0;(#,##0);"-"';
+
+                function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+                function cs(bg=W,tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+                function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
+                function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+
+                // 1. غلاف التقرير
+                const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+                [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+                for(let r=1;r<=40;r++) cv.getRow(r).height=22;
+                cv.getRow(2).height=80; cv.getRow(4).height=60;
+                cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+                bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+                bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'}; bc.border={bottom:{style:'thick',color:{argb:G}}};
+                mh(cv,1,4,4,`تقرير تحليل تكلفة العمالة\n${companyName}`,DB,GL,18);
+                const inf=[['📋 الجهة',companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',currency],['📊 نسبة العمالة',`${D.laborPercent.toFixed(1)}%`],['👥 إجمالي الموظفين',D.totalEmployees]];
+                let ir=6;
+                inf.forEach(([l,v],idx)=>{
+                    cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+                    const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+                    const bg=idx%2===0?AR:'FFFEFCF6';
+                    ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                    ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                    cv.getRow(ir).height=28; ir++;
+                });
+
+                // 2. المدخلات والافتراضات
+                const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true, showGridLines: false }] });
+                inputsSheet.getColumn(1).width = 5; inputsSheet.getColumn(2).width = 38; inputsSheet.getColumn(3).width = 22; inputsSheet.getColumn(4).width = 22; inputsSheet.getColumn(5).width = 5;
+                mh(inputsSheet,1,5,1,'📋 جدول المدخلات والافتراضات الأساسية',DB,GL,14);
+                inputsSheet.getRow(1).height=40;
+                mh(inputsSheet,2,4,2,'البيانات الأساسية',SB,W,11);
+                inputsSheet.getRow(2).height=28;
+                const inputsData = [
+                    ['المبيعات الشهرية المستهدفة', D.monthlySales, `${currency} ${D.monthlySales.toFixed(0)}`],
+                    ['متوسط الفاتورة للعميل', D.avgBill, `${currency} ${D.avgBill}`],
+                    ['متوسط الأجر الشهري للموظف', D.avgMonthlyWage, `${currency} ${D.avgMonthlyWage}`],
+                    ['أيام العمل في الأسبوع', D.workingDays, ''],
+                    ['نسبة العمالة المستهدفة', `${D.targetPercent}%`, ''],
+                    ['عدد الورديات', D.shiftsDetail.length, ''],
+                    ['نظام الإجازات', D.vacationType, '']
+                ];
+                let iRow=3;
+                inputsData.forEach(([label,val,note],idx)=>{
+                    inputsSheet.getRow(iRow).height=24;
+                    const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+                    const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
+                    lc.value=label; vc.value=val; nc.value=note;
+                    ap(lc,cs(bg,DT,true,'right'));
+                    ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?nc:null});
+                    ap(nc,cs(bg,'00695C',false,'center'));
+                    iRow++;
+                });
+
+                // 3. تفاصيل الورديات
+                const shiftsSheet = workbook.addWorksheet('تفاصيل الورديات', { views: [{ rightToLeft: true, showGridLines: false }] });
+                shiftsSheet.getColumn(1).width = 5; shiftsSheet.getColumn(2).width = 20; shiftsSheet.getColumn(3).width = 25; shiftsSheet.getColumn(4).width = 25; shiftsSheet.getColumn(5).width = 5;
+                mh(shiftsSheet,1,5,1,'🕒 تفاصيل الورديات',DB,GL,14);
+                shiftsSheet.getRow(1).height=40;
+                shiftsSheet.addRow(['الوردية', 'عدد الموظفين', 'ساعات الوردية', 'إجمالي ساعات العمل']);
+                D.shiftsDetail.forEach(s => {
+                    shiftsSheet.addRow([s.shift, s.employees, s.hours, s.employees * s.hours]);
+                });
+                const shiftHeader = shiftsSheet.getRow(2);
+                shiftHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                shiftHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+
+                // 4. مؤشرات الأداء
+                const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true, showGridLines: false }] });
+                [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
+                mh(kpiSheet,1,6,1,'📊 لوحة مؤشرات الأداء الرئيسية',DB,GL,15);
+                kpiSheet.getRow(1).height=45;
+                mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('ar-EG')}`,HB,W,10);
+                kpiSheet.getRow(2).height=26;
+                const kpis = [
+                    { label: 'نسبة العمالة', value: `${D.laborPercent.toFixed(1)}%`, good: D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax },
+                    { label: 'تكلفة العمالة الشهرية', value: `${currency} ${D.monthlyLaborCost.toFixed(0)}`, good: true },
+                    { label: 'المبيعات لكل موظف', value: `${currency} ${D.salesPerEmployee.toFixed(0)}`, good: true },
+                    { label: 'متوسط ساعات العمل', value: `${D.avgHoursPerEmployee.toFixed(1)} ساعة`, good: true },
+                    { label: 'العملاء لكل موظف', value: D.customersPerEmployee.toFixed(0), good: true }
+                ];
+                let kRow=3;
+                kpis.forEach((k,idx)=>{
+                    kpiSheet.getRow(kRow).height=40;
+                    kpiSheet.mergeCells(kRow,2,kRow,2);
+                    kpiSheet.mergeCells(kRow,3,kRow,3);
+                    kpiSheet.mergeCells(kRow,4,kRow,4);
+                    kpiSheet.mergeCells(kRow,5,kRow,5);
+                    const ic=kpiSheet.getCell(kRow,2); ic.value=`🔹 ${idx+1}`;
+                    const lc2=kpiSheet.getCell(kRow,3); lc2.value=k.label;
+                    const vc3=kpiSheet.getCell(kRow,4); vc3.value=k.value;
+                    const nc2=kpiSheet.getCell(kRow,5); nc2.value='';
+                    const bg=k.good?PB:NB, tc=k.good?PT:NT;
+                    [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
+                    ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
+                    lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                    vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
+                    nc2.font={name:'Arial',size:9,color:{argb:'444444'}}; nc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                    kRow++;
+                });
+                kRow++;
+                kpiSheet.mergeCells(kRow,2,kRow,5);
+                const kFinal=kpiSheet.getCell(kRow,2);
+                kFinal.value=D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax ? '✅ النسبة ضمن النطاق المثالي' : '⚠️ النسبة خارج النطاق المثالي';
+                kFinal.font={name:'Arial',bold:true,size:13,color:{argb:D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax?PT:'856404'}};
+                kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax?PB:GB}};
+                kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
+                kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
+                kpiSheet.getRow(kRow).height=40;
+
+                // 5. الرسم البياني
+                const chartsSheet = workbook.addWorksheet('الرسم البياني', { views: [{ rightToLeft: true, showGridLines: false }] });
+                chartsSheet.getColumn(1).width = 5; chartsSheet.getColumn(2).width = 50; chartsSheet.getColumn(3).width = 5;
+                mh(chartsSheet,1,3,1,'📈 المبيعات مقابل تكلفة العمالة',DB,GL,14);
+                chartsSheet.getRow(1).height=40;
+                const chartContainer = document.querySelector('.chart-container');
+                if (chartContainer) {
+                    try {
+                        const origBg = chartContainer.style.backgroundColor;
+                        chartContainer.style.backgroundColor = '#ffffff';
+                        const canvasImg = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
+                        chartContainer.style.backgroundColor = origBg;
+                        const imgData = canvasImg.toDataURL('image/png');
+                        const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                        chartsSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 18 }, editAs: 'oneCell' });
+                    } catch (err) {}
+                }
+
+                // 6. التوصيات
+                const recSheet = workbook.addWorksheet('التوصيات', { views: [{ rightToLeft: true, showGridLines: false }] });
+                recSheet.getColumn(1).width = 5; recSheet.getColumn(2).width = 50; recSheet.getColumn(3).width = 5;
+                mh(recSheet,1,3,1,'💡 التوصيات',DB,GL,14);
+                recSheet.getRow(1).height=40;
+                recSheet.getCell(3,2).value = D.suggestionsHtml.replace(/<[^>]*>/g, '\n').replace(/•/g, '-');
+                recSheet.getCell(3,2).font = { name: 'Arial', size: 11 };
+                recSheet.getCell(3,2).alignment = { wrapText: true, readingOrder: 'rtl' };
+
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const now = new Date();
+                const fileName = `تقرير_عمالة_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+                saveAs(blob, fileName);
+            } catch(err){ console.error(err); alert('خطأ Excel: '+err.message); }
+            finally{ hideLoading(); }
+        }
+
+        // ------------------ تصدير Word احترافي ------------------
+        async function exportToWord() {
+            if (!globalLaborData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+            showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات والرسم البياني');
+            try {
+                const D = globalLaborData;
+                const currency = D.currency;
+                const companyName = D.companyName;
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('ar-EG');
+
+                const chartContainer = document.querySelector('.chart-container');
+                let chartImgBase64 = '';
+                if (chartContainer) {
+                    const origBg = chartContainer.style.backgroundColor;
+                    chartContainer.style.backgroundColor = '#ffffff';
+                    const img = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
+                    chartContainer.style.backgroundColor = origBg;
+                    chartImgBase64 = img.toDataURL('image/png');
+                }
+
                 const kpiCards = document.querySelectorAll('.result-card');
                 let kpiRows = '';
                 let row = '';
@@ -1265,14 +1475,13 @@
                     const label = card.querySelector('.label') ? card.querySelector('.label').innerText : '';
                     const value = card.querySelector('.value') ? card.querySelector('.value').innerText : '';
                     const unit = card.querySelector('.unit') ? card.querySelector('.unit').innerText : '';
-
                     const cell = `
-                        <td style="border:1px solid #b8860b; padding:15px; text-align:center; background:#fefcf6; vertical-align:top;">
+                        <td style="border:1px solid #b8860b; padding:15px; text-align:center; background:#fefcf6;">
                             ${icon}
-                            <div style="font-weight:700; color:#666; margin:0.3rem 0;">${label}</div>
+                            <div style="font-weight:700; color:#666;">${label}</div>
                             <div style="font-size:1.6rem; font-weight:900; color:#b8860b;">${value}</div>
                             <div style="font-size:0.9rem; color:#777;">${unit}</div>
-                         </td>
+                        </td>
                     `;
                     row += cell;
                     count++;
@@ -1282,235 +1491,105 @@
                     }
                 });
 
-                // جدول المعطيات الأساسية
-                const summaryRows = `
-                    <tr><th style="background:#fefcf6; color:#b8860b;">المبيعات الشهرية المستهدفة</th><td>${currency} ${d.monthlySales}</td></tr>
-                    <tr><th style="background:#fefcf6; color:#b8860b;">متوسط الفاتورة للعميل</th><td>${currency} ${d.avgBill}</td></tr>
-                    <tr><th style="background:#fefcf6; color:#b8860b;">متوسط الأجر الشهري للموظف</th><td>${currency} ${d.avgMonthlyWage}</td></tr>
-                    <tr><th style="background:#fefcf6; color:#b8860b;">أيام العمل في الأسبوع</th><td>${d.workingDays}</td></tr>
-                    <tr><th style="background:#fefcf6; color:#b8860b;">نسبة العمالة المستهدفة</th><td>${d.targetPercent}%</td></tr>
-                    <tr><th style="background:#fefcf6; color:#b8860b;">إجمالي الموظفين</th><td>${d.totalEmployees}</td></tr>
-                    <tr><th style="background:#fefcf6; color:#b8860b;">إجمالي ساعات العمل اليومية</th><td>${d.totalShiftHours}</td></tr>
-                `;
-
-                const now = new Date();
-                const dateStr = now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
-
-                const reportHTML = `
-                    <html>
-                    <head>
-                        <meta charset='utf-8'>
-                        <style>
-                            body { direction: rtl; font-family: 'Tajawal', Arial, sans-serif; background: #fff; color: #333; padding: 2rem; }
-                            h1, h2, h3 { color: #b8860b; }
-                            table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: #fff; }
-                            th, td { border: 1px solid #b8860b; padding: 10px; text-align: center; }
-                            th { background: #fefcf6; color: #b8860b; }
-                            .kpi-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-                            .kpi-table td { border: 1px solid #b8860b; padding: 15px; text-align: center; background: #fefcf6; }
-                            .chart-container { text-align: center; margin: 2rem 0; }
-                            .chart-container img { max-width: 100%; border: 2px solid #b8860b; border-radius: 10px; background: #fff; }
-                            .footer { margin-top: 2rem; text-align: center; color: #777; border-top: 1px dashed #b8860b; padding-top: 1rem; }
-                        </style>
-                    </head>
-                    <body>
+                const fullHtml = `<!DOCTYPE html>
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+                <head><meta charset='utf-8'><title>تقرير تكلفة العمالة - FAROUK GRUP</title>
+                <style>
+                    body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;}
+                    .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                    .cover h1{font-size:32px;color:#b8860b;margin:0;}
+                    .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                    table{width:100%;border-collapse:collapse;margin:20px 0;direction:rtl;}
+                    th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                    th{background:#fefcf6;color:#b8860b;font-weight:bold;}
+                    .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+                    .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;}
+                </style></head>
+                <body>
+                    <div class="cover">
                         <h1>مجموعة فاروق للاستشارات والأعمال</h1>
                         <h2>تقرير تحليل تكلفة العمالة المثالية</h2>
                         <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
+                        <p>العملة: ${currency} | نسبة العمالة: ${D.laborPercent.toFixed(1)}%</p>
+                    </div>
+                    <h2 style="color:#b8860b;">المدخلات الأساسية</h2>
+                    <table><tbody>
+                        <tr><th>المبيعات الشهرية</th><td>${currency} ${D.monthlySales}</td><th>متوسط الفاتورة</th><td>${currency} ${D.avgBill}</td></tr>
+                        <tr><th>متوسط الأجر الشهري</th><td>${currency} ${D.avgMonthlyWage}</td><th>أيام العمل</th><td>${D.workingDays}</td></tr>
+                        <tr><th>نسبة العمالة المستهدفة</th><td>${D.targetPercent}%</td><th>عدد الورديات</th><td>${D.shiftsDetail.length}</td></tr>
+                    </tbody></table>
+                    <h2 style="color:#b8860b;">📊 مؤشرات الأداء</h2>
+                    <table>${kpiRows}</table>
+                    <h2 style="color:#b8860b;">📈 الرسم البياني</h2>
+                    <div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>
+                    <h2 style="color:#b8860b;">💡 التوصيات</h2>
+                    <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">
+                        <ul>${D.suggestionsHtml}</ul>
+                    </div>
+                    <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+                </body></html>`;
 
-                        <h3>المعطيات الأساسية</h3>
-                        <table>${summaryRows}</table>
-
-                        <h3>مؤشرات الأداء</h3>
-                        <table class="kpi-table">${kpiRows}</table>
-
-                        <h3>التقييم</h3>
-                        <div style="background:#f8f8f8; border:1px solid #b8860b; border-radius:10px; padding:1rem; margin:1rem 0;">
-                            ${d.alertMessage}
-                        </div>
-
-                        <h3>الرسم البياني: المبيعات مقابل تكلفة العمالة</h3>
-                        <div class="chart-container"><img src="${chartImg}" /></div>
-
-                        <h3>التوصيات</h3>
-                        <div style="background:#f8f8f8; border:1px solid #b8860b; border-radius:10px; padding:1rem;">
-                            <ul>${d.suggestions.replace(/<br>/g, '<br>')}</ul>
-                        </div>
-
-                        <div class="footer">
-                            تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة © ${now.getFullYear()}
-                        </div>
-                    </body>
-                    </html>
-                `;
-
-                const blob = new Blob(['\uFEFF' + reportHTML], { type: 'application/msword' });
+                const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `تقرير_عمالة_${companyName}_${now.toISOString().slice(0, 10)}.doc`;
+                link.download = `تقرير_عمالة_${companyName}_${now.toISOString().slice(0,10)}.doc`;
                 link.click();
                 URL.revokeObjectURL(link.href);
-            } catch (error) {
-                console.error(error);
-                alert('حدث خطأ أثناء إنشاء تقرير Word');
-            }
-        });
+            } catch(err){ console.error(err); alert('خطأ Word: '+err.message); }
+            finally{ hideLoading(); }
+        }
 
-        // ------------------ تصدير PDF (بخلفيات بيضاء) ------------------
+        // ------------------ تصدير PDF (محتفظ به) ------------------
         document.getElementById('exportPdfBtn').addEventListener('click', async function() {
-            if (!window.laborData) {
-                alert('الرجاء إجراء التحليل أولاً');
-                return;
-            }
-
+            if (!globalLaborData) { alert('الرجاء إجراء التحليل أولاً'); return; }
             try {
-                const d = window.laborData;
                 const resultsSection = document.getElementById('resultsSection');
-                if (!resultsSection || resultsSection.style.display === 'none') return;
-
-                // استنساخ المنطقة مع تغيير الأنماط للأبيض
                 const cloneSection = resultsSection.cloneNode(true);
                 const actionBar = cloneSection.querySelector('.action-bar');
                 if (actionBar) actionBar.remove();
-
-                const allButtons = cloneSection.querySelectorAll('button');
-                allButtons.forEach(btn => btn.style.display = 'none');
-
-                // تعديل أنماط العناصر لتصبح بخلفية بيضاء ونصوص داكنة
                 cloneSection.style.backgroundColor = '#ffffff';
                 cloneSection.style.padding = '20px';
                 cloneSection.style.borderRadius = '10px';
                 cloneSection.style.direction = 'rtl';
                 cloneSection.style.fontFamily = 'Tajawal, sans-serif';
                 cloneSection.style.color = '#333';
-
-                // تعديل كل result-card
                 const resultCards = cloneSection.querySelectorAll('.result-card');
                 resultCards.forEach(card => {
                     card.style.backgroundColor = '#fefcf6';
                     card.style.border = '2px solid #b8860b';
                     card.style.color = '#333';
-                    const label = card.querySelector('.label');
-                    if (label) label.style.color = '#666';
-                    const value = card.querySelector('.value');
-                    if (value) value.style.color = '#b8860b';
-                    const unit = card.querySelector('.unit');
-                    if (unit) unit.style.color = '#777';
-                    const icon = card.querySelector('i');
-                    if (icon) icon.style.color = '#b8860b';
                 });
-
-                // تعديل التنبيهات
-                const alertDiv = cloneSection.querySelector('#evaluationAlert .alert');
-                if (alertDiv) {
-                    alertDiv.style.background = alertDiv.classList.contains('alert-success') ? '#d4edda' : (alertDiv.classList.contains('alert-warning') ? '#fff3cd' : '#f8d7da');
-                    alertDiv.style.color = alertDiv.classList.contains('alert-success') ? '#155724' : (alertDiv.classList.contains('alert-warning') ? '#856404' : '#721c24');
-                    alertDiv.style.border = '1px solid ' + (alertDiv.classList.contains('alert-success') ? '#c3e6cb' : (alertDiv.classList.contains('alert-warning') ? '#ffeeba' : '#f5c6cb'));
-                }
-
-                // تعديل صندوق التوصيات
-                const suggestionBox = cloneSection.querySelector('.suggestion-box');
-                if (suggestionBox) {
-                    suggestionBox.style.backgroundColor = '#f8f8f8';
-                    suggestionBox.style.border = '2px solid #b8860b';
-                    suggestionBox.style.color = '#333';
-                    const h4 = suggestionBox.querySelector('h4');
-                    if (h4) h4.style.color = '#b8860b';
-                    const ul = suggestionBox.querySelector('ul');
-                    if (ul) ul.style.color = '#555';
-                }
-
-                // تعديل الرسم البياني (سيتم التقاطه بخلفية بيضاء لاحقاً)
-                const chartContainer = cloneSection.querySelector('.chart-container');
-                if (chartContainer) {
-                    chartContainer.style.backgroundColor = '#ffffff';
-                    chartContainer.style.border = '2px solid #b8860b';
-                }
-
-                // إضافة ترويسة وتذييل
                 const headerDiv = document.createElement('div');
-                headerDiv.innerHTML = `
-                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #b8860b; padding-bottom: 10px;">
-                        <h2 style="color: #b8860b; margin:0;">مجموعة فاروق للاستشارات والأعمال</h2>
-                        <p style="color: #666;">تقرير تحليل تكلفة العمالة المثالية</p>
-                        <p style="color: #666;">الجهة: ${d.companyName} | تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG-u-nu-latn')}</p>
-                    </div>
-                `;
+                headerDiv.innerHTML = `<div style="text-align:center;margin-bottom:20px;border-bottom:3px solid #b8860b;padding-bottom:10px;"><h2 style="color:#b8860b;">مجموعة فاروق للاستشارات والأعمال</h2><p>تقرير تحليل تكلفة العمالة</p><p>الجهة: ${globalLaborData.companyName} | ${new Date().toLocaleDateString('ar-EG')}</p></div>`;
                 cloneSection.insertBefore(headerDiv, cloneSection.firstChild);
-
-                const footerDiv = document.createElement('div');
-                footerDiv.innerHTML = `
-                    <div style="text-align: center; margin-top: 30px; color: #888; font-size:0.9rem; border-top: 1px dashed #b8860b; padding-top: 10px;">
-                        تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة © ${new Date().getFullYear()}
-                    </div>
-                `;
-                cloneSection.appendChild(footerDiv);
-
-                // وضع النسخة خارج الشاشة للتصوير
                 cloneSection.style.position = 'absolute';
                 cloneSection.style.left = '-9999px';
-                cloneSection.style.top = '0';
                 document.body.appendChild(cloneSection);
-
-                // التقاط الصورة بخلفية بيضاء
                 const canvas = await html2canvas(cloneSection, { scale: 2, backgroundColor: '#ffffff' });
-                const imgData = canvas.toDataURL('image/png');
-
                 document.body.removeChild(cloneSection);
-
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = pdf.internal.pageSize.getHeight();
-
                 const imgWidth = pdfWidth;
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
                 let heightLeft = imgHeight;
                 let position = 0;
-
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pdfHeight;
-
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pdf.internal.pageSize.getHeight();
                 while (heightLeft > 0) {
                     position = heightLeft - imgHeight;
                     pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pdfHeight;
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pdf.internal.pageSize.getHeight();
                 }
-
-                pdf.save(`تقرير_عمالة_${d.companyName}.pdf`);
-            } catch (error) {
-                console.error(error);
-                alert('حدث خطأ أثناء إنشاء ملف PDF');
-            }
+                pdf.save(`تقرير_عمالة_${globalLaborData.companyName}.pdf`);
+            } catch(err){ console.error(err); alert('خطأ PDF: '+err.message); }
         });
 
-        // تهيئة أولية
+        document.getElementById('exportExcelBtn').addEventListener('click', exportToFullExcel);
+        document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+
         renderShifts();
     </script>
-<!-- زر العودة إلى الرئيسية (عائم في اليمين) -->
-<a href="index.html" style="
-    position: fixed;
-    bottom: 20px;
-    right: 20px; /* وضعه في اليمين بدلاً من اليسار */
-    background: rgba(180,133,84,0.9);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-family: 'Tajawal', sans-serif;
-    font-weight: bold;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.3s;
-" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';">
-    <i class="fas fa-home"></i> الرئيسية
-</a>
 </body>
 </html>

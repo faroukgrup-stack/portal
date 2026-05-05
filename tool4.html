@@ -14,9 +14,12 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- html2canvas و jsPDF لتصدير PDF (اختياري) -->
+    <!-- html2canvas و jsPDF لتصدير PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- مكتبات Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -100,8 +103,6 @@
             100% { transform: translate(0,0) rotate(0deg); }
         }
 
-        /* تم إزالة الـ NAV بالكامل */
-
         .hero-mini {
             background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
             color: white;
@@ -112,15 +113,12 @@
             overflow: hidden;
             z-index: 2;
         }
-
         .hero-mini::before {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
             animation: rotate 40s linear infinite;
         }
-
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
         .hero-mini h2 { font-size: 2.5rem; font-weight: 900; color: var(--gold-light); margin-bottom: 0.5rem; position: relative; z-index: 2; }
         .hero-mini p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; opacity: 0.95; position: relative; z-index: 2; }
 
@@ -141,12 +139,10 @@
             box-shadow: var(--shadow-soft);
             margin-bottom: 2rem;
         }
-
         .calculator-card:hover {
             box-shadow: var(--shadow-glow);
             border-color: rgba(180,133,84,0.4);
         }
-
         .calculator-card h2 {
             font-size: 1.8rem;
             font-weight: 900;
@@ -198,7 +194,6 @@
             padding: 1.5rem;
             margin-bottom: 1rem;
         }
-
         .section h3 {
             color: var(--accent-soft);
             margin-bottom: 1rem;
@@ -208,10 +203,7 @@
             padding-bottom: 0.5rem;
         }
 
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
+        .form-group { margin-bottom: 1rem; }
         label {
             display: block;
             margin-bottom: 0.3rem;
@@ -219,12 +211,7 @@
             color: var(--accent-soft);
             font-size: 0.9rem;
         }
-
-        label i {
-            color: var(--accent-soft);
-            margin-left: 0.4rem;
-        }
-
+        label i { color: var(--accent-soft); margin-left: 0.4rem; }
         input, select, textarea {
             width: 100%;
             padding: 0.8rem 1rem;
@@ -236,27 +223,16 @@
             font-size: 1rem;
             transition: var(--transition);
         }
-
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--accent-glow);
             box-shadow: 0 0 0 3px rgba(180,133,84,0.2);
             background: rgba(15,20,30,0.9);
         }
+        textarea { min-height: 80px; resize: vertical; }
 
-        textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        .row-2 {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .row-2 > * {
-            flex: 1 1 200px;
-        }
+        .row-2 { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .row-2 > * { flex: 1 1 200px; }
 
         .competitor-row, .channel-row {
             display: flex;
@@ -277,7 +253,6 @@
             color: var(--text-light);
             padding: 0.6rem 0.8rem;
         }
-
         .remove-btn {
             background: var(--danger);
             color: white;
@@ -289,7 +264,6 @@
             font-weight: bold;
             flex-shrink: 0;
         }
-
         .btn-add {
             background: transparent;
             border: 2px solid var(--border-light);
@@ -304,11 +278,7 @@
             gap: 0.5rem;
             transition: var(--transition);
         }
-        .btn-add:hover {
-            background: rgba(180,133,84,0.3);
-            color: #fff;
-            border-color: var(--accent-glow);
-        }
+        .btn-add:hover { background: rgba(180,133,84,0.3); color: #fff; border-color: var(--accent-glow); }
 
         .btn-primary {
             background: rgba(180,133,84,0.2);
@@ -332,17 +302,13 @@
             transform: translateY(-3px);
         }
 
-        .results-section {
-            margin-top: 2rem;
-        }
-
+        .results-section { margin-top: 2rem; }
         .results-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
-
         .result-card {
             background: var(--bg-card);
             border: 1px solid var(--border-light);
@@ -351,30 +317,13 @@
             text-align: center;
             box-shadow: var(--shadow-soft);
         }
-        .result-card .label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 0.3rem;
-        }
-        .result-card .value {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: var(--accent-soft);
-        }
-        .result-card .unit {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
+        .result-card .label { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+        .result-card .value { font-size: 1.5rem; font-weight: 900; color: var(--accent-soft); }
+        .result-card .unit { font-size: 0.8rem; color: var(--text-muted); }
 
-        .alert {
-            padding: 1rem;
-            border-radius: 30px;
-            font-weight: 700;
-            margin: 1rem 0;
-        }
-        .alert-success { background: rgba(40,167,69,0.2); color: #4ade80; border: 1px solid var(--success); }
-        .alert-warning { background: rgba(255,193,7,0.2); color: #fbbf24; border: 1px solid var(--warning); }
+        .alert { padding: 1rem; border-radius: 30px; font-weight: 700; margin: 1rem 0; }
         .alert-danger { background: rgba(220,53,69,0.2); color: #f87171; border: 1px solid var(--danger); }
+        .alert-warning { background: rgba(255,193,7,0.2); color: #fbbf24; border: 1px solid var(--warning); }
 
         .suggestion-box {
             background: var(--bg-card);
@@ -383,14 +332,7 @@
             padding: 1.5rem;
             margin: 2rem 0;
         }
-        .suggestion-box h4 {
-            color: var(--accent-soft);
-            margin-bottom: 1rem;
-        }
-        .suggestion-box ul, .suggestion-box p {
-            margin-right: 1.5rem;
-            color: var(--text-muted);
-        }
+        .suggestion-box h4 { color: var(--accent-soft); margin-bottom: 1rem; }
 
         .chart-grid {
             display: grid;
@@ -404,12 +346,8 @@
             padding: 1rem;
             border: 1px solid var(--border-light);
             height: 250px;
-            margin: 0;
         }
-        canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
+        canvas { width: 100% !important; height: 100% !important; }
 
         .action-bar {
             display: flex;
@@ -418,7 +356,6 @@
             margin: 1rem 0;
             flex-wrap: wrap;
         }
-
         .btn-export {
             background: rgba(180,133,84,0.15);
             border: 1px solid var(--border-light);
@@ -437,7 +374,6 @@
         .btn-export.word { background: rgba(30,74,122,0.2); border-color: #1e4a7a; color: #8ab8ff; }
         .btn-export.word:hover { background: rgba(30,74,122,0.4); }
 
-        /* فوتر مبسط */
         .footer-simple {
             text-align: center;
             padding: 1.5rem;
@@ -448,12 +384,9 @@
             color: var(--text-muted);
             font-size: 0.85rem;
         }
-        .footer-simple span {
-            color: var(--accent-soft);
-            font-weight: 700;
-        }
+        .footer-simple span { color: var(--accent-soft); font-weight: 700; }
 
-        /* الآلة الحاسبة المنبثقة (Modal) */
+        /* آلة حاسبة منبثقة */
         .modal {
             display: none;
             position: fixed;
@@ -485,19 +418,8 @@
             align-items: center;
             justify-content: space-between;
         }
-        .modal-header h2 {
-            margin: 0;
-            color: var(--accent-soft);
-            font-size: 1rem;
-            font-weight: 900;
-        }
-        .close {
-            color: var(--text-muted);
-            float: left;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        .modal-header h2 { margin: 0; color: var(--accent-soft); font-size: 1rem; font-weight: 900; }
+        .close { color: var(--text-muted); float: left; font-size: 24px; font-weight: bold; cursor: pointer; }
         .close:hover { color: var(--accent-glow); }
         .modal-body { padding: 15px; }
         .calc-display {
@@ -529,19 +451,11 @@
             color: var(--text-light);
             cursor: pointer;
         }
-        .calc-btn:hover {
-            background: rgba(180,133,84,0.3);
-            border-color: var(--accent-glow);
-        }
+        .calc-btn:hover { background: rgba(180,133,84,0.3); border-color: var(--accent-glow); }
         .calc-btn.operator { color: var(--accent-soft); }
-        .calc-btn.equals {
-            background: rgba(180,133,84,0.3);
-            color: white;
-            grid-column: span 2;
-        }
+        .calc-btn.equals { background: rgba(180,133,84,0.3); color: white; grid-column: span 2; }
         .calc-btn.equals:hover { background: rgba(180,133,84,0.5); }
 
-        /* زر الآلة الحاسبة العائم */
         .calc-floating-btn {
             position: fixed;
             bottom: 20px;
@@ -561,14 +475,8 @@
             align-items: center;
             gap: 0.5rem;
         }
-        .calc-floating-btn:hover {
-            background: rgba(180,133,84,0.4);
-            color: #fff;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 15px rgba(180,133,84,0.3);
-        }
+        .calc-floating-btn:hover { background: rgba(180,133,84,0.4); color: #fff; border-color: var(--accent-glow); }
 
-        /* تحسينات الجوال */
         @media (max-width: 768px) {
             .hero-mini h2 { font-size: 2rem; }
             .hero-mini p { font-size: 1rem; }
@@ -587,22 +495,14 @@
             .chart-grid { grid-template-columns: 1fr; }
             .suggestion-box { padding: 1rem; }
             .section { padding: 1rem; }
-            .section h3 { font-size: 1.2rem; }
             .calc-floating-btn { padding: 0.6rem 1rem; font-size: 0.9rem; }
         }
     </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-<body style="overflow-x: hidden;">
-<!-- خلفية متوهجة -->
-<div class="glow-bg">
-    <span></span><span></span><span></span>
-</div>
+<div class="glow-bg"><span></span><span></span><span></span></div>
 <div class="floating-shape shape-1"></div>
 <div class="floating-shape shape-2"></div>
-
-<!-- تم إزالة الـ NAV بالكامل -->
 
 <section class="hero-mini">
     <h2>📊 دراسة الجدوى التسويقية الشاملة</h2>
@@ -630,92 +530,51 @@
 
         <!-- مدخلات متعددة -->
         <div class="grid-2">
-            <!-- القسم الأيمن -->
             <div>
                 <div class="section">
                     <h3><i class="fas fa-tag"></i> تعريف المشروع</h3>
-                    <div class="form-group">
-                        <label>اسم المشروع / المنتج</label>
-                        <input type="text" id="projectName" value="مطعم برغر">
-                    </div>
-                    <div class="form-group">
-                        <label>وصف مختصر</label>
-                        <textarea id="projectDesc" rows="2">مطعم وجبات سريعة متخصص في البرغر</textarea>
-                    </div>
-                    <div class="row-2">
-                        <div class="form-group"><label>الموقع</label><input type="text" id="location" value="الرياض"></div>
-                        <div class="form-group"><label>مدة الدراسة (شهر)</label><input type="number" id="studyMonths" value="12"></div>
-                    </div>
+                    <div class="form-group"><label>اسم المشروع / المنتج</label><input type="text" id="projectName" value="مطعم برغر"></div>
+                    <div class="form-group"><label>وصف مختصر</label><textarea id="projectDesc" rows="2">مطعم وجبات سريعة متخصص في البرغر</textarea></div>
+                    <div class="row-2"><div class="form-group"><label>الموقع</label><input type="text" id="location" value="الرياض"></div><div class="form-group"><label>مدة الدراسة (شهر)</label><input type="number" id="studyMonths" value="12"></div></div>
                 </div>
-
                 <div class="section">
                     <h3><i class="fas fa-chart-bar"></i> تحليل السوق</h3>
                     <div class="form-group"><label>إجمالي السوق (TAM)</label><input type="number" id="tam" value="10000000"></div>
                     <div class="form-group"><label>السوق القابل للخدمة (SAM)</label><input type="number" id="sam" value="4000000"></div>
                     <div class="form-group"><label>الحصة المستهدفة (SOM)</label><input type="number" id="som" value="200000"></div>
-                    <div class="row-2">
-                        <div class="form-group"><label>نمو سنوي %</label><input type="number" id="growthRate" value="5" step="0.1"></div>
-                    </div>
+                    <div class="row-2"><div class="form-group"><label>نمو سنوي %</label><input type="number" id="growthRate" value="5" step="0.1"></div></div>
                     <div class="form-group"><label>الاتجاهات الرئيسية</label><textarea id="trends" rows="2">صحي، توصيل سريع</textarea></div>
                 </div>
-
                 <div class="section">
                     <h3><i class="fas fa-users"></i> الجمهور المستهدف</h3>
-                    <div class="row-2">
-                        <div class="form-group"><label>الشريحة العمرية</label><input type="text" id="ageGroup" value="18-35"></div>
-                        <div class="form-group"><label>الجنس</label>
-                            <select id="gender"><option value="all">الكل</option><option value="male">ذكور</option><option value="female">إناث</option></select>
-                        </div>
-                    </div>
-                    <div class="row-2">
-                        <div class="form-group"><label>المنطقة</label><input type="text" id="geoArea" value="وسط المدينة"></div>
-                        <div class="form-group"><label>الدخل</label>
-                            <select id="income"><option value="low">منخفض</option><option value="medium" selected>متوسط</option><option value="high">مرتفع</option></select>
-                        </div>
-                    </div>
+                    <div class="row-2"><div class="form-group"><label>الشريحة العمرية</label><input type="text" id="ageGroup" value="18-35"></div><div class="form-group"><label>الجنس</label><select id="gender"><option value="all">الكل</option><option value="male">ذكور</option><option value="female">إناث</option></select></div></div>
+                    <div class="row-2"><div class="form-group"><label>المنطقة</label><input type="text" id="geoArea" value="وسط المدينة"></div><div class="form-group"><label>الدخل</label><select id="income"><option value="low">منخفض</option><option value="medium" selected>متوسط</option><option value="high">مرتفع</option></select></div></div>
                     <div class="form-group"><label>الاهتمامات / السلوك</label><textarea id="interests" rows="2">عشاق البرغر، يفضلون التوصيل</textarea></div>
                     <div class="form-group"><label>حجم الجمهور المحتمل</label><input type="number" id="audienceSize" value="500000"></div>
                 </div>
             </div>
-
-            <!-- القسم الأيسر -->
             <div>
                 <div class="section">
                     <h3><i class="fas fa-store-alt"></i> المنافسون</h3>
                     <div id="competitorsContainer"></div>
                     <button class="btn-add" id="addCompetitor"><i class="fas fa-plus"></i> إضافة منافس</button>
                 </div>
-
                 <div class="section">
                     <h3><i class="fas fa-bullhorn"></i> استراتيجية التسويق</h3>
                     <div class="form-group"><label>المنتج</label><textarea id="productStrategy" rows="2">برغر ممتاز، خيارات صحية</textarea></div>
-                    <div class="row-2">
-                        <div class="form-group"><label>سعر الوجبة</label><input type="number" id="price" value="50"></div>
-                        <div class="form-group"><label>تكلفة الوجبة</label><input type="number" id="costPerMeal" value="15"></div>
-                    </div>
+                    <div class="row-2"><div class="form-group"><label>سعر الوجبة</label><input type="number" id="price" value="50"></div><div class="form-group"><label>تكلفة الوجبة</label><input type="number" id="costPerMeal" value="15"></div></div>
                     <div class="form-group"><label>التوزيع</label><textarea id="placeStrategy" rows="2">موقع حيوي، توصيل عبر تطبيقات</textarea></div>
                     <div class="form-group"><label>الترويج</label><textarea id="promotionStrategy" rows="2">إعلانات، عروض افتتاح</textarea></div>
-                    <div class="row-2">
-                        <div class="form-group"><label>فريق تسويق (عدد)</label><input type="number" id="marketingTeam" value="2"></div>
-                        <div class="form-group"><label>مدة الخطة (شهر)</label><input type="number" id="planDuration" value="12"></div>
-                    </div>
+                    <div class="row-2"><div class="form-group"><label>فريق تسويق (عدد)</label><input type="number" id="marketingTeam" value="2"></div><div class="form-group"><label>مدة الخطة (شهر)</label><input type="number" id="planDuration" value="12"></div></div>
                 </div>
-
                 <div class="section">
                     <h3><i class="fas fa-file-invoice-dollar"></i> مصاريف تشغيل شهرية</h3>
-                    <div class="row-2">
-                        <div class="form-group"><label>إيجار</label><input type="number" id="rent" value="20000"></div>
-                        <div class="form-group"><label>رواتب</label><input type="number" id="salaries" value="30000"></div>
-                    </div>
-                    <div class="row-2">
-                        <div class="form-group"><label>فواتير</label><input type="number" id="utilities" value="5000"></div>
-                        <div class="form-group"><label>أخرى</label><input type="number" id="otherOpCost" value="5000"></div>
-                    </div>
+                    <div class="row-2"><div class="form-group"><label>إيجار</label><input type="number" id="rent" value="20000"></div><div class="form-group"><label>رواتب</label><input type="number" id="salaries" value="30000"></div></div>
+                    <div class="row-2"><div class="form-group"><label>فواتير</label><input type="number" id="utilities" value="5000"></div><div class="form-group"><label>أخرى</label><input type="number" id="otherOpCost" value="5000"></div></div>
                 </div>
             </div>
         </div>
 
-        <!-- القنوات وسلوك العملاء -->
         <div class="grid-2">
             <div class="section">
                 <h3><i class="fas fa-wifi"></i> قنوات التسويق</h3>
@@ -724,10 +583,7 @@
             </div>
             <div class="section">
                 <h3><i class="fas fa-shopping-cart"></i> سلوك العملاء</h3>
-                <div class="row-2">
-                    <div class="form-group"><label>مرات شراء شهرياً</label><input type="number" id="purchaseFrequency" value="2" step="0.5"></div>
-                    <div class="form-group"><label>مدة الولاء (شهر)</label><input type="number" id="loyaltyMonths" value="6"></div>
-                </div>
+                <div class="row-2"><div class="form-group"><label>مرات شراء شهرياً</label><input type="number" id="purchaseFrequency" value="2" step="0.5"></div><div class="form-group"><label>مدة الولاء (شهر)</label><input type="number" id="loyaltyMonths" value="6"></div></div>
                 <div class="form-group"><label>عملاء عابرون (شهرياً)</label><input type="number" id="walkIn" value="1000"></div>
             </div>
         </div>
@@ -739,77 +595,31 @@
             <div class="action-bar">
                 <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير Word</button>
                 <button class="btn-export" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
+                <button class="btn-export" id="exportFullExcelBtn" style="background: rgba(40,167,69,0.15); border-color: #28a745; color: #6fbf6f;"><i class="fas fa-file-excel"></i>  تصدير Excel شامل</button>
             </div>
 
             <div id="reportHeader" class="result-card" style="text-align:right;"></div>
-
             <div class="results-grid" id="resultsGrid"></div>
-
             <div id="alerts"></div>
-
             <div class="suggestion-box" id="strategicAdvice"></div>
-
             <div class="chart-grid">
-                <div class="chart-container">
-                    <canvas id="revenueChart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <canvas id="breakEvenChart"></canvas>
-                </div>
+                <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+                <div class="chart-container"><canvas id="breakEvenChart"></canvas></div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- فوتر مبسط -->
-<footer class="footer-simple">
-    جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
-</footer>
+<footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
 
-<!-- زر الآلة الحاسبة العائم -->
-<div class="calc-floating-btn" id="calculatorBtn">
-    <i class="fas fa-calculator"></i> آلة حاسبة
-</div>
+<div class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> آلة حاسبة</div>
+<div id="calculatorModal" class="modal"><div class="modal-content"><div class="modal-header"><span class="close">&times;</span><h2><i class="fas fa-calculator"></i> آلة حاسبة</h2></div><div class="modal-body"><input type="text" id="calcDisplay" class="calc-display" readonly><div class="calc-buttons"><button class="calc-btn" onclick="handleCalculatorInput('9')">9</button><button class="calc-btn" onclick="handleCalculatorInput('8')">8</button><button class="calc-btn" onclick="handleCalculatorInput('7')">7</button><button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button><button class="calc-btn" onclick="handleCalculatorInput('6')">6</button><button class="calc-btn" onclick="handleCalculatorInput('5')">5</button><button class="calc-btn" onclick="handleCalculatorInput('4')">4</button><button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button><button class="calc-btn" onclick="handleCalculatorInput('3')">3</button><button class="calc-btn" onclick="handleCalculatorInput('2')">2</button><button class="calc-btn" onclick="handleCalculatorInput('1')">1</button><button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button><button class="calc-btn" onclick="clearCalculator()">C</button><button class="calc-btn" onclick="handleCalculatorInput('.')">.</button><button class="calc-btn" onclick="handleCalculatorInput('0')">0</button><button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button><button class="calc-btn" onclick="backspaceCalculator()">⌫</button><button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button></div></div></div></div>
 
-<!-- نافذة الآلة الحاسبة المنبثقة -->
-<div id="calculatorModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span class="close">&times;</span>
-            <h2><i class="fas fa-calculator" style="color: var(--accent-soft);"></i> آلة حاسبة</h2>
-        </div>
-        <div class="modal-body">
-            <input type="text" id="calcDisplay" class="calc-display" readonly>
-            <div class="calc-buttons">
-                <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
-                <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
-                <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
-                <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
-                <button class="calc-btn" onclick="clearCalculator()">C</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
-                <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
-                <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
-                <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- AOS -->
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
     AOS.init({ duration: 800, once: true, offset: 100 });
 
-    // ------------------ إدارة المنافسين (بدون قيم افتراضية) ------------------
+    // ------------------ المنافسون ------------------
     let competitorCount = 2;
     function renderCompetitors() {
         const container = document.getElementById('competitorsContainer');
@@ -826,16 +636,10 @@
             container.appendChild(div);
         }
     }
-    window.removeCompetitor = function(btn) {
-        btn.parentElement.remove();
-        competitorCount--;
-    };
-    document.getElementById('addCompetitor').addEventListener('click', function() {
-        competitorCount++;
-        renderCompetitors();
-    });
+    window.removeCompetitor = function(btn) { btn.parentElement.remove(); competitorCount--; };
+    document.getElementById('addCompetitor').addEventListener('click', () => { competitorCount++; renderCompetitors(); });
 
-    // ------------------ إدارة القنوات (بدون قيم افتراضية) ------------------
+    // ------------------ القنوات ------------------
     let channelCount = 2;
     function renderChannels() {
         const container = document.getElementById('channelsContainer');
@@ -852,16 +656,10 @@
             container.appendChild(div);
         }
     }
-    window.removeChannel = function(btn) {
-        btn.parentElement.remove();
-        channelCount--;
-    };
-    document.getElementById('addChannel').addEventListener('click', function() {
-        channelCount++;
-        renderChannels();
-    });
+    window.removeChannel = function(btn) { btn.parentElement.remove(); channelCount--; };
+    document.getElementById('addChannel').addEventListener('click', () => { channelCount++; renderChannels(); });
 
-    // ------------------ دالة جمع البيانات ------------------
+    // ------------------ جمع البيانات ------------------
     function getData() {
         const competitors = [];
         document.querySelectorAll('.competitor-row').forEach(row => {
@@ -916,7 +714,7 @@
         };
     }
 
-    // ------------------ الحساب وعرض النتائج (كما هي) ------------------
+    // ------------------ الحساب وعرض النتائج ------------------
     let revenueChart, breakEvenChart;
 
     document.getElementById('calculateBtn').addEventListener('click', function() {
@@ -1035,108 +833,105 @@
             },
             options: { responsive: true, maintainAspectRatio: false, animation: false }
         });
+
+        // حفظ النتائج للتصدير
+        window.lastMarketingResults = {
+            inputs: d,
+            outputs: {
+                totalActiveCustomers,
+                annualRevenue,
+                annualMarketingCost,
+                marketingContribution,
+                cac,
+                roas,
+                ltv,
+                breakEvenCustomers,
+                compStrengthAvg,
+                compWeaknessAvg,
+                compIndex,
+                compDesc,
+                compColor,
+                marketScore,
+                marketColor,
+                warnings
+            }
+        };
     });
 
-    // ------------------ دوال التصدير Word و PDF (كما هي) ------------------
+    // ------------------ تصدير Word (نفس الكود الأصلي مع تحسين) ------------------
     document.getElementById('exportWordBtn').addEventListener('click', function() {
-        const resultsSection = document.getElementById('resultsSection');
-        if (!resultsSection || resultsSection.style.display === 'none') {
+        if (document.getElementById('resultsSection').style.display === 'none') {
             alert('الرجاء إجراء التحليل أولاً');
             return;
         }
+        const d = getData();
+        const headerContent = document.getElementById('reportHeader')?.innerHTML || '';
+        const resultsGridContent = document.getElementById('resultsGrid')?.innerHTML || '';
+        const alertsContent = document.getElementById('alerts')?.innerHTML || '';
+        const strategicContent = document.getElementById('strategicAdvice')?.innerHTML || '';
 
-        try {
-            const d = getData();
-            
-            const headerContent = document.getElementById('reportHeader')?.innerHTML || '';
-            const resultsGridContent = document.getElementById('resultsGrid')?.innerHTML || '';
-            const alertsContent = document.getElementById('alerts')?.innerHTML || '';
-            const strategicContent = document.getElementById('strategicAdvice')?.innerHTML || '';
+        const chart1Canvas = document.getElementById('revenueChart');
+        const chart2Canvas = document.getElementById('breakEvenChart');
+        let chart1Img = '', chart2Img = '';
+        if (chart1Canvas) chart1Img = chart1Canvas.toDataURL('image/png');
+        if (chart2Canvas) chart2Img = chart2Canvas.toDataURL('image/png');
 
-            const chart1Canvas = document.getElementById('revenueChart');
-            const chart2Canvas = document.getElementById('breakEvenChart');
-            
-            let chart1Img = '', chart2Img = '';
-            if (chart1Canvas) chart1Img = chart1Canvas.toDataURL('image/png');
-            if (chart2Canvas) chart2Img = chart2Canvas.toDataURL('image/png');
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/1999/xhtml' dir="rtl">
+            <head><meta charset="UTF-8"><title>تقرير تسويقي - FAROUK GRUP</title>
+            <style>
+                body { font-family: 'Arial', sans-serif; direction: rtl; margin: 2rem; }
+                h1 { color: #b8860b; text-align: center; }
+                h2 { color: #b8860b; border-bottom: 2px solid #b8860b; }
+                table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+                td { border: 1px solid #b8860b; padding: 10px; text-align: center; background: #fefcf6; }
+                .alert { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin: 10px 0; }
+                .strategic { background: #fef6e6; border-right: 4px solid #b8860b; padding: 10px; margin: 15px 0; }
+                img { max-width: 100%; height: auto; margin: 15px 0; border: 1px solid #b8860b; }
+            </style></head>
+            <body>
+                <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+                <h2>تقرير الدراسة التسويقية: ${d.projectName}</h2>
+                <p><strong>الجهة:</strong> ${d.companyName} | <strong>تاريخ التقرير:</strong> ${new Date().toLocaleDateString('ar-EG')}</p>
+                <div>${headerContent}</div>
+                <h3>المؤشرات المالية التسويقية</h3>
+                <table>${Array.from(document.querySelectorAll('.result-card')).map(card => {
+                    const label = card.querySelector('.label')?.innerText || '';
+                    const value = card.querySelector('.value')?.innerText || '';
+                    const unit = card.querySelector('.unit')?.innerText || '';
+                    return `<tr><td><strong>${label}</strong></td><td>${value} ${unit}</td></tr>`;
+                }).join('')}</table>
+                ${alertsContent ? `<div class="alert">${alertsContent}</div>` : ''}
+                <div class="strategic">${strategicContent}</div>
+                <h3>الرسوم البيانية</h3>
+                ${chart1Img ? `<img src="${chart1Img}" /><br>` : ''}
+                ${chart2Img ? `<img src="${chart2Img}" />` : ''}
+                <p style="text-align: center; margin-top: 40px;">© ${new Date().getFullYear()} FAROUK GRUP</p>
+            </body></html>
+        `;
 
-            const htmlContent = `
-                <!DOCTYPE html>
-                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/1999/xhtml' dir="rtl">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>تقرير تسويقي - FAROUK GRUP</title>
-                    <style>
-                        body { font-family: 'Arial', sans-serif; direction: rtl; margin: 2rem; }
-                        h1 { color: #b8860b; text-align: center; }
-                        h2 { color: #b8860b; border-bottom: 2px solid #b8860b; padding-bottom: 5px; }
-                        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
-                        td { border: 1px solid #b8860b; padding: 10px; text-align: center; background: #fefcf6; }
-                        .alert { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin: 10px 0; }
-                        .strategic { background: #fef6e6; border-right: 4px solid #b8860b; padding: 10px; margin: 15px 0; }
-                        img { max-width: 100%; height: auto; margin: 15px 0; border: 1px solid #b8860b; }
-                    </style>
-                </head>
-                <body>
-                    <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                    <h2>تقرير الدراسة التسويقية: ${d.projectName}</h2>
-                    <p><strong>الجهة:</strong> ${d.companyName} | <strong>تاريخ التقرير:</strong> ${new Date().toLocaleDateString('ar-EG')}</p>
-                    
-                    <div>${headerContent}</div>
-                    
-                    <h3>المؤشرات المالية التسويقية</h3>
-                     <table>
-                        ${Array.from(document.querySelectorAll('.result-card')).map(card => {
-                            const label = card.querySelector('.label')?.innerText || '';
-                            const value = card.querySelector('.value')?.innerText || '';
-                            const unit = card.querySelector('.unit')?.innerText || '';
-                            return `<tr><td><strong>${label}</strong></td><td>${value} ${unit}</td></tr>`;
-                        }).join('')}
-                     </table>
-                    
-                    ${alertsContent ? `<div class="alert">${alertsContent}</div>` : ''}
-                    
-                    <div class="strategic">${strategicContent}</div>
-                    
-                    <h3>الرسوم البيانية</h3>
-                    ${chart1Img ? `<img src="${chart1Img}" alt="الرسم البياني الأول" /><br>` : ''}
-                    ${chart2Img ? `<img src="${chart2Img}" alt="الرسم البياني الثاني" />` : ''}
-                    
-                    <p style="text-align: center; margin-top: 40px; color: #888;">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة © ${new Date().getFullYear()}</p>
-                </body>
-                </html>
-            `;
-
-            const blob = new Blob(['\uFEFF' + htmlContent], { type: 'application/msword' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `تقرير_تسويقي_${d.projectName}.doc`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(link.href);
-
-        } catch (error) {
-            console.error('خطأ في تصدير Word:', error);
-            alert('حدث خطأ أثناء إنشاء ملف Word');
-        }
+        const blob = new Blob(['\uFEFF' + htmlContent], { type: 'application/msword' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `تقرير_تسويقي_${d.projectName}.doc`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
     });
 
+    // ------------------ تصدير PDF (كما هو) ------------------
     document.getElementById('exportPdfBtn').addEventListener('click', async function() {
-        const resultsSection = document.getElementById('resultsSection');
-        if (!resultsSection || resultsSection.style.display === 'none') {
+        if (document.getElementById('resultsSection').style.display === 'none') {
             alert('الرجاء إجراء التحليل أولاً');
             return;
         }
-
         try {
-            const cloneSection = resultsSection.cloneNode(true);
+            const cloneSection = document.getElementById('resultsSection').cloneNode(true);
             const actionBar = cloneSection.querySelector('.action-bar');
             if (actionBar) actionBar.remove();
-
-            const allButtons = cloneSection.querySelectorAll('button');
-            allButtons.forEach(btn => btn.style.display = 'none');
-
+            cloneSection.querySelectorAll('button').forEach(btn => btn.style.display = 'none');
             cloneSection.style.backgroundColor = '#ffffff';
             cloneSection.style.padding = '20px';
             cloneSection.style.borderRadius = '10px';
@@ -1145,21 +940,10 @@
 
             const d = getData();
             const headerDiv = document.createElement('div');
-            headerDiv.innerHTML = `
-                <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #b8860b; padding-bottom: 10px;">
-                    <h2 style="color: #b8860b; margin:0;">مجموعة فاروق للاستشارات والأعمال</h2>
-                    <p style="color: #666;">تقرير الدراسة التسويقية: ${d.projectName}</p>
-                    <p style="color: #666;">الجهة: ${d.companyName} | تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG-u-nu-latn')}</p>
-                </div>
-            `;
+            headerDiv.innerHTML = `<div style="text-align:center; border-bottom:3px solid #b8860b;"><h2 style="color:#b8860b;">مجموعة فاروق للاستشارات والأعمال</h2><p>تقرير الدراسة التسويقية: ${d.projectName}</p><p>الجهة: ${d.companyName} | التاريخ: ${new Date().toLocaleDateString('ar-EG')}</p></div>`;
             cloneSection.insertBefore(headerDiv, cloneSection.firstChild);
-
             const footerDiv = document.createElement('div');
-            footerDiv.innerHTML = `
-                <div style="text-align: center; margin-top: 30px; color: #888; font-size:0.9rem; border-top: 1px dashed #b8860b; padding-top: 10px;">
-                    تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة © ${new Date().getFullYear()}
-                </div>
-            `;
+            footerDiv.innerHTML = `<div style="text-align:center; margin-top:30px;">© ${new Date().getFullYear()} FAROUK GRUP</div>`;
             cloneSection.appendChild(footerDiv);
 
             cloneSection.style.position = 'absolute';
@@ -1174,128 +958,175 @@
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-
-            const imgWidth = pdfWidth;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
+            const imgHeight = (canvas.height * pdfWidth) / canvas.width;
             let heightLeft = imgHeight;
             let position = 0;
-
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pdfHeight;
-
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+            heightLeft -= pdf.internal.pageSize.getHeight();
             while (heightLeft > 0) {
                 position = heightLeft - imgHeight;
                 pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pdfHeight;
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdf.internal.pageSize.getHeight();
             }
-
             pdf.save('تقرير_تسويقي_FAROUK.pdf');
         } catch (error) {
-            console.error(error);
-            alert('حدث خطأ أثناء إنشاء ملف PDF: ' + error.message);
+            alert('حدث خطأ: ' + error.message);
         }
     });
+
+    // ------------------ تصدير Excel شامل ------------------
+    async function exportToFullExcel() {
+        if (!window.lastMarketingResults) {
+            alert('الرجاء إجراء التحليل أولاً (اضغط على "احسب الدراسة الآن").');
+            return;
+        }
+        const data = window.lastMarketingResults;
+        const d = data.inputs;
+        const out = data.outputs;
+
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = 'FAROUK GRUP';
+        workbook.created = new Date();
+
+        // ورقة المدخلات
+        const inputsSheet = workbook.addWorksheet('المدخلات');
+        inputsSheet.mergeCells('A1:D1');
+        inputsSheet.getCell('A1').value = 'بيانات الدراسة التسويقية';
+        inputsSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
+        inputsSheet.getCell('A1').alignment = { horizontal: 'center' };
+
+        const inputsData = [
+            ['اسم المشروع', d.projectName], ['وصف المشروع', d.projectDesc], ['الموقع', d.location],
+            ['مدة الدراسة (شهر)', d.studyMonths], ['إجمالي السوق (TAM)', d.tam], ['السوق القابل للخدمة (SAM)', d.sam],
+            ['الحصة المستهدفة (SOM)', d.som], ['نمو سنوي %', d.growthRate * 100], ['الاتجاهات', d.trends],
+            ['الشريحة العمرية', d.ageGroup], ['الجنس', d.gender], ['المنطقة', d.geoArea], ['الدخل', d.income],
+            ['الاهتمامات', d.interests], ['حجم الجمهور', d.audienceSize], ['عدد المنافسين', d.competitors.length],
+            ['متوسط قوة المنافسين', out.compStrengthAvg.toFixed(1)], ['متوسط ضعف المنافسين', out.compWeaknessAvg.toFixed(1)],
+            ['مؤشر المنافسة', out.compIndex.toFixed(1)], ['المنتج', d.productStrategy], ['سعر الوجبة', d.price],
+            ['تكلفة الوجبة', d.costPerMeal], ['التوزيع', d.placeStrategy], ['الترويج', d.promotionStrategy],
+            ['فريق التسويق (عدد)', d.marketingTeam], ['مدة الخطة (شهر)', d.planDuration], ['إيجار شهري', d.rent],
+            ['رواتب', d.salaries], ['فواتير', d.utilities], ['مصاريف أخرى', d.otherOpCost],
+            ['مرات شراء شهرياً', d.purchaseFrequency], ['مدة الولاء (شهر)', d.loyaltyMonths], ['عملاء عابرون', d.walkIn]
+        ];
+
+        inputsSheet.addRows([['البند', 'القيمة']]);
+        inputsData.forEach(row => inputsSheet.addRow(row));
+        inputsSheet.getRow(2).font = { bold: true, color: { argb: 'ffffff' } };
+        inputsSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'b8860b' } };
+        inputsSheet.getColumn(1).width = 40;
+        inputsSheet.getColumn(2).width = 35;
+
+        // ورقة المؤشرات
+        const kpiSheet = workbook.addWorksheet('مؤشرات الأداء');
+        kpiSheet.mergeCells('A1:C1');
+        kpiSheet.getCell('A1').value = 'مؤشرات الأداء التسويقية';
+        kpiSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
+        kpiSheet.getCell('A1').alignment = { horizontal: 'center' };
+
+        const kpiData = [
+            ['عملاء نشطين (شهرياً)', out.totalActiveCustomers, ''],
+            ['الإيرادات السنوية المتوقعة', `${d.currency}${out.annualRevenue.toLocaleString()}`, ''],
+            ['تكاليف التسويق السنوية', `${d.currency}${out.annualMarketingCost.toLocaleString()}`, ''],
+            ['الهامش التسويقي السنوي', `${d.currency}${out.marketingContribution.toLocaleString()}`, out.marketingContribution >= 0 ? 'إيجابي' : 'سلبي'],
+            ['تكلفة الاستحواذ CAC', `${d.currency}${out.cac.toFixed(2)}`, ''],
+            ['القيمة الدائمة LTV', `${d.currency}${out.ltv.toFixed(2)}`, ''],
+            ['العائد على الإنفاق ROAS', `${out.roas}x`, ''],
+            ['عملاء التعادل (شهرياً)', Math.ceil(out.breakEvenCustomers), ''],
+            ['مؤشر جاذبية السوق', `${out.marketScore}/10 ${out.marketColor}`, '']
+        ];
+
+        kpiSheet.addRows([['المؤشر', 'القيمة', 'التقييم']]);
+        kpiData.forEach(row => kpiSheet.addRow(row));
+        kpiSheet.getRow(2).font = { bold: true, color: { argb: 'ffffff' } };
+        kpiSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'b8860b' } };
+        kpiSheet.getColumn(1).width = 35;
+        kpiSheet.getColumn(2).width = 30;
+        kpiSheet.getColumn(3).width = 15;
+
+        // ورقة التحذيرات
+        if (out.warnings && out.warnings.length) {
+            const warnSheet = workbook.addWorksheet('التحذيرات');
+            warnSheet.mergeCells('A1:B1');
+            warnSheet.getCell('A1').value = 'التحذيرات';
+            warnSheet.getCell('A1').font = { bold: true, size: 14, color: { argb: 'dc3545' } };
+            warnSheet.getCell('A1').alignment = { horizontal: 'center' };
+            warnSheet.addRows([['التحذير', '']]);
+            out.warnings.forEach(w => warnSheet.addRow([w, '']));
+        }
+
+        // ورقة الرسوم البيانية
+        const chartsSheet = workbook.addWorksheet('الرسوم البيانية');
+        chartsSheet.mergeCells('A1:C1');
+        chartsSheet.getCell('A1').value = 'الرسوم البيانية';
+        chartsSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
+        chartsSheet.getCell('A1').alignment = { horizontal: 'center' };
+
+        const canvases = [document.getElementById('revenueChart'), document.getElementById('breakEvenChart')];
+        const titles = ['الإيرادات vs تكاليف التسويق', 'مقارنة العملاء'];
+        let rowIdx = 3;
+        for (let i = 0; i < canvases.length; i++) {
+            if (canvases[i]) {
+                const titleCell = chartsSheet.getCell(`A${rowIdx}`);
+                titleCell.value = titles[i];
+                titleCell.font = { bold: true, size: 12 };
+                titleCell.alignment = { horizontal: 'center' };
+                chartsSheet.mergeCells(`A${rowIdx}:C${rowIdx}`);
+                rowIdx++;
+                try {
+                    const imgData = await html2canvas(canvases[i], { scale: 2, backgroundColor: '#ffffff' });
+                    const imageId = workbook.addImage({ base64: imgData.toDataURL('image/png'), extension: 'png' });
+                    chartsSheet.addImage(imageId, { tl: { col: 0, row: rowIdx - 1 }, br: { col: 3, row: rowIdx + 10 }, editAs: 'oneCell' });
+                    rowIdx += 12;
+                } catch (err) {
+                    chartsSheet.getCell(`A${rowIdx}`).value = `فشل إضافة الرسم: ${titles[i]}`;
+                    rowIdx += 2;
+                }
+            }
+        }
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, `تقرير_تسويقي_${d.projectName}.xlsx`);
+    }
+
+    document.getElementById('exportFullExcelBtn').addEventListener('click', exportToFullExcel);
 
     // ------------------ آلة حاسبة منبثقة ------------------
     const calcDisplay = document.getElementById('calcDisplay');
     let currentCalcInput = '';
-
-    function safeEvaluate(expression) {
-        let expr = expression.replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/');
-        if (!/^[0-9+\-*/().]+$/.test(expr)) throw new Error('تعبير غير صالح');
-        return new Function('return ' + expr)();
+    function safeEvaluate(expr) {
+        let e = expr.replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/');
+        if (!/^[0-9+\-*/().]+$/.test(e)) throw new Error('تعبير غير صالح');
+        return new Function('return ' + e)();
     }
-
-    window.handleCalculatorInput = function(value) {
-        currentCalcInput += value;
-        calcDisplay.value = currentCalcInput;
-    }
-
-    window.clearCalculator = function() {
-        currentCalcInput = '';
-        calcDisplay.value = '';
-    }
-
-    window.backspaceCalculator = function() {
-        currentCalcInput = currentCalcInput.slice(0, -1);
-        calcDisplay.value = currentCalcInput;
-    }
-
-    window.calculateCalculatorResult = function() {
-        try {
-            let result = safeEvaluate(currentCalcInput);
-            calcDisplay.value = result;
-            currentCalcInput = result.toString();
-        } catch (e) {
-            calcDisplay.value = 'خطأ';
-            currentCalcInput = '';
-        }
-    }
-
-    function handleKeyboard(e) {
-        if (modal.style.display !== 'block') return;
+    window.handleCalculatorInput = v => { currentCalcInput += v; calcDisplay.value = currentCalcInput; };
+    window.clearCalculator = () => { currentCalcInput = ''; calcDisplay.value = ''; };
+    window.backspaceCalculator = () => { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; };
+    window.calculateCalculatorResult = () => {
+        try { let r = safeEvaluate(currentCalcInput); calcDisplay.value = r; currentCalcInput = r.toString(); } catch { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
+    };
+    const modalCalc = document.getElementById('calculatorModal');
+    document.getElementById('calculatorBtn').onclick = e => { e.preventDefault(); modalCalc.style.display = 'block'; };
+    document.querySelector('#calculatorModal .close').onclick = () => { modalCalc.style.display = 'none'; };
+    window.onclick = e => { if (e.target == modalCalc) modalCalc.style.display = 'none'; };
+    document.addEventListener('keydown', function(e) {
+        if (modalCalc.style.display !== 'block') return;
         const key = e.key;
         e.preventDefault();
-        e.stopPropagation();
         if (key >= '0' && key <= '9') handleCalculatorInput(key);
         else if (key === '.') handleCalculatorInput('.');
         else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
         else if (key === 'Enter' || key === '=') calculateCalculatorResult();
         else if (key === 'Backspace') backspaceCalculator();
-        else if (key === 'Escape') modal.style.display = 'none';
+        else if (key === 'Escape') modalCalc.style.display = 'none';
         else if (key === 'c' || key === 'C') clearCalculator();
-    }
+    });
 
-    document.addEventListener('keydown', handleKeyboard);
-
-    const modal = document.getElementById('calculatorModal');
-    const btn = document.getElementById('calculatorBtn');
-    const span = document.getElementsByClassName('close')[0];
-
-    btn.onclick = function(e) {
-        e.preventDefault();
-        modal.style.display = 'block';
-    }
-
-    span.onclick = function() {
-        modal.style.display = 'none';
-    }
-
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
-    }
-
-    // ------------------ تهيئة أولية ------------------
+    // تهيئة أولية
     renderCompetitors();
     renderChannels();
 </script>
-<!-- زر العودة إلى الرئيسية (عائم في اليمين) -->
-<a href="index.html" style="
-    position: fixed;
-    bottom: 20px;
-    right: 20px; /* وضعه في اليمين بدلاً من اليسار */
-    background: rgba(180,133,84,0.9);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-family: 'Tajawal', sans-serif;
-    font-weight: bold;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.3s;
-" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';">
-    <i class="fas fa-home"></i> الرئيسية
-</a>
+<a href="index.html" style="position: fixed; bottom: 20px; right: 20px; background: rgba(180,133,84,0.9); color: white; padding: 12px 20px; border-radius: 50px; text-decoration: none; font-family: 'Tajawal', sans-serif; font-weight: bold; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 9999; display: flex; align-items: center; gap: 8px; transition: 0.3s;" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';"><i class="fas fa-home"></i> الرئيسية</a>
 </body>
 </html>

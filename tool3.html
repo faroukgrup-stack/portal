@@ -14,10 +14,12 @@
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- html2canvas لتصدير Word -->
+<!-- html2canvas لتصدير Word و Excel -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- إضافة مكتبات Excel -->
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <style>
-/* جميع الأنماط كما هي في الكود الأصلي (لم أغير شيئاً) */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
@@ -315,13 +317,13 @@ tr:last-child td { border-bottom: none; }
 .export-container {
     display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; margin: 1.5rem 0;
 }
-.export-btn, .export-word-btn {
+.export-word-btn, .export-excel-full-btn {
     background: rgba(180,133,84,0.15);
     border: 1px solid var(--border-light); border-radius: 40px; padding: 0.8rem 1.5rem;
     color: var(--accent-soft); font-weight: 700; cursor: pointer; transition: var(--transition);
     display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;
 }
-.export-btn:hover, .export-word-btn:hover {
+.export-word-btn:hover, .export-excel-full-btn:hover {
     background: rgba(180,133,84,0.3); color: #fff;
     border-color: var(--accent-glow); box-shadow: 0 0 15px rgba(180,133,84,0.3);
 }
@@ -551,7 +553,6 @@ tr:last-child td { border-bottom: none; }
     text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 <body style="overflow-x: hidden;">
@@ -802,7 +803,8 @@ tr:last-child td { border-bottom: none; }
 
             <!-- أزرار التصدير -->
             <div class="export-container">
-                <button class="export-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير تقرير Word</button>
+                <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير تقرير Word</button>
+                <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i>  تصدير إلى Excel شامل (مدخلات + نتائج + رسوم)</button>
             </div>
         </div>
 
@@ -863,7 +865,6 @@ AOS.init({ duration: 800, once: true, offset: 100 });
 const calcDisplay = document.getElementById('calcDisplay');
 let currentCalcInput = '';
 
-// دالة حسابية آمنة بدلاً من eval
 function safeEvaluate(expression) {
     let expr = expression.replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/');
     if (!/^[0-9+\-*/().]+$/.test(expr)) {
@@ -949,7 +950,6 @@ function addEquipmentRow(name = '', power = '', cost = '', space = '') {
     equipmentContainer.appendChild(row);
 }
 
-// ✅ تم تعديل هذين السطرين: إزالة القيم الافتراضية
 addEquipmentRow('', '', '', '');
 addEquipmentRow('', '', '', '');
 
@@ -1011,6 +1011,7 @@ function calculateAll() {
     const electricalCapacity = parseFloat(document.getElementById('electricalCapacity').value) || 200;
     const waterAvailabilityText = document.getElementById('waterAvailability').options[document.getElementById('waterAvailability').selectedIndex].text;
     const ventilationText = document.getElementById('ventilation').options[document.getElementById('ventilation').selectedIndex].text;
+    const deliveryAccessText = document.getElementById('deliveryAccess').options[document.getElementById('deliveryAccess').selectedIndex].text;
 
     // بيانات المعدات
     const { totalPower, totalCost: equipmentCost, totalSpace } = calculateEquipmentTotals();
@@ -1238,11 +1239,33 @@ function calculateAll() {
         },
         options: { responsive: true, maintainAspectRatio: false }
     });
+
+    // تخزين جميع النتائج للتصدير
+    window.lastResults = {
+        currency, companyName,
+        seats, hoursOpen, totalArea, kitchenPercent, electricalCapacity,
+        waterAvailabilityText, ventilationText, deliveryAccessText,
+        equipment: getEquipmentData(),
+        totalPower, equipmentCost, totalSpace,
+        turnoverRate, peakHours, occupancyRate, avgMealPrice, foodCostPercent,
+        employeesCount, avgSalary, monthlyRent, otherOpCost, equipmentLife,
+        constructionCost, licensesCost, workingCapital,
+        kitchenArea, diningArea, seatDensity,
+        maxCustomersDaily, actualCustomersDaily,
+        monthlyRevenue, monthlyFoodCost, monthlyLaborCost, monthlyFixedCosts,
+        totalMonthlyExpenses, netProfit,
+        totalInvestment, monthlyDepreciation, netProfitAfterDepreciation,
+        accountingProfit, contributionPerMeal, breakEvenMeals, breakEvenRevenue,
+        revenuePerSeat, primeCost, primePercent, laborCostPercent, fixedCostPercent,
+        riskRevenue, riskProfit, paybackMonths,
+        warnings, technicalScore, technicalRating, technicalColor,
+        financialScore, financialRating, financialColor
+    };
 }
 
 document.getElementById('calculateBtn').addEventListener('click', calculateAll);
 
-// ------------------ تصدير Word (محسّن) ------------------
+// ------------------ تصدير Word ------------------
 async function exportToWord() {
     const currency = document.getElementById('currencySelect').value;
     const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
@@ -1320,7 +1343,7 @@ async function exportToWord() {
                     <div style="font-size:1.8rem; font-weight:900; color:#b8860b;">${value}</div>
                     ${unit ? `<div style="font-size:0.9rem; color:#777;">${unit}</div>` : ''}
                     ${status ? status.replace(/class="status/g, 'style="margin-top:0.3rem; padding:0.2rem 0.5rem; border-radius:20px; display:inline-block;') : ''}
-                 </td>
+                  </td>
             `;
             row += cell;
             count++;
@@ -1421,7 +1444,180 @@ async function exportToWord() {
     }
 }
 
+// ------------------ تصدير Excel شامل ------------------
+async function exportToFullExcel() {
+    if (!window.lastResults) {
+        alert('الرجاء إجراء التحليل أولاً (اضغط على "احسب الدراسة الفنية").');
+        return;
+    }
+    const res = window.lastResults;
+    const currency = res.currency;
+    const companyName = res.companyName;
+
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'FAROUK GRUP';
+    workbook.created = new Date();
+
+    // ---------- ورقة المدخلات ----------
+    const inputsSheet = workbook.addWorksheet('المدخلات');
+    inputsSheet.mergeCells('A1:D1');
+    inputsSheet.getCell('A1').value = 'بيانات المشروع الأساسية';
+    inputsSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
+    inputsSheet.getCell('A1').alignment = { horizontal: 'center' };
+
+    const inputsData = [
+        ['نوع المطبخ', document.getElementById('kitchenType').options[document.getElementById('kitchenType').selectedIndex].text],
+        ['عدد الكراسي', res.seats],
+        ['نموذج الخدمة', document.getElementById('serviceModel').options[document.getElementById('serviceModel').selectedIndex].text],
+        ['ساعات العمل اليومية', res.hoursOpen],
+        ['فترات التشغيل', document.getElementById('shifts').options[document.getElementById('shifts').selectedIndex].text],
+        ['المساحة الإجمالية (م²)', res.totalArea],
+        ['نسبة منطقة المطبخ (%)', res.kitchenPercent],
+        ['قدرة الكهرباء المتوفرة (أمبير)', res.electricalCapacity],
+        ['مصدر المياه', res.waterAvailabilityText],
+        ['نظام التهوية', res.ventilationText],
+        ['سهولة التوصيل', res.deliveryAccessText],
+        ['عدد المعدات', res.equipment.length],
+        ['إجمالي قدرة المعدات (kW)', res.totalPower],
+        ['إجمالي تكلفة المعدات', `${currency} ${res.equipmentCost.toFixed(0)}`],
+        ['المساحة التي تشغلها المعدات (م²)', res.totalSpace],
+        ['معدل دوران الطاولة', res.turnoverRate],
+        ['ساعات الذروة اليومية', res.peakHours],
+        ['نسبة الإشغال المتوقعة (%)', res.occupancyRate * 100],
+        ['متوسط سعر الوجبة', `${currency} ${res.avgMealPrice}`],
+        ['تكلفة الطعام (%)', res.foodCostPercent * 100],
+        ['عدد الموظفين', res.employeesCount],
+        ['متوسط الراتب الشهري', `${currency} ${res.avgSalary}`],
+        ['الإيجار الشهري', `${currency} ${res.monthlyRent}`],
+        ['مصاريف تشغيل أخرى', `${currency} ${res.otherOpCost}`],
+        ['العمر الإنتاجي للمعدات (سنوات)', res.equipmentLife],
+        ['تكلفة الديكور والإنشاءات', `${currency} ${res.constructionCost}`],
+        ['التراخيص والرسوم', `${currency} ${res.licensesCost}`],
+        ['رأس المال العامل (3 أشهر)', `${currency} ${res.workingCapital}`]
+    ];
+
+    inputsSheet.addRows([['البند', 'القيمة']]);
+    inputsData.forEach(row => inputsSheet.addRow(row));
+    inputsSheet.getRow(2).font = { bold: true, color: { argb: 'ffffff' } };
+    inputsSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'b8860b' } };
+    inputsSheet.getColumn(1).width = 40;
+    inputsSheet.getColumn(2).width = 30;
+
+    // ---------- ورقة مؤشرات الأداء ----------
+    const kpiSheet = workbook.addWorksheet('مؤشرات الأداء');
+    kpiSheet.mergeCells('A1:C1');
+    kpiSheet.getCell('A1').value = 'مؤشرات الأداء الرئيسية';
+    kpiSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
+    kpiSheet.getCell('A1').alignment = { horizontal: 'center' };
+
+    const kpiData = [
+        ['الإيرادات الشهرية', `${currency} ${Math.round(res.monthlyRevenue)}`, ''],
+        ['صافي الربح (بعد الإهلاك)', `${currency} ${Math.round(res.accountingProfit)}`, res.accountingProfit > 0 ? 'مربح' : 'خاسر'],
+        ['نقطة التعادل (إيرادات)', `${currency} ${Math.round(res.breakEvenRevenue)}`, ''],
+        ['فترة الاسترداد', res.paybackMonths === Infinity ? '∞ شهر' : `${res.paybackMonths.toFixed(1)} شهر`, ''],
+        ['هامش الربح', `${((res.accountingProfit / res.monthlyRevenue) * 100).toFixed(1)}%`, ''],
+        ['Prime Cost', `${res.primePercent.toFixed(1)}%`, ''],
+        ['تكلفة العمالة (%)', `${res.laborCostPercent.toFixed(1)}%`, ''],
+        ['تكلفة الطعام (%)', `${res.foodCostPercent * 100}%`, ''],
+        ['إيرادات لكل كرسي', `${currency} ${Math.round(res.revenuePerSeat)}`, ''],
+        ['الاستثمار لكل كرسي', `${currency} ${Math.round(res.totalInvestment / res.seats)}`, '']
+    ];
+
+    kpiSheet.addRows([['المؤشر', 'القيمة', 'التقييم']]);
+    kpiData.forEach(row => kpiSheet.addRow(row));
+    const kpiHeader = kpiSheet.getRow(2);
+    kpiHeader.font = { bold: true, color: { argb: 'ffffff' } };
+    kpiHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'b8860b' } };
+    kpiSheet.getColumn(1).width = 30;
+    kpiSheet.getColumn(2).width = 20;
+    kpiSheet.getColumn(3).width = 15;
+
+    // ---------- ورقة الملخص المالي ----------
+    const summarySheet = workbook.addWorksheet('الملخص المالي');
+    summarySheet.mergeCells('A1:C1');
+    summarySheet.getCell('A1').value = 'الملخص المالي والتقييم';
+    summarySheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
+    summarySheet.getCell('A1').alignment = { horizontal: 'center' };
+
+    const summaryData = [
+        ['الاستثمار الإجمالي', `${currency} ${res.totalInvestment.toFixed(0)}`],
+        ['الإيرادات الشهرية', `${currency} ${res.monthlyRevenue.toFixed(0)}`],
+        ['إجمالي التكاليف الشهرية', `${currency} ${res.totalMonthlyExpenses.toFixed(0)}`],
+        ['صافي الربح الشهري', `${currency} ${res.accountingProfit.toFixed(0)}`],
+        ['نقطة التعادل (إيرادات)', `${currency} ${res.breakEvenRevenue.toFixed(0)}`],
+        ['هامش الأمان', `${((res.monthlyRevenue - res.breakEvenRevenue) / res.monthlyRevenue * 100).toFixed(1)}%`],
+        ['فترة الاسترداد', res.paybackMonths === Infinity ? 'غير محددة' : `${res.paybackMonths.toFixed(1)} شهر`],
+        ['التقييم الفني', `${res.technicalScore}/100 (${res.technicalRating})`],
+        ['التقييم المالي', `${res.financialScore}/100 (${res.financialRating})`]
+    ];
+
+    summarySheet.addRows([['البند', 'القيمة']]);
+    summaryData.forEach(row => summarySheet.addRow(row));
+    summarySheet.getRow(2).font = { bold: true, color: { argb: 'ffffff' } };
+    summarySheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'b8860b' } };
+    summarySheet.getColumn(1).width = 35;
+    summarySheet.getColumn(2).width = 25;
+
+    // إضافة التحذيرات إن وجدت
+    if (res.warnings && res.warnings.length) {
+        summarySheet.addRow([]);
+        summarySheet.addRow(['التحذيرات', '']);
+        res.warnings.forEach(w => summarySheet.addRow([w, '']));
+    }
+
+    // ---------- ورقة الرسوم البيانية ----------
+    const chartsSheet = workbook.addWorksheet('الرسوم البيانية');
+    chartsSheet.mergeCells('A1:C1');
+    chartsSheet.getCell('A1').value = 'الرسوم البيانية للمشروع';
+    chartsSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
+    chartsSheet.getCell('A1').alignment = { horizontal: 'center' };
+
+    const chartCanvases = [document.getElementById('financeChart'), document.getElementById('riskChart')];
+    const titles = ['تحليل الأداء المالي', 'تحليل المخاطر (انخفاض 20%)'];
+    let rowIdx = 3;
+
+    for (let i = 0; i < chartCanvases.length; i++) {
+        if (chartCanvases[i]) {
+            const titleCell = chartsSheet.getCell(`A${rowIdx}`);
+            titleCell.value = titles[i];
+            titleCell.font = { bold: true, size: 12 };
+            titleCell.alignment = { horizontal: 'center' };
+            chartsSheet.mergeCells(`A${rowIdx}:C${rowIdx}`);
+            rowIdx++;
+
+            try {
+                const canvas = chartCanvases[i];
+                const imgData = await html2canvas(canvas, { scale: 2, backgroundColor: '#ffffff' });
+                const imageId = workbook.addImage({
+                    base64: imgData.toDataURL('image/png'),
+                    extension: 'png'
+                });
+                chartsSheet.addImage(imageId, {
+                    tl: { col: 0, row: rowIdx - 1 },
+                    br: { col: 3, row: rowIdx + 10 },
+                    editAs: 'oneCell'
+                });
+                rowIdx += 12;
+            } catch (err) {
+                const failCell = chartsSheet.getCell(`A${rowIdx}`);
+                failCell.value = `فشل في إضافة الرسم البياني: ${titles[i]}`;
+                failCell.font = { italic: true };
+                rowIdx += 2;
+            }
+        }
+    }
+
+    // حفظ الملف
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const now = new Date();
+    const fileName = `تقرير_فني_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+    saveAs(blob, fileName);
+}
+
+// ربط الأحداث
 document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+document.getElementById('exportFullExcelBtn').addEventListener('click', exportToFullExcel);
 
 // تحديث تحذير الطاقة
 updatePowerAlert();

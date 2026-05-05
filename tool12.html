@@ -14,6 +14,9 @@
 <!-- Chart.js & html2canvas -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- مكتبات Excel احترافية -->
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -372,6 +375,53 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
     border-radius: 0 0 20px 20px;
 }
 
+/* شاشة تحميل التصدير */
+.export-loading {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    backdrop-filter: blur(6px);
+}
+.export-loading.show {
+    display: flex;
+}
+.export-loading-box {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-light);
+    border-radius: 24px;
+    padding: 2rem 3rem;
+    text-align: center;
+    box-shadow: var(--shadow-glow);
+}
+.export-loading-box i {
+    font-size: 3rem;
+    color: var(--accent-soft);
+    animation: spin 1s linear infinite;
+    display: block;
+    margin-bottom: 1rem;
+}
+.export-loading-box h3 {
+    color: var(--accent-soft);
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+.export-loading-box p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 /* فوتر مبسط */
 .footer-simple {
     text-align: center; padding: 1.5rem; margin-top: 2rem;
@@ -380,7 +430,7 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
 }
 .footer-simple span { color: var(--accent-soft); font-weight: 700; }
 
-/* الآلة الحاسبة المنبثقة (تتناسق مع الهوية) */
+/* الآلة الحاسبة المنبثقة */
 .modal {
     display: none;
     position: fixed;
@@ -506,22 +556,17 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
     .currency-row select, .currency-row input { width: 100%; }
     .charts-container { grid-template-columns: 1fr; }
 }
-/* إصلاح ظهور العناوين التي تختفي */
+/* إصلاح ظهور العناوين */
 .section-title-sm,
-.panel-header,
-.collapsible span,
 .result-card h4,
 .hero-mini h2 {
     -webkit-text-fill-color: initial !important;
     color: var(--accent-soft) !important;
     background: none !important;
-    background-image: none !important;
     text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body>
 <body style="overflow-x: hidden;">
 <!-- خلفية متوهجة -->
 <div class="glow-bg">
@@ -530,12 +575,19 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
 <div class="floating-shape shape-1"></div>
 <div class="floating-shape shape-2"></div>
 
-<!-- تم إزالة الـ NAV بالكامل -->
-
 <section class="hero-mini">
     <h2>حاسبة جدولة القروض المتقدمة</h2>
     <p>تحليل شامل مع دفعة أولى، دفعات إضافية، فترة سماح، رسم بياني، وجدول كامل</p>
 </section>
+
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">جاري إنشاء التقرير الاحترافي...</h3>
+        <p id="loadingMsg">يرجى الانتظار — قد يستغرق ذلك لحظات</p>
+    </div>
+</div>
 
 <section class="calc-wrapper">
     <div class="calc-box" data-aos="fade-up">
@@ -593,7 +645,7 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
             </div>
         </div>
 
-        <!-- قسم متقدم قابل للطي (الدفعة الأولى، دفعة إضافية، فترة سماح) -->
+        <!-- قسم متقدم قابل للطي -->
         <button type="button" class="collapsible" id="advancedCollapse">
             <span><i class="fas fa-sliders-h"></i> إعدادات متقدمة (دفعة أولى، دفعة إضافية، فترة سماح)</span>
             <i class="fas fa-chevron-down"></i>
@@ -624,7 +676,7 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
         <div class="results-section" id="resultsSection" style="display: none;">
             <div class="results-cards" id="kpiCards"></div>
 
-            <!-- مؤشرات ذكية (تحذيرات) -->
+            <!-- مؤشرات ذكية -->
             <div class="result-card" id="smartAlerts" style="text-align:right; padding:1rem;"></div>
 
             <!-- رسوم بيانية -->
@@ -646,8 +698,8 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
 
             <!-- أزرار التصدير -->
             <div class="export-container">
-                <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير إلى Excel</button>
-                <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير تقرير (Word)</button>
+                <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel احترافي</button>
+                <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تقرير Word كامل + رسوم بيانية</button>
             </div>
         </div>
 
@@ -657,7 +709,6 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
     </div>
 </section>
 
-<!-- فوتر مبسط -->
 <footer class="footer-simple">
     جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
 </footer>
@@ -667,7 +718,7 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
     <i class="fas fa-calculator"></i> آلة حاسبة
 </div>
 
-<!-- نافذة الآلة الحاسبة المنبثقة (مع الترتيب المطلوب: 9 8 7 / ، 6 5 4 * ، 3 2 1 - ، C 0 . + ، ⌫ و =) -->
+<!-- نافذة الآلة الحاسبة المنبثقة -->
 <div id="calculatorModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -677,31 +728,22 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
         <div class="modal-body">
             <input type="text" id="calcDisplay" class="calc-display" readonly>
             <div class="calc-buttons">
-                <!-- الصف الأول: 9 8 7 ÷ -->
                 <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
                 <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
                 <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
                 <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
-
-                <!-- الصف الثاني: 6 5 4 × -->
                 <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
                 <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
                 <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
                 <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
-
-                <!-- الصف الثالث: 3 2 1 - -->
                 <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
                 <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
                 <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
                 <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
-
-                <!-- الصف الرابع: C 0 . + -->
                 <button class="calc-btn" onclick="clearCalculator()">C</button>
                 <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
                 <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
                 <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
-
-                <!-- الصف الخامس: ⌫ و = (يمتد على 3 أعمدة) -->
                 <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
                 <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
             </div>
@@ -709,502 +751,531 @@ canvas { width: 100% !important; height: auto !important; max-height: 250px; }
     </div>
 </div>
 
-<!-- AOS JS -->
+<a href="index.html" style="position:fixed;bottom:20px;right:20px;background:rgba(180,133,84,0.9);color:white;padding:12px 20px;border-radius:50px;text-decoration:none;font-family:'Tajawal',sans-serif;font-weight:bold;backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,0.2);box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:9999;display:flex;align-items:center;gap:8px;transition:0.3s;" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';"><i class="fas fa-home"></i> الرئيسية</a>
+
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
     AOS.init({ duration: 800, once: true, offset: 100 });
-</script>
 
-<script>
-// ------------------ آلة حاسبة منبثقة (بدون eval) ------------------
-const calcDisplay = document.getElementById('calcDisplay');
-let currentCalcInput = '';
+    // ------------------ آلة حاسبة منبثقة ------------------
+    const calcDisplay = document.getElementById('calcDisplay');
+    let currentCalcInput = '';
 
-function safeEvaluate(expr) {
-    try {
-        if (!/^[0-9+\-*/().\s]+$/.test(expr)) throw new Error('غير مسموح');
-        expr = expr.replace(/÷/g, '/').replace(/×/g, '*');
-        return new Function('return (' + expr + ')')();
-    } catch {
-        return 'خطأ';
-    }
-}
-
-window.handleCalculatorInput = function(value) {
-    currentCalcInput += value;
-    calcDisplay.value = currentCalcInput;
-};
-
-window.clearCalculator = function() {
-    currentCalcInput = '';
-    calcDisplay.value = '';
-};
-
-window.backspaceCalculator = function() {
-    currentCalcInput = currentCalcInput.slice(0, -1);
-    calcDisplay.value = currentCalcInput;
-};
-
-window.calculateCalculatorResult = function() {
-    if (!currentCalcInput.trim()) return;
-    const result = safeEvaluate(currentCalcInput);
-    calcDisplay.value = result;
-    currentCalcInput = result.toString();
-};
-
-// لوحة المفاتيح للمودال
-const modal = document.getElementById('calculatorModal');
-const btn = document.getElementById('calculatorBtn');
-const span = document.querySelector('.close');
-
-btn.onclick = (e) => {
-    e.preventDefault();
-    modal.style.display = 'block';
-};
-span.onclick = () => { modal.style.display = 'none'; };
-window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
-
-document.addEventListener('keydown', (e) => {
-    if (modal.style.display !== 'block') return;
-    e.preventDefault();
-    const key = e.key;
-    if (key >= '0' && key <= '9') handleCalculatorInput(key);
-    else if (key === '.') handleCalculatorInput('.');
-    else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
-    else if (key === 'Enter' || key === '=') calculateCalculatorResult();
-    else if (key === 'Backspace') backspaceCalculator();
-    else if (key === 'Escape') modal.style.display = 'none';
-    else if (key.toLowerCase() === 'c') clearCalculator();
-});
-
-// ------------------ عناصر قابلة للطي ------------------
-const coll = document.getElementsByClassName('collapsible');
-for (let i = 0; i < coll.length; i++) {
-    coll[i].addEventListener('click', function() {
-        this.classList.toggle('active');
-        const content = this.nextElementSibling;
-        if (content.style.maxHeight) {
-            content.style.maxHeight = null;
-        } else {
-            content.style.maxHeight = content.scrollHeight + 'px';
+    function safeEvaluate(expr) {
+        try {
+            if (!/^[0-9+\-*/().\s]+$/.test(expr)) throw new Error('غير مسموح');
+            expr = expr.replace(/÷/g, '/').replace(/×/g, '*');
+            return new Function('return (' + expr + ')')();
+        } catch {
+            return 'خطأ';
         }
+    }
+
+    window.handleCalculatorInput = function(value) {
+        currentCalcInput += value;
+        calcDisplay.value = currentCalcInput;
+    };
+    window.clearCalculator = function() {
+        currentCalcInput = '';
+        calcDisplay.value = '';
+    };
+    window.backspaceCalculator = function() {
+        currentCalcInput = currentCalcInput.slice(0, -1);
+        calcDisplay.value = currentCalcInput;
+    };
+    window.calculateCalculatorResult = function() {
+        if (!currentCalcInput.trim()) return;
+        const result = safeEvaluate(currentCalcInput);
+        calcDisplay.value = result;
+        currentCalcInput = result.toString();
+    };
+
+    const modal = document.getElementById('calculatorModal');
+    document.getElementById('calculatorBtn').onclick = (e) => { e.preventDefault(); modal.style.display = 'block'; };
+    document.querySelector('.close').onclick = () => { modal.style.display = 'none'; };
+    window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+    document.addEventListener('keydown', (e) => {
+        if (modal.style.display !== 'block') return;
+        e.preventDefault();
+        const key = e.key;
+        if (key >= '0' && key <= '9') handleCalculatorInput(key);
+        else if (key === '.') handleCalculatorInput('.');
+        else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
+        else if (key === 'Enter' || key === '=') calculateCalculatorResult();
+        else if (key === 'Backspace') backspaceCalculator();
+        else if (key === 'Escape') modal.style.display = 'none';
+        else if (key.toLowerCase() === 'c') clearCalculator();
     });
-}
 
-// ------------------ الحساب الرئيسي ------------------
-let pieChart, stackedBarChart;
-
-function calculateLoan() {
-    const currency = document.getElementById('currencySelect').value;
-    const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
-
-    const principal = parseFloat(document.getElementById('loanAmount').value) || 0;
-    const annualRate = parseFloat(document.getElementById('interestRate').value) / 100 || 0;
-    const years = parseInt(document.getElementById('loanYears').value) || 10;
-    const frequency = parseInt(document.getElementById('paymentFrequency').value); // 12,4,2,1
-    const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
-    const extraPayment = parseFloat(document.getElementById('extraPayment').value) || 0;
-    const gracePeriod = parseInt(document.getElementById('gracePeriod').value) || 0;
-
-    if (principal <= 0 || annualRate <= 0 || years <= 0) {
-        alert('الرجاء إدخال قيم صحيحة.');
-        return;
-    }
-
-    let loanAfterDown = principal - downPayment;
-    if (loanAfterDown < 0) loanAfterDown = 0;
-
-    const totalPeriods = years * frequency;
-    const ratePerPeriod = annualRate / frequency;
-
-    // حساب الدفعة الثابتة (بدون دفعة إضافية)
-    let basePayment;
-    if (ratePerPeriod === 0) {
-        basePayment = loanAfterDown / totalPeriods;
-    } else {
-        basePayment = loanAfterDown * ratePerPeriod * Math.pow(1 + ratePerPeriod, totalPeriods) / (Math.pow(1 + ratePerPeriod, totalPeriods) - 1);
-    }
-
-    const totalPayment = basePayment + extraPayment;
-
-    // جدول السداد
-    let schedule = [];
-    let balance = loanAfterDown;
-    let totalInterest = 0;
-    let period = 1;
-
-    for (let i = 0; i < totalPeriods; i++) {
-        if (balance <= 0) break;
-        const interest = balance * ratePerPeriod;
-        let principalPaid = totalPayment - interest;
-        if (principalPaid > balance) principalPaid = balance;
-        balance -= principalPaid;
-        totalInterest += interest;
-        schedule.push({
-            period: period,
-            payment: totalPayment,
-            interest: interest,
-            principalPaid: principalPaid,
-            balance: balance > 0 ? balance : 0
+    // ------------------ عناصر قابلة للطي ------------------
+    const coll = document.getElementsByClassName('collapsible');
+    for (let i = 0; i < coll.length; i++) {
+        coll[i].addEventListener('click', function() {
+            this.classList.toggle('active');
+            const content = this.nextElementSibling;
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + 'px';
+            }
         });
-        if (balance <= 0) break;
-        period++;
     }
 
-    const actualPeriods = schedule.length;
-    const totalPayments = schedule.reduce((acc, r) => acc + r.payment, 0);
-    const yearsSaved = years - (actualPeriods / frequency);
-    const totalPrincipalPaid = loanAfterDown; // لأن أصل الدين يدفع بالكامل
+    // ------------------ المتغيرات العامة ------------------
+    let pieChart, stackedBarChart;
+    let globalLoanData = null;
 
-    // إظهار النتائج
-    document.getElementById('initialMessage').style.display = 'none';
-    document.getElementById('resultsSection').style.display = 'block';
+    // ------------------ دوال التحميل ------------------
+    function showLoading(title, msg) {
+        document.getElementById('loadingTitle').textContent = title;
+        document.getElementById('loadingMsg').textContent = msg;
+        document.getElementById('exportLoading').classList.add('show');
+    }
+    function hideLoading() {
+        document.getElementById('exportLoading').classList.remove('show');
+    }
 
-    // بطاقات KPI
-    let savingsText = extraPayment > 0 ? `(توفير ${Math.abs(yearsSaved).toFixed(1)} سنة)` : '';
-    document.getElementById('kpiCards').innerHTML = `
-        <div class="result-card">
-            <i class="fas fa-dollar-sign"></i>
-            <h4>الدفعة الدورية</h4>
-            <div class="value">${currency}${totalPayment.toFixed(2)}</div>
-            <div class="unit">${extraPayment > 0 ? '(يشمل الإضافي)' : ''}</div>
-        </div>
-        <div class="result-card">
-            <i class="fas fa-chart-line"></i>
-            <h4>إجمالي الفائدة</h4>
-            <div class="value">${currency}${totalInterest.toFixed(2)}</div>
-        </div>
-        <div class="result-card">
-            <i class="fas fa-coins"></i>
-            <h4>إجمالي المدفوعات</h4>
-            <div class="value">${currency}${totalPayments.toFixed(2)}</div>
-        </div>
-        <div class="result-card">
-            <i class="fas fa-calendar"></i>
-            <h4>عدد الدفعات الفعلية</h4>
-            <div class="value">${actualPeriods}</div>
-            <div class="unit">${savingsText}</div>
-        </div>
-    `;
+    // ------------------ الحساب الرئيسي ------------------
+    function calculateLoan() {
+        const currency = document.getElementById('currencySelect').value;
+        const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
 
-    // تحذيرات ذكية
-    let alerts = [];
-    if (extraPayment > 0) alerts.push(`✅ الدفعة الإضافية ستوفر ${Math.abs(yearsSaved).toFixed(1)} سنة من مدة القرض.`);
-    if (downPayment > 0) alerts.push(`💰 الدفعة الأولى خفضت أصل القرض إلى ${currency}${loanAfterDown.toFixed(2)}.`);
-    if (gracePeriod > 0) alerts.push(`⏳ فترة سماح ${gracePeriod} شهر (بدون دفعات).`);
-    if (totalInterest > principal * 0.5) alerts.push(`⚠️ إجمالي الفائدة كبير (أكثر من 50% من أصل القرض).`);
-    if (alerts.length === 0) alerts.push('✅ المؤشرات جيدة.');
-    document.getElementById('smartAlerts').innerHTML = `<strong><i class="fas fa-exclamation-triangle" style="color:var(--accent-soft);"></i> ملخص:</strong><br> ${alerts.join('<br>')}`;
+        const principal = parseFloat(document.getElementById('loanAmount').value) || 0;
+        const annualRate = parseFloat(document.getElementById('interestRate').value) / 100 || 0;
+        const years = parseInt(document.getElementById('loanYears').value) || 10;
+        const frequency = parseInt(document.getElementById('paymentFrequency').value);
+        const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
+        const extraPayment = parseFloat(document.getElementById('extraPayment').value) || 0;
+        const gracePeriod = parseInt(document.getElementById('gracePeriod').value) || 0;
 
-    // جدول السداد
-    let tableHtml = '<table><thead><tr><th>رقم الدفعة</th><th>الدفعة</th><th>الفائدة</th><th>أصل الدين</th><th>الرصيد المتبقي</th></tr></thead><tbody>';
-    schedule.forEach(row => {
-        tableHtml += `<tr>
-            <td>${row.period}</td>
-            <td>${currency}${row.payment.toFixed(2)}</td>
-            <td>${currency}${row.interest.toFixed(2)}</td>
-            <td>${currency}${row.principalPaid.toFixed(2)}</td>
-            <td>${currency}${row.balance.toFixed(2)}</td>
-        </tr>`;
-    });
-    tableHtml += '</tbody></table>';
-    document.getElementById('amortTable').innerHTML = tableHtml;
+        if (principal <= 0 || annualRate <= 0 || years <= 0) {
+            alert('الرجاء إدخال قيم صحيحة.');
+            return;
+        }
 
-    // رسم بياني دائري (إجمالي الفائدة مقابل أصل الدين)
-    const pieCtx = document.getElementById('pieChart').getContext('2d');
-    if (pieChart) pieChart.destroy();
-    pieChart = new Chart(pieCtx, {
-        type: 'pie',
-        data: {
-            labels: ['إجمالي الفائدة', 'أصل الدين'],
-            datasets: [{
-                data: [totalInterest, totalPrincipalPaid],
-                backgroundColor: ['#dc3545', '#28a745'],
-                borderColor: 'white',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: (ctx) => `${ctx.label}: ${currency}${ctx.raw.toFixed(2)}`
+        let loanAfterDown = principal - downPayment;
+        if (loanAfterDown < 0) loanAfterDown = 0;
+
+        const totalPeriods = years * frequency;
+        const ratePerPeriod = annualRate / frequency;
+
+        let basePayment;
+        if (ratePerPeriod === 0) {
+            basePayment = loanAfterDown / totalPeriods;
+        } else {
+            basePayment = loanAfterDown * ratePerPeriod * Math.pow(1 + ratePerPeriod, totalPeriods) / (Math.pow(1 + ratePerPeriod, totalPeriods) - 1);
+        }
+
+        const totalPayment = basePayment + extraPayment;
+
+        let schedule = [];
+        let balance = loanAfterDown;
+        let totalInterest = 0;
+        let period = 1;
+
+        for (let i = 0; i < totalPeriods; i++) {
+            if (balance <= 0) break;
+            const interest = balance * ratePerPeriod;
+            let principalPaid = totalPayment - interest;
+            if (principalPaid > balance) principalPaid = balance;
+            balance -= principalPaid;
+            totalInterest += interest;
+            schedule.push({
+                period: period,
+                payment: totalPayment,
+                interest: interest,
+                principalPaid: principalPaid,
+                balance: balance > 0 ? balance : 0
+            });
+            if (balance <= 0) break;
+            period++;
+        }
+
+        const actualPeriods = schedule.length;
+        const totalPayments = schedule.reduce((acc, r) => acc + r.payment, 0);
+        const yearsSaved = years - (actualPeriods / frequency);
+        const totalPrincipalPaid = loanAfterDown;
+
+        // عرض النتائج
+        document.getElementById('initialMessage').style.display = 'none';
+        document.getElementById('resultsSection').style.display = 'block';
+
+        let savingsText = extraPayment > 0 ? `(توفير ${Math.abs(yearsSaved).toFixed(1)} سنة)` : '';
+        document.getElementById('kpiCards').innerHTML = `
+            <div class="result-card">
+                <i class="fas fa-dollar-sign"></i>
+                <h4>الدفعة الدورية</h4>
+                <div class="value">${currency}${totalPayment.toFixed(2)}</div>
+                <div class="unit">${extraPayment > 0 ? '(يشمل الإضافي)' : ''}</div>
+            </div>
+            <div class="result-card">
+                <i class="fas fa-chart-line"></i>
+                <h4>إجمالي الفائدة</h4>
+                <div class="value">${currency}${totalInterest.toFixed(2)}</div>
+            </div>
+            <div class="result-card">
+                <i class="fas fa-coins"></i>
+                <h4>إجمالي المدفوعات</h4>
+                <div class="value">${currency}${totalPayments.toFixed(2)}</div>
+            </div>
+            <div class="result-card">
+                <i class="fas fa-calendar"></i>
+                <h4>عدد الدفعات الفعلية</h4>
+                <div class="value">${actualPeriods}</div>
+                <div class="unit">${savingsText}</div>
+            </div>
+        `;
+
+        let alerts = [];
+        if (extraPayment > 0) alerts.push(`✅ الدفعة الإضافية ستوفر ${Math.abs(yearsSaved).toFixed(1)} سنة من مدة القرض.`);
+        if (downPayment > 0) alerts.push(`💰 الدفعة الأولى خفضت أصل القرض إلى ${currency}${loanAfterDown.toFixed(2)}.`);
+        if (gracePeriod > 0) alerts.push(`⏳ فترة سماح ${gracePeriod} شهر (بدون دفعات).`);
+        if (totalInterest > principal * 0.5) alerts.push(`⚠️ إجمالي الفائدة كبير (أكثر من 50% من أصل القرض).`);
+        if (alerts.length === 0) alerts.push('✅ المؤشرات جيدة.');
+        document.getElementById('smartAlerts').innerHTML = `<strong><i class="fas fa-exclamation-triangle" style="color:var(--accent-soft);"></i> ملخص:</strong><br> ${alerts.join('<br>')}`;
+
+        let tableHtml = '<table><thead><tr><th>رقم الدفعة</th><th>الدفعة</th><th>الفائدة</th><th>أصل الدين</th><th>الرصيد المتبقي</th></tr></thead><tbody>';
+        schedule.forEach(row => {
+            tableHtml += `<tr>
+                <td>${row.period}</td>
+                <td>${currency}${row.payment.toFixed(2)}</td>
+                <td>${currency}${row.interest.toFixed(2)}</td>
+                <td>${currency}${row.principalPaid.toFixed(2)}</td>
+                <td>${currency}${row.balance.toFixed(2)}</td>
+            </tr>`;
+        });
+        tableHtml += '</tbody></table>';
+        document.getElementById('amortTable').innerHTML = tableHtml;
+
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        if (pieChart) pieChart.destroy();
+        pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['إجمالي الفائدة', 'أصل الدين'],
+                datasets: [{
+                    data: [totalInterest, totalPrincipalPaid],
+                    backgroundColor: ['#dc3545', '#28a745'],
+                    borderColor: 'white',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.label}: ${currency}${ctx.raw.toFixed(2)}`
+                        }
                     }
                 }
             }
-        }
-    });
+        });
 
-    // رسم بياني عمودي مكدس (توزيع الفائدة وأصل الدين لكل دفعة)
-    const barCtx = document.getElementById('stackedBarChart').getContext('2d');
-    if (stackedBarChart) stackedBarChart.destroy();
-    stackedBarChart = new Chart(barCtx, {
-        type: 'bar',
-        data: {
-            labels: schedule.map(r => r.period),
-            datasets: [
-                { label: 'الفائدة', data: schedule.map(r => r.interest), backgroundColor: '#dc3545' },
-                { label: 'أصل الدين', data: schedule.map(r => r.principalPaid), backgroundColor: '#28a745' }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { stacked: true, ticks: { color: '#ccc' } },
-                y: { stacked: true, beginAtZero: true, ticks: { color: '#ccc' } }
+        const barCtx = document.getElementById('stackedBarChart').getContext('2d');
+        if (stackedBarChart) stackedBarChart.destroy();
+        stackedBarChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: schedule.map(r => r.period),
+                datasets: [
+                    { label: 'الفائدة', data: schedule.map(r => r.interest), backgroundColor: '#dc3545' },
+                    { label: 'أصل الدين', data: schedule.map(r => r.principalPaid), backgroundColor: '#28a745' }
+                ]
             },
-            plugins: {
-                legend: { labels: { color: '#ddd' } }
-            }
-        }
-    });
-
-    // تخزين البيانات للتصدير
-    window.loanData = {
-        currency,
-        companyName,
-        principal,
-        annualRate,
-        years,
-        frequency,
-        downPayment,
-        extraPayment,
-        gracePeriod,
-        loanAfterDown,
-        totalPayment: totalPayment.toFixed(2),
-        totalInterest: totalInterest.toFixed(2),
-        totalPayments: totalPayments.toFixed(2),
-        actualPeriods,
-        schedule,
-        yearsSaved: yearsSaved.toFixed(1)
-    };
-}
-
-document.getElementById('calculateBtn').addEventListener('click', calculateLoan);
-
-// ------------------ تصدير إلى Excel ------------------
-function exportToExcel() {
-    if (!window.loanData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-    const d = window.loanData;
-    const rows = [
-        ['البيان', 'القيمة'],
-        ['الجهة', d.companyName],
-        ['العملة', d.currency],
-        ['مبلغ القرض', d.currency + d.principal],
-        ['معدل الفائدة السنوي', (d.annualRate*100).toFixed(2) + '%'],
-        ['المدة (سنوات)', d.years],
-        ['تكرار الدفع', d.frequency === 12 ? 'شهري' : d.frequency === 4 ? 'ربع سنوي' : d.frequency === 2 ? 'نصف سنوي' : 'سنوي'],
-        ['دفعة أولى', d.currency + d.downPayment],
-        ['دفعة إضافية دورية', d.currency + d.extraPayment],
-        ['فترة السماح (شهور)', d.gracePeriod],
-        ['مبلغ القرض بعد الدفعة الأولى', d.currency + d.loanAfterDown],
-        ['الدفعة الدورية الفعلية', d.currency + d.totalPayment],
-        ['إجمالي الفائدة', d.currency + d.totalInterest],
-        ['إجمالي المدفوعات', d.currency + d.totalPayments],
-        ['عدد الدفعات الفعلية', d.actualPeriods],
-        ['توفير في السنوات', d.yearsSaved + ' سنة'],
-        [],
-        ['جدول السداد'],
-        ['رقم الدفعة', 'الدفعة', 'الفائدة', 'أصل الدين', 'الرصيد المتبقي']
-    ];
-    d.schedule.forEach(r => {
-        rows.push([r.period, r.payment.toFixed(2), r.interest.toFixed(2), r.principalPaid.toFixed(2), r.balance.toFixed(2)]);
-    });
-    let csvContent = rows.map(row => row.map(cell => typeof cell === 'string' && cell.includes(',') ? `"${cell}"` : cell).join(',')).join('\n');
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.download = `جدولة_قرض_${new Date().toISOString().slice(0,10)}.csv`;
-    link.href = URL.createObjectURL(blob);
-    link.click();
-}
-
-// ------------------ تصدير إلى Word (محسّن للطباعة بخلفية بيضاء) ------------------
-async function exportToWord() {
-    if (!window.loanData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-    const d = window.loanData;
-    const currency = d.currency;
-    const companyName = d.companyName;
-
-    try {
-        // التقاط صور للرسوم البيانية بخلفية بيضاء
-        const pieCanvas = document.getElementById('pieChart');
-        const barCanvas = document.getElementById('stackedBarChart');
-        const [pieImg, barImg] = await Promise.all([
-            html2canvas(pieCanvas, { scale: 2, backgroundColor: '#ffffff' }),
-            html2canvas(barCanvas, { scale: 2, backgroundColor: '#ffffff' })
-        ]);
-        const pieData = pieImg.toDataURL('image/png');
-        const barData = barImg.toDataURL('image/png');
-
-        // جمع بطاقات KPI وتحويلها إلى جدول (بطاقتان في كل صف) - بخلفية بيضاء
-        const kpiCards = document.querySelectorAll('#kpiCards .result-card');
-        let kpiRows = '';
-        let rowCells = '';
-        let count = 0;
-        kpiCards.forEach((card, index) => {
-            const icon = card.querySelector('i') ? card.querySelector('i').outerHTML : '';
-            const title = card.querySelector('h4') ? card.querySelector('h4').innerText : '';
-            const value = card.querySelector('.value') ? card.querySelector('.value').innerText : '';
-            const unit = card.querySelector('.unit') ? card.querySelector('.unit').innerText : '';
-
-            const cell = `
-                <td style="border:1px solid #b8860b; padding:15px; text-align:center; background:#ffffff; width:50%;">
-                    ${icon.replace('style="color: var(--accent-soft);"', 'style="color: #b8860b;"')}
-                    <h4 style="margin:0.5rem 0; color:#333;">${title}</h4>
-                    <div style="font-size:1.6rem; font-weight:900; color:#b8860b;">${value}</div>
-                    <div style="font-size:0.9rem; color:#666;">${unit}</div>
-                </td>
-            `;
-            rowCells += cell;
-            count++;
-            if (count % 2 === 0 || index === kpiCards.length - 1) {
-                kpiRows += `<tr>${rowCells}</tr>`;
-                rowCells = '';
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: true, ticks: { color: '#ccc' } },
+                    y: { stacked: true, beginAtZero: true, ticks: { color: '#ccc' } }
+                },
+                plugins: {
+                    legend: { labels: { color: '#ddd' } }
+                }
             }
         });
 
-        // الملخص الذكي (نصوص فقط)
-        const smartAlertsHTML = document.getElementById('smartAlerts').innerText;
-
-        // جدول المعطيات الأساسية (بخلفية بيضاء)
-        const summaryRows = `
-            <tr><th style="background:#f0f0f0; color:#b8860b;">مبلغ القرض</th><td>${currency} ${d.principal}</td></tr>
-            <tr><th style="background:#f0f0f0; color:#b8860b;">معدل الفائدة السنوي</th><td>${(d.annualRate*100).toFixed(2)}%</td></tr>
-            <tr><th style="background:#f0f0f0; color:#b8860b;">المدة الأصلية</th><td>${d.years} سنة</td></tr>
-            <tr><th style="background:#f0f0f0; color:#b8860b;">تكرار الدفع</th><td>${d.frequency === 12 ? 'شهري' : d.frequency === 4 ? 'ربع سنوي' : d.frequency === 2 ? 'نصف سنوي' : 'سنوي'}</td></tr>
-            <tr><th style="background:#f0f0f0; color:#b8860b;">دفعة أولى</th><td>${currency} ${d.downPayment}</td></tr>
-            <tr><th style="background:#f0f0f0; color:#b8860b;">دفعة إضافية دورية</th><td>${currency} ${d.extraPayment}</td></tr>
-            <tr><th style="background:#f0f0f0; color:#b8860b;">فترة السماح (شهور)</th><td>${d.gracePeriod}</td></tr>
-            <tr><th style="background:#f0f0f0; color:#b8860b;">مبلغ القرض بعد الدفعة الأولى</th><td>${currency} ${d.loanAfterDown}</td></tr>
-            <tr><th style="background:#f0f0f0; color:#b8860b;">الدفعة الدورية الفعلية</th><td>${currency} ${d.totalPayment}</td></tr>
-            <tr><th style="background:#f0f0f0; color:#b8860b;">إجمالي الفائدة</th><td>${currency} ${d.totalInterest}</td></tr>
-            <tr><th style="background:#f0f0f0; color:#b8860b;">إجمالي المدفوعات</th><td>${currency} ${d.totalPayments}</td></tr>
-            <tr><th style="background:#f0f0f0; color:#b8860b;">عدد الدفعات الفعلية</th><td>${d.actualPeriods}</td></tr>
-            <tr><th style="background:#f0f0f0; color:#b8860b;">توفير في السنوات</th><td>${d.yearsSaved} سنة</td></tr>
-        `;
-
-        // جدول السداد
-        const amortRows = d.schedule.map(r => `
-            <tr>
-                <td>${r.period}</td>
-                <td>${currency}${r.payment.toFixed(2)}</td>
-                <td>${currency}${r.interest.toFixed(2)}</td>
-                <td>${currency}${r.principalPaid.toFixed(2)}</td>
-                <td>${currency}${r.balance.toFixed(2)}</td>
-            </tr>
-        `).join('');
-
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
-
-        const reportHTML = `
-            <html>
-            <head>
-                <meta charset='utf-8'>
-                <style>
-                    body { direction: rtl; font-family: 'Tajawal', Arial, sans-serif; background: #ffffff; color: #333333; padding: 2rem; }
-                    h1, h2, h3 { color: #b8860b; }
-                    table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: #ffffff; }
-                    th, td { border: 1px solid #b8860b; padding: 10px; text-align: center; }
-                    th { background: #f0f0f0; color: #b8860b; }
-                    .kpi-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-                    .kpi-table td { border: 1px solid #b8860b; padding: 15px; text-align: center; background: #ffffff; }
-                    .chart-container { text-align: center; margin: 2rem 0; }
-                    .chart-container img { max-width: 100%; border: 2px solid #b8860b; border-radius: 10px; background: #ffffff; }
-                    .footer { margin-top: 2rem; text-align: center; color: #888888; border-top: 1px dashed #b8860b; padding-top: 1rem; }
-                </style>
-            </head>
-            <body>
-                <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                <h2>تقرير جدولة القروض المتقدمة</h2>
-                <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
-
-                <h3>مؤشرات الأداء الرئيسية</h3>
-                <table class="kpi-table">
-                    ${kpiRows}
-                </table>
-
-                <h3>ملخص التحليل</h3>
-                <table>
-                    <tr><td style="background:#f8f8f8; color:#333; border:1px solid #b8860b;">${smartAlertsHTML}</td></tr>
-                </table>
-
-                <h3>المعطيات الأساسية</h3>
-                <table>
-                    ${summaryRows}
-                </table>
-
-                <h3>الرسوم البيانية</h3>
-                <div class="chart-container">
-                    <img src="${pieData}" />
-                </div>
-                <div class="chart-container">
-                    <img src="${barData}" />
-                </div>
-
-                <h3>جدول السداد الكامل</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>رقم الدفعة</th>
-                            <th>الدفعة</th>
-                            <th>الفائدة</th>
-                            <th>أصل الدين</th>
-                            <th>الرصيد المتبقي</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${amortRows}
-                    </tbody>
-                </table>
-
-                <div class="footer">
-                    تم إنشاء هذا التقرير بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة © ${now.getFullYear()}
-                </div>
-            </body>
-            </html>
-        `;
-
-        const blob = new Blob(['\uFEFF' + reportHTML], { type: 'application/msword' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `تقرير_قرض_${companyName}_${now.toISOString().slice(0,10)}.doc`;
-        link.click();
-        URL.revokeObjectURL(link.href);
-    } catch (error) {
-        console.error(error);
-        alert('حدث خطأ أثناء إنشاء تقرير Word');
+        // تخزين البيانات للتصدير
+        globalLoanData = {
+            currency, companyName, principal, annualRate, years, frequency,
+            downPayment, extraPayment, gracePeriod, loanAfterDown,
+            totalPayment: totalPayment.toFixed(2),
+            totalInterest: totalInterest.toFixed(2),
+            totalPayments: totalPayments.toFixed(2),
+            actualPeriods, schedule, yearsSaved: yearsSaved.toFixed(1),
+            totalPrincipalPaid: loanAfterDown,
+            alerts: alerts.join('<br>')
+        };
     }
-}
 
-document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
-document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+    document.getElementById('calculateBtn').addEventListener('click', calculateLoan);
+
+    // ------------------ تصدير Excel احترافي ------------------
+    async function exportToFullExcel() {
+        if (!globalLoanData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+        showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'يرجى الانتظار');
+        try {
+            const D = globalLoanData;
+            const currency = D.currency;
+            const companyName = D.companyName;
+
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'FAROUK GRUP';
+            workbook.created = new Date();
+
+            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+            const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
+            const PT = 'FF155724', NT = 'FF721C24', GB = 'FFFFF3CD';
+            const nc = '#,##0.00;(#,##0.00);"-"';
+
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function cs(bg=W,tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+
+            // 1. غلاف التقرير
+            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+            [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+            for(let r=1;r<=40;r++) cv.getRow(r).height=22;
+            cv.getRow(2).height=80; cv.getRow(4).height=60;
+            cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+            bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'}; bc.border={bottom:{style:'thick',color:{argb:G}}};
+            mh(cv,1,4,4,`تقرير جدولة القروض\n${companyName}`,DB,GL,18);
+            const inf=[['📋 الجهة',companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',currency],['📊 الدفعة الدورية',`${currency} ${D.totalPayment}`],['⏱️ إجمالي الفائدة',`${currency} ${D.totalInterest}`]];
+            let ir=6;
+            inf.forEach(([l,v],idx)=>{
+                cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+                const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+                const bg=idx%2===0?AR:'FFFEFCF6';
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                cv.getRow(ir).height=28; ir++;
+            });
+
+            // 2. المدخلات والافتراضات
+            const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            inputsSheet.getColumn(1).width = 5; inputsSheet.getColumn(2).width = 38; inputsSheet.getColumn(3).width = 22; inputsSheet.getColumn(4).width = 22; inputsSheet.getColumn(5).width = 5;
+            mh(inputsSheet,1,5,1,'📋 جدول المدخلات والافتراضات الأساسية',DB,GL,14);
+            inputsSheet.getRow(1).height=40;
+            mh(inputsSheet,2,4,2,'البيانات الأساسية للقرض',SB,W,11);
+            inputsSheet.getRow(2).height=28;
+            const freqMap = {12:'شهري',4:'ربع سنوي',2:'نصف سنوي',1:'سنوي'};
+            const inputsData = [
+                ['مبلغ القرض', D.principal, `${currency} ${D.principal.toFixed(0)}`],
+                ['معدل الفائدة السنوي', D.annualRate*100, `${(D.annualRate*100).toFixed(2)}%`],
+                ['المدة (سنوات)', D.years, ''],
+                ['تكرار الدفع', freqMap[D.frequency], ''],
+                ['دفعة أولى', D.downPayment, `${currency} ${D.downPayment.toFixed(0)}`],
+                ['دفعة إضافية دورية', D.extraPayment, `${currency} ${D.extraPayment.toFixed(0)}`],
+                ['فترة السماح (شهور)', D.gracePeriod, ''],
+                ['أصل القرض بعد الدفعة الأولى', D.loanAfterDown, `${currency} ${D.loanAfterDown.toFixed(0)}`]
+            ];
+            let iRow=3;
+            inputsData.forEach(([label,val,note],idx)=>{
+                inputsSheet.getRow(iRow).height=24;
+                const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+                const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
+                lc.value=label; vc.value=val; nc.value=note;
+                ap(lc,cs(bg,DT,true,'right'));
+                ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?nc:null});
+                ap(nc,cs(bg,'00695C',false,'center'));
+                iRow++;
+            });
+
+            // 3. مؤشرات الأداء
+            const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true, showGridLines: false }] });
+            [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
+            mh(kpiSheet,1,6,1,'📊 لوحة مؤشرات الأداء الرئيسية',DB,GL,15);
+            kpiSheet.getRow(1).height=45;
+            mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('ar-EG')}`,HB,W,10);
+            kpiSheet.getRow(2).height=26;
+            const kpis = [
+                { label: 'الدفعة الدورية', value: `${currency} ${D.totalPayment}`, good: true },
+                { label: 'إجمالي الفائدة', value: `${currency} ${D.totalInterest}`, good: D.totalInterest < D.principal*0.3 },
+                { label: 'إجمالي المدفوعات', value: `${currency} ${D.totalPayments}`, good: true },
+                { label: 'عدد الدفعات الفعلية', value: D.actualPeriods, good: true }
+            ];
+            let kRow=3;
+            kpis.forEach((k,idx)=>{
+                kpiSheet.getRow(kRow).height=40;
+                kpiSheet.mergeCells(kRow,2,kRow,2);
+                kpiSheet.mergeCells(kRow,3,kRow,3);
+                kpiSheet.mergeCells(kRow,4,kRow,4);
+                kpiSheet.mergeCells(kRow,5,kRow,5);
+                const ic=kpiSheet.getCell(kRow,2); ic.value=`🔹 ${idx+1}`;
+                const lc2=kpiSheet.getCell(kRow,3); lc2.value=k.label;
+                const vc3=kpiSheet.getCell(kRow,4); vc3.value=k.value;
+                const nc2=kpiSheet.getCell(kRow,5); nc2.value='';
+                const bg=k.good?PB:NB, tc=k.good?PT:NT;
+                [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
+                ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
+                lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
+                nc2.font={name:'Arial',size:9,color:{argb:'444444'}}; nc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                kRow++;
+            });
+            kRow++;
+            kpiSheet.mergeCells(kRow,2,kRow,5);
+            const kFinal=kpiSheet.getCell(kRow,2);
+            kFinal.value=D.extraPayment>0?'✅ دفعات إضافية توفر الوقت والمال':'ℹ️ يمكن إضافة دفعة إضافية لتسريع السداد';
+            kFinal.font={name:'Arial',bold:true,size:13,color:{argb:PT}};
+            kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:PB}};
+            kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
+            kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
+            kpiSheet.getRow(kRow).height=40;
+
+            // 4. جدول السداد
+            const tableSheet = workbook.addWorksheet('جدول السداد', { views: [{ rightToLeft: true, showGridLines: false }] });
+            tableSheet.getColumn(1).width = 5; tableSheet.getColumn(2).width = 15; tableSheet.getColumn(3).width = 20; tableSheet.getColumn(4).width = 20; tableSheet.getColumn(5).width = 20; tableSheet.getColumn(6).width = 20; tableSheet.getColumn(7).width = 5;
+            mh(tableSheet,1,7,1,'📋 جدول السداد الكامل',DB,GL,14);
+            tableSheet.getRow(1).height=40;
+            tableSheet.addRow(['رقم الدفعة', 'الدفعة', 'الفائدة', 'أصل الدين', 'الرصيد المتبقي']);
+            const headerRow = tableSheet.getRow(2);
+            headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+            D.schedule.forEach(r => {
+                tableSheet.addRow([r.period, r.payment, r.interest, r.principalPaid, r.balance]);
+            });
+
+            // 5. الرسوم البيانية
+            const chartsSheet = workbook.addWorksheet('الرسوم البيانية', { views: [{ rightToLeft: true, showGridLines: false }] });
+            chartsSheet.getColumn(1).width = 5; chartsSheet.getColumn(2).width = 50; chartsSheet.getColumn(3).width = 5;
+            mh(chartsSheet,1,3,1,'📊 تحليل بياني',DB,GL,14);
+            chartsSheet.getRow(1).height=40;
+            const chartContainer = document.querySelector('.charts-container');
+            if (chartContainer) {
+                try {
+                    const origBg = chartContainer.style.backgroundColor;
+                    chartContainer.style.backgroundColor = '#ffffff';
+                    const canvasImg = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
+                    chartContainer.style.backgroundColor = origBg;
+                    const imgData = canvasImg.toDataURL('image/png');
+                    const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                    chartsSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 25 }, editAs: 'oneCell' });
+                } catch (err) {}
+            }
+
+            // 6. التفسير والتوصيات
+            const intSheet = workbook.addWorksheet('التفسير والتوصيات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            intSheet.getColumn(1).width = 5; intSheet.getColumn(2).width = 50; intSheet.getColumn(3).width = 5;
+            mh(intSheet,1,3,1,'📝 التفسير والتوصيات',DB,GL,14);
+            intSheet.getRow(1).height=45;
+            const sections = [
+                { title: '1. ملخص القرض', content: `الجهة: ${companyName}\nمبلغ القرض: ${currency} ${D.principal.toFixed(0)}\nمعدل الفائدة: ${(D.annualRate*100).toFixed(2)}%\nالمدة: ${D.years} سنة` },
+                { title: '2. تحليل السداد', content: `الدفعة الدورية: ${currency} ${D.totalPayment}\nإجمالي الفائدة: ${currency} ${D.totalInterest}\nإجمالي المدفوعات: ${currency} ${D.totalPayments}\nعدد الدفعات الفعلية: ${D.actualPeriods}\nتوفير في المدة: ${D.yearsSaved} سنة` },
+                { title: '3. التوصيات', content: D.extraPayment > 0 ? '• الاستمرار في الدفعات الإضافية لتقليل الفائدة والمدة.\n• يمكن زيادة الدفعة الإضافية لتسريع السداد.' : '• يمكن إضافة دفعة إضافية دورية لتوفير الفائدة وتقصير المدة.\n• مراجعة إمكانية إعادة التمويل إذا كانت الفائدة مرتفعة.' },
+                { title: '4. تنويه', content: 'هذا التحليل مبني على افتراضات تقديرية. النتائج الفعلية قد تختلف. يُنصح باستشارة مستشار مالي قبل اتخاذ القرارات.' }
+            ];
+            let itRow=2;
+            sections.forEach((sec,idx)=>{
+                itRow++;
+                intSheet.getRow(itRow).height=30;
+                intSheet.mergeCells(itRow,2,itRow,2);
+                const tc3=intSheet.getCell(itRow,2);
+                tc3.value=sec.title;
+                tc3.font={name:'Arial',bold:true,size:12,color:{argb:GL}};
+                tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?HB:SB}};
+                tc3.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                tc3.border={bottom:{style:'medium',color:{argb:G}}};
+                itRow++;
+                intSheet.getRow(itRow).height=Math.max(60, sec.content.split('\n').length*18);
+                intSheet.mergeCells(itRow,2,itRow,2);
+                const cc=intSheet.getCell(itRow,2);
+                cc.value=sec.content;
+                cc.font={name:'Arial',size:10,color:{argb:DT}};
+                cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};
+                cc.alignment={horizontal:'right',vertical:'top',wrapText:true,readingOrder:'rtl'};
+                cc.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
+            });
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const now = new Date();
+            const fileName = `تقرير_قرض_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+            saveAs(blob, fileName);
+        } catch(err){ console.error(err); alert('خطأ Excel: '+err.message); }
+        finally{ hideLoading(); }
+    }
+
+    // ------------------ تصدير Word احترافي ------------------
+    async function exportToWord() {
+        if (!globalLoanData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+        showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات والرسوم البيانية');
+        try {
+            const D = globalLoanData;
+            const currency = D.currency;
+            const companyName = D.companyName;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ar-EG');
+
+            const chartContainer = document.querySelector('.charts-container');
+            let chartImgBase64 = '';
+            if (chartContainer) {
+                const origBg = chartContainer.style.backgroundColor;
+                chartContainer.style.backgroundColor = '#ffffff';
+                const img = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
+                chartContainer.style.backgroundColor = origBg;
+                chartImgBase64 = img.toDataURL('image/png');
+            }
+
+            let tableRows = '';
+            D.schedule.forEach(r => {
+                tableRows += `<tr><td>${r.period}</td><td>${currency} ${r.payment.toFixed(2)}</td><td>${currency} ${r.interest.toFixed(2)}</td><td>${currency} ${r.principalPaid.toFixed(2)}</td><td>${currency} ${r.balance.toFixed(2)}</td></tr>`;
+            });
+
+            const fullHtml = `<!DOCTYPE html>
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+            <head><meta charset='utf-8'><title>تقرير جدولة القروض - FAROUK GRUP</title>
+            <style>
+                body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;}
+                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                .cover h1{font-size:32px;color:#b8860b;margin:0;}
+                .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                table{width:100%;border-collapse:collapse;margin:20px 0;direction:rtl;}
+                th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                th{background:#fefcf6;color:#b8860b;font-weight:bold;}
+                .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+                .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;}
+            </style></head>
+            <body>
+                <div class="cover">
+                    <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+                    <h2>تقرير جدولة القروض المتقدمة</h2>
+                    <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
+                    <p>العملة: ${currency} | الدفعة الدورية: ${currency} ${D.totalPayment}</p>
+                </div>
+                <h2 style="color:#b8860b;">المدخلات الأساسية</h2>
+                <table><tbody>
+                    <tr><th>مبلغ القرض</th><td>${currency} ${D.principal.toFixed(0)}</td><th>معدل الفائدة</th><td>${(D.annualRate*100).toFixed(2)}%</td></tr>
+                    <tr><th>المدة (سنوات)</th><td>${D.years}</td><th>تكرار الدفع</th><td>${D.frequency===12?'شهري':D.frequency===4?'ربع سنوي':D.frequency===2?'نصف سنوي':'سنوي'}</td></tr>
+                    <tr><th>دفعة أولى</th><td>${currency} ${D.downPayment}</td><th>دفعة إضافية دورية</th><td>${currency} ${D.extraPayment}</td></tr>
+                </tbody></table>
+                <h2 style="color:#b8860b;">📊 مؤشرات الأداء</h2>
+                <div style="margin:20px 0;padding:20px;background:#d4edda;border-radius:10px;text-align:center;">
+                    <span style="font-size:2rem;font-weight:bold;color:#155724;">إجمالي الفائدة: ${currency} ${D.totalInterest}</span>
+                </div>
+                <h2 style="color:#b8860b;">📈 الرسوم البيانية</h2>
+                <div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>
+                <h2 style="color:#b8860b;">📋 جدول السداد</h2>
+                <table><thead><tr><th>رقم الدفعة</th><th>الدفعة</th><th>الفائدة</th><th>أصل الدين</th><th>الرصيد المتبقي</th></tr></thead><tbody>${tableRows}</tbody></table>
+                <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+            </body></html>`;
+
+            const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `تقرير_قرض_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        } catch(err){ console.error(err); alert('خطأ Word: '+err.message); }
+        finally{ hideLoading(); }
+    }
+
+    document.getElementById('exportExcelBtn').addEventListener('click', exportToFullExcel);
+    document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
 </script>
-<!-- زر العودة إلى الرئيسية (عائم في اليمين) -->
-<a href="index.html" style="
-    position: fixed;
-    bottom: 20px;
-    right: 20px; /* وضعه في اليمين بدلاً من اليسار */
-    background: rgba(180,133,84,0.9);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-family: 'Tajawal', sans-serif;
-    font-weight: bold;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.3s;
-" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';">
-    <i class="fas fa-home"></i> الرئيسية
-</a>
 </body>
 </html>

@@ -11,7 +11,11 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- مكتبات Excel احترافية -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
+        /* جميع الأنماط السابقة + إضافة شاشة التحميل */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root { --bg-dark:#0b0e17; --bg-panel:rgba(18,24,36,0.85); --bg-card:rgba(22,30,46,0.8); --border-light:rgba(180,133,84,0.25); --accent-glow:#b48554; --accent-soft:#cfa776; --text-light:#f0f4fa; --text-muted:#aab7d4; --text-dark:#0b0e17; --shadow-soft:0 15px 35px -10px rgba(0,0,0,0.6),0 0 0 1px rgba(180,133,84,0.15); --shadow-glow:0 15px 35px -10px rgba(0,0,0,0.8),0 0 20px rgba(180,133,84,0.3); --radius-md:20px; --radius-lg:30px; --transition:all 0.3s ease; --gold:#b8860b; --gold-light:#d4b15a; --gold-soft:rgba(184,134,11,0.1); --dark:#0f0f0f; --dark-light:#1a1a1a; --white:#ffffff; --success:#28a745; --warning:#ffc107; --danger:#dc3545; }
         body { font-family:'Tajawal',sans-serif; background:radial-gradient(circle at 70% 30%,#141c2b,#0a0e16); color:var(--text-light); line-height:1.6; min-height:100vh; position:relative; overflow-x:hidden; }
@@ -89,22 +93,53 @@
         .calc-btn.equals { background:rgba(180,133,84,0.3); color:white; grid-column:span 2; }
         .calc-btn.equals:hover { background:rgba(180,133,84,0.5); }
         @media (max-width:768px) { .hero-mini h2 { font-size:2rem; } .featured-badge { width:70px; height:70px; } .featured-badge i { font-size:1.4rem; } .featured-badge span { font-size:0.6rem; } .grid-2 { grid-template-columns:1fr; } .currency-row select, .currency-row input { width:100%; } }
-    /* إصلاح ظهور العناوين التي تختفي */
-.section-title-sm,
-.panel-header,
-.collapsible span,
-.result-card h4,
-.hero-mini h2 {
-    -webkit-text-fill-color: initial !important;
-    color: var(--accent-soft) !important;
-    background: none !important;
-    background-image: none !important;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
+        .section-title-sm, .panel-header, .collapsible span, .result-card h4, .hero-mini h2 { -webkit-text-fill-color: initial !important; color: var(--accent-soft) !important; background: none !important; background-image: none !important; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+
+        /* شاشة تحميل التصدير */
+        .export-loading {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(6px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: var(--bg-panel);
+            border: 2px solid var(--border-light);
+            border-radius: 24px;
+            padding: 2rem 3rem;
+            text-align: center;
+            box-shadow: var(--shadow-glow);
+        }
+        .export-loading-box i {
+            font-size: 3rem;
+            color: var(--accent-soft);
+            animation: spin 1s linear infinite;
+            display: block;
+            margin-bottom: 1rem;
+        }
+        .export-loading-box h3 { color: var(--accent-soft); margin-bottom: 0.5rem; font-size: 1.2rem; }
+        .export-loading-box p { color: var(--text-muted); font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body style="overflow-x: hidden;">
 <div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- شاشة التحميل -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">جاري إنشاء التقرير الاحترافي...</h3>
+        <p id="loadingMsg">يرجى الانتظار — قد يستغرق ذلك لحظات</p>
+    </div>
+</div>
+
 <section class="hero-mini">
     <h2>📊 حاسبة النسب المالية الشاملة</h2>
     <p>تحليل السيولة، الربحية، الملاءة، والنشاط مع توصيات ذكية</p>
@@ -129,12 +164,9 @@
                 <div class="form-group tooltip"><label>النقد وما يعادله</label><input type="number" id="cash" placeholder="مثال: 100000"><span class="tooltiptext">الرصيد النقدي والودائع الجارية.</span></div>
                 <div class="form-group tooltip"><label>المخزون</label><input type="number" id="inventory" placeholder="مثال: 200000"><span class="tooltiptext">قيمة المخزون (بضاعة، مواد خام).</span></div>
                 <div class="form-group tooltip"><label>أصول متداولة أخرى</label><input type="number" id="otherCurrentAssets" placeholder="مثال: 100000"><span class="tooltiptext">مدينون، استثمارات قصيرة، إلخ.</span></div>
-                <!-- تم إزالة حقل إجمالي الأصول المتداولة -->
                 <div class="form-group tooltip"><label>الأصول الثابتة</label><input type="number" id="fixedAssets" placeholder="مثال: 500000"><span class="tooltiptext">مباني، آلات، معدات.</span></div>
-                <!-- تم إزالة حقل إجمالي الأصول -->
                 <div class="form-group tooltip"><label>الخصوم المتداولة</label><input type="number" id="currentLiabilities" placeholder="مثال: 300000"><span class="tooltiptext">ديون مستحقة خلال عام.</span></div>
                 <div class="form-group tooltip"><label>الخصوم طويلة الأجل</label><input type="number" id="longTermLiabilities" placeholder="مثال: 200000"><span class="tooltiptext">قروض طويلة الأجل، سندات.</span></div>
-                <!-- تم إزالة حقل إجمالي الخصوم وحقوق الملكية -->
             </div>
             <!-- قائمة الدخل والتدفقات -->
             <div>
@@ -155,7 +187,7 @@
         <div class="results-section" id="resultsSection" style="display: none;">
             <div class="action-bar">
                 <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير Word</button>
-                <button class="btn-export" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel (CSV)</button>
+                <button class="btn-export" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel (شامل)</button>
             </div>
             <div class="results-grid" id="summaryCards"></div>
             <div class="table-container" id="ratiosTable"></div>
@@ -193,6 +225,8 @@
 AOS.init({ duration: 800, once: true });
 
 // ------------------ دوال الحساب ------------------
+let lastCalculation = null; // لتخزين النتائج والمدخلات للتصدير
+
 function getInputs() {
     let cash = parseFloat(document.getElementById('cash').value) || 0;
     let inventory = parseFloat(document.getElementById('inventory').value) || 0;
@@ -224,7 +258,7 @@ function getInputs() {
 
     return {
         currency: document.getElementById('currencySelect').value,
-        companyName: document.getElementById('companyName').value,
+        companyName: document.getElementById('companyName').value || 'الجهة',
         currentAssets, cash, inventory, currentLiabilities, totalAssets, totalLiabilities, equity,
         revenue, cogs, operatingExpenses, interestExpense, taxRate,
         operatingProfit, ebit, netProfit,
@@ -294,15 +328,17 @@ function displayResults() {
     const inputs = getInputs();
     const ratios = calculateRatios(inputs);
     const currency = inputs.currency;
-    const company = inputs.companyName || 'الجهة';
+    const company = inputs.companyName;
+
+    // تخزين للتصدير
+    lastCalculation = { inputs, ratios, currency, company };
 
     document.getElementById('resultsSection').style.display = 'block';
     document.getElementById('initialMessage').style.display = 'none';
 
-    // تنسيق الأرقام مع العملة
     const formatMoney = (num) => `${currency} ${num.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0})}`;
 
-    // بطاقات سريعة + إضافة القيم المالية الأساسية
+    // بطاقات سريعة
     document.getElementById('summaryCards').innerHTML = `
         <div class="result-card"><div class="label">النسبة المتداولة</div><div class="value">${ratios.currentRatio.toFixed(2)}</div><div class="status ${evaluateRatio(ratios.currentRatio,{good:1.5,warning:1}).class}">${evaluateRatio(ratios.currentRatio,{good:1.5,warning:1}).text}</div></div>
         <div class="result-card"><div class="label">هامش الربح الصافي</div><div class="value">${(ratios.netMargin*100).toFixed(1)}%</div><div class="status ${evaluateRatio(ratios.netMargin,{good:0.15,warning:0.05}).class}">${evaluateRatio(ratios.netMargin,{good:0.15,warning:0.05}).text}</div></div>
@@ -318,7 +354,7 @@ function displayResults() {
 
     // جدول مفصل
     let tableHtml = `<thead> <th>الفئة</th><th>النسبة</th><th>القيمة</th><th>التقييم</th> </thead><tbody>`;
-    const addRow = (cat, name, value, ev) => { tableHtml += ` <td>${cat}</td><td>${name}</td><td>${value}</td><td class="${ev.class}">${ev.text}</td> </tr>`; };
+    const addRow = (cat, name, value, ev) => { tableHtml += `<tr><td>${cat}</td><td>${name}</td><td>${value}</td><td class="${ev.class}">${ev.text}</td></tr>`; };
     addRow('السيولة','النسبة المتداولة', ratios.currentRatio.toFixed(2), evaluateRatio(ratios.currentRatio,{good:1.5,warning:1}));
     addRow('السيولة','النسبة السريعة', ratios.quickRatio.toFixed(2), evaluateRatio(ratios.quickRatio,{good:1,warning:0.5}));
     addRow('السيولة','النسبة النقدية', ratios.cashRatio.toFixed(2), evaluateRatio(ratios.cashRatio,{good:0.5,warning:0.2}));
@@ -378,56 +414,203 @@ function displayResults() {
     barsChart = new Chart(ctxBars, { type: 'bar', data: barData, options: { responsive: true, maintainAspectRatio: false } });
 }
 
-// ------------------ دوال التصدير ------------------
-function exportToExcel() {
-    const table = document.querySelector('#ratiosTable table');
-    if (!table) { alert('الرجاء إجراء التحليل أولاً'); return; }
-    const rows = [];
-    const headers = [];
-    table.querySelectorAll('thead th').forEach(th => headers.push(th.innerText));
-    rows.push(headers);
-    table.querySelectorAll('tbody tr').forEach(tr => {
-        const row = [];
-        tr.querySelectorAll('td').forEach(td => row.push(td.innerText));
-        rows.push(row);
-    });
-    let csv = rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `نسب_مالية_${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();
+// ------------------ دوال مساعدة للتحميل ------------------
+function showLoading(title, msg) {
+    document.getElementById('loadingTitle').textContent = title;
+    document.getElementById('loadingMsg').textContent = msg;
+    document.getElementById('exportLoading').classList.add('show');
+}
+function hideLoading() {
+    document.getElementById('exportLoading').classList.remove('show');
 }
 
+// ------------------ تصدير Excel احترافي ------------------
+async function exportToExcel() {
+    if (!lastCalculation) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+    showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'تجهيز الأوراق والبيانات');
+    try {
+        const { inputs, ratios, currency, company } = lastCalculation;
+        const companyName = company || 'الجهة';
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('ar-EG');
+
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = 'FAROUK GRUP';
+        workbook.created = new Date();
+
+        const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+        const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
+        const PT = 'FF155724', NT = 'FF721C24', GB = 'FFFFF3CD';
+
+        function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+        function cs(bg=W,tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+        function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
+        function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+
+        // 1. غلاف التقرير
+        const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+        [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+        cv.getRow(2).height=60; cv.getRow(4).height=50;
+        cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+        bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+        bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'}; bc.border={bottom:{style:'thick',color:{argb:G}}};
+        mh(cv,1,4,4,`تقرير النسب المالية الشاملة\n${companyName}`,DB,GL,16);
+        const inf=[['📋 الجهة',companyName],['📅 التاريخ',dateStr],['💰 العملة',currency],['📊 صافي الربح',`${currency} ${inputs.netProfit.toFixed(0)}`],['📈 ROE',`${(ratios.roe*100).toFixed(1)}%`]];
+        let ir=6;
+        inf.forEach(([l,v],idx)=>{
+            cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+            const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+            const bg=idx%2===0?AR:'FFFEFCF6';
+            ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+            ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+            cv.getRow(ir).height=28; ir++;
+        });
+
+        // 2. المدخلات
+        const inpSheet = workbook.addWorksheet('المدخلات', { views: [{ rightToLeft: true }] });
+        inpSheet.getColumn(1).width = 5; inpSheet.getColumn(2).width = 35; inpSheet.getColumn(3).width = 20; inpSheet.getColumn(4).width = 20;
+        mh(inpSheet,1,4,1,'📋 المدخلات المالية',DB,GL,14);
+        const inputRows = [
+            ['النقد وما يعادله', inputs.cash], ['المخزون', inputs.inventory], ['أصول متداولة أخرى', inputs.otherCurrent], ['الأصول الثابتة', inputs.fixedAssets],
+            ['الخصوم المتداولة', inputs.currentLiabilities], ['الخصوم طويلة الأجل', inputs.longTermLiabilities],
+            ['الإيرادات', inputs.revenue], ['تكلفة المبيعات', inputs.cogs], ['المصاريف التشغيلية', inputs.operatingExpenses],
+            ['مصروفات الفائدة', inputs.interestExpense], ['نسبة الضريبة', inputs.taxRate*100+'%'], ['المبيعات الآجلة', inputs.creditSales],
+            ['حسابات المدينين', inputs.receivables], ['حسابات الدائنين', inputs.payables]
+        ];
+        let iRow=3;
+        inputRows.forEach(([l,v],idx)=>{
+            inpSheet.getRow(iRow).height=24;
+            const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+            const lc=inpSheet.getCell(iRow,2), vc=inpSheet.getCell(iRow,3);
+            lc.value=l; vc.value=v;
+            ap(lc,cs(bg,DT,true,'right'));
+            ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof v==='number'?'#,##0':null});
+            iRow++;
+        });
+
+        // 3. النسب المالية
+        const ratioSheet = workbook.addWorksheet('النسب المالية', { views: [{ rightToLeft: true }] });
+        ratioSheet.getColumn(1).width = 5; ratioSheet.getColumn(2).width = 25; ratioSheet.getColumn(3).width = 20; ratioSheet.getColumn(4).width = 20; ratioSheet.getColumn(5).width = 15;
+        mh(ratioSheet,1,5,1,'📊 جدول النسب المالية',DB,GL,14);
+        const rHeader = ratioSheet.getRow(3);
+        ['الفئة','النسبة','القيمة','التقييم'].forEach((h,i)=> { const c=rHeader.getCell(i+2); c.value=h; ap(c,hs(HB,GL)); });
+        const ratioList = [
+            ['السيولة','النسبة المتداولة', ratios.currentRatio.toFixed(2), evaluateRatio(ratios.currentRatio,{good:1.5,warning:1}).text],
+            ['السيولة','النسبة السريعة', ratios.quickRatio.toFixed(2), evaluateRatio(ratios.quickRatio,{good:1,warning:0.5}).text],
+            ['السيولة','النسبة النقدية', ratios.cashRatio.toFixed(2), evaluateRatio(ratios.cashRatio,{good:0.5,warning:0.2}).text],
+            ['الربحية','هامش الربح الإجمالي', (ratios.grossMargin*100).toFixed(1)+'%', evaluateRatio(ratios.grossMargin,{good:0.4,warning:0.2}).text],
+            ['الربحية','هامش الربح التشغيلي', (ratios.operatingMargin*100).toFixed(1)+'%', evaluateRatio(ratios.operatingMargin,{good:0.2,warning:0.1}).text],
+            ['الربحية','هامش الربح الصافي', (ratios.netMargin*100).toFixed(1)+'%', evaluateRatio(ratios.netMargin,{good:0.15,warning:0.05}).text],
+            ['الربحية','ROA', (ratios.roa*100).toFixed(1)+'%', evaluateRatio(ratios.roa,{good:0.1,warning:0.05}).text],
+            ['الربحية','ROE', (ratios.roe*100).toFixed(1)+'%', evaluateRatio(ratios.roe,{good:0.2,warning:0.1}).text],
+            ['الملاءة','الدين إلى حقوق الملكية', ratios.debtToEquity.toFixed(2), evaluateRatio(ratios.debtToEquity,{good:1,warning:2}).text],
+            ['الملاءة','الدين إلى الأصول', ratios.debtToAssets.toFixed(2), evaluateRatio(ratios.debtToAssets,{good:0.5,warning:0.7}).text],
+            ['الملاءة','تغطية الفائدة', ratios.interestCoverage.toFixed(2), evaluateRatio(ratios.interestCoverage,{good:3,warning:1.5}).text],
+            ['النشاط','دوران المخزون', ratios.inventoryTurnover.toFixed(2), 'مرات'],
+            ['النشاط','أيام المخزون', ratios.daysInventory.toFixed(0), 'يوم'],
+            ['النشاط','دوران المدينين', ratios.receivablesTurnover.toFixed(2), 'مرات'],
+            ['النشاط','أيام تحصيل المدينين', ratios.daysSalesOutstanding.toFixed(0), 'يوم'],
+            ['النشاط','دوران الدائنين', ratios.payablesTurnover.toFixed(2), 'مرات'],
+            ['النشاط','أيام سداد الدائنين', ratios.daysPayables.toFixed(0), 'يوم'],
+            ['النشاط','دورة التحويل النقدي', ratios.cashConversionCycle.toFixed(0), 'يوم']
+        ];
+        let rRow=4;
+        ratioList.forEach(r => {
+            const row = ratioSheet.getRow(rRow);
+            [2,3,4,5].forEach((c,i)=> { const cell=row.getCell(c); cell.value=r[i]; ap(cell,cs(AR,DT,false,'center')); });
+            rRow++;
+        });
+
+        // 4. الرسوم البيانية
+        const chartSheet = workbook.addWorksheet('الرسوم البيانية', { views: [{ rightToLeft: true }] });
+        chartSheet.getColumn(1).width = 5; chartSheet.getColumn(2).width = 60;
+        mh(chartSheet,1,2,1,'📈 الرسوم البيانية',DB,GL,14);
+        const chartGrid = document.querySelector('.chart-grid');
+        if (chartGrid) {
+            try {
+                const origBg = chartGrid.style.backgroundColor;
+                chartGrid.style.backgroundColor = '#ffffff';
+                const canvasImg = await html2canvas(chartGrid, { scale: 2, backgroundColor: '#ffffff' });
+                chartGrid.style.backgroundColor = origBg;
+                const imgData = canvasImg.toDataURL('image/png');
+                const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                chartSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 30 }, editAs: 'oneCell' });
+            } catch (e) {}
+        }
+
+        // 5. التوصيات
+        const recSheet = workbook.addWorksheet('التوصيات', { views: [{ rightToLeft: true }] });
+        recSheet.getColumn(1).width = 5; recSheet.getColumn(2).width = 60;
+        mh(recSheet,1,2,1,'💡 التوصيات',DB,GL,14);
+        const recs = getRecommendation(ratios);
+        let recRow=3;
+        recs.forEach(r => {
+            recSheet.getRow(recRow).height=25;
+            const cell = recSheet.getCell(recRow,2);
+            cell.value = '• ' + r;
+            cell.font = { name: 'Arial', size: 11, color: { argb: DT } };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEFCF6' } };
+            cell.alignment = { horizontal: 'right', vertical: 'middle', wrapText: true, readingOrder: 'rtl' };
+            recRow++;
+        });
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const fileName = `نسب_مالية_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+        saveAs(blob, fileName);
+    } catch(err) {
+        console.error(err);
+        alert('خطأ أثناء إنشاء ملف Excel: ' + err.message);
+    } finally {
+        hideLoading();
+    }
+}
+
+// ------------------ تصدير Word احترافي ------------------
 async function exportToWord() {
-    const resultsSection = document.getElementById('resultsSection');
-    if (!resultsSection || resultsSection.style.display === 'none') { alert('الرجاء إجراء التحليل أولاً'); return; }
-    const companyName = document.getElementById('companyName').value || 'الجهة';
-    const dateStr = new Date().toLocaleDateString('ar-EG', { year:'numeric', month:'long', day:'numeric' });
-    const radarCanvas = document.getElementById('radarChart');
-    const barsCanvas = document.getElementById('barsChart');
-    const [radarImg, barsImg] = await Promise.all([
-        html2canvas(radarCanvas, { scale: 2, backgroundColor: '#ffffff' }),
-        html2canvas(barsCanvas, { scale: 2, backgroundColor: '#ffffff' })
-    ]);
-    const radarDataUrl = radarImg.toDataURL('image/png');
-    const barsDataUrl = barsImg.toDataURL('image/png');
-    const tableHtml = document.querySelector('#ratiosTable')?.innerHTML || '';
-    const cardsHtml = document.querySelector('#summaryCards')?.innerHTML || '';
-    const recHtml = document.getElementById('recommendations')?.innerHTML || '';
-    const htmlContent = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>تقرير النسب المالية</title><style>body{font-family:Arial;direction:rtl;margin:2rem;} .header{text-align:center;border-bottom:2px solid #b8860b;} .sub-title{color:#b8860b;margin-top:25px;} table{width:100%;border-collapse:collapse;margin:1rem 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;} .result-card{background:#fefcf6;border:1px solid #b8860b;border-radius:10px;padding:1rem;margin:1rem 0;} .chart-img{border:1px solid #ccc;padding:10px;}</style></head><body>
+    if (!lastCalculation) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+    showLoading('جاري إنشاء تقرير Word الاحترافي...', 'تجهيز البيانات والرسوم البيانية');
+    try {
+        const { inputs, ratios, currency, company } = lastCalculation;
+        const companyName = company || 'الجهة';
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('ar-EG');
+
+        const chartGrid = document.querySelector('.chart-grid');
+        let chartImgBase64 = '';
+        if (chartGrid) {
+            const origBg = chartGrid.style.backgroundColor;
+            chartGrid.style.backgroundColor = '#ffffff';
+            const img = await html2canvas(chartGrid, { scale: 2, backgroundColor: '#ffffff' });
+            chartGrid.style.backgroundColor = origBg;
+            chartImgBase64 = img.toDataURL('image/png');
+        }
+
+        const cardsHtml = document.getElementById('summaryCards').innerHTML;
+        const tableHtml = document.getElementById('ratiosTable').innerHTML;
+        const recHtml = document.getElementById('recommendations').innerHTML;
+
+        const fullHtml = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>تقرير النسب المالية</title>
+        <style>body{font-family:Arial;direction:rtl;margin:2rem;} .header{text-align:center;border-bottom:2px solid #b8860b;} .sub-title{color:#b8860b;margin-top:25px;} table{width:100%;border-collapse:collapse;margin:1rem 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;} .result-card{background:#fefcf6;border:1px solid #b8860b;border-radius:10px;padding:1rem;margin:1rem 0;} .chart-img{border:1px solid #ccc;padding:10px;}</style></head><body>
         <div class="header"><h1>مجموعة فاروق للاستشارات والأعمال</h1><p>تقرير النسب المالية الشاملة</p><p>الجهة: ${companyName} | التاريخ: ${dateStr}</p></div>
         <div class="sub-title">📊 ملخص النتائج</div><div class="result-card">${cardsHtml}</div>
         <div class="sub-title">📋 التفصيل المالي</div>${tableHtml}
-        <div class="sub-title">📈 التحليل البياني</div><div class="chart-container"><img src="${radarDataUrl}" width="400" /><br/><img src="${barsDataUrl}" width="400" /></div>
+        <div class="sub-title">📈 التحليل البياني</div><div class="chart-container"><img src="${chartImgBase64}" width="600" /></div>
         <div class="sub-title">💡 التوصيات</div><div class="result-card">${recHtml}</div>
-        <div style="text-align:center;margin-top:40px;">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال</div>
-    </body></html>`;
-    const blob = new Blob(['\uFEFF' + htmlContent], { type: 'application/msword' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `تقرير_نسب_مالية_${companyName}.doc`;
-    a.click();
+        <div style="text-align:center;margin-top:40px;">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال</div></body></html>`;
+
+        const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `تقرير_نسب_مالية_${companyName}.doc`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    } catch (error) {
+        console.error(error);
+        alert('خطأ في إنشاء تقرير Word');
+    } finally {
+        hideLoading();
+    }
 }
 
 // ------------------ الآلة الحاسبة ------------------
@@ -435,7 +618,8 @@ let currentCalcInput = '';
 const calcDisplay = document.getElementById('calcDisplay');
 const modal = document.getElementById('calculatorModal');
 const btnCalc = document.getElementById('calculatorBtn');
-const spanClose = document.getElementsByClassName('close')[0];
+const spanClose = document.querySelector('.close');
+
 window.handleCalculatorInput = (v) => { currentCalcInput += v; calcDisplay.value = currentCalcInput; };
 window.clearCalculator = () => { currentCalcInput = ''; calcDisplay.value = ''; };
 window.backspaceCalculator = () => { currentCalcInput = currentCalcInput.slice(0,-1); calcDisplay.value = currentCalcInput; };

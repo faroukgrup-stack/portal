@@ -14,13 +14,15 @@
     <!-- AOS Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <!-- html2canvas لتصدير Word -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- مكتبات Excel احترافية -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
+    <style>
+        /* ========== جميع الأنماط الأصلية كاملة ========== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-dark: #0b0e17;
             --bg-panel: rgba(18, 24, 36, 0.85);
@@ -58,537 +60,140 @@
             position: relative;
         }
 
-        /* خلفية متوهجة */
-        .glow-bg {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .glow-bg span {
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%);
-            border-radius: 50%;
-            filter: blur(80px);
-            animation: glowMove 20s infinite alternate ease-in-out;
-        }
+        .glow-bg { position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 0; }
+        .glow-bg span { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%); border-radius: 50%; filter: blur(80px); animation: glowMove 20s infinite alternate ease-in-out; }
         .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(180,133,84,0.12) 0%, transparent 70%); }
         .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
         .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.1) 0%, transparent 70%); animation-delay: -5s; }
+        @keyframes glowMove { 0% { transform: translate(0, 0) scale(1); opacity: 0.5; } 100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; } }
 
-        @keyframes glowMove {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-            100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; }
-        }
-
-        .floating-shape {
-            position: absolute;
-            width: 300px; height: 300px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%);
-            z-index: 0; pointer-events: none;
-        }
-
+        .floating-shape { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%); z-index: 0; pointer-events: none; }
         .shape-1 { top: -100px; left: -100px; animation: float 20s infinite ease-in-out; }
         .shape-2 { bottom: -50px; right: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
+        @keyframes float { 0% { transform: translate(0,0) rotate(0deg); } 33% { transform: translate(30px,-30px) rotate(5deg); } 66% { transform: translate(-20px,20px) rotate(-5deg); } 100% { transform: translate(0,0) rotate(0deg); } }
 
-        @keyframes float {
-            0% { transform: translate(0,0) rotate(0deg); }
-            33% { transform: translate(30px,-30px) rotate(5deg); }
-            66% { transform: translate(-20px,20px) rotate(-5deg); }
-            100% { transform: translate(0,0) rotate(0deg); }
-        }
+        .hero-mini { background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%); color: white; text-align: center; padding: 3rem 1rem; border-bottom: 4px solid var(--gold); position: relative; overflow: hidden; z-index: 2; }
+        .hero-mini::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%); animation: rotate 40s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .hero-mini h2 { font-size: 2.5rem; font-weight: 900; color: var(--gold-light); margin-bottom: 0.5rem; position: relative; z-index: 2; }
+        .hero-mini p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; opacity: 0.95; position: relative; z-index: 2; }
 
-        /* تم إزالة الـ NAV بالكامل */
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; position: relative; z-index: 2; }
+        .checklist-card { background: var(--bg-panel); backdrop-filter: blur(15px); border: 2px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-soft); position: relative; overflow: hidden; }
+        .checklist-card:hover { box-shadow: var(--shadow-glow); border-color: rgba(180,133,84,0.4); }
+        .checklist-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, transparent 0%, rgba(184,134,11,0.05) 100%); z-index: -1; }
+        .checklist-card h2 { font-size: 1.8rem; font-weight: 900; background: linear-gradient(135deg, #f0e6d2, #cfa776); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1.5rem; text-align: center; border-bottom: 2px solid var(--border-light); padding-bottom: 0.5rem; }
 
-        .hero-mini {
-            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
-            color: white;
-            text-align: center;
-            padding: 3rem 1rem;
-            border-bottom: 4px solid var(--gold);
-            position: relative;
-            overflow: hidden;
-            z-index: 2;
-        }
+        .info-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+        .info-item { flex: 1 1 250px; }
+        .info-item label { display: block; margin-bottom: 0.5rem; font-weight: 700; color: var(--accent-soft); }
+        .info-item input { width: 100%; padding: 1rem; border: 2px solid var(--border-light); border-radius: 30px; background: rgba(10,14,23,0.7); color: var(--text-light); font-family: 'Inter', sans-serif; }
+        .info-item input:focus { outline: none; border-color: var(--accent-glow); box-shadow: 0 0 0 3px rgba(180,133,84,0.2); }
 
-        .hero-mini::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
-            animation: rotate 40s linear infinite;
-        }
+        .signature-row { display: flex; gap: 1.5rem; margin-bottom: 2rem; background: rgba(180,133,84,0.15); border: 1px solid var(--border-light); padding: 1.5rem; border-radius: 30px; }
+        .signature-item { flex: 1; }
+        .signature-item label { font-weight: 700; color: var(--accent-soft); }
+        .signature-item input { width: 100%; padding: 0.8rem; border: 2px solid var(--border-light); border-radius: 30px; background: rgba(10,14,23,0.7); color: var(--text-light); }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .hero-mini h2 {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--gold-light);
-            margin-bottom: 0.5rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-mini p {
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto;
-            opacity: 0.95;
-            position: relative;
-            z-index: 2;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        .checklist-card {
-            background: var(--bg-panel);
-            backdrop-filter: blur(15px);
-            border: 2px solid var(--border-light);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-soft);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .checklist-card:hover {
-            box-shadow: var(--shadow-glow);
-            border-color: rgba(180,133,84,0.4);
-        }
-
-        .checklist-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, transparent 0%, rgba(184,134,11,0.05) 100%);
-            z-index: -1;
-        }
-
-        .checklist-card h2 {
-            font-size: 1.8rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #f0e6d2, #cfa776);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            border-bottom: 2px solid var(--border-light);
-            padding-bottom: 0.5rem;
-        }
-
-        .info-row {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-        .info-item {
-            flex: 1 1 250px;
-        }
-        .info-item label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-            color: var(--accent-soft);
-        }
-        .info-item input {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid var(--border-light);
-            border-radius: 30px;
-            background: rgba(10,14,23,0.7);
-            color: var(--text-light);
-            font-family: 'Inter', sans-serif;
-        }
-        .info-item input:focus {
-            outline: none;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 0 3px rgba(180,133,84,0.2);
-        }
-
-        .signature-row {
-            display: flex;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-            background: rgba(180,133,84,0.15);
-            border: 1px solid var(--border-light);
-            padding: 1.5rem;
-            border-radius: 30px;
-        }
-        .signature-item {
-            flex: 1;
-        }
-        .signature-item label {
-            font-weight: 700;
-            color: var(--accent-soft);
-        }
-        .signature-item input {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid var(--border-light);
-            border-radius: 30px;
-            background: rgba(10,14,23,0.7);
-            color: var(--text-light);
-        }
-
-        .checklist-section {
-            margin-bottom: 2rem;
-            border: 2px solid var(--border-light);
-            border-radius: 30px;
-            padding: 1.5rem;
-        }
-        .section-title {
-            color: var(--accent-soft);
-            font-weight: 900;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .checklist-item {
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid rgba(180,133,84,0.2);
-            padding-bottom: 1rem;
-        }
-        .item-row {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-        }
-        .item-row input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
-            accent-color: var(--accent-glow);
-            cursor: pointer;
-        }
-        .item-row label {
-            font-weight: 700;
-            color: var(--text-light);
-            cursor: pointer;
-            flex: 1;
-        }
-        .risk-badge {
-            display: inline-block;
-            padding: 0.2rem 0.8rem;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
+        .checklist-section { margin-bottom: 2rem; border: 2px solid var(--border-light); border-radius: 30px; padding: 1.5rem; }
+        .section-title { color: var(--accent-soft); font-weight: 900; font-size: 1.5rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .checklist-item { margin-bottom: 1.5rem; border-bottom: 1px solid rgba(180,133,84,0.2); padding-bottom: 1rem; }
+        .item-row { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+        .item-row input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--accent-glow); cursor: pointer; }
+        .item-row label { font-weight: 700; color: var(--text-light); cursor: pointer; flex: 1; }
+        .risk-badge { display: inline-block; padding: 0.2rem 0.8rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; }
         .risk-high { background: var(--risk-high); color: white; }
         .risk-medium { background: var(--risk-medium); color: #111; }
         .risk-low { background: var(--risk-low); color: white; }
 
-        .notes-field {
-            margin-top: 0.5rem;
-            margin-right: 2.2rem;
-            width: calc(100% - 2.2rem);
-        }
-        .notes-field textarea {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid var(--border-light);
-            border-radius: 15px;
-            background: rgba(10,14,23,0.7);
-            color: var(--text-light);
-            font-family: 'Tajawal', sans-serif;
-            resize: vertical;
-            min-height: 60px;
-        }
+        .notes-field { margin-top: 0.5rem; margin-right: 2.2rem; width: calc(100% - 2.2rem); }
+        .notes-field textarea { width: 100%; padding: 0.5rem; border: 1px solid var(--border-light); border-radius: 15px; background: rgba(10,14,23,0.7); color: var(--text-light); font-family: 'Tajawal', sans-serif; resize: vertical; min-height: 60px; }
 
-        .recommendation-box {
-            margin-top: 0.5rem;
-            margin-right: 2.2rem;
-            padding: 0.8rem;
-            border-radius: 15px;
-            background: rgba(255,193,7,0.15);
-            border: 1px solid var(--warning);
-            color: #fbbf24;
-            font-size: 0.9rem;
-        }
-        .recommendation-box strong {
-            display: block;
-            margin-bottom: 0.3rem;
-        }
+        .recommendation-box { margin-top: 0.5rem; margin-right: 2.2rem; padding: 0.8rem; border-radius: 15px; background: rgba(255,193,7,0.15); border: 1px solid var(--warning); color: #fbbf24; font-size: 0.9rem; }
+        .recommendation-box strong { display: block; margin-bottom: 0.3rem; }
 
-        .result-area {
-            margin: 2rem 0;
-            padding: 1.5rem;
-            background: rgba(180,133,84,0.15);
-            border: 1px solid var(--border-light);
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .score {
-            font-size: 2rem;
-            font-weight: 900;
-            color: var(--accent-soft);
-        }
-        .evaluation {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text-muted);
-        }
-        .overall-risk {
-            font-size: 1.5rem;
-            font-weight: 900;
-            padding: 0.5rem 1.5rem;
-            border-radius: 50px;
-        }
+        .result-area { margin: 2rem 0; padding: 1.5rem; background: rgba(180,133,84,0.15); border: 1px solid var(--border-light); border-radius: 30px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+        .score { font-size: 2rem; font-weight: 900; color: var(--accent-soft); }
+        .evaluation { font-size: 1.2rem; font-weight: 700; color: var(--text-muted); }
+        .overall-risk { font-size: 1.5rem; font-weight: 900; padding: 0.5rem 1.5rem; border-radius: 50px; }
         .risk-level-high { background: var(--risk-high); color: white; }
         .risk-level-medium { background: var(--risk-medium); color: #111; }
         .risk-level-low { background: var(--risk-low); color: white; }
 
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 2rem;
-        }
-        .btn-primary {
-            background: rgba(180,133,84,0.2);
-            border: 1px solid var(--border-light);
-            color: var(--accent-soft);
-            border-radius: 50px;
-            padding: 1rem 2.5rem;
-            font-weight: 900;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.8rem;
-            backdrop-filter: blur(10px);
-        }
-        .btn-primary:hover {
-            background: rgba(180,133,84,0.4);
-            color: #fff;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 25px rgba(180,133,84,0.3);
-            transform: translateY(-3px);
-        }
-        .btn-secondary {
-            background: rgba(30,74,122,0.2);
-            border: 1px solid #1e4a7a;
-            color: #8ab8ff;
-            border-radius: 50px;
-            padding: 1rem 2.5rem;
-            font-weight: 900;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-        .btn-secondary:hover {
-            background: rgba(30,74,122,0.4);
-            color: #fff;
-            border-color: #1e4a7a;
-            transform: translateY(-3px);
-        }
+        .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
+        .btn-primary { background: rgba(180,133,84,0.2); border: 1px solid var(--border-light); color: var(--accent-soft); border-radius: 50px; padding: 1rem 2.5rem; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.8rem; backdrop-filter: blur(10px); }
+        .btn-primary:hover { background: rgba(180,133,84,0.4); color: #fff; border-color: var(--accent-glow); box-shadow: 0 0 25px rgba(180,133,84,0.3); transform: translateY(-3px); }
+        .btn-secondary { background: rgba(30,74,122,0.2); border: 1px solid #1e4a7a; color: #8ab8ff; border-radius: 50px; padding: 1rem 2.5rem; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.8rem; }
+        .btn-secondary:hover { background: rgba(30,74,122,0.4); color: #fff; border-color: #1e4a7a; transform: translateY(-3px); }
 
-        /* فوتر مبسط */
-        .footer-simple {
-            text-align: center;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            background: rgba(10,14,23,0.5);
-            backdrop-filter: blur(5px);
-            border-top: 1px solid var(--border-light);
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-        .footer-simple span {
-            color: var(--accent-soft);
-            font-weight: 700;
-        }
+        /* شاشة تحميل التصدير */
+        .export-loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(6px); }
+        .export-loading.show { display: flex; }
+        .export-loading-box { background: var(--bg-panel); border: 2px solid var(--border-light); border-radius: 24px; padding: 2rem 3rem; text-align: center; box-shadow: var(--shadow-glow); }
+        .export-loading-box i { font-size: 3rem; color: var(--accent-soft); animation: spin 1s linear infinite; display: block; margin-bottom: 1rem; }
+        .export-loading-box h3 { color: var(--accent-soft); margin-bottom: 0.5rem; font-size: 1.2rem; }
+        .export-loading-box p { color: var(--text-muted); font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* الآلة الحاسبة المنبثقة */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.8);
-            backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            background: var(--bg-panel);
-            margin: 5% auto;
-            padding: 0;
-            border: 2px solid var(--border-light);
-            border-radius: 30px;
-            width: 90%;
-            max-width: 300px;
-            box-shadow: var(--shadow-glow);
-        }
-        .modal-header {
-            background: rgba(180,133,84,0.15);
-            border-bottom: 2px solid var(--border-light);
-            padding: 10px 15px;
-            border-radius: 28px 28px 0 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .modal-header h2 {
-            margin: 0;
-            color: var(--accent-soft);
-            font-size: 1rem;
-            font-weight: 900;
-        }
-        .close {
-            color: var(--text-muted);
-            float: left;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        /* فوتر */
+        .footer-simple { text-align: center; padding: 1.5rem; margin-top: 2rem; background: rgba(10,14,23,0.5); backdrop-filter: blur(5px); border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.85rem; }
+        .footer-simple span { color: var(--accent-soft); font-weight: 700; }
+
+        /* الآلة الحاسبة */
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(4px); }
+        .modal-content { background: var(--bg-panel); margin: 5% auto; padding: 0; border: 2px solid var(--border-light); border-radius: 30px; width: 90%; max-width: 300px; box-shadow: var(--shadow-glow); }
+        .modal-header { background: rgba(180,133,84,0.15); border-bottom: 2px solid var(--border-light); padding: 10px 15px; border-radius: 28px 28px 0 0; display: flex; align-items: center; justify-content: space-between; }
+        .modal-header h2 { margin: 0; color: var(--accent-soft); font-size: 1rem; font-weight: 900; }
+        .close { color: var(--text-muted); float: left; font-size: 24px; font-weight: bold; cursor: pointer; }
         .close:hover { color: var(--accent-glow); }
         .modal-body { padding: 15px; }
-        .calc-display {
-            width: 100%;
-            height: 45px;
-            font-size: 1.4rem;
-            text-align: left;
-            padding: 0 10px;
-            border: 2px solid var(--border-light);
-            border-radius: 20px;
-            margin-bottom: 15px;
-            background: rgba(10,14,23,0.8);
-            color: var(--accent-soft);
-            font-family: 'Inter', monospace;
-            direction: ltr;
-        }
-        .calc-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-        }
-        .calc-btn {
-            background: rgba(180,133,84,0.1);
-            border: 1px solid var(--border-light);
-            border-radius: 15px;
-            padding: 10px 0;
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-light);
-            cursor: pointer;
-        }
-        .calc-btn:hover {
-            background: rgba(180,133,84,0.3);
-            border-color: var(--accent-glow);
-        }
+        .calc-display { width: 100%; height: 45px; font-size: 1.4rem; text-align: left; padding: 0 10px; border: 2px solid var(--border-light); border-radius: 20px; margin-bottom: 15px; background: rgba(10,14,23,0.8); color: var(--accent-soft); font-family: 'Inter', monospace; direction: ltr; }
+        .calc-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+        .calc-btn { background: rgba(180,133,84,0.1); border: 1px solid var(--border-light); border-radius: 15px; padding: 10px 0; font-size: 1rem; font-weight: 700; color: var(--text-light); cursor: pointer; }
+        .calc-btn:hover { background: rgba(180,133,84,0.3); border-color: var(--accent-glow); }
         .calc-btn.operator { color: var(--accent-soft); }
-        .calc-btn.equals {
-            background: rgba(180,133,84,0.3);
-            color: white;
-            grid-column: span 2;
-        }
+        .calc-btn.equals { background: rgba(180,133,84,0.3); color: white; grid-column: span 2; }
         .calc-btn.equals:hover { background: rgba(180,133,84,0.5); }
 
-        /* زر الآلة الحاسبة العائم */
-        .calc-floating-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(180,133,84,0.2);
-            border: 1px solid var(--border-light);
-            border-radius: 50px;
-            padding: 0.8rem 1.2rem;
-            color: var(--accent-soft);
-            font-size: 1rem;
-            font-weight: 700;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .calc-floating-btn:hover {
-            background: rgba(180,133,84,0.4);
-            color: #fff;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 15px rgba(180,133,84,0.3);
-        }
+        .calc-floating-btn { position: fixed; bottom: 20px; left: 20px; background: rgba(180,133,84,0.2); border: 1px solid var(--border-light); border-radius: 50px; padding: 0.8rem 1.2rem; color: var(--accent-soft); font-size: 1rem; font-weight: 700; z-index: 100; backdrop-filter: blur(10px); cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 0.5rem; }
+        .calc-floating-btn:hover { background: rgba(180,133,84,0.4); color: #fff; border-color: var(--accent-glow); box-shadow: 0 0 15px rgba(180,133,84,0.3); }
 
-        /* تحسينات الجوال */
         @media (max-width: 768px) {
-            nav { display: none; }
             .hero-mini h2 { font-size: 2rem; }
-            .hero-mini p { font-size: 1rem; }
             .checklist-card { padding: 1.5rem; }
             .signature-row { flex-direction: column; }
             .item-row { flex-direction: column; align-items: flex-start; }
-            .item-row label { width: 100%; }
-            .risk-badge { align-self: flex-start; }
-            .notes-field { margin-right: 0; width: 100%; }
-            .recommendation-box { margin-right: 0; width: 100%; }
+            .notes-field, .recommendation-box { margin-right: 0; width: 100%; }
             .btn-group { flex-direction: column; }
             .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
             .result-area { flex-direction: column; align-items: flex-start; }
-            .calc-floating-btn { padding: 0.6rem 1rem; font-size: 0.9rem; bottom: 15px; left: 15px; }
         }
     </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 <body style="overflow-x: hidden;">
-<!-- خلفية متوهجة -->
-<div class="glow-bg">
-    <span></span>
-    <span></span>
-    <span></span>
-</div>
-
-<!-- أشكال هندسية -->
+<div class="glow-bg"><span></span><span></span><span></span></div>
 <div class="floating-shape shape-1"></div>
 <div class="floating-shape shape-2"></div>
 
-<!-- تم إزالة الـ NAV بالكامل -->
-
-<!-- Hero -->
 <section class="hero-mini">
     <h2>📋 نظام تدقيق HACCP المتقدم</h2>
     <p>تحليل المخاطر - توصيات تصحيحية فورية - تقارير احترافية</p>
 </section>
 
-<!-- Main Container -->
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">جاري إنشاء التقرير الاحترافي...</h3>
+        <p id="loadingMsg">يرجى الانتظار — قد يستغرق ذلك لحظات</p>
+    </div>
+</div>
+
 <div class="container">
     <div class="checklist-card" data-aos="fade-up">
         <h2><i class="fas fa-clipboard-check"></i> نموذج التدقيق اليومي مع تحليل المخاطر</h2>
 
-        <!-- تاريخ واسم المسؤول -->
         <div class="info-row">
             <div class="info-item">
                 <label><i class="fas fa-calendar-alt"></i> التاريخ</label>
@@ -600,7 +205,6 @@
             </div>
         </div>
 
-        <!-- قسم التوقيع (يظهر في التقرير) -->
         <div class="signature-row">
             <div class="signature-item">
                 <label><i class="fas fa-pen"></i> اسم المسؤول (للتوقيع)</label>
@@ -612,13 +216,11 @@
             </div>
         </div>
 
-        <!-- أقسام القائمة (جميع بنود HACCP الأساسية مع إضافة مستوى الخطر وملاحظات وتوصيات) -->
         <div id="checklistContainer">
             <!-- 1. الاستلام -->
             <div class="checklist-section">
                 <div class="section-title"><i class="fas fa-truck"></i> 1. مرحلة الاستلام</div>
                 
-                <!-- بند 1: درجة حرارة المواد -->
                 <div class="checklist-item" id="item-rec1">
                     <div class="item-row">
                         <input type="checkbox" id="rec1" class="haccp-item" data-risk="high" data-id="rec1">
@@ -631,7 +233,6 @@
                     <div id="recommendation-rec1" class="recommendation-box" style="display: none;"></div>
                 </div>
 
-                <!-- بند 2: سلامة العبوات -->
                 <div class="checklist-item" id="item-rec2">
                     <div class="item-row">
                         <input type="checkbox" id="rec2" class="haccp-item" data-risk="medium" data-id="rec2">
@@ -644,7 +245,6 @@
                     <div id="recommendation-rec2" class="recommendation-box" style="display: none;"></div>
                 </div>
 
-                <!-- بند 3: تواريخ الصلاحية -->
                 <div class="checklist-item" id="item-rec3">
                     <div class="item-row">
                         <input type="checkbox" id="rec3" class="haccp-item" data-risk="high" data-id="rec3">
@@ -657,7 +257,6 @@
                     <div id="recommendation-rec3" class="recommendation-box" style="display: none;"></div>
                 </div>
 
-                <!-- بند 4: شهادات صحية -->
                 <div class="checklist-item" id="item-rec4">
                     <div class="item-row">
                         <input type="checkbox" id="rec4" class="haccp-item" data-risk="medium" data-id="rec4">
@@ -670,7 +269,6 @@
                     <div id="recommendation-rec4" class="recommendation-box" style="display: none;"></div>
                 </div>
 
-                <!-- بند 5: فصل المواد -->
                 <div class="checklist-item" id="item-rec5">
                     <div class="item-row">
                         <input type="checkbox" id="rec5" class="haccp-item" data-risk="medium" data-id="rec5">
@@ -1204,7 +802,8 @@
         <!-- الأزرار -->
         <div class="btn-group">
             <button class="btn-primary" id="calculateBtn"><i class="fas fa-calculator"></i> احسب النتيجة والتوصيات</button>
-            <button class="btn-secondary" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير Word</button>
+            <button class="btn-primary" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel احترافي</button>
+            <button class="btn-secondary" id="exportWordBtn"><i class="fas fa-file-word"></i> تقرير Word كامل</button>
         </div>
     </div>
 </div>
@@ -1242,8 +841,8 @@
                 <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
                 <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
                 <button class="calc-btn" onclick="clearCalculator()">C</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
                 <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
                 <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
                 <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
                 <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
@@ -1252,352 +851,287 @@
     </div>
 </div>
 
+<!-- زر العودة للرئيسية -->
+<a href="index.html" style="position:fixed;bottom:20px;right:20px;background:rgba(180,133,84,0.9);color:white;padding:12px 20px;border-radius:50px;text-decoration:none;font-family:'Tajawal',sans-serif;font-weight:bold;backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,0.2);box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:9999;display:flex;align-items:center;gap:8px;transition:0.3s;" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';"><i class="fas fa-home"></i> الرئيسية</a>
+
 <!-- AOS -->
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
     AOS.init({ duration: 800, once: true, offset: 100 });
+    document.getElementById('checkDate').value = new Date().toISOString().split('T')[0];
 
-    // تعيين تاريخ اليوم تلقائياً
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('checkDate').value = today;
-
-    // قاعدة بيانات التوصيات التصحيحية
+    // قاعدة بيانات التوصيات التصحيحية الكاملة
     const correctiveActions = {
-        // الاستلام
         rec1: { risk: "مرتفع", action: "يجب رفض المواد إذا كانت درجة حرارتها أعلى من 4°C للمبردة أو -18°C للمجمدة.", recommendation: "استخدم مقياس حرارة معاير وسجل درجة الحرارة. إذا كانت مرتفعة، أعِد الشحنة فوراً." },
         rec2: { risk: "متوسط", action: "العبوات التالفة قد تسبب تلوثاً. يجب عزل المواد ذات العبوات التالفة.", recommendation: "افحص العبوات عند الاستلام. إذا وجدت تالفة، أعدها أو استخدمها فوراً بعد التأكد." },
         rec3: { risk: "مرتفع", action: "المواد منتهية الصلاحية يجب عدم استخدامها أبداً.", recommendation: "تحقق من التواريخ قبل الاستلام. أي مادة منتهية يجب رفضها." },
         rec4: { risk: "متوسط", action: "المواد عالية الخطورة (لحوم، دواجن) تحتاج شهادة صحية.", recommendation: "اطلب الشهادة من المورد واحتفظ بها في الملف." },
         rec5: { risk: "متوسط", action: "المواد النيئة قد تلوث الجاهزة إذا لم تفصل.", recommendation: "خصص منطقة منفصلة في شاحنة التوصيل للمواد النيئة والجاهزة." },
-
-        // التخزين
         sto1: { risk: "مرتفع", action: "درجة حرارة الثلاجة يجب أن تكون ≤ 4°C لمنع نمو البكتيريا.", recommendation: "افحص درجة الحرارة وسجلها يومياً. إذا كانت مرتفعة، اضبط الثلاجة أو استدع فني صيانة." },
         sto2: { risk: "مرتفع", action: "درجة حرارة المجمد يجب أن تكون ≤ -18°C.", recommendation: "سجل درجة الحرارة مرتين يومياً. أي ارتفاع يستدعي فحص الجهاز." },
         sto3: { risk: "متوسط", action: "المواد النيئة تحت المواد المطبوخة تمنع تسرب السوائل.", recommendation: "أعد تنظيم الرفوف بحيث تكون المواد النيئة في الأسفل." },
         sto4: { risk: "مرتفع", action: "المواد الكيميائية يجب تخزينها بعيداً عن الغذاء.", recommendation: "خصص خزانة منفصلة ومغلقة للمواد الكيميائية." },
         sto5: { risk: "متوسط", action: "تراكم الثلج يقلل كفاءة التبريد.", recommendation: "قم بإزالة الثلج بشكل دوري ونظف الثلاجات." },
         sto6: { risk: "متوسط", action: "FIFO يمنع انتهاء الصلاحية.", recommendation: "ضع المواد الجديدة خلف القديمة، وأشر على العبوات بالتاريخ." },
-
-        // التحضير
         prep1: { risk: "مرتفع", action: "غسل اليدين يمنع التلوث المتبادل.", recommendation: "وفر محطات غسل يدين بالقرب من مناطق التحضير، وراقب الالتزام." },
         prep2: { risk: "مرتفع", action: "استخدام ألواح منفصلة يمنع انتقال البكتيريا.", recommendation: "استخدم ألواح ملونة مختلفة (أحمر للحوم، أخضر للخضار، إلخ)." },
         prep3: { risk: "مرتفع", action: "تعقيم الأدوات بعد المواد النيئة ضروري.", recommendation: "استخدم معقمات معتمدة واتبع تعليمات التركيز." },
         prep4: { risk: "مرتفع", action: "الأطعمة القابلة للتلف لا تترك خارج التبريد أكثر من ساعتين.", recommendation: "تأكد من إعادة الأطعمة سريعاً إلى الثلاجة أو استخدم طاولات مبردة." },
         prep5: { risk: "مرتفع", action: "إذابة الأغذية في درجة حرارة الغرفة يسمح بنمو البكتيريا.", recommendation: "خطط مسبقاً وضع الأغذية في الثلاجة ليلة كاملة، أو استخدم الميكروويف." },
-
-        // الطهي
         cook1: { risk: "مرتفع", action: "عدم وصول الدواجن إلى 74°C يعني بقاء البكتيريا الضارة.", recommendation: "استخدم مقياس حرارة الطعام وسجل درجة الحرارة في منتصف القطعة." },
         cook2: { risk: "مرتفع", action: "اللحوم المفرومة تحتاج 71°C لقتل البكتيريا.", recommendation: "لا تعتمد على اللون، استخدم مقياس الحرارة دائماً." },
         cook3: { risk: "مرتفع", action: "الأسماك تحتاج 63°C.", recommendation: "تأكد من وصول السمك لدرجة الحرارة المناسبة." },
         cook4: { risk: "مرتفع", action: "إعادة التسخين غير الكافية تسمح بنمو البكتيريا.", recommendation: "أعد التسخين إلى 74°C خلال ساعتين." },
         cook5: { risk: "متوسط", action: "تسجيل درجات الحرارة مهم للتوثيق.", recommendation: "احتفظ بسجل يومي لدرجات حرارة الطهي." },
-
-        // التبريد
         cool1: { risk: "مرتفع", action: "التبريد البطيء يسمح بنمو البكتيريا.", recommendation: "استخدم أوعية ضحلة، وضعها في حمام ثلج، أو استخدم مبرّد سريع." },
         cool2: { risk: "مرتفع", action: "يجب إكمال التبريد إلى 4°C خلال 6 ساعات إجمالاً.", recommendation: "راقب الوقت ودرجة الحرارة، واستخدم أدوات تبريد مناسبة." },
         cool3: { risk: "متوسط", action: "الأوعية الضحلة تساعد على التبريد السريع.", recommendation: "استخدم أواني بعمق أقل من 10 سم." },
         cool4: { risk: "متوسط", action: "تغطية الأطعمة تمنع التلوث والجفاف.", recommendation: "استخدم أغطية بلاستيكية أو أطباق تغطية." },
-
-        // النظافة الشخصية
         per1: { risk: "متوسط", action: "الزي النظيف يمنع نقل الملوثات.", recommendation: "وفر زياً نظيفاً يومياً، واستخدم مئزراً نظيفاً." },
         per2: { risk: "متوسط", action: "تغطية الشعر تمنع سقوطه في الطعام.", recommendation: "وفر شبكات شعر للجميع، وراقب الالتزام." },
         per3: { risk: "منخفض", action: "المجوهرات قد تؤوي البكتيريا أو تسقط في الطعام.", recommendation: "اطلب من الموظفين خلعها قبل البدء." },
         per4: { risk: "منخفض", action: "الأظافر الطويلة أو المطلية قد تحتوي بكتيريا.", recommendation: "قم بفحص دوري ووفّر أدوات تقليم." },
         per5: { risk: "مرتفع", action: "العامل المريض قد ينقل الأمراض.", recommendation: "اطلب من الموظفين إبلاغ المشرف وعدم العمل أثناء المرض." },
         per6: { risk: "مرتفع", action: "غسل اليدين بعد الأنشطة المذكورة ضروري.", recommendation: "وفر مغاسل وصابون ومعقمات، ودرب الموظفين على الوقت الكافي للغسل." },
-
-        // التنظيف
         clean1: { risk: "مرتفع", action: "الأسطح غير النظيفة تلوث الطعام.", recommendation: "نظف وعقم فوراً بعد كل استخدام باستخدام مواد مناسبة." },
         clean2: { risk: "مرتفع", action: "الأحواض قد تكون مصدر تلوث.", recommendation: "نظفها يومياً بمطهر." },
         clean3: { risk: "متوسط", action: "بقايا الطعام على الأرض تجذب الآفات.", recommendation: "امسح الأرضيات فوراً بعد الانسكابات ونظفها يومياً." },
         clean4: { risk: "مرتفع", action: "المواد غير المعتمدة أو التركيز الخاطئ لا تعقم.", recommendation: "استخدم مواد معتمدة واتبع التعليمات بدقة." },
         clean5: { risk: "متوسط", action: "جدول التنظيف يضمن عدم نسيان المهام.", recommendation: "علق جدولاً واضحاً ووقع عليه بعد كل مهمة." },
-
-        // مكافحة الآفات
         pest1: { risk: "مرتفع", action: "وجود آفات يعني خطر تلوث.", recommendation: "اتصل بشركة مكافحة فوراً وابحث عن مصدر الدخول." },
         pest2: { risk: "مرتفع", action: "الفتحات تسمح بدخول الآفات.", recommendation: "افحص وسد جميع الفتحات باستخدام سيلكون أو شبوك." },
         pest3: { risk: "متوسط", action: "المصائد تراقب وجود الآفات.", recommendation: "ركّز على الأماكن التي يحتمل وجود الآفات فيها." },
         pest4: { risk: "مرتفع", action: "شركة متخصصة تضمن مكافحة فعالة.", recommendation: "احتفظ بعقد وتقارير الزيارات." },
-
-        // التوثيق
         doc1: { risk: "مرتفع", action: "عدم تسجيل درجات الحرارة يجعل المراقبة مستحيلة.", recommendation: "سجل درجات الحرارة مرتين يومياً في سجل مخصص." },
         doc2: { risk: "مرتفع", action: "تسجيل الطهي ضروري للتدقيق.", recommendation: "احتفظ بسجل لدرجات حرارة الطهي والتبريد." },
         doc3: { risk: "متوسط", action: "سجلات الاستلام مهمة للتتبع.", recommendation: "احتفظ بالسجلات لمدة 6 أشهر على الأقل." },
         doc4: { risk: "متوسط", action: "التوقيع يثبت المسؤولية.", recommendation: "اطلب من المسؤول التوقيع يومياً على السجلات." },
-
-        // التدريب
         tr1: { risk: "مرتفع", action: "الموظفون غير المدربين قد يسببون مخاطر.", recommendation: "وفر تدريباً دورياً وسجل حضور الموظفين." },
         tr2: { risk: "متوسط", action: "التعليمات المعلقة تذكر العاملين.", recommendation: "علق لوحات في أماكن بارزة توضح إجراءات السلامة." },
         tr3: { risk: "متوسط", action: "التذكير الدوري يعزز الوعي.", recommendation: "عقد اجتماعات يومية سريعة للتذكير." }
     };
 
-    // إظهار التوصيات بناءً على حالة checkbox
     function setupRecommendations() {
-        const items = document.querySelectorAll('.haccp-item');
-        items.forEach(item => {
+        document.querySelectorAll('.haccp-item').forEach(item => {
             item.addEventListener('change', function() {
                 const id = this.dataset.id;
                 const recBox = document.getElementById(`recommendation-${id}`);
                 if (!this.checked) {
-                    // غير مطابق -> أظهر التوصية
                     const data = correctiveActions[id];
                     if (data) {
                         recBox.style.display = 'block';
-                        recBox.innerHTML = `
-                            <strong>⚠️ مستوى الخطر: ${data.risk}</strong><br>
-                            <strong>الإجراء التصحيحي:</strong> ${data.action}<br>
-                            <strong>التوصية:</strong> ${data.recommendation}
-                        `;
-                    } else {
-                        recBox.style.display = 'none';
+                        recBox.innerHTML = `<strong>⚠️ مستوى الخطر: ${data.risk}</strong><br><strong>الإجراء التصحيحي:</strong> ${data.action}<br><strong>التوصية:</strong> ${data.recommendation}`;
                     }
                 } else {
-                    // مطابق -> أخفِ التوصية
                     recBox.style.display = 'none';
                 }
             });
         });
     }
 
-    // حساب النتيجة الإجمالية ومستوى الخطر العام
-    document.getElementById('calculateBtn').addEventListener('click', function() {
-        const items = document.querySelectorAll('.haccp-item');
-        let checked = 0;
-        items.forEach(item => {
-            if (item.checked) checked++;
-        });
-        const total = items.length;
-        const percent = Math.round((checked / total) * 100);
-        const resultArea = document.getElementById('resultArea');
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const evaluationText = document.getElementById('evaluationText');
-        const overallRiskDisplay = document.getElementById('overallRiskDisplay');
-
-        resultArea.style.display = 'flex';
-        scoreDisplay.textContent = percent + '%';
-
-        let evaluation = '';
-        let overallRiskLevel = '';
-        let riskClass = '';
-        if (percent === 100) {
-            evaluation = 'ممتاز! امتثال كامل لمعايير HACCP.';
-            overallRiskLevel = 'منخفض';
-            riskClass = 'risk-level-low';
-        } else if (percent >= 90) {
-            evaluation = 'جيد جداً، مع بعض التحسينات البسيطة.';
-            overallRiskLevel = 'منخفض';
-            riskClass = 'risk-level-low';
-        } else if (percent >= 75) {
-            evaluation = 'مقبول، لكن هناك ملاحظات يجب معالجتها.';
-            overallRiskLevel = 'متوسط';
-            riskClass = 'risk-level-medium';
-        } else if (percent >= 50) {
-            evaluation = 'تحتاج إلى تحسين كبير في عدة مجالات.';
-            overallRiskLevel = 'مرتفع';
-            riskClass = 'risk-level-high';
-        } else {
-            evaluation = 'غير مطابق للمعايير – خطر صحي محتمل.';
-            overallRiskLevel = 'مرتفع جداً';
-            riskClass = 'risk-level-high';
-        }
-
-        evaluationText.textContent = evaluation;
-        overallRiskDisplay.textContent = `مستوى الخطر العام: ${overallRiskLevel}`;
-        overallRiskDisplay.className = `overall-risk ${riskClass}`;
-    });
-
-    // تصدير Word مع جميع البيانات (بما في ذلك الملاحظات والتوصيات)
-    document.getElementById('exportWordBtn').addEventListener('click', function() {
+    // دالة جمع بيانات التدقيق
+    function collectAuditData() {
         const date = document.getElementById('checkDate').value;
         const inspector = document.getElementById('inspectorName').value || 'غير محدد';
         const signatureName = document.getElementById('signatureName').value || inspector;
         const signature = document.getElementById('signature').value || '';
-
-        // جمع بنود الأقسام مع الملاحظات والتوصيات
-        const sections = document.querySelectorAll('.checklist-section');
-        let itemsHTML = '';
-        sections.forEach(section => {
-            const sectionTitle = section.querySelector('.section-title').innerText;
-            itemsHTML += `<h3 style="color:#b8860b; margin-top:20px;">${sectionTitle}</h3>`;
-
-            const checklistItems = section.querySelectorAll('.checklist-item');
-            checklistItems.forEach(item => {
-                const checkbox = item.querySelector('input[type="checkbox"]');
-                const label = item.querySelector('label').innerText;
-                const note = item.querySelector('textarea')?.value || '';
-                const riskBadge = item.querySelector('.risk-badge')?.innerText || '';
-                const status = checkbox.checked ? '✅ مطابق' : '❌ غير مطابق';
-                const id = checkbox.dataset.id;
-                const data = correctiveActions[id];
-                const recommendationText = (!checkbox.checked && data) ? 
-                    `<p style="color:#856404; margin-top:5px;"><strong>التوصية:</strong> ${data.recommendation}</p>` : '';
-
-                itemsHTML += `
-                    <div style="margin:10px 0; padding:10px; border-bottom:1px solid #eee;">
-                        <p><strong>${status}</strong> - ${label} (${riskBadge})</p>
-                        ${note ? `<p><strong>ملاحظات:</strong> ${note}</p>` : ''}
-                        ${recommendationText}
-                    </div>
-                `;
+        const items = document.querySelectorAll('.haccp-item');
+        let checked = 0;
+        const details = [];
+        items.forEach(item => {
+            const id = item.dataset.id;
+            const label = item.closest('.checklist-item').querySelector('label').innerText;
+            const note = document.getElementById(`note-${id}`)?.value || '';
+            const status = item.checked;
+            if (status) checked++;
+            const data = correctiveActions[id] || {};
+            details.push({
+                id, label, status, note,
+                risk: data.risk || '',
+                action: data.action || '',
+                recommendation: data.recommendation || ''
             });
         });
+        const total = items.length;
+        const percent = Math.round((checked / total) * 100);
+        let evaluation = '', overallRiskLevel = '';
+        if (percent === 100) { evaluation = 'ممتاز! امتثال كامل'; overallRiskLevel = 'منخفض'; }
+        else if (percent >= 90) { evaluation = 'جيد جداً'; overallRiskLevel = 'منخفض'; }
+        else if (percent >= 75) { evaluation = 'مقبول'; overallRiskLevel = 'متوسط'; }
+        else if (percent >= 50) { evaluation = 'يحتاج تحسين'; overallRiskLevel = 'مرتفع'; }
+        else { evaluation = 'غير مطابق'; overallRiskLevel = 'مرتفع جداً'; }
+        return { date, inspector, signatureName, signature, details, checked, total, percent, evaluation, overallRiskLevel };
+    }
 
-        // النتيجة النهائية
-        const score = document.getElementById('scoreDisplay').textContent;
-        const evaluation = document.getElementById('evaluationText').textContent;
-        const overallRisk = document.getElementById('overallRiskDisplay').textContent;
-
-        const style = `
-            <style>
-                body { font-family: 'Tajawal', sans-serif; margin: 2rem; }
-                h1 { color: #b8860b; border-bottom: 2px solid #b8860b; }
-                h2 { color: #b8860b; margin-top: 30px; }
-                .result { background: #fef6e6; padding: 1rem; border-right: 4px solid #b8860b; }
-                .signature { margin-top: 40px; display: flex; justify-content: space-between; }
-            </style>
-        `;
-
-        const content = `
-            <!DOCTYPE html>
-            <html dir="rtl">
-            <head>
-                <meta charset="UTF-8">
-                <title>تقرير تدقيق HACCP المتقدم</title>
-                ${style}
-            </head>
-            <body>
-                <h1>📋 تقرير التدقيق اليومي لنظام HACCP مع تحليل المخاطر</h1>
-                <p><strong>التاريخ:</strong> ${date}</p>
-                <p><strong>المسؤول:</strong> ${inspector}</p>
-                <hr>
-                ${itemsHTML}
-                <hr>
-                <div class="result">
-                    <h2>النتيجة النهائية</h2>
-                    <p style="font-size:1.5rem; font-weight:900;">${score}</p>
-                    <p>${evaluation}</p>
-                    <p>${overallRisk}</p>
-                </div>
-
-                <!-- توقيع المسؤول -->
-                <div class="signature">
-                    <div>
-                        <p><strong>اسم المسؤول:</strong> ${signatureName}</p>
-                    </div>
-                    <div>
-                        <p><strong>التوقيع:</strong> ${signature || "________________"}</p>
-                    </div>
-                </div>
-
-                <p style="margin-top:40px; color:#777;">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة</p>
-            </body>
-            </html>
-        `;
-
-        const blob = new Blob(['\uFEFF' + content], { type: 'application/msword' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `تقرير_HACCP_${date}.doc`;
-        link.click();
-        URL.revokeObjectURL(link.href);
+    document.getElementById('calculateBtn').addEventListener('click', function() {
+        const data = collectAuditData();
+        document.getElementById('resultArea').style.display = 'flex';
+        document.getElementById('scoreDisplay').textContent = data.percent + '%';
+        document.getElementById('evaluationText').textContent = data.evaluation;
+        const riskEl = document.getElementById('overallRiskDisplay');
+        riskEl.textContent = `مستوى الخطر العام: ${data.overallRiskLevel}`;
+        riskEl.className = 'overall-risk ' + (data.overallRiskLevel.includes('منخفض') ? 'risk-level-low' : (data.overallRiskLevel.includes('متوسط') ? 'risk-level-medium' : 'risk-level-high'));
     });
 
-    // تفعيل التوصيات
-    setupRecommendations();
+    // دوال التحميل
+    function showLoading(title, msg) {
+        document.getElementById('loadingTitle').textContent = title;
+        document.getElementById('loadingMsg').textContent = msg;
+        document.getElementById('exportLoading').classList.add('show');
+    }
+    function hideLoading() { document.getElementById('exportLoading').classList.remove('show'); }
 
-    // ------------------ آلة حاسبة منبثقة ------------------
+    // تصدير Excel احترافي
+    async function exportToFullExcel() {
+        const data = collectAuditData();
+        showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'يرجى الانتظار');
+        try {
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'FAROUK GRUP';
+            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035';
+            const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
+            const PT = 'FF155724', NT = 'FF721C24';
+
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+
+            // غلاف
+            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true }] });
+            [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+            cv.getRow(2).height=80; cv.getRow(4).height=60;
+            cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+            bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'}; bc.border={bottom:{style:'thick',color:{argb:G}}};
+            mh(cv,1,4,4,`تقرير تدقيق HACCP\n${data.inspector}`,DB,GL,18);
+            const inf=[['📋 التاريخ',data.date],['👤 المسؤول',data.inspector],['📊 النسبة',`${data.percent}%`],['⚠️ مستوى الخطر',data.overallRiskLevel]];
+            let ir=6;
+            inf.forEach(([l,v],idx)=>{
+                cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+                const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+                const bg=idx%2===0?AR:'FFFEFCF6';
+                lc.font={name:'Arial',bold:true,size:11,color:{argb:'00695C'}}; lc.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; lc.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                vc.font={name:'Arial',size:11,color:{argb:DT}}; vc.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; vc.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
+                cv.getRow(ir).height=28; ir++;
+            });
+
+            // تفاصيل التدقيق
+            const detailSheet = workbook.addWorksheet('تفاصيل التدقيق', { views: [{ rightToLeft: true }] });
+            detailSheet.getColumn(1).width = 5; detailSheet.getColumn(2).width = 50; detailSheet.getColumn(3).width = 15; detailSheet.getColumn(4).width = 20; detailSheet.getColumn(5).width = 30; detailSheet.getColumn(6).width = 5;
+            mh(detailSheet,1,6,1,'📋 قائمة تدقيق HACCP',DB,GL,14);
+            detailSheet.getRow(1).height=40;
+            detailSheet.addRow(['البند', 'الحالة', 'مستوى الخطر', 'ملاحظات', 'التوصية']);
+            const headerRow = detailSheet.getRow(2);
+            headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+            data.details.forEach(item => {
+                detailSheet.addRow([item.label, item.status ? '✅ مطابق' : '❌ غير مطابق', item.risk, item.note, item.status ? '' : item.recommendation]);
+            });
+
+            // ملخص النتائج
+            const summarySheet = workbook.addWorksheet('ملخص النتائج', { views: [{ rightToLeft: true }] });
+            summarySheet.getColumn(1).width = 30; summarySheet.getColumn(2).width = 40;
+            summarySheet.getCell('A1').value = 'النسبة المئوية للامتثال'; summarySheet.getCell('B1').value = `${data.percent}%`;
+            summarySheet.getCell('A2').value = 'التقييم'; summarySheet.getCell('B2').value = data.evaluation;
+            summarySheet.getCell('A3').value = 'مستوى الخطر العام'; summarySheet.getCell('B3').value = data.overallRiskLevel;
+            summarySheet.getCell('A4').value = 'توقيع المسؤول'; summarySheet.getCell('B4').value = `${data.signatureName} - ${data.signature}`;
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, `تقرير_HACCP_${data.date}.xlsx`);
+        } catch(err) { alert('خطأ Excel: '+err.message); }
+        finally { hideLoading(); }
+    }
+
+    // تصدير Word احترافي
+    async function exportToWord() {
+        const data = collectAuditData();
+        showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات');
+        try {
+            const resultArea = document.getElementById('resultArea');
+            let resultImg = '';
+            if (resultArea) {
+                const canvas = await html2canvas(resultArea, { scale: 2, backgroundColor: '#ffffff' });
+                resultImg = canvas.toDataURL('image/png');
+            }
+
+            let itemsHTML = '';
+            data.details.forEach(item => {
+                itemsHTML += `
+                    <tr>
+                        <td>${item.label}</td>
+                        <td style="color:${item.status?'#155724':'#721c24'};">${item.status ? '✅ مطابق' : '❌ غير مطابق'}</td>
+                        <td>${item.risk}</td>
+                        <td>${item.note || '-'}</td>
+                        <td>${item.status ? '-' : item.recommendation}</td>
+                    </tr>
+                `;
+            });
+
+            const fullHtml = `<!DOCTYPE html>
+            <html dir="rtl">
+            <head><meta charset="utf-8"><title>تقرير HACCP - FAROUK GRUP</title>
+            <style>
+                body{font-family:'Tajawal',sans-serif;margin:2rem;background:#fff;color:#333;}
+                h1{color:#b8860b;border-bottom:2px solid #b8860b;}
+                table{width:100%;border-collapse:collapse;margin:20px 0;}
+                th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                th{background:#fefcf6;color:#b8860b;}
+                .signature{margin-top:40px;display:flex;justify-content:space-between;}
+            </style></head>
+            <body>
+                <h1>📋 تقرير التدقيق اليومي لنظام HACCP</h1>
+                <p><strong>التاريخ:</strong> ${data.date} | <strong>المسؤول:</strong> ${data.inspector}</p>
+                ${resultImg ? `<div style="text-align:center;margin:20px 0;"><img src="${resultImg}" style="max-width:100%;border:1px solid #b8860b;"/></div>` : ''}
+                <h2>نتيجة التدقيق: ${data.percent}% - ${data.evaluation} (مستوى الخطر: ${data.overallRiskLevel})</h2>
+                <table>
+                    <thead><tr><th>البند</th><th>الحالة</th><th>مستوى الخطر</th><th>ملاحظات</th><th>التوصية</th></tr></thead>
+                    <tbody>${itemsHTML}</tbody>
+                </table>
+                <div class="signature">
+                    <div><strong>اسم المسؤول:</strong> ${data.signatureName}</div>
+                    <div><strong>التوقيع:</strong> ${data.signature || '________________'}</div>
+                </div>
+                <p style="margin-top:40px;color:#777;">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${new Date().getFullYear()}</p>
+            </body></html>`;
+
+            const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `تقرير_HACCP_${data.date}.doc`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        } catch(err) { alert('خطأ Word: '+err.message); }
+        finally { hideLoading(); }
+    }
+
+    document.getElementById('exportExcelBtn').addEventListener('click', exportToFullExcel);
+    document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+
+    // الآلة الحاسبة
     const calcDisplay = document.getElementById('calcDisplay');
     let currentCalcInput = '';
-
-    function safeEvaluate(expression) {
-        let expr = expression.replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/');
-        if (!/^[0-9+\-*/().]+$/.test(expr)) throw new Error('تعبير غير صالح');
-        return new Function('return ' + expr)();
-    }
-
-    window.handleCalculatorInput = function(value) {
-        currentCalcInput += value;
-        calcDisplay.value = currentCalcInput;
-    }
-
-    window.clearCalculator = function() {
-        currentCalcInput = '';
-        calcDisplay.value = '';
-    }
-
-    window.backspaceCalculator = function() {
-        currentCalcInput = currentCalcInput.slice(0, -1);
-        calcDisplay.value = currentCalcInput;
-    }
-
-    window.calculateCalculatorResult = function() {
-        try {
-            let result = safeEvaluate(currentCalcInput);
-            calcDisplay.value = result;
-            currentCalcInput = result.toString();
-        } catch (e) {
-            calcDisplay.value = 'خطأ';
-            currentCalcInput = '';
-        }
-    }
-
-    function handleKeyboard(e) {
-        if (modal.style.display !== 'block') return;
-        const key = e.key;
-        e.preventDefault();
-        e.stopPropagation();
-        if (key >= '0' && key <= '9') handleCalculatorInput(key);
-        else if (key === '.') handleCalculatorInput('.');
-        else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
-        else if (key === 'Enter' || key === '=') calculateCalculatorResult();
-        else if (key === 'Backspace') backspaceCalculator();
-        else if (key === 'Escape') modal.style.display = 'none';
-        else if (key === 'c' || key === 'C') clearCalculator();
-    }
-
-    document.addEventListener('keydown', handleKeyboard);
-
+    function safeEvaluate(expr) { try { if (!/^[0-9+\-*/().\s]+$/.test(expr)) throw new Error(); expr = expr.replace(/÷/g, '/').replace(/×/g, '*'); return new Function('return (' + expr + ')')(); } catch { return 'خطأ'; } }
+    window.handleCalculatorInput = (v) => { currentCalcInput += v; calcDisplay.value = currentCalcInput; };
+    window.clearCalculator = () => { currentCalcInput = ''; calcDisplay.value = ''; };
+    window.backspaceCalculator = () => { currentCalcInput = currentCalcInput.slice(0,-1); calcDisplay.value = currentCalcInput; };
+    window.calculateCalculatorResult = () => { if (!currentCalcInput) return; const r = safeEvaluate(currentCalcInput); calcDisplay.value = r; currentCalcInput = r.toString(); };
     const modal = document.getElementById('calculatorModal');
-    const btn = document.getElementById('calculatorBtn');
-    const span = document.getElementsByClassName('close')[0];
-
-    btn.onclick = function(e) {
+    document.getElementById('calculatorBtn').onclick = (e) => { e.preventDefault(); modal.style.display = 'block'; };
+    document.querySelector('.close').onclick = () => modal.style.display = 'none';
+    window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+    document.addEventListener('keydown', (e) => {
+        if (modal.style.display !== 'block') return;
         e.preventDefault();
-        modal.style.display = 'block';
-    }
+        const k = e.key;
+        if (k>='0'&&k<='9') handleCalculatorInput(k);
+        else if (k=='.') handleCalculatorInput('.');
+        else if (k=='+'||k=='-'||k=='*'||k=='/') handleCalculatorInput(k);
+        else if (k=='Enter'||k=='=') calculateCalculatorResult();
+        else if (k=='Backspace') backspaceCalculator();
+        else if (k=='Escape') modal.style.display = 'none';
+        else if (k.toLowerCase()=='c') clearCalculator();
+    });
 
-    span.onclick = function() {
-        modal.style.display = 'none';
-    }
-
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
-    }
+    setupRecommendations();
 </script>
-<!-- زر العودة إلى الرئيسية (عائم في اليمين) -->
-<a href="index.html" style="
-    position: fixed;
-    bottom: 20px;
-    right: 20px; /* وضعه في اليمين بدلاً من اليسار */
-    background: rgba(180,133,84,0.9);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-family: 'Tajawal', sans-serif;
-    font-weight: bold;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.3s;
-" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';">
-    <i class="fas fa-home"></i> الرئيسية
-</a>
 </body>
 </html>
