@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <title>نموذج تقييم الموظفين | FAROUK GRUP</title>
+    <!-- حماية الصفحة -->
+    <script src="auth-check.js"></script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- AOS Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- html2canvas & ExcelJS & FileSaver -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* جميع الأنماط من الهوية الأصلية مع تعديلات تناسب التقييم */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0b0e17;
+            --bg-panel: rgba(18, 24, 36, 0.85);
+            --bg-card: rgba(22, 30, 46, 0.8);
+            --border-light: rgba(180, 133, 84, 0.25);
+            --accent-glow: #b48554;
+            --accent-soft: #cfa776;
+            --text-light: #f0f4fa;
+            --text-muted: #aab7d4;
+            --text-dark: #0b0e17;
+            --shadow-soft: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 133, 84, 0.15);
+            --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
+            --radius-md: 20px;
+            --radius-lg: 30px;
+            --transition: all 0.3s ease;
+            --gold: #b8860b;
+            --gold-light: #d4b15a;
+            --gold-soft: rgba(184,134,11,0.1);
+            --dark: #0f0f0f;
+            --dark-light: #1a1a1a;
+            --white: #ffffff;
+            --offwhite: #f9f9f9;
+            --text: #333;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+        }
+        .glow-bg { position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 0; }
+        .glow-bg span { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%); border-radius: 50%; filter: blur(80px); animation: glowMove 20s infinite alternate ease-in-out; }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(180,133,84,0.12) 0%, transparent 70%); }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.1) 0%, transparent 70%); animation-delay: -5s; }
+        @keyframes glowMove { 0% { transform: translate(0, 0) scale(1); opacity: 0.5; } 100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; } }
+        .floating-shape { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%); z-index: 0; pointer-events: none; }
+        .shape-1 { top: -100px; right: -100px; animation: float 20s infinite ease-in-out; }
+        .shape-2 { bottom: -50px; left: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
+        @keyframes float { 0% { transform: translate(0,0) rotate(0deg); } 33% { transform: translate(30px,-30px) rotate(5deg); } 66% { transform: translate(-20px,20px) rotate(-5deg); } 100% { transform: translate(0,0) rotate(0deg); } }
+        
+        .hero-mini {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 1rem;
+            border-bottom: 4px solid var(--gold);
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+        }
+        .hero-mini::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
+            animation: rotate 40s linear infinite;
+        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .hero-mini h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--gold-light);
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+        .hero-mini p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.95;
+            position: relative;
+            z-index: 2;
+        }
+        .calc-wrapper {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 2;
+        }
+        .calc-box {
+            background: var(--bg-panel);
+            backdrop-filter: blur(15px);
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            overflow: hidden;
+        }
+        .calc-box:hover {
+            box-shadow: var(--shadow-glow);
+            border-color: rgba(180,133,84,0.4);
+        }
+        .featured-badge {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background: linear-gradient(135deg, var(--accent-glow), var(--gold-light));
+            color: #111;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            font-weight: 900;
+            border: 3px solid white;
+            z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+        .calc-box h2 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f0e6d2, #cfa776);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .personal-info {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-light);
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.8rem 1.2rem;
+        }
+        .info-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+        .info-field label {
+            font-weight: 700;
+            color: var(--accent-soft);
+            font-size: 0.85rem;
+        }
+        .info-field input, .info-field select {
+            background: rgba(10,14,23,0.7);
+            border: 2px solid var(--border-light);
+            border-radius: 30px;
+            padding: 0.6rem 1rem;
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            width: 100%;
+            outline: none;
+        }
+        .info-field input:focus, .info-field select:focus {
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.2);
+        }
+        .info-field input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .progress-area {
+            background: var(--bg-card);
+            border-radius: 60px;
+            padding: 0.6rem 1.5rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            border: 1px solid var(--border-light);
+        }
+        .counter {
+            background: rgba(10,14,23,0.6);
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            color: var(--gold-light);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .progress-bar-bg {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-dark);
+            border-radius: 20px;
+            overflow: hidden;
+            min-width: 80px;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-glow), var(--gold-light));
+            border-radius: 20px;
+            transition: width 0.25s ease;
+        }
+
+        .questions-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+            max-height: 65vh;
+            overflow-y: auto;
+            padding-left: 5px;
+        }
+        .questions-grid::-webkit-scrollbar { width: 6px; }
+        .questions-grid::-webkit-scrollbar-track { background: var(--bg-dark); border-radius: 10px; }
+        .questions-grid::-webkit-scrollbar-thumb { background: var(--accent-glow); border-radius: 10px; }
+
+        .domain-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 1.2rem 1.5rem;
+            border: 1px solid var(--border-light);
+        }
+        .domain-title {
+            color: var(--accent-soft);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 2px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .domain-title .num-badge {
+            background: var(--accent-glow);
+            color: #0b0e17;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 800;
+        }
+        .question-item {
+            background: rgba(10,14,23,0.4);
+            border-radius: var(--radius-md);
+            padding: 0.8rem 1.2rem;
+            margin-bottom: 0.8rem;
+            border: 1px solid var(--border-light);
+            transition: var(--transition);
+        }
+        .question-item:last-child { margin-bottom: 0; }
+        .question-item:hover { border-color: var(--accent-glow); }
+        .question-text {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+        .q-num {
+            background: var(--accent-glow);
+            color: #0b0e17;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            margin-left: 0.5rem;
+            flex-shrink: 0;
+        }
+        .options-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.8rem;
+            justify-content: flex-start;
+        }
+        .radio-option {
+            background: rgba(10,14,23,0.6);
+            border-radius: 50px;
+            padding: 0.3rem 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--border-light);
+        }
+        .radio-option.selected {
+            background: rgba(180,133,84,0.25);
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 0 2px rgba(180,133,84,0.3);
+        }
+        .radio-option input {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: transparent;
+            margin: 0;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .radio-option input:checked {
+            border-color: var(--gold-light);
+            background: var(--gold-light);
+            box-shadow: inset 0 0 0 4px rgba(10,14,23,0.8);
+        }
+        .radio-option label {
+            color: var(--text-light);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .radio-option:hover {
+            background: rgba(180,133,84,0.15);
+        }
+
+        .action-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .result-btn, .export-btn {
+            flex: 1;
+            min-width: 160px;
+            background: rgba(180,133,84,0.2);
+            border: 1px solid var(--border-light);
+            border-radius: 50px;
+            padding: 0.9rem 1.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--accent-soft);
+            font-family: 'Tajawal', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .result-btn:hover, .export-btn:hover {
+            background: rgba(180,133,84,0.4);
+            color: #fff;
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 15px rgba(180,133,84,0.3);
+            transform: translateY(-2px);
+        }
+        .export-btn {
+            background: rgba(42,122,90,0.2);
+            border-color: rgba(42,122,90,0.3);
+            color: #7fc9a5;
+        }
+        .export-btn:hover {
+            background: rgba(42,122,90,0.4);
+            border-color: #2a7a5a;
+            color: #fff;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-container {
+            background: var(--bg-panel);
+            border-radius: var(--radius-lg);
+            max-width: 650px;
+            width: 100%;
+            max-height: 90vh;
+            border: 2px solid var(--border-light);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-glow);
+            transform: scale(0.9);
+            transition: transform 0.2s;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+        .modal-container::-webkit-scrollbar { width: 4px; }
+        .modal-container::-webkit-scrollbar-track { background: var(--bg-dark); border-radius: 10px; }
+        .modal-container::-webkit-scrollbar-thumb { background: var(--accent-glow); border-radius: 10px; }
+        .modal-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .modal-title {
+            color: var(--accent-soft);
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+        .total-score {
+            background: var(--bg-card);
+            border-radius: 60px;
+            padding: 0.8rem;
+            margin: 0.8rem 0;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--gold-light);
+            border: 1px solid var(--border-light);
+        }
+        .interpretation {
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 0.8rem;
+            border-radius: 40px;
+            background: rgba(10,14,23,0.5);
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .recommendations-box {
+            text-align: right;
+            background: rgba(10,14,23,0.5);
+            border-radius: var(--radius-md);
+            padding: 0.8rem 1.2rem;
+            margin-bottom: 1rem;
+            border-right: 4px solid var(--accent-glow);
+        }
+        .recommendations-box h3 {
+            color: var(--accent-soft);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .recommendations-box ul {
+            list-style: none;
+            padding: 0;
+        }
+        .recommendations-box li {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+        .recommendations-box li:last-child { border-bottom: none; }
+        .rec-dot { color: var(--gold-light); font-weight: bold; }
+        .modal-btn {
+            background: rgba(180,133,84,0.2);
+            border: 1px solid var(--border-light);
+            border-radius: 50px;
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Tajawal', sans-serif;
+            color: var(--accent-soft);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 0.5rem;
+            width: 80%;
+            align-self: center;
+        }
+        .modal-btn:hover {
+            background: rgba(180,133,84,0.4);
+            color: #fff;
+            border-color: var(--accent-glow);
+        }
+
+        .warning-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(220,53,69,0.9);
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 60px;
+            font-weight: 700;
+            z-index: 1100;
+            font-size: 0.95rem;
+            display: none;
+            transition: 0.2s;
+            pointer-events: none;
+        }
+
+        .footer-simple {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            background: rgba(10,14,23,0.5);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid var(--border-light);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .footer-simple span {
+            color: var(--accent-soft);
+            font-weight: 700;
+        }
+
+        .calc-floating-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(180,133,84,0.2);
+            border: 1px solid var(--border-light);
+            border-radius: 50px;
+            padding: 0.8rem 1.2rem;
+            color: var(--accent-soft);
+            font-size: 1rem;
+            font-weight: 700;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-floating-btn:hover {
+            background: rgba(180,133,84,0.4);
+            color: #fff;
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 15px rgba(180,133,84,0.3);
+        }
+
+        /* Modal Calculator (مطابق للأصل) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: var(--bg-panel);
+            margin: 5% auto;
+            padding: 0;
+            border: 2px solid var(--border-light);
+            border-radius: 30px;
+            width: 90%;
+            max-width: 300px;
+            box-shadow: var(--shadow-glow);
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.15);
+            border-bottom: 2px solid var(--border-light);
+            padding: 10px 15px;
+            border-radius: 28px 28px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h2 {
+            margin: 0;
+            color: var(--accent-soft);
+            font-size: 1rem;
+            font-weight: 900;
+        }
+        .close {
+            color: var(--text-muted);
+            float: left;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover { color: var(--accent-glow); }
+        .modal-body { padding: 15px; }
+        .calc-display {
+            width: 100%;
+            height: 45px;
+            font-size: 1.4rem;
+            text-align: left;
+            padding: 0 10px;
+            border: 2px solid var(--border-light);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            background: rgba(10,14,23,0.8);
+            color: var(--accent-soft);
+            font-family: 'Inter', monospace;
+            direction: ltr;
+        }
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.1);
+            border: 1px solid var(--border-light);
+            border-radius: 15px;
+            padding: 10px 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-light);
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-btn:hover {
+            background: rgba(180,133,84,0.3);
+            border-color: var(--accent-glow);
+        }
+        .calc-btn.operator { color: var(--accent-soft); }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.3);
+            color: white;
+            grid-column: span 2;
+        }
+        .calc-btn.equals:hover {
+            background: rgba(180,133,84,0.5);
+        }
+
+        @media (max-width: 768px) {
+            .hero-mini h2 { font-size: 2rem; }
+            .hero-mini p { font-size: 1rem; }
+            .calc-box { padding: 1rem; }
+            .featured-badge { width: 70px; height: 70px; }
+            .featured-badge i { font-size: 1.4rem; }
+            .featured-badge span { font-size: 0.6rem; }
+            .info-grid { grid-template-columns: 1fr; }
+            .action-row { flex-direction: column; }
+            .result-btn, .export-btn { width: 100%; }
+            .questions-grid { max-height: 50vh; }
+            .calc-floating-btn { padding: 0.6rem 1rem; font-size: 0.9rem; bottom: 15px; left: 15px; }
+        }
+        .section-title-sm, .panel-header, .collapsible span, .result-card h4, .hero-mini h2 {
+            -webkit-text-fill-color: initial !important;
+            color: var(--accent-soft) !important;
+            background: none !important;
+            background-image: none !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body style="overflow-x: hidden;">
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+
+    <!-- ====== الهيدر الموحد ====== -->
+    <section class="hero-mini">
+        <h2>نموذج تقييم الموظفين</h2>
+        <p>تقييم شامل للأداء الوظيفي مع توصيات تطويرية ذكية</p>
+    </section>
+
+    <!-- ====== المحتوى الرئيسي ====== -->
+    <section class="calc-wrapper">
+        <div class="calc-box" data-aos="fade-up">
+            <div class="featured-badge"><i class="fas fa-user-check"></i><span>تقييم</span></div>
+            <h2>بيانات الموظف</h2>
+
+            <!-- معلومات شخصية -->
+            <div class="personal-info">
+                <div class="info-grid">
+                    <div class="info-field"><label><i class="fas fa-building"></i> مكان العمل</label><input type="text" id="workPlace" placeholder="المدينة، الفرع"></div>
+                    <div class="info-field"><label><i class="fas fa-id-badge"></i> الرقم الوظيفي</label><input type="text" id="empId" placeholder="أدخل الرقم"></div>
+                    <div class="info-field"><label><i class="fas fa-user"></i> الاسم</label><input type="text" id="empName" placeholder="الاسم الكامل"></div>
+                    <div class="info-field"><label><i class="fas fa-graduation-cap"></i> المؤهل العلمي</label><input type="text" id="qualification" placeholder="مثال: بكالوريوس"></div>
+                    <div class="info-field"><label><i class="fas fa-briefcase"></i> المسمى الوظيفي</label><input type="text" id="grade" placeholder="المسمى الوظيفي"></div>
+                    <div class="info-field"><label><i class="fas fa-calendar-alt"></i> تاريخ الدرجة</label><input type="date" id="gradeDate"></div>
+                    <div class="info-field"><label><i class="fas fa-calendar-check"></i> تاريخ التعيين</label><input type="date" id="hireDate"></div>
+                    <div class="info-field"><label><i class="fas fa-star"></i> درجة التقييم السابق</label><input type="number" id="prevScore" placeholder="من 100" min="0" max="100"></div>
+                </div>
+            </div>
+
+            <!-- شريط التقدم -->
+            <div class="progress-area">
+                <div class="counter" id="answeredCounter">0 / 40</div>
+                <div class="progress-bar-bg"><div class="progress-fill" id="progressFill"></div></div>
+                <div class="counter">✨ تقييم الأداء</div>
+            </div>
+
+            <!-- الأسئلة -->
+            <div id="questionsContainer" class="questions-grid"></div>
+
+            <!-- أزرار الإجراء -->
+            <div class="action-row">
+                <button id="showResultBtn" class="result-btn"><i class="fas fa-chart-bar"></i> عرض النتيجة والتوصيات</button>
+                <button id="exportWordBtn" class="export-btn"><i class="fas fa-file-word"></i> تقرير Word</button>
+                <button id="exportExcelBtn" class="export-btn"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+            </div>
+            <div style="text-align:center;color:var(--text-muted);font-size:0.8rem;margin-top:1rem;">
+                <i class="fas fa-clipboard-list" style="color:var(--accent-soft);"></i> 40 معياراً في 7 مجالات | الحد الأقصى 200 نقطة
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== الفوتر الموحد ====== -->
+    <footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
+
+    <!-- ====== زر الرئيسية ====== -->
+    <a href="index.html" style="position:fixed;bottom:20px;right:20px;background:rgba(180,133,84,0.9);color:white;padding:12px 20px;border-radius:50px;text-decoration:none;font-family:'Tajawal',sans-serif;font-weight:bold;backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,0.2);box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:9999;display:flex;align-items:center;gap:8px;transition:0.3s;" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';"><i class="fas fa-home"></i> الرئيسية</a>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== مودال عرض النتيجة ====== -->
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-icon">🏆</div>
+            <div class="modal-title">نتيجة التقييم</div>
+            <div class="total-score" id="modalScore">-- نقطة</div>
+            <div class="interpretation" id="modalInterpretation"></div>
+            <div class="recommendations-box">
+                <h3>📌 التوصيات والتطوير</h3>
+                <ul id="recList"></ul>
+            </div>
+            <button class="modal-btn" id="closeModalBtn">فهمت ذلك ✓</button>
+        </div>
+    </div>
+
+    <!-- ====== تنبيه ====== -->
+    <div id="warningToast" class="warning-toast">⚠️ الرجاء الإجابة على جميع المعايير قبل عرض النتيجة.</div>
+
+    <!-- ====== سكربتات ====== -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true, offset: 100 });
+
+        // ============================================================
+        // تعريف المجالات والمعايير (40 معياراً)
+        // ============================================================
+        const domains = [
+            { name: "الشركة الأم", range: [1,4], criteria: ["الإخلاص للشركة والمحافظة على مصالحها", "الالتزام بأنظمة وسياسات الشركة", "المحافظة على ممتلكات الشركة", "المحافظة على أسرار الشركة"] },
+            { name: "الإدارة العليا", range: [5,8], criteria: ["تفهم أهداف الإدارة العليا وسياستها", "تقبل انتقادات وتوجيهات الرؤساء", "الالتزام بتعليمات الإدارة العليا", "تقبل متطلبات العمل تحت الضغط"] },
+            { name: "القسم أو الشعبة", range: [9,12], criteria: ["المعرفة بأساليب وإجراءات العمل", "الاهتمام بتطوير وتحسين مستوى العمل", "المرونة والتكيف في بيئة العمل", "التعاون مع الزملاء في العمل"] },
+            { name: "مجال التخصص", range: [13,16], criteria: ["مستوى الكفاءة في مجال التخصص", "مواكبة أحدث التطورات في التخصص", "القدرة على استيعاب مستجدات مجال التخصص", "القدرة على نقل الخبرة في مجال التخصص"] },
+            { name: "القدرات والمهارات الإدارية", range: [17,20], criteria: ["القدرة على التخطيط الجيد", "القدرة على اتخاذ القرارات", "القدرة على الإشراف الإداري", "القدرة على الإشراف الفني"] },
+            { name: "القدرات والمهارات العملية", range: [21,28], criteria: ["الإبداع والابتكار في العمل", "المبادرة والمبادأة في العمل", "الدقة والترتيب والتنظيم في العمل", "القدرة على العمل بدون إشراف", "القدرة على العمل تحت الضغط", "الاهتمام بتطوير وتحسين أسلوب العمل", "القدرة على إيجاد حلول للمشكلات في العمل", "القدرة على تحمل مسئوليات أعلى في العمل"] },
+            { name: "الالتزام في العمل", range: [29,34], criteria: ["الالتزام بقواعد وأساليب وإجراءات العمل", "الالتزام بتعليمات الرئيس المباشر في العمل", "الالتزام بمواعيد الدوام في العمل", "الالتزام بقواعد الوقاية والسلامة في العمل", "الالتزام بالقيافة والهندام في العمل", "الالتزام باللباس الرسمي في العمل"] },
+            { name: "السمات الشخصية والعلاقات", range: [35,40], criteria: ["الاتزان وعدم الاندفاع في بيئة العمل", "سرعة البديهة وحُسن التصرف في العمل", "القدرة على تحمل المسؤولية في العمل", "العلاقة مع الزملاء في العمل", "العلاقة مع المرؤوسين في العمل", "العلاقة مع الجمهور في العمل"] }
+        ];
+
+        let allCriteria = [];
+        let globalIndex = 0;
+        domains.forEach(domain => {
+            domain.criteria.forEach(c => {
+                globalIndex++;
+                allCriteria.push({ id: globalIndex, domain: domain.name, text: c });
+            });
+        });
+        const totalQuestions = allCriteria.length; // 40
+
+        const optionLabels = { 1: "ضعيف", 2: "متوسط", 3: "جيد", 4: "جيد جداً", 5: "ممتاز" };
+        let answers = new Array(totalQuestions).fill(null);
+        const container = document.getElementById("questionsContainer");
+
+        // ============================================================
+        // إنشاء واجهة الأسئلة
+        // ============================================================
+        function renderQuestions() {
+            container.innerHTML = "";
+            let currentDomain = "";
+            let domainDiv = null;
+
+            allCriteria.forEach((item, idx) => {
+                if (item.domain !== currentDomain) {
+                    currentDomain = item.domain;
+                    domainDiv = document.createElement("div");
+                    domainDiv.className = "domain-section";
+                    const title = document.createElement("div");
+                    title.className = "domain-title";
+                    const badge = document.createElement("span");
+                    badge.className = "num-badge";
+                    badge.innerText = item.id;
+                    title.appendChild(badge);
+                    const titleText = document.createElement("span");
+                    titleText.innerText = currentDomain;
+                    title.appendChild(titleText);
+                    domainDiv.appendChild(title);
+                    container.appendChild(domainDiv);
+                }
+
+                const qDiv = document.createElement("div");
+                qDiv.className = "question-item";
+                qDiv.setAttribute("data-qidx", idx);
+
+                const qHeader = document.createElement("div");
+                qHeader.className = "question-text";
+                const numSpan = document.createElement("span");
+                numSpan.className = "q-num";
+                numSpan.innerText = item.id;
+                const textSpan = document.createElement("span");
+                textSpan.innerText = item.text;
+                qHeader.appendChild(numSpan);
+                qHeader.appendChild(textSpan);
+
+                const optionsDiv = document.createElement("div");
+                optionsDiv.className = "options-row";
+
+                for (let val = 1; val <= 5; val++) {
+                    const radioWrap = document.createElement("div");
+                    radioWrap.className = "radio-option";
+                    const radioInput = document.createElement("input");
+                    radioInput.type = "radio";
+                    radioInput.name = `q_${idx}`;
+                    radioInput.value = val;
+                    radioInput.id = `q_${idx}_val_${val}`;
+                    const label = document.createElement("label");
+                    label.htmlFor = `q_${idx}_val_${val}`;
+                    label.innerText = optionLabels[val];
+
+                    radioInput.addEventListener("change", (function(index, selectedVal) {
+                        return function(e) {
+                            if (e.target.checked) {
+                                answers[index] = selectedVal;
+                                updateProgressAndBar();
+                                highlightSelectedOption(radioWrap.parentElement, selectedVal);
+                            }
+                        };
+                    })(idx, val));
+
+                    radioWrap.appendChild(radioInput);
+                    radioWrap.appendChild(label);
+                    optionsDiv.appendChild(radioWrap);
+                }
+
+                qDiv.appendChild(qHeader);
+                qDiv.appendChild(optionsDiv);
+                domainDiv.appendChild(qDiv);
+
+                if (answers[idx] !== null) {
+                    const selectedRadio = document.querySelector(`input[name="q_${idx}"][value="${answers[idx]}"]`);
+                    if (selectedRadio) {
+                        selectedRadio.checked = true;
+                        const parentOpt = selectedRadio.closest(".radio-option");
+                        if (parentOpt) highlightSelectedOption(parentOpt.parentElement, answers[idx]);
+                    }
+                }
+            });
+        }
+
+        function highlightSelectedOption(optionsContainer, selectedVal) {
+            if (!optionsContainer) return;
+            const allRadios = optionsContainer.querySelectorAll(".radio-option");
+            allRadios.forEach(opt => {
+                const input = opt.querySelector("input");
+                if (input && parseInt(input.value) === selectedVal) {
+                    opt.classList.add("selected");
+                } else {
+                    opt.classList.remove("selected");
+                }
+            });
+        }
+
+        function updateProgressAndBar() {
+            const answeredCount = answers.filter(a => a !== null).length;
+            document.getElementById("answeredCounter").innerText = `${answeredCount} / ${totalQuestions}`;
+            const percent = (answeredCount / totalQuestions) * 100;
+            const fillEl = document.getElementById("progressFill");
+            fillEl.style.width = `${percent}%`;
+            if (answeredCount === totalQuestions) fillEl.style.background = "#FFD966";
+            else fillEl.style.background = "linear-gradient(90deg, #C4A747, #e6c86e)";
+        }
+
+        // ============================================================
+        // دوال الحساب والتوصيات
+        // ============================================================
+        function calculateTotalScore() {
+            let sum = 0;
+            for (let i = 0; i < totalQuestions; i++) {
+                if (answers[i] === null) return null;
+                sum += answers[i];
+            }
+            return sum;
+        }
+
+        function getDomainAverages() {
+            let domainResults = [];
+            let startIdx = 0;
+            domains.forEach(domain => {
+                const count = domain.criteria.length;
+                let sum = 0;
+                let allAnswered = true;
+                for (let i = startIdx; i < startIdx + count; i++) {
+                    if (answers[i] === null) { allAnswered = false; break; }
+                    sum += answers[i];
+                }
+                const avg = allAnswered ? (sum / count) : null;
+                const maxPossible = count * 5;
+                const achieved = allAnswered ? sum : 0;
+                const percent = allAnswered ? (achieved / maxPossible) * 100 : 0;
+                domainResults.push({
+                    name: domain.name,
+                    avg: avg,
+                    percent: percent,
+                    count: count,
+                    sum: sum,
+                    allAnswered: allAnswered
+                });
+                startIdx += count;
+            });
+            return domainResults;
+        }
+
+        function getInterpretation(score) {
+            const maxScore = totalQuestions * 5;
+            const percent = (score / maxScore) * 100;
+            if (percent >= 90) return { level: "ممتاز", message: "أداء متميز جداً، يستحق التقدير والترقية.", color: "#4ade80" };
+            else if (percent >= 75) return { level: "جيد جداً", message: "أداء عالٍ، مع بعض النقاط القابلة للتطوير.", color: "#facc15" };
+            else if (percent >= 60) return { level: "جيد", message: "أداء مقبول، يحتاج إلى تحسين في بعض المجالات.", color: "#fb923c" };
+            else if (percent >= 45) return { level: "متوسط", message: "أداء أقل من المتوقع، يحتاج إلى خطة تطوير.", color: "#f87171" };
+            else return { level: "ضعيف", message: "أداء غير مرضٍ، يتطلب تدخلاً عاجلاً.", color: "#ef4444" };
+        }
+
+        function getDomainSuggestion(domainName, level) {
+            const suggestions = {
+                "الشركة الأم": {
+                    weak: "عقد دورات توعوية حول رؤية ورسالة الشركة، وتعزيز روح الانتماء عبر برامج الحوافز المعنوية والمادية.",
+                    medium: "تعزيز قنوات التواصل الداخلي لشرح السياسات، وإشراك الموظف في اتخاذ القرارات البسيطة التي تخص مصالح الشركة."
+                },
+                "الإدارة العليا": {
+                    weak: "تنظيم ورش عمل حول كيفية تقبل النقد البناء وإدارة الضغوط، مع توفير نموذج قيادي يحتذى به داخل الإدارة.",
+                    medium: "تحسين أسلوب التواصل بين الرؤساء والمرؤوسين، وعقد اجتماعات دورية لمناقشة التحديات وإيجاد الحلول المشتركة."
+                },
+                "القسم أو الشعبة": {
+                    weak: "تحديث إجراءات العمل بشكل دوري، وتوفير دليل إجراءات موحد، مع تشجيع ثقافة التعاون عبر أنشطة بناء الفريق.",
+                    medium: "تنظيم جلسات عصف ذهني داخل القسم، وتطبيق نظام التناوب الوظيفي لزيادة المرونة والمعرفة الإجرائية."
+                },
+                "مجال التخصص": {
+                    weak: "توفير برامج تدريبية مكثفة في التخصص، وحضور مؤتمرات متخصصة، وإنشاء مكتبة مراجع رقمية محدثة.",
+                    medium: "ربط الموظف بمرشد مهني (Mentor) في نفس التخصص، وتحفيزه على الحصول على شهادات مهنية معتمدة."
+                },
+                "القدرات والمهارات الإدارية": {
+                    weak: "التحاق الموظف بدورات في القيادة وإدارة المشاريع، مع تكليفه بمهام إشرافية بسيطة تحت التوجيه المباشر.",
+                    medium: "تطبيق أسلوب التقييم الذاتي للمهام الإدارية، وعقد جلسات تغذية راجعة (Feedback) دورية مع المشرف المباشر."
+                },
+                "القدرات والمهارات العملية": {
+                    weak: "تدريب عملي على رأس العمل، وتحديد أهداف أداء يومية، وتحفيز الموظف على تقديم حلول للمشكلات البسيطة أولاً بأول.",
+                    medium: "إطلاق مسابقات داخلية للإبداع والابتكار، ومنح الموظف صلاحيات أكبر في تنفيذ مهامه دون الرجوع المستمر للمشرف."
+                },
+                "الالتزام في العمل": {
+                    weak: "مراجعة لائحة الانضباط الوظيفي مع الموظف، وتطبيق نظام المكافآت والعقوبات بشكل واضح وعادل، ومتابعة الالتزام بالزي الرسمي.",
+                    medium: "تعزيز ثقافة القدوة من خلال المشرفين الملتزمين، وتذكير الموظف باستمرار بأهمية الالتزام بالوقت والإجراءات."
+                },
+                "السمات الشخصية والعلاقات": {
+                    weak: "إلحاق الموظف بدورات في الذكاء العاطفي ومهارات التواصل، وعقد جلسات توعية حول أهمية الاحترام المتبادل في بيئة العمل.",
+                    medium: "تشجيع الموظف على المشاركة في الفعاليات الاجتماعية داخل الشركة، وتدريبه على كيفية التعامل مع مختلف الشخصيات."
+                }
+            };
+            const domainSuggest = suggestions[domainName];
+            if (!domainSuggest) return "مراجعة الأداء في هذا المجال وتحديد خطة تحسين بالتعاون مع المشرف.";
+            return domainSuggest[level] || domainSuggest.medium;
+        }
+
+        function generateRecommendations(domainAverages, totalScore) {
+            const maxScore = totalQuestions * 5;
+            const overallPercent = (totalScore / maxScore) * 100;
+            let recommendations = [];
+
+            // توصيات عامة
+            if (overallPercent >= 90) {
+                recommendations.push("🟢 أداؤك متميز في جميع المجالات. نوصي بالاستمرار في نفس المستوى، مع التركيز على نقل الخبرة للآخرين وتولي مهام قيادية أكبر.");
+            } else if (overallPercent >= 75) {
+                recommendations.push("🟡 أداؤك جيد جداً. ركز على تعزيز نقاط القوة الحالية، خاصة في المجالات التي حصلت فيها على درجات أقل من 80%.");
+            } else if (overallPercent >= 60) {
+                recommendations.push("🟠 أداؤك في حدود المقبول. نوصي بوضع خطة تطوير فردية تركز على المجالات التي تقل عن 60%.");
+            } else if (overallPercent >= 45) {
+                recommendations.push("🔴 أداؤك يحتاج إلى تحسين كبير. نوصي بتدخل مكثف من المشرفين وتحديد أهداف قصيرة المدى قابلة للقياس.");
+            } else {
+                recommendations.push("⛔ أداؤك غير مرضٍ. نوصي بجلسات تقييم أسبوعية، وتحديد أسباب الضعف، وربما إعادة توزيع المهام أو توفير تدريب مكثف.");
+            }
+
+            // توصيات خاصة بالمجالات
+            domainAverages.forEach(d => {
+                if (!d.allAnswered) return;
+                if (d.percent < 60) {
+                    let suggestion = `🔻 مجال "${d.name}" يعتبر **ضعيفاً** (${Math.round(d.percent)}%). `;
+                    suggestion += getDomainSuggestion(d.name, "weak");
+                    recommendations.push(suggestion);
+                } else if (d.percent < 75) {
+                    let suggestion = `📌 مجال "${d.name}" يحتاج إلى **تحسين** (${Math.round(d.percent)}%). `;
+                    suggestion += getDomainSuggestion(d.name, "medium");
+                    recommendations.push(suggestion);
+                } else {
+                    recommendations.push(`✅ مجال "${d.name}" يعتبر **قوياً** (${Math.round(d.percent)}%)، استمر في الحفاظ على هذا المستوى.`);
+                }
+            });
+
+            return recommendations;
+        }
+
+        // ============================================================
+        // عرض المودال
+        // ============================================================
+        function showResultModal() {
+            for (let i = 0; i < totalQuestions; i++) {
+                if (answers[i] === null) {
+                    const toast = document.getElementById("warningToast");
+                    toast.style.display = "block";
+                    setTimeout(() => {
+                        toast.style.opacity = "0";
+                        setTimeout(() => { toast.style.display = "none"; toast.style.opacity = "1"; }, 400);
+                    }, 2000);
+                    const firstUnanswered = document.querySelector(`.question-item[data-qidx="${i}"]`);
+                    if (firstUnanswered) {
+                        firstUnanswered.scrollIntoView({ behavior: "smooth", block: "center" });
+                        firstUnanswered.style.border = "2px solid #dc3545";
+                        setTimeout(() => { firstUnanswered.style.border = ""; }, 1500);
+                    }
+                    return;
+                }
+            }
+
+            const totalScore = calculateTotalScore();
+            if (totalScore === null) return;
+            const interpretation = getInterpretation(totalScore);
+            const domainAverages = getDomainAverages();
+            const recommendations = generateRecommendations(domainAverages, totalScore);
+
+            const modal = document.getElementById("resultModal");
+            document.getElementById("modalScore").innerText = `${totalScore} نقطة (من 200)`;
+            document.getElementById("modalInterpretation").innerHTML = `
+                <strong style="color: ${interpretation.color};">${interpretation.level}</strong><br>
+                ${interpretation.message}
+            `;
+
+            const recList = document.getElementById("recList");
+            recList.innerHTML = "";
+            recommendations.forEach(rec => {
+                const li = document.createElement("li");
+                li.innerHTML = `<span class="rec-dot">•</span> ${rec}`;
+                recList.appendChild(li);
+            });
+
+            modal.classList.add("active");
+        }
+
+        function closeModal() {
+            document.getElementById("resultModal").classList.remove("active");
+        }
+
+        document.getElementById("showResultBtn").addEventListener("click", showResultModal);
+        document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+        document.getElementById("resultModal").addEventListener("click", function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // ============================================================
+        // تصدير Word (مع التوصيات)
+        // ============================================================
+        function generateWordHTML() {
+            const empName = document.getElementById("empName").value || "غير مدخل";
+            const empId = document.getElementById("empId").value || "غير مدخل";
+            const workPlace = document.getElementById("workPlace").value || "غير مدخل";
+            const qualification = document.getElementById("qualification").value || "غير مدخل";
+            const grade = document.getElementById("grade").value || "غير مدخل";
+            const gradeDate = document.getElementById("gradeDate").value || "غير مدخل";
+            const hireDate = document.getElementById("hireDate").value || "غير مدخل";
+            const prevScore = document.getElementById("prevScore").value || "غير مدخل";
+
+            let totalScore = 0;
+            let allAnswered = true;
+            for (let i = 0; i < totalQuestions; i++) {
+                if (answers[i] === null) { allAnswered = false; break; }
+                totalScore += answers[i];
+            }
+
+            const interpretation = allAnswered ? getInterpretation(totalScore) : { level: "غير مكتمل", message: "لم يتم الإجابة على جميع المعايير.", color: "#888" };
+            const domainAverages = allAnswered ? getDomainAverages() : [];
+            const recommendations = allAnswered ? generateRecommendations(domainAverages, totalScore) : ["يرجى إكمال التقييم للحصول على توصيات."];
+
+            let rows = "";
+            allCriteria.forEach((item, idx) => {
+                const answer = answers[idx] !== null ? answers[idx] : "-";
+                const label = answer !== "-" ? optionLabels[answer] : "-";
+                rows += `<tr><td style="border:1px solid #999;padding:6px;text-align:center;">${item.id}</td>
+                        <td style="border:1px solid #999;padding:6px;">${item.domain}</td>
+                        <td style="border:1px solid #999;padding:6px;">${item.text}</td>
+                        <td style="border:1px solid #999;padding:6px;text-align:center;">${label}</td>
+                        <td style="border:1px solid #999;padding:6px;text-align:center;">${answer}</td></tr>`;
+            });
+
+            let recHtml = "";
+            if (allAnswered) {
+                recHtml = recommendations.map(r => `<li>${r}</li>`).join('');
+            } else {
+                recHtml = `<li>${recommendations[0]}</li>`;
+            }
+
+            const htmlContent = `
+                <html dir="rtl">
+                <head><meta charset="UTF-8">
+                    <style>
+                        body { font-family: 'Arial', sans-serif; padding: 30px; direction: rtl; }
+                        h1 { color: #0a1a2a; border-bottom: 3px solid #C4A747; padding-bottom: 10px; }
+                        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        .info-table td { padding: 8px 12px; border: 1px solid #ccc; }
+                        .info-table td:first-child { font-weight: bold; background: #f0f0f0; width: 25%; }
+                        .summary { background: #f9f9f9; padding: 15px; border-radius: 12px; margin: 20px 0; }
+                        .summary strong { color: #C4A747; }
+                        .rec-box { background: #f0f7ff; border-right: 5px solid #C4A747; padding: 15px; margin: 20px 0; border-radius: 10px; }
+                        .rec-box h3 { margin-top: 0; color: #0a1a2a; }
+                        .rec-box ul { padding-right: 20px; }
+                        .rec-box li { margin-bottom: 8px; }
+                        table.details { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+                        table.details th { background: #0a1a2a; color: white; padding: 8px; border: 1px solid #999; }
+                        table.details td { padding: 6px; border: 1px solid #999; }
+                        .footer { margin-top: 30px; font-size: 0.8rem; color: #555; text-align: center; }
+                    </style>
+                </head>
+                <body>
+                    <h1>تقرير تقييم الموظف مع التوصيات</h1>
+                    <table class="info-table">
+                        <tr><td>الاسم</td><td>${empName}</td><td>الرقم الوظيفي</td><td>${empId}</td></tr>
+                        <tr><td>مكان العمل</td><td>${workPlace}</td><td>المؤهل العلمي</td><td>${qualification}</td></tr>
+                        <tr><td>المسمى الوظيفي</td><td>${grade}</td><td>تاريخ الدرجة</td><td>${gradeDate}</td></tr>
+                        <tr><td>تاريخ التعيين</td><td>${hireDate}</td><td>درجة التقييم السابق</td><td>${prevScore}</td></tr>
+                    </table>
+
+                    <div class="summary">
+                        <strong>النتيجة الإجمالية:</strong> ${allAnswered ? totalScore + ' نقطة (من 200)' : 'غير مكتملة'} &nbsp;|&nbsp;
+                        <strong>التقدير:</strong> <span style="color:${interpretation.color};">${interpretation.level}</span><br>
+                        <strong>التفسير:</strong> ${interpretation.message}
+                    </div>
+
+                    <div class="rec-box">
+                        <h3>📌 التوصيات والتطوير المقترح</h3>
+                        <ul>${recHtml}</ul>
+                    </div>
+
+                    <h2>تفاصيل التقييم حسب المعايير</h2>
+                    <table class="details">
+                        <thead><tr><th>#</th><th>المجال</th><th>المعيار</th><th>التقدير</th><th>الدرجة</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                    <div class="footer">تم إنشاء هذا التقرير بواسطة مجموعة فاروق للإستشارات والأعمال | ${new Date().toLocaleDateString('ar-EG')}</div>
+                </body>
+                </html>
+            `;
+            return htmlContent;
+        }
+
+        function exportToWord() {
+            for (let i = 0; i < totalQuestions; i++) {
+                if (answers[i] === null) {
+                    const toast = document.getElementById("warningToast");
+                    toast.style.display = "block";
+                    setTimeout(() => {
+                        toast.style.opacity = "0";
+                        setTimeout(() => { toast.style.display = "none"; toast.style.opacity = "1"; }, 400);
+                    }, 2000);
+                    return;
+                }
+            }
+            const content = generateWordHTML();
+            const blob = new Blob([content], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `تقرير_تقييم_${document.getElementById('empName').value || 'موظف'}.doc`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+
+        document.getElementById("exportWordBtn").addEventListener("click", exportToWord);
+
+        // ============================================================
+        // تصدير Excel احترافي (باستخدام ExcelJS)
+        // ============================================================
+        async function exportToExcel() {
+            // التحقق من اكتمال الإجابات
+            for (let i = 0; i < totalQuestions; i++) {
+                if (answers[i] === null) {
+                    const toast = document.getElementById("warningToast");
+                    toast.style.display = "block";
+                    setTimeout(() => {
+                        toast.style.opacity = "0";
+                        setTimeout(() => { toast.style.display = "none"; toast.style.opacity = "1"; }, 400);
+                    }, 2000);
+                    return;
+                }
+            }
+
+            const empName = document.getElementById("empName").value || "غير مدخل";
+            const empId = document.getElementById("empId").value || "غير مدخل";
+            const workPlace = document.getElementById("workPlace").value || "غير مدخل";
+            const qualification = document.getElementById("qualification").value || "غير مدخل";
+            const grade = document.getElementById("grade").value || "غير مدخل";
+            const gradeDate = document.getElementById("gradeDate").value || "غير مدخل";
+            const hireDate = document.getElementById("hireDate").value || "غير مدخل";
+            const prevScore = document.getElementById("prevScore").value || "غير مدخل";
+
+            const totalScore = calculateTotalScore();
+            if (totalScore === null) return;
+            const interpretation = getInterpretation(totalScore);
+            const domainAverages = getDomainAverages();
+            const recommendations = generateRecommendations(domainAverages, totalScore);
+
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'FAROUK GRUP';
+            workbook.created = new Date();
+
+            const ws = workbook.addWorksheet('تقييم الموظف', { views: [{ rightToLeft: true, showGridLines: false }] });
+
+            // إعدادات الألوان
+            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+            const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A';
+
+            // نمط الرأس
+            function headerStyle(bg = HB, tc = GL) {
+                return {
+                    font: { name: 'Arial', bold: true, size: 11, color: { argb: tc } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
+                    alignment: { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'rtl' },
+                    border: {
+                        top: { style: 'thin', color: { argb: G } },
+                        bottom: { style: 'thin', color: { argb: G } },
+                        left: { style: 'thin', color: { argb: G } },
+                        right: { style: 'thin', color: { argb: G } }
+                    }
+                };
+            }
+
+            function cellStyle(bg = W, tc = DT, bold = false, h = 'center') {
+                return {
+                    font: { name: 'Arial', bold: bold, size: 10, color: { argb: tc } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
+                    alignment: { horizontal: h, vertical: 'middle', wrapText: true, readingOrder: 'rtl' },
+                    border: {
+                        top: { style: 'hair', color: { argb: 'FFCCCCCC' } },
+                        bottom: { style: 'hair', color: { argb: 'FFCCCCCC' } },
+                        left: { style: 'hair', color: { argb: 'FFCCCCCC' } },
+                        right: { style: 'hair', color: { argb: 'FFCCCCCC' } }
+                    }
+                };
+            }
+
+            function mergeAndSet(ws, row, col1, col2, text, bg = HB, tc = GL, fs = 12) {
+                ws.mergeCells(row, col1, row, col2);
+                const c = ws.getCell(row, col1);
+                c.value = text;
+                c.font = { name: 'Arial', bold: true, size: fs, color: { argb: tc } };
+                c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+                c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'rtl' };
+                c.border = {
+                    top: { style: 'medium', color: { argb: G } },
+                    bottom: { style: 'medium', color: { argb: G } },
+                    left: { style: 'medium', color: { argb: G } },
+                    right: { style: 'medium', color: { argb: G } }
+                };
+            }
+
+            // عرض الأعمدة
+            ws.getColumn(1).width = 5;
+            ws.getColumn(2).width = 30;
+            ws.getColumn(3).width = 30;
+            ws.getColumn(4).width = 30;
+            ws.getColumn(5).width = 15;
+            ws.getColumn(6).width = 15;
+
+            // العنوان الرئيسي
+            mergeAndSet(ws, 1, 1, 6, 'تقرير تقييم الموظف - FAROUK GRUP', DB, GL, 16);
+            ws.getRow(1).height = 40;
+
+            // معلومات الموظف
+            const infoData = [
+                ['الاسم', empName, 'الرقم الوظيفي', empId],
+                ['مكان العمل', workPlace, 'المؤهل العلمي', qualification],
+                ['المسمى الوظيفي', grade, 'تاريخ الدرجة', gradeDate],
+                ['تاريخ التعيين', hireDate, 'درجة التقييم السابق', prevScore]
+            ];
+            let rowIdx = 2;
+            infoData.forEach(row => {
+                ws.getRow(rowIdx).height = 24;
+                const bg = rowIdx % 2 === 0 ? AR : 'FFFEFCF6';
+                [
+                    { col: 2, val: row[0] }, { col: 3, val: row[1] },
+                    { col: 4, val: row[2] }, { col: 5, val: row[3] }
+                ].forEach(item => {
+                    const cell = ws.getCell(rowIdx, item.col);
+                    cell.value = item.val;
+                    Object.assign(cell, cellStyle(bg, DT, false, 'right'));
+                });
+                rowIdx++;
+            });
+
+            // النتيجة الإجمالية
+            rowIdx++;
+            ws.mergeCells(rowIdx, 2, rowIdx, 5);
+            const sumCell = ws.getCell(rowIdx, 2);
+            sumCell.value = `النتيجة الإجمالية: ${totalScore} نقطة (من 200)  |  التقدير: ${interpretation.level}`;
+            sumCell.font = { name: 'Arial', bold: true, size: 12, color: { argb: interpretation.color } };
+            sumCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AR } };
+            sumCell.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+            sumCell.border = {
+                top: { style: 'thin', color: { argb: G } },
+                bottom: { style: 'thin', color: { argb: G } },
+                left: { style: 'thin', color: { argb: G } },
+                right: { style: 'thin', color: { argb: G } }
+            };
+            ws.getRow(rowIdx).height = 30;
+            rowIdx++;
+
+            // التوصيات
+            ws.mergeCells(rowIdx, 2, rowIdx, 5);
+            const recTitle = ws.getCell(rowIdx, 2);
+            recTitle.value = '📌 التوصيات والتطوير المقترح';
+            Object.assign(recTitle, headerStyle(HB, GL));
+            ws.getRow(rowIdx).height = 28;
+            rowIdx++;
+
+            recommendations.forEach((rec, idx) => {
+                ws.mergeCells(rowIdx, 2, rowIdx, 5);
+                const recCell = ws.getCell(rowIdx, 2);
+                recCell.value = `${idx+1}. ${rec}`;
+                const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
+                Object.assign(recCell, cellStyle(bg, DT, false, 'right'));
+                ws.getRow(rowIdx).height = 22;
+                rowIdx++;
+            });
+
+            // جدول تفاصيل المعايير
+            rowIdx++;
+            ws.mergeCells(rowIdx, 2, rowIdx, 5);
+            const detailTitle = ws.getCell(rowIdx, 2);
+            detailTitle.value = 'تفاصيل التقييم حسب المعايير';
+            Object.assign(detailTitle, headerStyle(HB, GL));
+            ws.getRow(rowIdx).height = 28;
+            rowIdx++;
+
+            // رأس الجدول
+            const headers = ['#', 'المجال', 'المعيار', 'التقدير', 'الدرجة'];
+            headers.forEach((h, idx) => {
+                const cell = ws.getCell(rowIdx, idx + 2);
+                cell.value = h;
+                Object.assign(cell, headerStyle(SB, W));
+            });
+            ws.getRow(rowIdx).height = 28;
+            rowIdx++;
+
+            // بيانات المعايير
+            allCriteria.forEach((item, idx) => {
+                const answer = answers[idx] !== null ? answers[idx] : '-';
+                const label = answer !== '-' ? optionLabels[answer] : '-';
+                const row = ws.getRow(rowIdx);
+                row.height = 22;
+                const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
+                [
+                    { col: 2, val: item.id },
+                    { col: 3, val: item.domain },
+                    { col: 4, val: item.text },
+                    { col: 5, val: label },
+                    { col: 6, val: answer }
+                ].forEach(item2 => {
+                    const cell = ws.getCell(rowIdx, item2.col);
+                    cell.value = item2.val;
+                    Object.assign(cell, cellStyle(bg, DT, false, item2.col === 6 ? 'center' : 'right'));
+                    if (item2.col === 6) {
+                        cell.font = { name: 'Arial', bold: true, size: 10, color: { argb: answer >= 4 ? 'FF28A745' : answer >= 3 ? 'FFED6C02' : 'FFDC3545' } };
+                    }
+                });
+                rowIdx++;
+            });
+
+            // تذييل
+            rowIdx++;
+            ws.mergeCells(rowIdx, 2, rowIdx, 5);
+            const footerCell = ws.getCell(rowIdx, 2);
+            footerCell.value = `تم إنشاء هذا التقرير بواسطة مجموعة فاروق للإستشارات والأعمال | ${new Date().toLocaleDateString('ar-EG')}`;
+            footerCell.font = { name: 'Arial', size: 9, color: { argb: 'FF888888' } };
+            footerCell.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+            ws.getRow(rowIdx).height = 25;
+
+            // حفظ الملف
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const fileName = `تقييم_${empName}_${new Date().toISOString().slice(0,10)}.xlsx`;
+            saveAs(blob, fileName);
+        }
+
+        document.getElementById("exportExcelBtn").addEventListener("click", exportToExcel);
+
+        // ============================================================
+
+        // ============================================================
+        // التهيئة
+        // ============================================================
+        function init() {
+            renderQuestions();
+            updateProgressAndBar();
+            for (let i = 0; i < totalQuestions; i++) {
+                const selectedInput = document.querySelector(`input[name="q_${i}"]:checked`);
+                if (selectedInput) {
+                    const val = parseInt(selectedInput.value);
+                    answers[i] = val;
+                    const optionsRow = selectedInput.closest('.options-row');
+                    if (optionsRow) highlightSelectedOption(optionsRow, val);
+                }
+            }
+            updateProgressAndBar();
+        }
+        init();
+    </script>
+</body>
+</html>
