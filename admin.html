@@ -100,6 +100,16 @@
             color: var(--accent-soft);
             margin-bottom: 1.5rem;
         }
+        .login-card .admin-email {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.05);
+            padding: 8px 12px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-bottom: 1.2rem;
+            border: 1px dashed var(--border-light);
+        }
         .login-input {
             width: 100%;
             padding: 0.9rem 1rem;
@@ -616,6 +626,8 @@
         </div>
         <h2>الدخول للمصرح لهم</h2>
         <p class="sub-title">مجموعة فاروق للاستشارات والأعمال</p>
+        <!-- إظهار اسم المستخدم الثابت كتذكير (للقراءة فقط) -->
+        <div class="admin-email"><i class="fas fa-envelope"></i> faroukgrup@gmail.com</div>
         <input type="password" id="passwordInput" class="login-input" placeholder="كلمة المرور" autofocus>
         <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> دخول</button>
         <div class="error-msg" id="errorMsg"></div>
