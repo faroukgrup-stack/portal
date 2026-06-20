@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <title>أداة توليد المحتوى الذكي | FAROUK GRUP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-dark: #0b0e17;
+            --bg-panel: rgba(18,24,36,0.85);
+            --bg-card: rgba(22,30,46,0.8);
+            --border-light: rgba(180,133,84,0.25);
+            --accent-glow: #b48554;
+            --accent-soft: #cfa776;
+            --text-light: #f0f4fa;
+            --text-muted: #aab7d4;
+            --shadow-soft: 0 15px 35px -10px rgba(0,0,0,0.6), 0 0 0 1px rgba(180,133,84,0.15);
+            --radius-md: 20px;
+            --radius-lg: 30px;
+            --transition: all 0.3s ease;
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+        .glow-bg { position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 0; }
+        .glow-bg span { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%); border-radius: 50%; filter: blur(80px); animation: glowMove 20s infinite alternate ease-in-out; }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; animation-delay: -5s; }
+        @keyframes glowMove { 0% { transform: translate(0,0) scale(1); opacity:0.5; } 100% { transform: translate(40px,-30px) scale(1.2); opacity:0.8; } }
+        .hero-mini {
+            background: linear-gradient(135deg, #0b0e17, #1a1a1a);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid var(--accent-glow); position: relative; overflow: hidden; z-index: 2;
+        }
+        .hero-mini::before {
+            content: ''; position: absolute; top:-50%; left:-50%; width:200%; height:200%;
+            background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
+            animation: rotate 40s linear infinite;
+        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .hero-mini h2 { font-size: 2.5rem; font-weight: 900; color: var(--accent-soft); position: relative; z-index: 2; }
+        .hero-mini p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; position: relative; z-index: 2; color: #fff; }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; position: relative; z-index: 2; }
+        .calc-box {
+            background: var(--bg-panel); backdrop-filter: blur(15px);
+            border: 2px solid var(--border-light); border-radius: var(--radius-lg);
+            padding: 2rem; box-shadow: var(--shadow-soft);
+        }
+        .form-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 10px; font-weight: 700; color: var(--accent-soft); }
+        label i { margin-left: 0.5rem; }
+        input, select, textarea {
+            width: 100%; padding: 15px; border: 2px solid var(--border-light);
+            border-radius: 30px; font-family: 'Tajawal', sans-serif; font-size: 1rem;
+            background: rgba(10,14,23,0.7); color: var(--text-light); transition: var(--transition);
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none; border-color: var(--accent-glow); box-shadow: 0 0 0 3px rgba(180,133,84,0.3);
+        }
+        textarea { min-height: 200px; resize: vertical; }
+        .btn-main {
+            width: 100%; padding: 18px; background: rgba(180,133,84,0.2);
+            border: 1px solid var(--border-light); color: var(--accent-soft);
+            border-radius: 50px; font-size: 1.2rem; font-weight: 900; cursor: pointer;
+            transition: var(--transition); backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        .btn-main:hover { background: rgba(180,133,84,0.4); color: #fff; }
+        .btn-cancel {
+            background: rgba(220,53,69,0.2); border-color: rgba(220,53,69,0.4); color: #f8d7da;
+            margin-top: 10px; display: none;
+        }
+        #outputSection { margin-top: 30px; display: none; }
+        .action-bar { display: flex; gap: 15px; margin-bottom: 20px; }
+        .btn-export {
+            padding: 12px 25px; border-radius: 50px; background: var(--accent-glow);
+            color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.2s;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .result-container {
+            background: var(--bg-card); border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg); padding: 1.5rem; min-height: 150px;
+        }
+        .content-card {
+            background: rgba(22,30,46,0.6); border: 1px solid var(--border-light);
+            border-radius: 20px; padding: 1.2rem; margin-bottom: 1.5rem;
+        }
+        .content-card h3 { color: var(--accent-soft); border-bottom: 2px solid var(--border-light); padding-bottom: 8px; }
+        .loading-box { text-align: center; padding: 30px; }
+        .home-btn {
+            position: fixed; bottom: 20px; right: 20px; background: rgba(180,133,84,0.9);
+            color: white; padding: 12px 20px; border-radius: 50px; text-decoration: none;
+            z-index: 9999; display: flex; align-items: center; gap: 8px;
+        }
+        .footer-simple {
+            text-align: center; padding: 1.5rem; margin-top: 2rem;
+            background: rgba(10,14,23,0.5); border-top: 1px solid var(--border-light);
+            color: var(--text-muted);
+        }
+        @media (max-width: 768px) { .hero-mini h2 { font-size: 2rem; } }
+    </style>
+</head>
+<body>
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+    <section class="hero-mini">
+        <h2><i class="fas fa-robot"></i> أداة التحليل وتوليد المحتوى</h2>
+        <p>أنشئ محتوى احترافي، حلل تقاريرك، واستلهم أفكاراً مبتكرة بلمسة زر واحدة</p>
+    </section>
+
+    <div class="container">
+        <div class="calc-box">
+            <div class="form-group">
+                <label><i class="fas fa-user-tie"></i> الاسم الكريم</label>
+                <input type="text" id="userName" placeholder="أدخل اسمك">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-cogs"></i> نوع الخدمة</label>
+                <select id="toolService">
+                    <option value="reportAnalysis">📊 تحليل تقرير</option>
+                    <option value="weeklyContent">📅 خطة أسبوعية</option>
+                    <option value="monthlyContent">🗓️ خطة شهرية</option>
+                    <option value="viralIdeas">🔥 أفكار فيروسية</option>
+                    <option value="buildContent">🏗️ بناء محتوى كامل</option>
+                    <option value="digitalProducts">💡 منتجات رقمية</option>
+                    <option value="askQuestion">❓ الإجابة على سؤال</option>
+                    <option value="videoScript">📹 نص فيديو</option>
+                </select>
+            </div>
+            <div class="form-group" id="countRow" style="display:none;">
+                <label><i class="fas fa-hashtag"></i> العدد</label>
+                <input type="number" id="itemCount" min="1" max="30" value="7">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-file-alt"></i> نص التقرير أو تفاصيل المطلوب</label>
+                <textarea id="userPrompt" placeholder="ألصق هنا النص..."></textarea>
+            </div>
+            <button class="btn-main" id="generateBtn"><i class="fas fa-magic"></i> ابدأ التحليل / التوليد</button>
+            <button class="btn-main btn-cancel" id="cancelBtn"><i class="fas fa-times-circle"></i> إلغاء الطلب</button>
+
+            <div id="outputSection">
+                <div class="action-bar">
+                    <button class="btn-export" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير إلى Word</button>
+                </div>
+                <div id="aiOutput" class="result-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
+    <a href="index.html" class="home-btn"><i class="fas fa-home"></i> الرئيسية</a>
+
+    <script>
+        // ============ إعدادات الـ Proxy الآمن ============
+        const GEMINI_PROXY_URL = 'https://falling-sound-3ffcgemini-proxyjs.faroukgrup.workers.dev/'; // Worker الخاص بك
+        let geminiProxyAvailable = true; // سيتم تعطيله تلقائياً إذا فشل
+
+        let abortController = null;
+        let generationInProgress = false;
+
+        document.getElementById('toolService').addEventListener('change', function() {
+            const needsCount = ['weeklyContent', 'viralIdeas', 'digitalProducts', 'videoScript'];
+            document.getElementById('countRow').style.display = needsCount.includes(this.value) ? 'block' : 'none';
+        });
+        document.getElementById('toolService').dispatchEvent(new Event('change'));
+
+        function showLoading(stage) {
+            document.getElementById('aiOutput').innerHTML = `
+                <div class="loading-box">
+                    <i class="fas fa-circle-notch fa-spin fa-2x" style="color:var(--accent-soft)"></i>
+                    <div style="margin-top:10px; color:var(--accent-soft);">${stage}</div>
+                </div>`;
+        }
+
+        function finishGeneration() {
+            generationInProgress = false;
+            document.getElementById('generateBtn').style.display = 'flex';
+            document.getElementById('cancelBtn').style.display = 'none';
+            abortController = null;
+        }
+
+        function cleanText(text) {
+            return text.replace(/Support Pollinations\.AI[\s\S]*/i, '')
+                       .replace(/Powered by[^\n]*/gi, '')
+                       .replace(/https?:\/\/[^\s]*/gi, '')
+                       .replace(/\n\s*\n/g, '\n\n').trim();
+        }
+
+        function displayContent(text) {
+            const output = document.getElementById('aiOutput');
+            output.innerHTML = '';
+            const cleaned = cleanText(text);
+            const sections = cleaned.split(/###/);
+            if (sections.length > 1) {
+                sections.forEach(sec => {
+                    if (sec.trim().length < 5) return;
+                    const lines = sec.trim().split('\n');
+                    const title = lines[0].replace(/[:\-*]/g, '').trim();
+                    const body = lines.slice(1).join('\n').trim();
+                    const card = document.createElement('div');
+                    card.className = 'content-card';
+                    card.innerHTML = title && body 
+                        ? `<h3>${title}</h3><p>${body.replace(/\n/g, '<br>')}</p>`
+                        : `<p>${sec.replace(/\n/g, '<br>')}</p>`;
+                    output.appendChild(card);
+                });
+            } else {
+                const card = document.createElement('div');
+                card.className = 'content-card';
+                card.innerHTML = `<p>${cleaned.replace(/\n/g, '<br>')}</p>`;
+                output.appendChild(card);
+            }
+        }
+
+        // ============ الاتصال الآمن عبر الـ Worker ============
+        async function callGeminiViaProxy(prompt, signal) {
+            if (!geminiProxyAvailable) throw new Error('GEMINI_DISABLED');
+            
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 25000);
+            const combinedSignal = signal ? combineSignals(signal, controller.signal) : controller.signal;
+
+            try {
+                const response = await fetch(GEMINI_PROXY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt }),
+                    signal: combinedSignal
+                });
+                clearTimeout(timeout);
+
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        geminiProxyAvailable = false; // تعطيل الوكيل إذا فشل المصادقة
+                        throw new Error('GEMINI_DISABLED');
+                    }
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error || `HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+                    return data.candidates[0].content.parts[0].text;
+                }
+                throw new Error('استجابة غير متوقعة من الخادم الوسيط');
+            } catch (err) {
+                clearTimeout(timeout);
+                if (err.name === 'AbortError') throw err;
+                if (err.message === 'GEMINI_DISABLED') throw err;
+                throw new Error('GEMINI_FAIL');
+            }
+        }
+
+        // ============ استدعاء Pollinations (احتياطي) ============
+        async function callPollinationsWithRetry(prompt, signal) {
+            const models = ['openai', 'llama', 'mistral', 'gpt-4'];
+            let lastError;
+
+            for (const model of models) {
+                if (signal?.aborted) throw new DOMException('تم الإلغاء', 'AbortError');
+                for (let attempt = 1; attempt <= 5; attempt++) {
+                    if (signal?.aborted) throw new DOMException('تم الإلغاء', 'AbortError');
+                    try {
+                        return await callPollinationsOnce(prompt, model, signal);
+                    } catch (err) {
+                        if (err.name === 'AbortError') throw err;
+                        if (err.message === 'RATE_LIMIT' && attempt < 5) {
+                            const wait = Math.floor(Math.random() * 2000 + 1000) * attempt;
+                            await delay(wait, signal);
+                            continue;
+                        }
+                        lastError = err;
+                        break;
+                    }
+                }
+            }
+            throw lastError || new Error('تعذر الاتصال بجميع الخدمات.');
+        }
+
+        async function callPollinationsOnce(prompt, model, signal) {
+            const url = 'https://text.pollinations.ai/openai/v1/chat/completions';
+            const body = JSON.stringify({
+                model, messages: [
+                    { role: 'system', content: 'أجب بالعربية الفصحى فقط مع عناوين تبدأ بـ ###.' },
+                    { role: 'user', content: prompt }
+                ], temperature: 0.8, max_tokens: 2500
+            });
+
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 25000);
+            const combinedSignal = signal ? combineSignals(signal, controller.signal) : controller.signal;
+
+            try {
+                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, signal: combinedSignal });
+                clearTimeout(timeout);
+                if (response.status === 429) throw new Error('RATE_LIMIT');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                return data.choices[0].message.content;
+            } catch (err) {
+                clearTimeout(timeout);
+                throw err;
+            }
+        }
+
+        function combineSignals(s1, s2) {
+            if (s1.aborted || s2.aborted) return AbortSignal.abort();
+            const controller = new AbortController();
+            s1.addEventListener('abort', () => controller.abort());
+            s2.addEventListener('abort', () => controller.abort());
+            return controller.signal;
+        }
+
+        const delay = (ms, signal) => new Promise((resolve, reject) => {
+            const timer = setTimeout(resolve, ms);
+            signal?.addEventListener('abort', () => { clearTimeout(timer); reject(new DOMException('تم الإلغاء', 'AbortError')); });
+        });
+
+        // ============ الدالة الرئيسية للتوليد ============
+        async function fetchBestResult(prompt, signal) {
+            if (geminiProxyAvailable) {
+                try {
+                    return await callGeminiViaProxy(prompt, signal);
+                } catch (err) {
+                    if (err.message === 'GEMINI_DISABLED' || err.name === 'AbortError') {
+                        throw err;
+                    }
+                    // فشل مؤقت، استمر للاحتياطي
+                }
+            }
+            return await callPollinationsWithRetry(prompt, signal);
+        }
+
+        document.getElementById('generateBtn').addEventListener('click', async function() {
+            if (generationInProgress) return;
+            const name = document.getElementById('userName').value.trim();
+            const service = document.getElementById('toolService').value;
+            const prompt = document.getElementById('userPrompt').value.trim();
+            const count = document.getElementById('itemCount')?.value || 7;
+            if (!prompt) { alert('يرجى إدخال النص'); return; }
+
+            abortController = new AbortController();
+            generationInProgress = true;
+            document.getElementById('generateBtn').style.display = 'none';
+            document.getElementById('cancelBtn').style.display = 'flex';
+            document.getElementById('outputSection').style.display = 'block';
+            showLoading('جارٍ المعالجة...');
+
+            let instruction = '';
+            if (service === 'reportAnalysis') instruction = `حلل التقرير التالي للأستاذ ${name}. الأقسام: ملخص تنفيذي، تحليل، نقاط قوة/ضعف، توصيات.`;
+            else if (service === 'weeklyContent') instruction = `خطة محتوى أسبوعية (${count} أيام).`;
+            else if (service === 'monthlyContent') instruction = `خطة شهرية (4 أسابيع).`;
+            else if (service === 'viralIdeas') instruction = `${count} أفكار فيروسية.`;
+            else if (service === 'buildContent') instruction = `محتوى كامل (مقدمة، 3 أقسام، خاتمة).`;
+            else if (service === 'digitalProducts') instruction = `${count} منتجات رقمية.`;
+            else if (service === 'askQuestion') instruction = `أجب بتفصيل.`;
+            else if (service === 'videoScript') instruction = `${count} نصوص فيديو.`;
+
+            const fullPrompt = `${instruction}\nالتفاصيل:\n${prompt}\nاللغة: العربية الفصحى. استخدم ### للعناوين.`;
+
+            try {
+                const result = await fetchBestResult(fullPrompt, abortController.signal);
+                displayContent(result);
+            } catch (err) {
+                if (err.name === 'AbortError') {
+                    document.getElementById('aiOutput').innerHTML = '<p style="color:#ffc107; text-align:center;">تم إلغاء الطلب.</p>';
+                } else {
+                    document.getElementById('aiOutput').innerHTML = '<p style="color:#f8d7da; text-align:center;">الخدمة مشغولة جداً حالياً، يرجى المحاولة بعد قليل.</p>';
+                }
+            } finally {
+                finishGeneration();
+            }
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', () => abortController?.abort());
+        document.getElementById('exportWordBtn').addEventListener('click', () => {
+            const output = document.getElementById('aiOutput');
+            if (!output.children.length) return alert('لا يوجد محتوى');
+            const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><style>body{font-family:'Tajawal',sans-serif;padding:20px;}h3{color:#b8860b;}</style></head><body>${output.innerHTML}</body></html>`;
+            const blob = new Blob([html], { type: 'application/msword' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `تقرير_${new Date().toISOString().slice(0,10)}.doc`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        });
+    </script>
+</body>
+</html>
