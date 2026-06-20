@@ -157,9 +157,9 @@
     <a href="index.html" class="home-btn"><i class="fas fa-home"></i> الرئيسية</a>
 
     <script>
-        // ============ إعدادات الـ Proxy الآمن ============
-        const GEMINI_PROXY_URL = 'https://falling-sound-3ffcgemini-proxyjs.faroukgrup.workers.dev/'; // Worker الخاص بك
-        let geminiProxyAvailable = true; // سيتم تعطيله تلقائياً إذا فشل
+        // ============ إعدادات الـ Proxy ============
+        const GEMINI_PROXY_URL = 'https://falling-sound-3ffcgemini-proxyjs.faroukgrup.workers.dev/';
+        let geminiProxyAvailable = true;
 
         let abortController = null;
         let generationInProgress = false;
@@ -218,46 +218,58 @@
             }
         }
 
-        // ============ الاتصال الآمن عبر الـ Worker ============
+        // ============ استدعاء الـ Proxy مع معالجة محسنة ============
         async function callGeminiViaProxy(prompt, signal) {
             if (!geminiProxyAvailable) throw new Error('GEMINI_DISABLED');
             
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 25000);
-            const combinedSignal = signal ? combineSignals(signal, controller.signal) : controller.signal;
+            // محاولتين للـ Proxy
+            for (let attempt = 1; attempt <= 2; attempt++) {
+                if (signal?.aborted) throw new DOMException('تم الإلغاء', 'AbortError');
+                
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 20000);
+                const combinedSignal = signal ? combineSignals(signal, controller.signal) : controller.signal;
 
-            try {
-                const response = await fetch(GEMINI_PROXY_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt }),
-                    signal: combinedSignal
-                });
-                clearTimeout(timeout);
+                try {
+                    const response = await fetch(GEMINI_PROXY_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt }),
+                        signal: combinedSignal
+                    });
+                    clearTimeout(timeout);
 
-                if (!response.ok) {
-                    if (response.status === 401 || response.status === 403) {
-                        geminiProxyAvailable = false; // تعطيل الوكيل إذا فشل المصادقة
-                        throw new Error('GEMINI_DISABLED');
+                    // التحقق من الأخطاء
+                    if (!response.ok) {
+                        if (response.status === 401 || response.status === 403) {
+                            geminiProxyAvailable = false;
+                            throw new Error('GEMINI_DISABLED');
+                        }
+                        const errData = await response.json().catch(() => ({}));
+                        throw new Error(errData.error || `HTTP ${response.status}`);
                     }
-                    const errData = await response.json().catch(() => ({}));
-                    throw new Error(errData.error || `HTTP ${response.status}`);
-                }
 
-                const data = await response.json();
-                if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-                    return data.candidates[0].content.parts[0].text;
+                    const data = await response.json();
+                    if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+                        return data.candidates[0].content.parts[0].text;
+                    }
+                    throw new Error('استجابة غير متوقعة');
+                } catch (err) {
+                    clearTimeout(timeout);
+                    if (err.name === 'AbortError') {
+                        // إذا كان الإلغاء من المؤقت (AbortError من controller) نعيد المحاولة مرة واحدة
+                        if (!signal?.aborted && attempt === 1) continue;
+                        throw err;
+                    }
+                    if (err.message === 'GEMINI_DISABLED') throw err;
+                    if (attempt === 1) continue; // إعادة محاولة واحدة فقط
+                    throw new Error('PROXY_FAIL');
                 }
-                throw new Error('استجابة غير متوقعة من الخادم الوسيط');
-            } catch (err) {
-                clearTimeout(timeout);
-                if (err.name === 'AbortError') throw err;
-                if (err.message === 'GEMINI_DISABLED') throw err;
-                throw new Error('GEMINI_FAIL');
             }
+            throw new Error('PROXY_FAIL');
         }
 
-        // ============ استدعاء Pollinations (احتياطي) ============
+        // ============ Pollinations كاحتياط ============
         async function callPollinationsWithRetry(prompt, signal) {
             const models = ['openai', 'llama', 'mistral', 'gpt-4'];
             let lastError;
@@ -322,16 +334,15 @@
             signal?.addEventListener('abort', () => { clearTimeout(timer); reject(new DOMException('تم الإلغاء', 'AbortError')); });
         });
 
-        // ============ الدالة الرئيسية للتوليد ============
+        // ============ دالة التوليد الرئيسية ============
         async function fetchBestResult(prompt, signal) {
+            // المحاولة عبر الـ Proxy
             if (geminiProxyAvailable) {
                 try {
                     return await callGeminiViaProxy(prompt, signal);
                 } catch (err) {
-                    if (err.message === 'GEMINI_DISABLED' || err.name === 'AbortError') {
-                        throw err;
-                    }
-                    // فشل مؤقت، استمر للاحتياطي
+                    if (err.message === 'GEMINI_DISABLED' || err.name === 'AbortError') throw err;
+                    // إذا فشل الـ Proxy ننتقل للاحتياطي
                 }
             }
             return await callPollinationsWithRetry(prompt, signal);
@@ -370,8 +381,10 @@
             } catch (err) {
                 if (err.name === 'AbortError') {
                     document.getElementById('aiOutput').innerHTML = '<p style="color:#ffc107; text-align:center;">تم إلغاء الطلب.</p>';
+                } else if (err.message === 'GEMINI_DISABLED' || err.message === 'PROXY_FAIL') {
+                    document.getElementById('aiOutput').innerHTML = '<p style="color:#f8d7da; text-align:center;">تعذر الاتصال بالخادم الرئيسي، جارٍ استخدام الخدمات الاحتياطية...</p>';
                 } else {
-                    document.getElementById('aiOutput').innerHTML = '<p style="color:#f8d7da; text-align:center;">الخدمة مشغولة جداً حالياً، يرجى المحاولة بعد قليل.</p>';
+                    document.getElementById('aiOutput').innerHTML = `<p style="color:#f8d7da; text-align:center;">${err.message}</p>`;
                 }
             } finally {
                 finishGeneration();
