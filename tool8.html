@@ -682,7 +682,7 @@
                     <label><i class="fas fa-calculator"></i> نوع التدفق:</label>
                     <select id="flowTypeSelect">
                         <option value="operating">التدفق التشغيلي (OCF)</option>
-                        <option value="free" selected>التدفق الحر (FCFF)</option>
+                        <option value="free" selected>التدفق الحر (FCF)</option>
                     </select>
                 </div>
             </div>
@@ -899,7 +899,7 @@
                 flowName = 'التدفق التشغيلي (OCF)';
             } else { // free
                 finalFCF = operatingCF - capex - wcChange;
-                flowName = 'التدفق الحر (FCFF)';
+                flowName = 'التدفق الحر (FCF)';
             }
 
             // إنشاء تسميات الفترات الخمس القادمة
@@ -1136,7 +1136,7 @@
                     ['التغير في رأس المال العامل (سنوي)', I.wcChangeAnnual, `${currency} ${I.wcChangeAnnual.toFixed(0)}`],
                     ['معدل النمو المتوقع (%)', I.growthRatePercent, ''],
                     ['الفترة المختارة', I.period === 'monthly' ? 'شهرية' : I.period === 'quarterly' ? 'ربع سنوية' : 'سنوية', ''],
-                    ['نوع التدفق', I.flowType === 'operating' ? 'تشغيلي (OCF)' : 'حر (FCFF)', ''],
+                    ['نوع التدفق', I.flowType === 'operating' ? 'تشغيلي (OCF)' : 'حر (FCF)', ''],
                     ['العملة المستخدمة', I.currency, ''],
                     ['اسم الجهة / المشروع', I.companyName, '']
                 ];
