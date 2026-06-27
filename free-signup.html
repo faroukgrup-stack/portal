@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اشتراك مجاني - مجموعة فاروق</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* نفس الأنماط التي لديك مع تعديلات بسيطة */
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: #0b0e17;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .reg-card {
+            background: rgba(18, 24, 36, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,215,0,0.3);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #333;
+            color: white;
+            border-radius: 8px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #d4af37, #aa8a2e);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .msg-box {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+            font-weight: bold;
+        }
+        .success {
+            background: rgba(75, 181, 67, 0.2);
+            color: #4bb543;
+            border: 1px solid #4bb543;
+        }
+        .error {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+            border: 1px solid #ff4444;
+        }
+        .exists {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+            border: 1px solid #ffa500;
+        }
+        .renew-link {
+            color: #d4af37;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+        .renew-link:hover {
+            color: #fff;
+        }
+        .login-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #d4af37;
+            text-decoration: none;
+            border: 1px solid #d4af37;
+            padding: 8px 20px;
+            border-radius: 30px;
+            transition: 0.3s;
+        }
+        .login-link:hover {
+            background: #d4af37;
+            color: #000;
+        }
+        .hint {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="reg-card">
+    <i class="fas fa-gift" style="font-size: 3rem; color: #d4af37; margin-bottom: 20px;"></i>
+    <h2>اشتراك مجاني لمدة 30 يوماً</h2>
+    <p>أدخل بياناتك للحصول على نسخة تجريبية مجانية</p>
+
+    <form id="freeForm">
+        <input type="text" name="fullName" placeholder="الاسم الكامل (اختياري)">
+        <input type="email" name="username" placeholder="البريد الإلكتروني" required inputmode="email">
+        <input type="password" name="password" placeholder="كلمة المرور (للوصول إلى المنصة)" required>
+        <button type="submit" id="freeBtn">احصل على الاشتراك المجاني</button>
+    </form>
+
+    <!-- منطقة الرسائل -->
+    <div id="msgBox" class="msg-box"></div>
+
+    <div style="margin-top: 20px; font-size: 0.9rem; color: #aaa;">
+        لديك حساب بالفعل؟ <a href="https://portal.farouk-grup.com/" style="color: #d4af37;">سجل الدخول</a>
+    </div>
+</div>
+
+<script>
+    // رابط Google Apps Script (نفس الرابط الذي تستخدمه)
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzKfhyxsOq5s0vI-Ps7i4nJ6mCdCnWKfqr5xIgqUs92gWKKXeaVp7GynMbegh9DZqDP/exec';
+
+    const form = document.getElementById('freeForm');
+    const btn = document.getElementById('freeBtn');
+    const msgBox = document.getElementById('msgBox');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // إخفاء الرسائل السابقة
+        msgBox.style.display = 'none';
+        msgBox.className = 'msg-box';
+
+        // تعطيل الزر
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري المعالجة...';
+
+        const formData = new FormData(this);
+        formData.append('action', 'freeRegister');
+
+        fetch(scriptURL, {
+            method: 'POST',
+            body: formData,
+            mode: 'cors'   // مهم لقراءة الرد
+        })
+        .then(response => response.json())
+        .then(data => {
+            // إظهار الرسالة
+            msgBox.style.display = 'block';
+
+            if (data.status === 'success') {
+                // نجاح التسجيل
+                msgBox.className = 'msg-box success';
+                msgBox.innerHTML = `
+                    <i class="fas fa-check-circle"></i> ${data.message}<br>
+                    <a href="${data.loginUrl}" class="login-link" target="_blank">اذهب إلى صفحة الدخول</a>
+                `;
+                // إعادة تعيين النموذج (اختياري)
+                form.reset();
+            } 
+            else if (data.status === 'exists') {
+                // البريد موجود مسبقاً
+                msgBox.className = 'msg-box exists';
+                msgBox.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i> ${data.message}<br>
+                    <a href="${data.renewLink}" target="_blank" class="renew-link">اضغط هنا لتجديد الاشتراك</a>
+                `;
+            } 
+            else {
+                // خطأ عام
+                msgBox.className = 'msg-box error';
+                msgBox.textContent = '❌ ' + (data.message || 'حدث خطأ غير معروف');
+            }
+        })
+        .catch(error => {
+            msgBox.style.display = 'block';
+            msgBox.className = 'msg-box error';
+            msgBox.textContent = '❌ تعذر الاتصال بالسيرفر. تأكد من اتصالك بالإنترنت وحاول مجدداً.';
+            console.error('Fetch error:', error);
+        })
+        .finally(() => {
+            // إعادة تمكين الزر
+            btn.disabled = false;
+            btn.innerHTML = 'احصل على الاشتراك المجاني';
+        });
+    });
+</script>
+
+</body>
+</html>
