@@ -2,14 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>تفعيل الاشتراك الشهري - مجموعة فاروق</title>
+    <title>تفعيل الاشتراك - مجموعة فاروق</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body {
             font-family: 'Tajawal', sans-serif;
             background: #0b0e17; color: white;
-            display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px;
+            display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;
         }
         .reg-card {
             background: rgba(18, 24, 36, 0.9);
@@ -20,114 +20,68 @@
         input {
             width: 100%; padding: 12px; margin: 10px 0;
             background: rgba(255,255,255,0.05); border: 1px solid #333;
-            color: white; border-radius: 8px; font-family: inherit; box-sizing: border-box;
+            color: white; border-radius: 8px; font-family: inherit;
         }
         input[readonly] { background: rgba(255,255,255,0.02); color: #aaa; cursor: not-allowed; }
         button {
             width: 100%; padding: 15px; margin-top: 20px;
             background: linear-gradient(135deg, #d4af37, #aa8a2e);
-            border: none; border-radius: 8px; color: #000; font-weight: bold; cursor: pointer; font-family: inherit;
+            border: none; border-radius: 8px; color: #000; font-weight: bold; cursor: pointer;
         }
-        button:disabled { opacity: 0.6; cursor: not-allowed; }
-        .msg-box {
-            margin-top: 18px;
-            padding: 12px;
-            border-radius: 8px;
-            display: none;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        .success { background: rgba(75,181,67,0.2); color: #4bb543; border: 1px solid #4bb543; }
-        .error { background: rgba(255,68,68,0.2); color: #ff4444; border: 1px solid #ff4444; }
-        .exists { background: rgba(255,165,0,0.2); color: #ffa500; border: 1px solid #ffa500; }
-        .login-link {
-            display: inline-block; margin-top: 10px; color: #d4af37; text-decoration: none;
-            border: 1px solid #d4af37; padding: 6px 18px; border-radius: 30px; font-size: 0.9rem;
-        }
-        .domain-hint {
-            font-size: 0.75rem; color: #aaa; margin-top: 2px; text-align: right;
-        }
+        .success-msg { color: #4bb543; display: none; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="reg-card">
     <i class="fas fa-user-plus" style="font-size: 3rem; color: #d4af37; margin-bottom: 20px;"></i>
-    <h2>تفعيل حساب المشترك الشهري</h2>
-    <p>اشتراك لمدة شهر واحد مع جميع الميزات</p>
+    <h2>تفعيل حساب المشترك</h2>
+    <p>يرجى إدخال بيانات الدخول الخاصة بك</p>
 
-    <form id="monthlyForm">
-        <input type="text" name="fullName" placeholder="الاسم الكامل (اختياري)">
-        <input type="email" name="username" placeholder="البريد الإلكتروني (Gmail, Yahoo...)" required inputmode="email">
-        <div class="domain-hint">نطاقات حقيقية فقط (مثل gmail.com, outlook.com)</div>
-        <input type="password" name="password" placeholder="كلمة المرور للدخول" required minlength="6">
+    <form id="registrationForm">
+        <input type="text" name="fullName" placeholder="الاسم الكامل" required>
+        
+        <!-- حقل البريد الإلكتروني بدلاً من اسم المستخدم العادي -->
+        <input type="email" name="username" placeholder="البريد الإلكتروني الذي تم تسجيله عند دفع الاشتراك mo....@gmail.com" required inputmode="email">
+        
+        <input type="password" name="password" placeholder="كلمة المرور بالانجليزي" required>
+        
         <label style="display:block; text-align:right; font-size: 0.8rem; margin-top: 10px; color: #d4af37;">تاريخ انتهاء الاشتراك (تلقائي):</label>
         <input type="text" id="expiryDisplay" readonly>
-        <button type="submit" id="monthlyBtn">تفعيل الاشتراك الشهري</button>
+        
+        <input type="hidden" name="duration" value="1">
+        <button type="submit" id="regBtn">تفعيل الحساب الآن</button>
     </form>
-
-    <div id="msgBox" class="msg-box"></div>
+    <div id="msg" class="success-msg">تم تفعيل حسابك! جاري تحويلك للبوابة...</div>
 </div>
 
 <script>
-    // عرض تاريخ بعد شهر للتوضيح
+    // حساب التاريخ بعد شهر للعرض فقط
     const nextMonth = new Date();
     nextMonth.setMonth(nextMonth.getMonth() + 1);
     document.getElementById('expiryDisplay').value = nextMonth.toISOString().split('T')[0];
 
-    // رابط السكريبت الرئيسي المطوَّر (نفسه لجميع العمليات)
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzEKTIjGkqFYe183KqU_oJlKQgYtylaR5m-coI3IjAesafRQpacGpDqWABC5gJWoVxj/exec';
 
-    const form = document.getElementById('monthlyForm');
-    const btn = document.getElementById('monthlyBtn');
-    const msgBox = document.getElementById('msgBox');
-
-    form.addEventListener('submit', function(e) {
+    document.getElementById('registrationForm').addEventListener('submit', e => {
         e.preventDefault();
-        msgBox.style.display = 'none';
-        msgBox.className = 'msg-box';
+        const btn = document.getElementById('regBtn');
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري التفعيل...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري الربط...';
 
-        const formData = new FormData(this);
-        formData.append('action', 'monthRegister');   // الإجراء الجديد للشهر
+        const formData = new FormData(e.target);
+        formData.append('action', 'register');
 
-        fetch(scriptURL, {
-            method: 'POST',
-            body: formData,
-            mode: 'cors'
-        })
-        .then(response => response.json())
-        .then(data => {
-            msgBox.style.display = 'block';
-
-            if (data.status === 'success') {
-                msgBox.className = 'msg-box success';
-                msgBox.innerHTML = `
-                    <i class="fas fa-check-circle"></i> ${data.message}<br>
-                    <a href="${data.loginUrl}" class="login-link">اذهب إلى صفحة الدخول</a>
-                `;
-                form.reset();
-            } 
-            else if (data.status === 'exists') {
-                msgBox.className = 'msg-box exists';
-                msgBox.innerHTML = `
-                    <i class="fas fa-exclamation-triangle"></i> ${data.message}
-                `;
-            } 
-            else {
-                msgBox.className = 'msg-box error';
-                msgBox.textContent = '❌ ' + (data.message || 'حدث خطأ غير معروف');
-            }
+        fetch(scriptURL, { method: 'POST', body: formData, mode: 'no-cors'})
+        .then(() => {
+            document.getElementById('msg').style.display = 'block';
+            setTimeout(() => {
+                window.location.href = 'https://portal.farouk-grup.com/';
+            }, 3000);
         })
         .catch(error => {
-            msgBox.style.display = 'block';
-            msgBox.className = 'msg-box error';
-            msgBox.textContent = '❌ تعذر الاتصال بالسيرفر. تأكد من اتصالك بالإنترنت.';
-        })
-        .finally(() => {
+            alert('حدث خطأ، يرجى المحاولة لاحقاً');
             btn.disabled = false;
-            btn.innerHTML = 'تفعيل الاشتراك الشهري';
         });
     });
 </script>
