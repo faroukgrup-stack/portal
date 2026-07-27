@@ -36,6 +36,35 @@
         .login-card p { font-size:0.85rem; margin-bottom:1.2rem; }
         .login-input { width:100%; padding:0.9rem 1rem; background:rgba(10,14,23,0.8); border:1px solid var(--border-light); border-radius:60px; font-family:'Inter',sans-serif; font-size:1rem; text-align:center; direction:ltr; margin-bottom:1rem; color:var(--accent-soft); box-shadow:inset 0 2px 8px rgba(0,0,0,0.6); transition:var(--transition); }
         .login-input:focus { outline:none; border-color:var(--accent-glow); box-shadow:0 0 0 3px rgba(180,133,84,0.3), inset 0 2px 8px black; }
+
+        /* تنسيق حقل كلمة المرور مع أيقونة العين */
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        .password-wrapper .login-input {
+            margin-bottom: 0;
+            padding-left: 45px; /* مساحة للأيقونة */
+        }
+        .toggle-password {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 5px;
+            z-index: 2;
+            transition: color 0.2s;
+        }
+        .toggle-password:hover {
+            color: var(--accent-soft);
+        }
+
         .whatsapp-link { display:block; margin-top:15px; font-size:0.8rem; color:var(--accent-soft); text-decoration:none; opacity:0.8; }
         .whatsapp-link:hover { opacity:1; text-decoration:underline; }
         .login-btn { width:100%; padding:1rem; background:rgba(180,133,84,0.15); border:1px solid var(--border-light); border-radius:60px; font-family:'Tajawal',sans-serif; font-size:1.2rem; font-weight:700; color:var(--accent-soft); cursor:pointer; transition:var(--transition); display:flex; align-items:center; justify-content:center; gap:0.8rem; backdrop-filter:blur(10px); margin-top:0.5rem; }
@@ -186,7 +215,15 @@
             <h2>دخول المصرح لهم</h2>
             <p>مجموعة فاروق للاستشارات والأعمال</p>
             <input type="email" id="usernameInput" class="login-input" placeholder="البريد الإلكتروني">
-            <input type="password" id="passwordInput" class="login-input" placeholder="كلمة المرور">
+            
+            <!-- حقل كلمة المرور مع زر العين -->
+            <div class="password-wrapper">
+                <input type="password" id="passwordInput" class="login-input" placeholder="كلمة المرور">
+                <button type="button" class="toggle-password" id="togglePasswordBtn" tabindex="-1" aria-label="إظهار كلمة المرور">
+                    <i class="fas fa-eye" id="eyeIcon"></i>
+                </button>
+            </div>
+
             <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> دخول</button>
             <a href="https://wa.me/905550196682" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i> نسيت كلمة المرور؟ اضغط هنا</a>
             <a href="https://portal.farouk-grup.com/finance-hub" target="_blank" class="whatsapp-link"><i class="fas fa-star"></i> للإشتراك بالمنصة؟ اضغط هنا</a>
@@ -267,13 +304,24 @@
     <script>
         AOS.init({ duration: 800, once: true });
 
+        // ─── تفعيل زر العين لإظهار / إخفاء كلمة المرور ────────
+        const passwordField = document.getElementById('passwordInput');
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        togglePasswordBtn.addEventListener('click', function() {
+            const isPassword = passwordField.type === 'password';
+            passwordField.type = isPassword ? 'text' : 'password';
+            eyeIcon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+            togglePasswordBtn.setAttribute('aria-label', isPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور');
+        });
+
         const GOOGLE_SCRIPT_URL = "https://farouk-api-proxy.faroukgrup.workers.dev/";
         const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 ساعة
 
         const loginOverlay = document.getElementById('loginOverlay');
         const dashboard = document.getElementById('dashboard');
         const usernameInput = document.getElementById('usernameInput');
-        const passwordInput = document.getElementById('passwordInput');
         const loginBtn = document.getElementById('loginBtn');
         const errorMsg = document.getElementById('errorMsg');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -402,7 +450,7 @@
         // ========== تسجيل الدخول ==========
         async function attemptLogin() {
             const user = usernameInput.value.trim();
-            const pass = passwordInput.value.trim();
+            const pass = passwordField.value.trim();
 
             if (!user || !pass) {
                 errorMsg.textContent = '❌ يرجى إدخال البريد الإلكتروني وكلمة المرور';
@@ -455,8 +503,8 @@
 
         // ========== الأحداث ==========
         loginBtn.addEventListener('click', attemptLogin);
-        passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') attemptLogin(); });
-        usernameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') passwordInput.focus(); });
+        passwordField.addEventListener('keypress', (e) => { if (e.key === 'Enter') attemptLogin(); });
+        usernameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') passwordField.focus(); });
 
         logoutBtn.addEventListener('click', () => {
             if (logoutTimer) clearTimeout(logoutTimer);
@@ -499,6 +547,7 @@
                     { name: "دراسة الجدوى التسويقية الشاملة", icon: "fa-chart-simple", file: "tool4.html" },
                     { name: "حساب العائد على الاستثمار للعقاري", icon: "fa-building", file: "tool5.html" },
                     { name: "حاسبة العائد على الاستثمار (ROI)", icon: "fa-chart-line", file: "tool11.html" },
+                    { name: "حاسبة تقييم المطاعم", icon: "fa-ranking-star", file: "tool30.html" },
                     { name: "تحليل الاستثمار (NPV / IRR / Payback)", icon: "fa-wave-square", file: "tool26.html" }
 
                 ]
@@ -513,6 +562,7 @@
                     { name: "التنبؤ المالي المتقدم", icon: "fa-arrow-trend-up", file: "tool19.html" },
                     { name: "حاسبة الإهلاك", icon: "fa-chart-simple", file: "tool9.html" },
                     { name: "حاسبة معدل الخصم (WACC)", icon: "fa-scale-balanced", file: "tool10.html" },
+                    { name: "تحليل السيناريوهات", icon: "fas fa-lightbulb", file: "tool28.html" },
                     { name: "حاسبة جدولة القروض", icon: "fa-hand-holding-usd", file: "tool12.html" }
                 ]
             },
@@ -543,6 +593,7 @@
                 tools: [
                     { name: "تقييم الموظفين", icon: "fa-user-check", file: "tool20.html" },
                     { name: "مقياس تقييم الإداري", icon: "fa-user-check", file: "tool21.html" },
+                    { name: "تقييم المعارف والمهارات", icon: "fa-award", file: "tool29.html" },
                     { name: " أداة التحليل وتوليد المحتوى(تجريبية)", icon: "fas fa-robot", file: "tool24.html" },
                     { name: "آلة حاسبة إدارية", icon: "fa-calculator", file: "tool16.html" }
                 ]

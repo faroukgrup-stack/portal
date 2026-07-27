@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <title>حاسبة تقييم المطاعم | FAROUK GRUP</title>
+    <!-- حماية الصفحة -->
+    <script src="auth-check.js"></script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0b0e17;
+            --bg-panel: rgba(18, 24, 36, 0.85);
+            --bg-card: rgba(22, 30, 46, 0.8);
+            --border-light: rgba(180, 133, 84, 0.25);
+            --accent-glow: #b48554;
+            --accent-soft: #cfa776;
+            --text-light: #f0f4fa;
+            --text-muted: #aab7d4;
+            --text-dark: #0b0e17;
+            --shadow-soft: 0 15px 35px -10px rgba(0,0,0,0.6), 0 0 0 1px rgba(180,133,84,0.15);
+            --shadow-glow: 0 15px 35px -10px rgba(0,0,0,0.8), 0 0 20px rgba(180,133,84,0.3);
+            --radius-md: 20px;
+            --radius-lg: 30px;
+            --transition: all 0.3s ease;
+            --gold: #b8860b;
+            --gold-light: #d4b15a;
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+        }
+        .glow-bg { position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 0; }
+        .glow-bg span { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%); border-radius: 50%; filter: blur(80px); animation: glowMove 20s infinite alternate ease-in-out; }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; animation-delay: -5s; }
+        @keyframes glowMove { 0% { transform: translate(0, 0) scale(1); opacity: 0.5; } 100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; } }
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 2.5rem 1rem;
+            border-bottom: 4px solid var(--gold); position: relative; overflow: hidden; z-index: 2;
+        }
+        .hero-mini::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%); animation: rotate 30s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .hero-mini h2 { font-size: 2.5rem; font-weight: 900; color: var(--gold-light); margin-bottom: 0.5rem; position: relative; z-index: 2; }
+        .hero-mini p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; opacity: 0.95; position: relative; z-index: 2; color: #e0d7c6; }
+        .calc-wrapper { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; position: relative; z-index: 2; }
+        .calc-box {
+            background: var(--bg-panel); backdrop-filter: blur(15px);
+            border: 2px solid var(--border-light); border-radius: var(--radius-lg);
+            padding: 1.8rem; box-shadow: var(--shadow-soft); position: relative; overflow: hidden;
+        }
+        .calc-box:hover { box-shadow: var(--shadow-glow); border-color: rgba(180,133,84,0.4); }
+        .currency-row {
+            display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+            background: rgba(180,133,84,0.15); border: 1px solid var(--border-light);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
+        }
+        .currency-row label { font-weight: 700; color: var(--accent-soft); margin: 0; }
+        .currency-row select, .currency-row input {
+            padding: 0.5rem 1rem; border: 2px solid var(--border-light); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: var(--text-light);
+        }
+        .section-title-sm {
+            font-size: 1.3rem; font-weight: 900; color: var(--accent-soft); margin: 1.5rem 0 0.8rem 0;
+            border-bottom: 2px solid var(--border-light); padding-bottom: 0.3rem;
+        }
+        .form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+        .form-group { flex: 1 1 180px; margin-bottom: 0.8rem; position: relative; }
+        label { display: block; margin-bottom: 0.3rem; font-weight: 700; color: var(--accent-soft); font-size: 0.9rem; }
+        label i { color: var(--accent-soft); margin-left: 0.3rem; }
+        input, select {
+            width: 100%; padding: 0.8rem 1rem; border: 2px solid var(--border-light); border-radius: 30px;
+            font-family: 'Inter', sans-serif; font-size: 0.95rem; background: rgba(10,14,23,0.7); color: var(--text-light);
+            transition: var(--transition);
+        }
+        input:focus, select:focus { outline: none; border-color: var(--accent-glow); box-shadow: 0 0 0 3px rgba(180,133,84,0.2); }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: #1a1a2e;
+            color: #f0f4fa;
+            text-align: center;
+            border-radius: 8px;
+            padding: 8px;
+            position: absolute;
+            z-index: 100;
+            bottom: 130%;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            border: 1px solid var(--gold);
+            pointer-events: none;
+        }
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1a1a2e transparent transparent transparent;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 1rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.2); border: 1px solid var(--border-light);
+            color: var(--accent-soft); font-weight: 900; font-size: 1.2rem; cursor: pointer;
+            transition: var(--transition); backdrop-filter: blur(10px); margin: 1.5rem 0;
+        }
+        .btn-calculate:hover {
+            background: rgba(180,133,84,0.4); color: #fff; border-color: var(--accent-glow);
+            box-shadow: 0 0 25px rgba(180,133,84,0.3); transform: translateY(-3px);
+        }
+        .results-section { margin-top: 2rem; }
+        .results-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .result-card {
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            border-radius: var(--radius-md); padding: 1.2rem; text-align: center;
+            box-shadow: var(--shadow-soft); transition: var(--transition);
+        }
+        .result-card:hover { transform: translateY(-5px); border-color: var(--accent-glow); }
+        .result-card i { font-size: 1.8rem; color: var(--accent-soft); margin-bottom: 0.5rem; }
+        .result-card h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem; }
+        .result-card .value { font-size: 1.4rem; font-weight: 900; color: var(--accent-soft); }
+        .result-card .unit { font-size: 0.8rem; color: var(--text-muted); }
+        .status { font-size: 0.8rem; margin-top: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 20px; display: inline-block; }
+        .status-good { background: #28a745; color: white; }
+        .status-bad { background: #dc3545; color: white; }
+        .status-warning { background: #ffc107; color: #111; }
+        .table-container { overflow-x: auto; margin-top: 1.5rem; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-card); padding: 0.8rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { background: rgba(180,133,84,0.2); color: var(--accent-soft); font-weight: 900; padding: 0.5rem; border-bottom: 2px solid var(--border-light); }
+        td { padding: 0.5rem; border-bottom: 1px solid rgba(180,133,84,0.2); text-align: center; color: var(--text-light); }
+        .export-container { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; margin: 1.5rem 0; }
+        .export-btn {
+            background: rgba(180,133,84,0.15); border: 1px solid var(--border-light); border-radius: 40px;
+            padding: 0.8rem 1.5rem; color: var(--accent-soft); font-weight: 700; cursor: pointer;
+            transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;
+        }
+        .export-btn:hover { background: rgba(180,133,84,0.3); color: #fff; border-color: var(--accent-glow); }
+        .footer-simple { text-align: center; padding: 1.5rem; margin-top: 2rem; background: rgba(10,14,23,0.5); backdrop-filter: blur(5px); border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.85rem; }
+        .footer-simple span { color: var(--accent-soft); font-weight: 700; }
+        .capital-injection { background: rgba(42,122,90,0.1); border: 1px solid rgba(42,122,90,0.3); border-radius: var(--radius-md); padding: 1rem; margin: 1rem 0; }
+        .capital-injection h3 { color: #7fc9a5; margin-bottom: 0.8rem; }
+        .warning-note { background: rgba(220,53,69,0.1); border-right: 4px solid #dc3545; padding: 0.8rem; border-radius: 8px; margin: 1rem 0; color: #f8d7da; }
+        @media (max-width: 768px) {
+            .hero-mini h2 { font-size: 2rem; }
+            .calc-box { padding: 1rem; }
+            .tooltip .tooltiptext { width: 160px; margin-left: -80px; font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<section class="hero-mini">
+    <h2>حاسبة تقييم المطاعم</h2>
+    <p>قيمة عادلة مبنية على الأرباح والديون – مع تحليل الحساسية وعوامل الخطر</p>
+</section>
+
+<section class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <!-- اختيار العملة -->
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> العملة:</label>
+            <select id="currencySelect">
+                <option value="$" selected>دولار ($)</option>
+                <option value="€">يورو (€)</option>
+                <option value="₺">ليرة تركية (₺)</option>
+                <option value="ج.م">جنيه مصري (ج.م)</option>
+                <option value="د.ك">دينار كويتي (د.ك)</option>
+                <option value="ر.س">ريال سعودي (ر.س)</option>
+            </select>
+            <label><i class="fas fa-store"></i> اسم المطعم:</label>
+            <input type="text" id="restaurantName" value="مطعم النخبة" style="width:200px;">
+        </div>
+
+        <!-- بيانات المطعم الأساسية مع شرح -->
+        <div class="section-title-sm"><i class="fas fa-store"></i> بيانات المطعم الأساسية</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-calendar-alt"></i> سنة التأسيس</label>
+                <input type="number" id="estYear" value="2018" min="1990" max="2026">
+                <span class="tooltiptext">السنة التي بدأ فيها المطعم نشاطه التجاري. تستخدم لتقييم الاستمرارية.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-file-contract"></i> سنة انتهاء عقد الإيجار</label>
+                <input type="number" id="leaseExpiry" value="2029" min="2025" max="2050">
+                <span class="tooltiptext">إذا كان متبقي على العقد أقل من 3 سنوات، يتم تخفيض المضاعف تلقائياً ليعكس المخاطر العالية.</span>
+            </div>
+        </div>
+
+        <!-- البيانات المالية مع شرح لكل حقل -->
+        <div class="section-title-sm"><i class="fas fa-coins"></i> البيانات المالية (سنوية)</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-receipt"></i> إجمالي الإيرادات</label>
+                <input type="number" id="revenue" value="500000" step="1000">
+                <span class="tooltiptext">إجمالي مبيعات المطعم السنوية قبل خصم أي تكاليف.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-shopping-cart"></i> تكلفة البضاعة المباعة (COGS)</label>
+                <input type="number" id="cogs" value="200000" step="1000">
+                <span class="tooltiptext">تكلفة المواد الخام والمكونات المستخدمة في إعداد الأطباق والمشروبات.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-tools"></i> المصاريف التشغيلية (OPEX)</label>
+                <input type="number" id="opex" value="150000" step="1000">
+                <span class="tooltiptext">الإيجار، الرواتب، الكهرباء، التسويق، الصيانة وغيرها من التكاليف التشغيلية.</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-chart-line"></i> الإهلاك والاستهلاك (D&A)</label>
+                <input type="number" id="depreciation" value="20000" step="1000">
+                <span class="tooltiptext">التناقص السنوي في قيمة الأصول مثل معدات المطبخ والأثاث.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-hand-holding-usd"></i> الفوائد المدفوعة</label>
+                <input type="number" id="interest" value="10000" step="1000">
+                <span class="tooltiptext">الفوائد السنوية المدفوعة على القروض البنكية.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-file-invoice-dollar"></i> الضرائب المدفوعة</label>
+                <input type="number" id="taxes" value="15000" step="1000">
+                <span class="tooltiptext">إجمالي الضرائب السنوية (دخل، مبيعات، إلخ).</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-university"></i> إجمالي الديون القائمة</label>
+                <input type="number" id="totalDebt" value="200000" step="1000">
+                <span class="tooltiptext">المبلغ المتبقي من القروض والفوائد المتراكمة المستحقة على المطعم.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-couch"></i> القيمة السوقية للمعدات والأثاث</label>
+                <input type="number" id="assetValue" value="80000" step="1000" placeholder="اختياري">
+                <span class="tooltiptext">القيمة التقديرية لو بيعت المعدات والأثاث اليوم، وليس سعر الشراء الأصلي.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-sliders-h"></i> مضاعف السوق (2 - 4)</label>
+                <input type="number" id="multiplier" value="3" min="2" max="4" step="0.1">
+                <span class="tooltiptext">يعكس قوة العلامة التجارية ونمو الأرباح. العالي يعني تقييم أقوى.</span>
+            </div>
+        </div>
+
+        <!-- خيار ضخ رأس مال -->
+        <div class="capital-injection">
+            <h3><i class="fas fa-money-bill-wave"></i> سيناريو ضخ رأس مال إضافي</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><input type="checkbox" id="capitalInjectionEnabled" style="width:auto; margin-left:0.5rem;"> تفعيل ضخ رأس مال</label>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-coins"></i> قيمة الضخ</label>
+                    <input type="number" id="injectionAmount" value="50000" step="1000" disabled>
+                    <span class="tooltiptext">المبلغ الإضافي الذي سيتم استثماره في المطعم لتطويره أو توسيعه.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-percent"></i> العائد المتوقع على الضخ (%)</label>
+                    <input type="number" id="injectionROI" value="20" step="0.5" disabled>
+                    <span class="tooltiptext">النسبة المئوية للعائد السنوي المتوقع من المبلغ المستثمر حديثاً.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- حصة المستثمر -->
+        <div class="section-title-sm"><i class="fas fa-user-friends"></i> حصتك في المطعم</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> نسبة الملكية (%)</label>
+                <input type="number" id="ownershipPercent" value="50" min="1" max="100" step="0.1">
+                <span class="tooltiptext">النسبة التي تملكها من المطعم. إذا كنت شريكاً بنسبة 50% أدخل 50.</span>
+            </div>
+        </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> احسب التقييم</button>
+
+        <!-- نتائج التقييم -->
+        <div id="resultsSection" style="display:none;">
+            <div class="results-cards" id="kpiCards"></div>
+
+            <!-- تحذير عقد الإيجار -->
+            <div id="leaseWarning" class="warning-note" style="display:none;"></div>
+
+            <!-- تقييم الكفاءة -->
+            <div class="result-card" id="efficiencyCard" style="text-align:right; padding:1.2rem;"></div>
+
+            <!-- تحليل الحساسية للمضاعف -->
+            <div class="section-title-sm">📈 تحليل الحساسية (تأثير المضاعف على القيمة العادلة)</div>
+            <div class="table-container" id="sensitivityTable"></div>
+
+            <!-- أزرار التصدير -->
+            <div class="export-container">
+                <button class="export-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تقرير Word</button>
+                <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+            </div>
+        </div>
+        <div id="initialMessage" style="margin-top:1rem; color:var(--text-muted); text-align:center;">
+            <i class="fas fa-robot" style="color: var(--accent-soft);"></i> أدخل البيانات واضغط على الزر للبدء
+        </div>
+    </div>
+</section>
+
+<footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: true, offset: 100 });
+
+    // تفعيل/تعطيل حقول ضخ رأس المال
+    document.getElementById('capitalInjectionEnabled').addEventListener('change', function(e) {
+        const disabled = !e.target.checked;
+        document.getElementById('injectionAmount').disabled = disabled;
+        document.getElementById('injectionROI').disabled = disabled;
+    });
+
+    // دالة حساب مؤشرات المطعم
+    function computeValuation() {
+        const rev = parseFloat(document.getElementById('revenue').value) || 0;
+        const cogs = parseFloat(document.getElementById('cogs').value) || 0;
+        const opex = parseFloat(document.getElementById('opex').value) || 0;
+        const depr = parseFloat(document.getElementById('depreciation').value) || 0;
+        const interest = parseFloat(document.getElementById('interest').value) || 0;
+        const taxes = parseFloat(document.getElementById('taxes').value) || 0;
+        const totalDebt = parseFloat(document.getElementById('totalDebt').value) || 0;
+        const assetValue = parseFloat(document.getElementById('assetValue').value) || 0;
+        const multiplier = parseFloat(document.getElementById('multiplier').value) || 3;
+        const ownership = parseFloat(document.getElementById('ownershipPercent').value) || 100;
+        const estYear = parseInt(document.getElementById('estYear').value) || 2018;
+        const leaseExpiry = parseInt(document.getElementById('leaseExpiry').value) || 2029;
+
+        // EBITDA = الإيرادات - COGS - OPEX
+        const EBITDA = rev - cogs - opex;
+        const netProfit = EBITDA - depr - interest - taxes;
+        const enterpriseValue = EBITDA * multiplier;
+        const equityValue = enterpriseValue - totalDebt;
+        const fairValue = equityValue > 0 ? equityValue : 0;
+        const sharePrice = (fairValue * ownership) / 100;
+        const paybackYears = netProfit > 0 ? equityValue / netProfit : Infinity;
+        const efficiencyIndex = assetValue > 0 ? fairValue / assetValue : 0;
+
+        // معالجة عقد الإيجار
+        const currentYear = new Date().getFullYear();
+        const remainingLease = leaseExpiry - currentYear;
+        let leaseWarning = '';
+        let adjustedMultiplier = multiplier;
+        if (remainingLease < 3) {
+            adjustedMultiplier *= Math.max(0.2, remainingLease / 10);
+            leaseWarning = `⚠️ تنبيه: عقد الإيجار متبقي عليه ${remainingLease} سنة/سنوات فقط. تم تعديل المضاعف تلقائياً إلى ${adjustedMultiplier.toFixed(2)} ليعكس المخاطر العالية.`;
+        }
+
+        const finalEV = EBITDA * adjustedMultiplier;
+        const finalEquity = finalEV - totalDebt;
+        const finalFairValue = finalEquity > 0 ? finalEquity : 0;
+
+        // معالجة ضخ رأس المال
+        const injectionEnabled = document.getElementById('capitalInjectionEnabled').checked;
+        let injectionImpact = null;
+        if (injectionEnabled) {
+            const injectionAmount = parseFloat(document.getElementById('injectionAmount').value) || 0;
+            const injectionROI = parseFloat(document.getElementById('injectionROI').value) || 20;
+            const incrementalEBITDA = injectionAmount * (injectionROI / 100);
+            const newEBITDA = EBITDA + incrementalEBITDA;
+            const newEV = newEBITDA * adjustedMultiplier;
+            const newEquity = newEV - totalDebt;
+            injectionImpact = {
+                newFairValue: newEquity > 0 ? newEquity : 0,
+                incrementalEBITDA: incrementalEBITDA,
+                newPayback: netProfit + incrementalEBITDA - depr - interest - taxes > 0 ? newEquity / (netProfit + incrementalEBITDA) : Infinity
+            };
+        }
+
+        return {
+            EBITDA, netProfit, enterpriseValue, equityValue, fairValue: finalFairValue,
+            sharePrice, paybackYears, efficiencyIndex, assetValue, multiplier: adjustedMultiplier,
+            remainingLease, leaseWarning,
+            injectionImpact,
+            rev, cogs, opex, depr, interest, taxes, totalDebt, ownership
+        };
+    }
+
+    // عرض النتائج مع استخدام رمز العملة
+    function displayResults(res) {
+        const currency = document.getElementById('currencySelect').value;
+        document.getElementById('initialMessage').style.display = 'none';
+        document.getElementById('resultsSection').style.display = 'block';
+
+        const kpiContainer = document.getElementById('kpiCards');
+        kpiContainer.innerHTML = `
+            <div class="result-card"><i class="fas fa-chart-bar"></i><h4>EBITDA</h4><div class="value">${currency}${res.EBITDA.toFixed(0)}</div></div>
+            <div class="result-card"><i class="fas fa-building"></i><h4>قيمة الكيان (EV)</h4><div class="value">${currency}${(res.EBITDA * res.multiplier).toFixed(0)}</div><div class="unit">بالمضاعف ${res.multiplier.toFixed(2)}</div></div>
+            <div class="result-card"><i class="fas fa-hand-holding-usd"></i><h4>القيمة العادلة للمطعم</h4><div class="value">${currency}${res.fairValue.toFixed(0)}</div><div class="status ${res.fairValue > res.totalDebt ? 'status-good' : 'status-bad'}">${res.fairValue > 0 ? 'قيمة إيجابية' : 'قيمة سالبة'}</div></div>
+            <div class="result-card"><i class="fas fa-user-check"></i><h4>سعر حصتك (${res.ownership}%)</h4><div class="value">${currency}${res.sharePrice.toFixed(0)}</div></div>
+            <div class="result-card"><i class="fas fa-clock"></i><h4>فترة استرداد رأس المال</h4><div class="value">${isFinite(res.paybackYears) ? res.paybackYears.toFixed(2)+' سنة' : 'لا نهائي'}</div></div>
+            <div class="result-card"><i class="fas fa-balance-scale"></i><h4>مؤشر الكفاءة</h4><div class="value">${res.efficiencyIndex.toFixed(2)}</div><div class="status ${res.efficiencyIndex >= 1 ? 'status-good' : 'status-bad'}">${res.efficiencyIndex >= 1 ? 'تشغيلياً مجدٍ' : 'غير مجدٍ'}</div></div>
+        `;
+
+        // تحذير الإيجار
+        const leaseDiv = document.getElementById('leaseWarning');
+        if (res.leaseWarning) {
+            leaseDiv.style.display = 'block';
+            leaseDiv.innerHTML = res.leaseWarning;
+        } else {
+            leaseDiv.style.display = 'none';
+        }
+
+        // كفاءة التقييم
+        const effCard = document.getElementById('efficiencyCard');
+        if (res.assetValue > 0) {
+            effCard.innerHTML = `
+                <strong><i class="fas fa-info-circle"></i> مقارنة القيمة العادلة بالأصول:</strong>
+                القيمة السوقية للأصول ${currency}${res.assetValue.toFixed(0)} |
+                القيمة العادلة ${currency}${res.fairValue.toFixed(0)} |
+                ${res.fairValue >= res.assetValue ? '✅ المطعم يحقق قيمة أعلى من أصوله (تشغيل مربح)' : '❌ القيمة أقل من قيمة الأصول – المطعم غير مجدٍ تشغيلياً'}
+            `;
+        } else {
+            effCard.innerHTML = 'لم يتم إدخال قيمة سوقية للأصول لإجراء المقارنة.';
+        }
+
+        // تأثير ضخ رأس المال
+        if (res.injectionImpact) {
+            const inj = res.injectionImpact;
+            effCard.innerHTML += `<br><br><strong>💉 بعد ضخ رأس المال:</strong> القيمة العادلة المتوقعة ${currency}${inj.newFairValue.toFixed(0)} |
+            فترة الاسترداد الجديدة ${isFinite(inj.newPayback) ? inj.newPayback.toFixed(2)+' سنة' : 'غير محسوبة'}`;
+        }
+
+        // جدول تحليل الحساسية
+        const sensDiv = document.getElementById('sensitivityTable');
+        const mults = [2, 2.5, 3, 3.5, 4];
+        let sensRows = '';
+        mults.forEach(m => {
+            const ev = res.EBITDA * m;
+            const eq = ev - res.totalDebt;
+            const fair = eq > 0 ? eq : 0;
+            sensRows += `<tr>
+                <td>${m}</td>
+                <td>${currency}${ev.toFixed(0)}</td>
+                <td>${currency}${fair.toFixed(0)}</td>
+                <td>${currency}${((fair * res.ownership)/100).toFixed(0)}</td>
+            </tr>`;
+        });
+        sensDiv.innerHTML = `
+            <table>
+                <thead><tr><th>المضاعف</th><th>قيمة الكيان</th><th>القيمة العادلة</th><th>سعر حصتك</th></tr></thead>
+                <tbody>${sensRows}</tbody>
+            </table>
+        `;
+    }
+
+    document.getElementById('calculateBtn').addEventListener('click', function() {
+        const res = computeValuation();
+        window.lastValuation = res;
+        displayResults(res);
+    });
+
+    // تصدير Word
+    document.getElementById('exportWordBtn').addEventListener('click', function() {
+        if (!window.lastValuation) { alert('الرجاء إجراء الحساب أولاً'); return; }
+        const res = window.lastValuation;
+        const name = document.getElementById('restaurantName').value || 'مطعم';
+        const currency = document.getElementById('currencySelect').value;
+        const content = `
+        <html dir="rtl">
+        <head><meta charset="utf-8"><title>تقييم ${name}</title>
+        <style>body{font-family:'Tajawal',sans-serif;padding:30px;}h1{color:#b48554;}table{width:100%;border-collapse:collapse;}td,th{border:1px solid #aaa;padding:8px;}th{background:#f4ebd9;}</style>
+        </head><body>
+        <h1>تقرير تقييم مطعم: ${name}</h1>
+        <p>تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG')}</p>
+        <h2>النتائج</h2>
+        <table>
+        <tr><th>EBITDA</th><td>${currency}${res.EBITDA.toFixed(0)}</td></tr>
+        <tr><th>القيمة العادلة</th><td>${currency}${res.fairValue.toFixed(0)}</td></tr>
+        <tr><th>سعر حصة ${res.ownership}%</th><td>${currency}${res.sharePrice.toFixed(0)}</td></tr>
+        <tr><th>فترة الاسترداد</th><td>${isFinite(res.paybackYears) ? res.paybackYears.toFixed(2)+' سنة' : 'لا نهائي'}</td></tr>
+        </table>
+        <p style="text-align:center;color:#888;">تم بواسطة FAROUK GRUP © ${new Date().getFullYear()}</p>
+        </body></html>`;
+        const blob = new Blob([content], {type: 'application/msword'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `تقييم_${name}.doc`;
+        a.click();
+    });
+
+    // تصدير Excel
+    document.getElementById('exportExcelBtn').addEventListener('click', async function() {
+        if (!window.lastValuation) { alert('الرجاء إجراء الحساب أولاً'); return; }
+        const res = window.lastValuation;
+        const name = document.getElementById('restaurantName').value || 'مطعم';
+        const currency = document.getElementById('currencySelect').value;
+        const workbook = new ExcelJS.Workbook();
+        const ws = workbook.addWorksheet('تقييم المطعم', {views:[{rightToLeft:true}]});
+        ws.columns = [{width:35},{width:25}];
+        ws.addRow(['المؤشر', 'القيمة']);
+        ws.addRow(['EBITDA', `${currency}${res.EBITDA.toFixed(0)}`]);
+        ws.addRow(['القيمة العادلة', `${currency}${res.fairValue.toFixed(0)}`]);
+        ws.addRow(['سعر الحصة', `${currency}${res.sharePrice.toFixed(0)}`]);
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+        saveAs(blob, `تقييم_${name}.xlsx`);
+    });
+</script>
+</body>
+</html>

@@ -46,7 +46,6 @@
             position: relative;
         }
 
-        /* خلفية زخرفية */
         body::before {
             content: '';
             position: fixed;
@@ -81,7 +80,6 @@
             66% { transform: translate(-20px, 20px) scale(0.94); }
         }
 
-        /* شريط علوي مصغر */
         .mini-nav {
             position: absolute;
             top: 20px;
@@ -124,7 +122,6 @@
             transform: translateY(-2px);
         }
 
-        /* الحاوية الرئيسية (بطاقة الاشتراك) */
         .sub-card {
             text-align: center;
             max-width: 480px;
@@ -159,7 +156,6 @@
             opacity: 0.8;
         }
 
-        /* أيقونة */
         .icon-wrapper {
             display: inline-flex;
             align-items: center;
@@ -190,7 +186,6 @@
             50% { box-shadow: 0 0 0 20px rgba(184, 134, 11, 0); }
         }
 
-        /* العنوان */
         .sub-title {
             font-family: 'Cairo', 'Alexandria', sans-serif;
             font-size: 2.2rem;
@@ -224,7 +219,6 @@
             gap: 8px;
         }
 
-        /* حقل الإدخال */
         .input-group {
             margin-bottom: 1rem;
             text-align: right;
@@ -249,6 +243,36 @@
             box-shadow: 0 0 12px rgba(184, 134, 11, 0.25);
         }
 
+        /* تنسيق حقل كلمة المرور مع العين */
+        .password-group {
+            position: relative;
+        }
+
+        .password-group input {
+            padding-left: 45px; /* مكان للزر */
+        }
+
+        .toggle-password {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px 8px;
+            z-index: 2;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-password:hover {
+            color: var(--gold-light);
+        }
+
         .domain-hint {
             font-size: 0.72rem;
             color: #8895a7;
@@ -266,7 +290,6 @@
             border-radius: 2px;
         }
 
-        /* زر */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -303,7 +326,6 @@
             filter: grayscale(30%);
         }
 
-        /* رسائل الحالة */
         .msg-box {
             margin-top: 1.5rem;
             padding: 14px;
@@ -362,7 +384,6 @@
             border-color: var(--gold);
         }
 
-        /* رابط تسجيل الدخول أسفل البطاقة */
         .login-alt {
             margin-top: 1.2rem;
             font-size: 0.85rem;
@@ -381,7 +402,6 @@
             border-bottom-color: var(--gold-light);
         }
 
-        /* الفوتر */
         .mini-footer {
             position: absolute;
             bottom: 20px;
@@ -397,7 +417,6 @@
             font-weight: 700;
         }
 
-        /* RESPONSIVE */
         @media (max-width: 600px) {
             .sub-card {
                 padding: 2rem 1.4rem;
@@ -442,7 +461,6 @@
 </head>
 <body>
 
-    <!-- شريط علوي مع اللوقو -->
     <div class="mini-nav" data-aos="fade-down" data-aos-duration="700">
         <a href="/" class="logo-sm">
             <img src="https://lh3.googleusercontent.com/d/1e6u-DPTinDJl_Q9wW3QvGgzFbXO_2sXa" alt="FAROUK GRUP LOGO">
@@ -450,9 +468,7 @@
         </a>
     </div>
 
-    <!-- بطاقة الاشتراك السنوي -->
     <div class="sub-card" data-aos="zoom-in-up" data-aos-duration="800" data-aos-delay="150">
-        <!-- أيقونة التاج -->
         <div class="icon-wrapper">
             <i class="fas fa-crown"></i>
         </div>
@@ -460,12 +476,10 @@
         <h1 class="sub-title">اشتراك سنوي مدفوع</h1>
         <p class="sub-desc">سنة كاملة من الوصول الشامل لجميع خدمات المنصة</p>
 
-        <!-- شارة السعر -->
         <div class="price-tag">
             <i class="fas fa-calendar-alt"></i> 365 يوم &bull; <i class="fas fa-infinity"></i> وصول غير محدود
         </div>
 
-        <!-- فورم الاشتراك -->
         <form id="yearlyForm">
             <div class="input-group">
                 <input type="text" name="fullName" placeholder="الاسم الكامل (اختياري)">
@@ -476,8 +490,12 @@
                     <i class="fas fa-shield-alt"></i> نطاقات مسموحة فقط: gmail.com, yahoo.com, outlook.com ...
                 </div>
             </div>
-            <div class="input-group">
-                <input type="password" name="password" placeholder="كلمة المرور للدخول" required minlength="6">
+            <!-- حقل كلمة المرور مع زر العين -->
+            <div class="input-group password-group">
+                <input type="password" name="password" id="passwordField" placeholder="كلمة المرور للدخول" required minlength="6">
+                <button type="button" class="toggle-password" id="togglePasswordBtn" tabindex="-1" aria-label="إظهار كلمة المرور">
+                    <i class="fas fa-eye" id="eyeIcon"></i>
+                </button>
             </div>
 
             <button type="submit" class="btn" id="yearlyBtn">
@@ -485,7 +503,6 @@
             </button>
         </form>
 
-        <!-- منطقة الرسائل -->
         <div id="msgBox" class="msg-box"></div>
 
         <div class="divider"></div>
@@ -495,18 +512,28 @@
         </div>
     </div>
 
-    <!-- فوتير مصغر -->
     <div class="mini-footer">
         جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span> &mdash; إسطنبول، تركيا
     </div>
 
-    <!-- AOS JS -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init({
             duration: 700,
             once: true,
             offset: 50
+        });
+
+        // زر العين لإظهار/إخفاء كلمة المرور
+        const passwordField = document.getElementById('passwordField');
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        togglePasswordBtn.addEventListener('click', function() {
+            const isPassword = passwordField.type === 'password';
+            passwordField.type = isPassword ? 'text' : 'password';
+            eyeIcon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+            togglePasswordBtn.setAttribute('aria-label', isPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور');
         });
 
         // ================ منطق الاشتراك ================
@@ -525,7 +552,7 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري التفعيل...';
 
             const formData = new FormData(this);
-            formData.append('action', 'yearRegister');   // المفتاح الجديد في السكريبت
+            formData.append('action', 'yearRegister');
 
             fetch(scriptURL, {
                 method: 'POST',
@@ -543,6 +570,9 @@
                         <a href="${data.loginUrl}" class="login-link" target="_blank">اذهب إلى صفحة الدخول</a>
                     `;
                     form.reset();
+                    // إعادة ضبط حقل كلمة المرور والأيقونة بعد إعادة التعيين
+                    passwordField.type = 'password';
+                    eyeIcon.className = 'fas fa-eye';
                 } 
                 else if (data.status === 'exists') {
                     msgBox.className = 'msg-box exists';

@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <title>تحليل السيناريوهات | FAROUK GRUP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* الهوية الموحدة للمنصة */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-dark: #0b0e17;
+            --bg-panel: rgba(18,24,36,0.85);
+            --bg-card: rgba(22,30,46,0.8);
+            --border-light: rgba(180,133,84,0.25);
+            --accent-glow: #b48554;
+            --accent-soft: #cfa776;
+            --text-light: #f0f4fa;
+            --text-muted: #aab7d4;
+            --shadow-soft: 0 15px 35px -10px rgba(0,0,0,0.6), 0 0 0 1px rgba(180,133,84,0.15);
+            --shadow-glow: 0 15px 35px -10px rgba(0,0,0,0.8), 0 0 20px rgba(180,133,84,0.3);
+            --radius-md: 20px;
+            --radius-lg: 30px;
+            --transition: all 0.3s ease;
+            --gold: #b8860b;
+            --gold-light: #d4b15a;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+        }
+        .glow-bg { position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 0; }
+        .glow-bg span { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%); border-radius: 50%; filter: blur(80px); animation: glowMove 20s infinite alternate ease-in-out; }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(180,133,84,0.12) 0%, transparent 70%); }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.1) 0%, transparent 70%); animation-delay: -5s; }
+        @keyframes glowMove { 0% { transform: translate(0, 0) scale(1); opacity: 0.5; } 100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; } }
+        .floating-shape { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%); z-index: 0; pointer-events: none; }
+        .shape-1 { top: -100px; right: -100px; animation: float 20s infinite ease-in-out; }
+        .shape-2 { bottom: -50px; left: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
+        @keyframes float { 0% { transform: translate(0,0) rotate(0deg); } 33% { transform: translate(30px,-30px) rotate(5deg); } 66% { transform: translate(-20px,20px) rotate(-5deg); } 100% { transform: translate(0,0) rotate(0deg); } }
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+        }
+        .hero-mini::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
+            animation: rotate 40s linear infinite;
+        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .hero-mini h2 { font-size: 2.5rem; font-weight: 900; color: #d4b15a; margin-bottom: 0.5rem; position: relative; z-index: 2; }
+        .hero-mini p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; opacity: 0.95; position: relative; z-index: 2; }
+        .calc-wrapper {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 2;
+        }
+        .calc-box {
+            background: rgba(18,24,36,0.85);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(180,133,84,0.25);
+            border-radius: 30px;
+            padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6), 0 0 0 1px rgba(180,133,84,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .calc-box:hover {
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.8), 0 0 20px rgba(180,133,84,0.3);
+            border-color: rgba(180,133,84,0.4);
+        }
+        .featured-badge {
+            position: absolute;
+            top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111;
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            font-weight: 900;
+            border: 3px solid white;
+            z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+        .calc-box h2 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f0e6d2, #cfa776);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .section-title-sm {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #cfa776 !important;
+            background: none !important;
+            -webkit-text-fill-color: #cfa776 !important;
+            margin: 1.2rem 0 0.8rem 0;
+            border-bottom: 2px solid rgba(180,133,84,0.25);
+            padding-bottom: 0.3rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .currency-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(180,133,84,0.15);
+            border: 1px solid rgba(180,133,84,0.25);
+            padding: 0.8rem 1rem;
+            border-radius: 50px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .currency-row label { font-weight: 700; color: #cfa776; margin: 0; }
+        .currency-row select, .currency-row input {
+            padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25);
+            border-radius: 30px;
+            background: rgba(10,14,23,0.7);
+            color: #f0f4fa;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+        }
+        .currency-row select { width: 150px; }
+        .currency-row input { width: 250px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* بيانات الأساس */
+        .base-data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .input-group label {
+            font-weight: 700;
+            color: #cfa776;
+            font-size: 0.85rem;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: rgba(10,14,23,0.7);
+            border: 2px solid rgba(180,133,84,0.25);
+            border-radius: 30px;
+            color: #f0f4fa;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.2);
+        }
+
+        /* السيناريوهات */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .scenario-card {
+            background: rgba(22,30,46,0.8);
+            border: 1px solid rgba(180,133,84,0.25);
+            border-radius: 20px;
+            padding: 1rem 1.2rem;
+            transition: all 0.3s ease;
+        }
+        .scenario-card:hover { border-color: #b48554; }
+        .scenario-card h4 {
+            color: #cfa776;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .scenario-card .field-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .scenario-card .field-row .field {
+            flex: 1;
+            min-width: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+        .scenario-card .field-row .field label {
+            font-size: 0.75rem;
+            color: #aab7d4;
+            font-weight: 600;
+        }
+        .scenario-card .field-row .field input {
+            width: 100%;
+            padding: 0.4rem 0.6rem;
+            background: rgba(10,14,23,0.7);
+            border: 1px solid rgba(180,133,84,0.25);
+            border-radius: 20px;
+            color: #f0f4fa;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .scenario-card .field-row .field input:focus {
+            outline: none;
+            border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.2);
+        }
+
+        .btn-primary {
+            background: rgba(180,133,84,0.2);
+            border: 1px solid rgba(180,133,84,0.25);
+            border-radius: 40px;
+            padding: 0.8rem 2rem;
+            color: #cfa776;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Tajawal', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            backdrop-filter: blur(5px);
+        }
+        .btn-primary:hover {
+            background: rgba(180,133,84,0.4);
+            color: #fff;
+            border-color: #b48554;
+            box-shadow: 0 0 20px rgba(180,133,84,0.3);
+            transform: translateY(-2px);
+        }
+        .btn-primary.centered {
+            width: 100%;
+            justify-content: center;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        /* النتائج */
+        .results-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .result-card {
+            background: rgba(22,30,46,0.8);
+            border: 1px solid rgba(180,133,84,0.25);
+            border-radius: 20px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .result-card:hover { border-color: #b48554; }
+        .result-card .label { font-size: 0.8rem; color: #aab7d4; }
+        .result-card .value { font-size: 1.6rem; font-weight: 900; margin: 0.3rem 0; }
+        .result-card .change {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        .change-positive { color: #4ade80; }
+        .change-negative { color: #f87171; }
+        .change-neutral { color: #fbbf24; }
+
+        .chart-container {
+            background: rgba(22,30,46,0.8);
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid rgba(180,133,84,0.25);
+            height: 280px;
+        }
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .export-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+        .export-btn {
+            background: rgba(180,133,84,0.2);
+            border: 1px solid rgba(180,133,84,0.25);
+            border-radius: 50px;
+            padding: 0.8rem 2rem;
+            font-weight: 700;
+            color: #cfa776;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Tajawal', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .export-btn:hover {
+            background: rgba(180,133,84,0.4);
+            color: #fff;
+            border-color: #b48554;
+            transform: translateY(-2px);
+        }
+
+        .footer-simple {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            background: rgba(10,14,23,0.5);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid rgba(180,133,84,0.25);
+            color: #aab7d4;
+            font-size: 0.85rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        .home-btn {
+            position: fixed;
+            bottom: 20px; right: 20px;
+            background: rgba(180,133,84,0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: bold;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+        .home-btn:hover { background: #b48554; transform: scale(1.05); }
+
+        .calc-floating-btn {
+            position: fixed;
+            bottom: 20px; left: 20px;
+            background: rgba(180,133,84,0.2);
+            border: 1px solid rgba(180,133,84,0.25);
+            border-radius: 50px;
+            padding: 0.8rem 1.2rem;
+            color: #cfa776;
+            font-size: 1rem;
+            font-weight: 700;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-floating-btn:hover {
+            background: rgba(180,133,84,0.4);
+            color: #fff;
+            border-color: #b48554;
+            box-shadow: 0 0 15px rgba(180,133,84,0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: rgba(18,24,36,0.85);
+            margin: 5% auto;
+            padding: 0;
+            border: 2px solid rgba(180,133,84,0.25);
+            border-radius: 30px;
+            width: 90%;
+            max-width: 300px;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.8), 0 0 20px rgba(180,133,84,0.3);
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.15);
+            border-bottom: 2px solid rgba(180,133,84,0.25);
+            padding: 10px 15px;
+            border-radius: 28px 28px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .close { color: #aab7d4; float: left; font-size: 24px; font-weight: bold; cursor: pointer; }
+        .close:hover { color: #b48554; }
+        .modal-body { padding: 15px; }
+        .calc-display {
+            width: 100%;
+            height: 45px;
+            font-size: 1.4rem;
+            text-align: left;
+            padding: 0 10px;
+            border: 2px solid rgba(180,133,84,0.25);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            background: rgba(10,14,23,0.8);
+            color: #cfa776;
+            font-family: 'Inter', monospace;
+            direction: ltr;
+        }
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.1);
+            border: 1px solid rgba(180,133,84,0.25);
+            border-radius: 15px;
+            padding: 10px 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #f0f4fa;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.3); border-color: #b48554; }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals { background: rgba(180,133,84,0.3); color: white; grid-column: span 2; }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.5); }
+
+        .summary-table {
+            overflow-x: auto;
+            margin-top: 1rem;
+            border: 1px solid rgba(180,133,84,0.25);
+            border-radius: 20px;
+            background: rgba(22,30,46,0.8);
+            padding: 0.8rem;
+        }
+        .summary-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .summary-table th {
+            background: rgba(180,133,84,0.2);
+            color: #cfa776;
+            font-weight: 900;
+            padding: 0.5rem;
+            border-bottom: 2px solid rgba(180,133,84,0.25);
+        }
+        .summary-table td {
+            padding: 0.5rem;
+            border-bottom: 1px solid rgba(180,133,84,0.2);
+            text-align: center;
+            color: #f0f4fa;
+        }
+        .summary-table tr:last-child td { border-bottom: none; }
+
+        @media (max-width: 768px) {
+            .hero-mini h2 { font-size: 2rem; }
+            .hero-mini p { font-size: 1rem; }
+            .calc-box { padding: 1rem; }
+            .featured-badge { width: 70px; height: 70px; }
+            .featured-badge i { font-size: 1.4rem; }
+            .featured-badge span { font-size: 0.6rem; }
+            .currency-row select, .currency-row input { width: 100%; }
+            .base-data-grid { grid-template-columns: 1fr; }
+            .scenario-grid { grid-template-columns: 1fr; }
+            .chart-grid { grid-template-columns: 1fr; }
+            .results-comparison { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+
+    <section class="hero-mini">
+        <h2>🔮 تحليل السيناريوهات</h2>
+        <p>محاكاة تأثير المتغيرات على أداء المنشأة – ماذا لو تغيرت المبيعات، الرواتب، أو تكاليف المواد الخام؟</p>
+    </section>
+
+    <section class="calc-wrapper">
+        <div class="calc-box" data-aos="fade-up">
+            <div class="featured-badge"><i class="fas fa-bolt"></i><span>محاكاة</span></div>
+            <h2>محاكاة السيناريوهات المالية</h2>
+
+            <!-- العملة واسم الجهة -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> العملة:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>دولار ($)</option>
+                    <option value="€">يورو (€)</option>
+                    <option value="₺">ليرة تركية (₺)</option>
+                    <option value="ج.م">جنيه مصري (ج.م)</option>
+                    <option value="د.ك">دينار كويتي (د.ك)</option>
+                    <option value="ر.س">ريال سعودي (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> اسم الجهة:</label>
+                <input type="text" id="companyName" value="الشركة / المنشأة" placeholder="اسم الجهة">
+            </div>
+
+            <!-- البيانات الأساسية -->
+            <div class="section-title-sm">📋 البيانات المالية الأساسية</div>
+            <div class="base-data-grid">
+                <div class="input-group">
+                    <label><i class="fas fa-chart-line"></i> الإيرادات الشهرية</label>
+                    <input type="number" id="baseRevenue" value="500000" step="1000">
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-users"></i> الرواتب الشهرية</label>
+                    <input type="number" id="baseSalaries" value="150000" step="1000">
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-boxes"></i> تكلفة المواد الخام</label>
+                    <input type="number" id="baseMaterials" value="100000" step="1000">
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-file-invoice"></i> المصاريف التشغيلية الأخرى</label>
+                    <input type="number" id="baseOtherCosts" value="80000" step="1000">
+                </div>
+            </div>
+
+            <!-- السيناريوهات -->
+            <div class="section-title-sm">⚡ تغييرات السيناريو (القيم المئوية)</div>
+            <div class="scenario-grid">
+                <div class="scenario-card">
+                    <h4><i class="fas fa-chart-simple" style="color:var(--accent-glow);"></i> المبيعات</h4>
+                    <div class="field-row">
+                        <div class="field">
+                            <label>نسبة التغيير %</label>
+                            <input type="number" id="scenarioRevenue" value="-20" step="1">
+                        </div>
+                    </div>
+                </div>
+                <div class="scenario-card">
+                    <h4><i class="fas fa-users" style="color:var(--accent-glow);"></i> الرواتب</h4>
+                    <div class="field-row">
+                        <div class="field">
+                            <label>نسبة التغيير %</label>
+                            <input type="number" id="scenarioSalaries" value="15" step="1">
+                        </div>
+                    </div>
+                </div>
+                <div class="scenario-card">
+                    <h4><i class="fas fa-boxes" style="color:var(--accent-glow);"></i> المواد الخام</h4>
+                    <div class="field-row">
+                        <div class="field">
+                            <label>نسبة التغيير %</label>
+                            <input type="number" id="scenarioMaterials" value="10" step="1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- زر المحاكاة -->
+            <button class="btn-primary centered" id="simulateBtn"><i class="fas fa-play"></i> تشغيل المحاكاة</button>
+
+            <!-- منطقة النتائج -->
+            <div id="resultsArea" style="display:none; margin-top: 2rem;">
+                <div class="section-title-sm">📊 نتائج المحاكاة</div>
+                <div class="results-comparison" id="resultsCards"></div>
+
+                <div class="section-title-sm">📈 الرسوم البيانية</div>
+                <div class="chart-grid">
+                    <div class="chart-container"><canvas id="comparisonChart"></canvas></div>
+                    <div class="chart-container"><canvas id="impactChart"></canvas></div>
+                </div>
+
+                <div class="section-title-sm">📋 جدول المقارنة التفصيلي</div>
+                <div class="summary-table" id="comparisonTable"></div>
+
+                <div class="section-title-sm">💡 التوصيات والتحليل</div>
+                <div id="recommendations" style="background:rgba(10,14,23,0.5);border-radius:20px;padding:1rem 1.5rem;border-right:4px solid var(--accent-glow);margin:1rem 0;"></div>
+
+                <div class="export-container">
+                    <button class="export-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تقرير Word</button>
+                    <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
+
+    <a href="index.html" class="home-btn"><i class="fas fa-home"></i> الرئيسية</a>
+
+    <!-- آلة حاسبة منبثقة -->
+    <div class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> آلة حاسبة</div>
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><span class="close">&times;</span><h2><i class="fas fa-calculator" style="color: var(--accent-soft);"></i> آلة حاسبة</h2></div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button><button class="calc-btn" onclick="handleCalculatorInput('8')">8</button><button class="calc-btn" onclick="handleCalculatorInput('7')">7</button><button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button><button class="calc-btn" onclick="handleCalculatorInput('5')">5</button><button class="calc-btn" onclick="handleCalculatorInput('4')">4</button><button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
+                    <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button><button class="calc-btn" onclick="handleCalculatorInput('2')">2</button><button class="calc-btn" onclick="handleCalculatorInput('1')">1</button><button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
+                    <button class="calc-btn" onclick="clearCalculator()">C</button><button class="calc-btn" onclick="handleCalculatorInput('.')">.</button><button class="calc-btn" onclick="handleCalculatorInput('0')">0</button><button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
+                    <button class="calc-btn" onclick="backspaceCalculator()">⌫</button><button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true, offset: 100 });
+
+        // ============================================================
+        // المحاكاة الرئيسية
+        // ============================================================
+        let comparisonChart = null;
+        let impactChart = null;
+
+        function runSimulation() {
+            const currency = document.getElementById('currencySelect').value;
+            const company = document.getElementById('companyName').value || 'الجهة';
+
+            // قراءة البيانات الأساسية
+            const baseRevenue = parseFloat(document.getElementById('baseRevenue').value) || 0;
+            const baseSalaries = parseFloat(document.getElementById('baseSalaries').value) || 0;
+            const baseMaterials = parseFloat(document.getElementById('baseMaterials').value) || 0;
+            const baseOtherCosts = parseFloat(document.getElementById('baseOtherCosts').value) || 0;
+
+            // قراءة السيناريوهات
+            const scenarioRevenuePct = parseFloat(document.getElementById('scenarioRevenue').value) || 0;
+            const scenarioSalariesPct = parseFloat(document.getElementById('scenarioSalaries').value) || 0;
+            const scenarioMaterialsPct = parseFloat(document.getElementById('scenarioMaterials').value) || 0;
+
+            // التحقق من صحة المدخلات
+            if (baseRevenue <= 0 || baseSalaries < 0 || baseMaterials < 0 || baseOtherCosts < 0) {
+                alert('الرجاء إدخال قيم صحيحة (الإيرادات > 0، التكاليف >= 0).');
+                return;
+            }
+
+            // حساب القيم الحالية
+            const currentTotalCosts = baseSalaries + baseMaterials + baseOtherCosts;
+            const currentProfit = baseRevenue - currentTotalCosts;
+            const currentMargin = baseRevenue > 0 ? (currentProfit / baseRevenue) * 100 : 0;
+
+            // حساب قيم السيناريو
+            const scenarioRevenue = baseRevenue * (1 + scenarioRevenuePct / 100);
+            const scenarioSalaries = baseSalaries * (1 + scenarioSalariesPct / 100);
+            const scenarioMaterials = baseMaterials * (1 + scenarioMaterialsPct / 100);
+            const scenarioOtherCosts = baseOtherCosts; // بدون تغيير
+            const scenarioTotalCosts = scenarioSalaries + scenarioMaterials + scenarioOtherCosts;
+            const scenarioProfit = scenarioRevenue - scenarioTotalCosts;
+            const scenarioMargin = scenarioRevenue > 0 ? (scenarioProfit / scenarioRevenue) * 100 : 0;
+
+            // التغيرات
+            const revenueChange = scenarioRevenue - baseRevenue;
+            const costsChange = scenarioTotalCosts - currentTotalCosts;
+            const profitChange = scenarioProfit - currentProfit;
+            const marginChange = scenarioMargin - currentMargin;
+
+            // تخزين النتائج للتصدير
+            window.lastScenarioResults = {
+                currency,
+                company,
+                base: { revenue: baseRevenue, salaries: baseSalaries, materials: baseMaterials, otherCosts: baseOtherCosts, totalCosts: currentTotalCosts, profit: currentProfit, margin: currentMargin },
+                scenario: { revenue: scenarioRevenue, salaries: scenarioSalaries, materials: scenarioMaterials, otherCosts: scenarioOtherCosts, totalCosts: scenarioTotalCosts, profit: scenarioProfit, margin: scenarioMargin },
+                changes: { revenue: revenueChange, costs: costsChange, profit: profitChange, margin: marginChange },
+                scenarioPcts: { revenue: scenarioRevenuePct, salaries: scenarioSalariesPct, materials: scenarioMaterialsPct },
+                isBetter: scenarioProfit > currentProfit
+            };
+
+            // عرض النتائج
+            displayResults(window.lastScenarioResults);
+        }
+
+        // ============================================================
+        // عرض النتائج
+        // ============================================================
+        function displayResults(data) {
+            const area = document.getElementById('resultsArea');
+            area.style.display = 'block';
+
+            const currency = data.currency;
+            const base = data.base;
+            const scenario = data.scenario;
+            const changes = data.changes;
+
+            // بطاقات النتائج
+            document.getElementById('resultsCards').innerHTML = `
+                <div class="result-card">
+                    <div class="label">الإيرادات</div>
+                    <div class="value" style="color:${changes.revenue >= 0 ? '#4ade80' : '#f87171'}">${currency}${scenario.revenue.toFixed(0)}</div>
+                    <div class="change ${changes.revenue >= 0 ? 'change-positive' : 'change-negative'}">${changes.revenue >= 0 ? '+' : ''}${currency}${changes.revenue.toFixed(0)} (${data.scenarioPcts.revenue >= 0 ? '+' : ''}${data.scenarioPcts.revenue}%)</div>
+                </div>
+                <div class="result-card">
+                    <div class="label">إجمالي التكاليف</div>
+                    <div class="value" style="color:${changes.costs <= 0 ? '#4ade80' : '#f87171'}">${currency}${scenario.totalCosts.toFixed(0)}</div>
+                    <div class="change ${changes.costs <= 0 ? 'change-positive' : 'change-negative'}">${changes.costs >= 0 ? '+' : ''}${currency}${changes.costs.toFixed(0)}</div>
+                </div>
+                <div class="result-card">
+                    <div class="label">صافي الربح</div>
+                    <div class="value" style="color:${changes.profit >= 0 ? '#4ade80' : '#f87171'}">${currency}${scenario.profit.toFixed(0)}</div>
+                    <div class="change ${changes.profit >= 0 ? 'change-positive' : 'change-negative'}">${changes.profit >= 0 ? '+' : ''}${currency}${changes.profit.toFixed(0)} (${changes.profit >= 0 ? '+' : ''}${(changes.profit / base.profit * 100).toFixed(1)}%)</div>
+                </div>
+                <div class="result-card">
+                    <div class="label">هامش الربح</div>
+                    <div class="value" style="color:${changes.margin >= 0 ? '#4ade80' : '#f87171'}">${scenario.margin.toFixed(1)}%</div>
+                    <div class="change ${changes.margin >= 0 ? 'change-positive' : 'change-negative'}">${changes.margin >= 0 ? '+' : ''}${changes.margin.toFixed(1)}%</div>
+                </div>
+            `;
+
+            // جدول المقارنة
+            document.getElementById('comparisonTable').innerHTML = `
+                <table>
+                    <thead><tr><th>المؤشر</th><th>القيمة الحالية</th><th>قيمة السيناريو</th><th>التغيير</th><th>نسبة التغيير</th></tr></thead>
+                    <tbody>
+                        <tr><td>الإيرادات</td><td>${currency}${base.revenue.toFixed(0)}</td><td>${currency}${scenario.revenue.toFixed(0)}</td><td style="color:${changes.revenue >= 0 ? '#4ade80' : '#f87171'}">${changes.revenue >= 0 ? '+' : ''}${currency}${changes.revenue.toFixed(0)}</td><td style="color:${changes.revenue >= 0 ? '#4ade80' : '#f87171'}">${changes.revenue >= 0 ? '+' : ''}${data.scenarioPcts.revenue}%</td></tr>
+                        <tr><td>الرواتب</td><td>${currency}${base.salaries.toFixed(0)}</td><td>${currency}${scenario.salaries.toFixed(0)}</td><td style="color:${(scenario.salaries - base.salaries) <= 0 ? '#4ade80' : '#f87171'}">${(scenario.salaries - base.salaries) >= 0 ? '+' : ''}${currency}${(scenario.salaries - base.salaries).toFixed(0)}</td><td style="color:${(scenario.salaries - base.salaries) <= 0 ? '#4ade80' : '#f87171'}">${data.scenarioPcts.salaries >= 0 ? '+' : ''}${data.scenarioPcts.salaries}%</td></tr>
+                        <tr><td>المواد الخام</td><td>${currency}${base.materials.toFixed(0)}</td><td>${currency}${scenario.materials.toFixed(0)}</td><td style="color:${(scenario.materials - base.materials) <= 0 ? '#4ade80' : '#f87171'}">${(scenario.materials - base.materials) >= 0 ? '+' : ''}${currency}${(scenario.materials - base.materials).toFixed(0)}</td><td style="color:${(scenario.materials - base.materials) <= 0 ? '#4ade80' : '#f87171'}">${data.scenarioPcts.materials >= 0 ? '+' : ''}${data.scenarioPcts.materials}%</td></tr>
+                        <tr><td>مصاريف أخرى</td><td>${currency}${base.otherCosts.toFixed(0)}</td><td>${currency}${scenario.otherCosts.toFixed(0)}</td><td style="color:#fbbf24;">0</td><td style="color:#fbbf24;">0%</td></tr>
+                        <tr style="font-weight:900;border-top:2px solid var(--border-light);"><td>إجمالي التكاليف</td><td>${currency}${base.totalCosts.toFixed(0)}</td><td>${currency}${scenario.totalCosts.toFixed(0)}</td><td style="color:${changes.costs <= 0 ? '#4ade80' : '#f87171'}">${changes.costs >= 0 ? '+' : ''}${currency}${changes.costs.toFixed(0)}</td><td style="color:${changes.costs <= 0 ? '#4ade80' : '#f87171'}">${(changes.costs / base.totalCosts * 100).toFixed(1)}%</td></tr>
+                        <tr style="font-weight:900;background:rgba(180,133,84,0.1);"><td>صافي الربح</td><td>${currency}${base.profit.toFixed(0)}</td><td>${currency}${scenario.profit.toFixed(0)}</td><td style="color:${changes.profit >= 0 ? '#4ade80' : '#f87171'}">${changes.profit >= 0 ? '+' : ''}${currency}${changes.profit.toFixed(0)}</td><td style="color:${changes.profit >= 0 ? '#4ade80' : '#f87171'}">${(changes.profit / base.profit * 100).toFixed(1)}%</td></tr>
+                        <tr><td>هامش الربح</td><td>${base.margin.toFixed(1)}%</td><td>${scenario.margin.toFixed(1)}%</td><td style="color:${changes.margin >= 0 ? '#4ade80' : '#f87171'}">${changes.margin >= 0 ? '+' : ''}${changes.margin.toFixed(1)}%</td><td style="color:${changes.margin >= 0 ? '#4ade80' : '#f87171'}">${(changes.margin / (base.margin || 1) * 100).toFixed(1)}%</td></tr>
+                    </tbody>
+                </table>
+            `;
+
+            // التوصيات
+            const recDiv = document.getElementById('recommendations');
+            let recHtml = `<h4 style="color:var(--accent-soft);margin-bottom:0.5rem;"><i class="fas fa-lightbulb" style="color:var(--accent-glow);"></i> تحليل السيناريو</h4>`;
+            if (data.isBetter) {
+                recHtml += `<p style="color:#4ade80;">✅ السيناريو يؤدي إلى <strong>تحسن</strong> في الربحية بمقدار ${currency}${changes.profit.toFixed(0)} (${(changes.profit / base.profit * 100).toFixed(1)}%).</p>`;
+                recHtml += `<p style="color:var(--text-light);">التغييرات الإيجابية في المبيعات أو خفض التكاليف أثرت بشكل إيجابي على النتيجة النهائية. استمر في تعزيز الاستراتيجيات التي أدت إلى هذا التحسن.</p>`;
+            } else {
+                recHtml += `<p style="color:#f87171;">🔴 السيناريو يؤدي إلى <strong>تراجع</strong> في الربحية بمقدار ${currency}${Math.abs(changes.profit).toFixed(0)} (${(Math.abs(changes.profit) / base.profit * 100).toFixed(1)}%).</p>`;
+                // تحديد السبب الرئيسي
+                let reasons = [];
+                if (changes.revenue < 0) reasons.push('انخفاض الإيرادات');
+                if (scenario.salaries > base.salaries) reasons.push('ارتفاع الرواتب');
+                if (scenario.materials > base.materials) reasons.push('ارتفاع تكلفة المواد الخام');
+                if (reasons.length > 0) {
+                    recHtml += `<p style="color:var(--text-light);">الأسباب الرئيسية: <strong style="color:#fbbf24;">${reasons.join('، ')}</strong>.</p>`;
+                }
+                recHtml += `<p style="color:var(--text-light);">يوصى بمراجعة هيكل التكاليف، البحث عن بدائل للمواد الخام، أو زيادة الكفاءة التشغيلية للتعويض.</p>`;
+            }
+            recHtml += `<p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.5rem;">* يعتمد التحليل على البيانات المدخلة وقد لا يعكس جميع العوامل التشغيلية.</p>`;
+            recDiv.innerHTML = recHtml;
+
+            // الرسوم البيانية
+            const ctx1 = document.getElementById('comparisonChart').getContext('2d');
+            const ctx2 = document.getElementById('impactChart').getContext('2d');
+
+            if (comparisonChart) comparisonChart.destroy();
+            if (impactChart) impactChart.destroy();
+
+            // رسم بياني 1: مقارنة الحالي vs السيناريو
+            comparisonChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['الإيرادات', 'التكاليف الكلية', 'صافي الربح'],
+                    datasets: [
+                        {
+                            label: 'القيمة الحالية',
+                            data: [base.revenue, base.totalCosts, base.profit],
+                            backgroundColor: 'rgba(180,133,84,0.6)',
+                            borderColor: '#b48554',
+                            borderWidth: 2,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'قيمة السيناريو',
+                            data: [scenario.revenue, scenario.totalCosts, scenario.profit],
+                            backgroundColor: data.isBetter ? 'rgba(40,167,69,0.6)' : 'rgba(220,53,69,0.6)',
+                            borderColor: data.isBetter ? '#28a745' : '#dc3545',
+                            borderWidth: 2,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#aab7d4' } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${currency}${context.parsed.y.toFixed(0)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#aab7d4' },
+                            grid: { color: 'rgba(180,133,84,0.2)' }
+                        },
+                        x: {
+                            ticks: { color: '#aab7d4' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // رسم بياني 2: التأثير على الهامش والربح
+            impactChart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['الحالي', 'السيناريو'],
+                    datasets: [
+                        {
+                            label: 'هامش الربح %',
+                            data: [base.margin, scenario.margin],
+                            borderColor: '#4ade80',
+                            backgroundColor: 'rgba(74,222,128,0.1)',
+                            fill: true,
+                            tension: 0.1,
+                            pointRadius: 6
+                        },
+                        {
+                            label: 'صافي الربح',
+                            data: [base.profit, scenario.profit],
+                            borderColor: '#b48554',
+                            backgroundColor: 'rgba(180,133,84,0.1)',
+                            fill: true,
+                            tension: 0.1,
+                            pointRadius: 6,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#aab7d4' } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.datasetIndex === 0) {
+                                        return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}%`;
+                                    } else {
+                                        return `${context.dataset.label}: ${currency}${context.parsed.y.toFixed(0)}`;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            position: 'right',
+                            ticks: { color: '#4ade80', callback: function(value) { return value + '%'; } },
+                            grid: { color: 'rgba(74,222,128,0.15)' }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'left',
+                            ticks: { color: '#b48554' },
+                            grid: { display: false }
+                        },
+                        x: {
+                            ticks: { color: '#aab7d4' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============================================================
+        // تصدير Excel احترافي
+        // ============================================================
+        async function exportExcel() {
+            if (!window.lastScenarioResults) { alert('الرجاء تشغيل المحاكاة أولاً.'); return; }
+            const data = window.lastScenarioResults;
+            const currency = data.currency;
+            const company = data.company;
+
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'FAROUK GRUP';
+            workbook.created = new Date();
+
+            const ws = workbook.addWorksheet('تحليل السيناريوهات', { views: [{ rightToLeft: true, showGridLines: false }] });
+
+            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+            const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A';
+
+            function headerStyle(bg = HB, tc = GL) {
+                return {
+                    font: { name: 'Arial', bold: true, size: 11, color: { argb: tc } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
+                    alignment: { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'rtl' },
+                    border: { top: { style: 'thin', color: { argb: G } }, bottom: { style: 'thin', color: { argb: G } }, left: { style: 'thin', color: { argb: G } }, right: { style: 'thin', color: { argb: G } } }
+                };
+            }
+            function cellStyle(bg = W, tc = DT, bold = false, h = 'center') {
+                return {
+                    font: { name: 'Arial', bold: bold, size: 10, color: { argb: tc } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
+                    alignment: { horizontal: h, vertical: 'middle', wrapText: true, readingOrder: 'rtl' },
+                    border: { top: { style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair', color: { argb: 'FFCCCCCC' } }, left: { style: 'hair', color: { argb: 'FFCCCCCC' } }, right: { style: 'hair', color: { argb: 'FFCCCCCC' } } }
+                };
+            }
+            function mergeAndSet(ws, row, col1, col2, text, bg = HB, tc = GL, fs = 12) {
+                ws.mergeCells(row, col1, row, col2);
+                const c = ws.getCell(row, col1);
+                c.value = text;
+                c.font = { name: 'Arial', bold: true, size: fs, color: { argb: tc } };
+                c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+                c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'rtl' };
+                c.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } }, left: { style: 'medium', color: { argb: G } }, right: { style: 'medium', color: { argb: G } } };
+            }
+
+            ws.getColumn(1).width = 5;
+            ws.getColumn(2).width = 30;
+            ws.getColumn(3).width = 20;
+            ws.getColumn(4).width = 20;
+            ws.getColumn(5).width = 20;
+            ws.getColumn(6).width = 20;
+
+            mergeAndSet(ws, 1, 1, 6, `تقرير تحليل السيناريوهات - ${company}`, DB, GL, 16);
+            ws.getRow(1).height = 40;
+
+            mergeAndSet(ws, 2, 1, 6, `العملة: ${currency}  |  تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG')}`, HB, GL, 11);
+            ws.getRow(2).height = 28;
+
+            // جدول البيانات
+            const headers = ['المؤشر', 'القيمة الحالية', 'قيمة السيناريو', 'التغيير', 'نسبة التغيير %', 'السيناريو %'];
+            const headerRow = ws.getRow(3);
+            headers.forEach((h, idx) => {
+                const cell = ws.getCell(3, idx + 1);
+                cell.value = h;
+                Object.assign(cell, headerStyle(SB, W));
+            });
+            ws.getRow(3).height = 28;
+
+            const b = data.base;
+            const s = data.scenario;
+            const c = data.changes;
+            const p = data.scenarioPcts;
+
+            const rows = [
+                ['الإيرادات', b.revenue, s.revenue, c.revenue, (c.revenue / b.revenue * 100), p.revenue],
+                ['الرواتب', b.salaries, s.salaries, s.salaries - b.salaries, ((s.salaries - b.salaries) / b.salaries * 100), p.salaries],
+                ['المواد الخام', b.materials, s.materials, s.materials - b.materials, ((s.materials - b.materials) / b.materials * 100), p.materials],
+                ['مصاريف أخرى', b.otherCosts, s.otherCosts, 0, 0, 0],
+                ['إجمالي التكاليف', b.totalCosts, s.totalCosts, c.costs, (c.costs / b.totalCosts * 100), ''],
+                ['صافي الربح', b.profit, s.profit, c.profit, (c.profit / b.profit * 100), ''],
+                ['هامش الربح %', b.margin, s.margin, c.margin, (c.margin / b.margin * 100), '']
+            ];
+
+            rows.forEach((r, i) => {
+                const rowNum = i + 4;
+                const bg = i % 2 === 0 ? AR : 'FFFEFCF6';
+                const row = ws.getRow(rowNum);
+                row.height = 24;
+                r.forEach((val, colIdx) => {
+                    const cell = ws.getCell(rowNum, colIdx + 1);
+                    if (typeof val === 'number') {
+                        if (colIdx >= 1 && colIdx <= 4) cell.numFmt = '#,##0.00';
+                        else if (colIdx === 5) cell.numFmt = '0.00%';
+                        cell.value = val;
+                    } else {
+                        cell.value = val;
+                    }
+                    Object.assign(cell, cellStyle(bg, DT, false, colIdx === 0 || colIdx === 5 ? 'right' : 'center'));
+                });
+            });
+
+            const footerRow = rows.length + 5;
+            ws.mergeCells(footerRow, 1, footerRow, 6);
+            const footerCell = ws.getCell(footerRow, 1);
+            footerCell.value = `النتيجة: ${data.isBetter ? '✅ تحسن في الربحية' : '🔴 تراجع في الربحية'}  |  تم الإنشاء بواسطة FAROUK GRUP`;
+            footerCell.font = { name: 'Arial', size: 9, color: { argb: 'FF888888' } };
+            footerCell.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+            ws.getRow(footerRow).height = 28;
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, `Scenario_Analysis_${company}_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        // ============================================================
+        // تصدير Word
+        // ============================================================
+        function exportWord() {
+            if (!window.lastScenarioResults) { alert('الرجاء تشغيل المحاكاة أولاً.'); return; }
+            const data = window.lastScenarioResults;
+            const currency = data.currency;
+            const company = data.company;
+
+            const b = data.base;
+            const s = data.scenario;
+            const c = data.changes;
+
+            const htmlContent = `
+                <html dir="rtl">
+                <head><meta charset="UTF-8"><style>
+                    body { font-family: Arial, sans-serif; padding: 30px; direction: rtl; }
+                    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; }
+                    .info { margin: 15px 0; }
+                    table { width: 100%; border-collapse: collapse; }
+                    th { background: #b8860b; color: white; padding: 8px; }
+                    td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+                    .positive { color: #28a745; }
+                    .negative { color: #dc3545; }
+                    .rec { background: #f9f9f9; padding: 15px; border-right: 4px solid #b8860b; margin: 20px 0; }
+                    .footer { margin-top: 30px; color: #777; text-align: center; }
+                </style></head>
+                <body>
+                    <h1>تقرير تحليل السيناريوهات</h1>
+                    <div class="info"><strong>الجهة:</strong> ${company} &nbsp;|&nbsp; <strong>العملة:</strong> ${currency}</div>
+                    <div class="info"><strong>تاريخ التقرير:</strong> ${new Date().toLocaleDateString('ar-EG')}</div>
+                    <h2>تغييرات السيناريو</h2>
+                    <ul>
+                        <li>المبيعات: ${data.scenarioPcts.revenue >= 0 ? '+' : ''}${data.scenarioPcts.revenue}%</li>
+                        <li>الرواتب: ${data.scenarioPcts.salaries >= 0 ? '+' : ''}${data.scenarioPcts.salaries}%</li>
+                        <li>المواد الخام: ${data.scenarioPcts.materials >= 0 ? '+' : ''}${data.scenarioPcts.materials}%</li>
+                    </ul>
+                    <table>
+                        <thead><tr><th>المؤشر</th><th>القيمة الحالية</th><th>قيمة السيناريو</th><th>التغيير</th></tr></thead>
+                        <tbody>
+                            <tr><td>الإيرادات</td><td>${currency}${b.revenue.toFixed(0)}</td><td>${currency}${s.revenue.toFixed(0)}</td><td class="${c.revenue >= 0 ? 'positive' : 'negative'}">${c.revenue >= 0 ? '+' : ''}${currency}${c.revenue.toFixed(0)}</td></tr>
+                            <tr><td>إجمالي التكاليف</td><td>${currency}${b.totalCosts.toFixed(0)}</td><td>${currency}${s.totalCosts.toFixed(0)}</td><td class="${c.costs <= 0 ? 'positive' : 'negative'}">${c.costs >= 0 ? '+' : ''}${currency}${c.costs.toFixed(0)}</td></tr>
+                            <tr style="font-weight:bold;background:#f0f0f0;"><td>صافي الربح</td><td>${currency}${b.profit.toFixed(0)}</td><td>${currency}${s.profit.toFixed(0)}</td><td class="${c.profit >= 0 ? 'positive' : 'negative'}">${c.profit >= 0 ? '+' : ''}${currency}${c.profit.toFixed(0)}</td></tr>
+                            <tr><td>هامش الربح</td><td>${b.margin.toFixed(1)}%</td><td>${s.margin.toFixed(1)}%</td><td class="${c.margin >= 0 ? 'positive' : 'negative'}">${c.margin >= 0 ? '+' : ''}${c.margin.toFixed(1)}%</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="rec">
+                        <h3>📌 التوصية</h3>
+                        <p>${data.isBetter ? '✅ السيناريو يؤدي إلى تحسن في الربحية.' : '🔴 السيناريو يؤدي إلى تراجع في الربحية.'}</p>
+                        <p>التغيير الكلي في صافي الربح: ${currency}${c.profit.toFixed(0)} (${(c.profit / b.profit * 100).toFixed(1)}%)</p>
+                    </div>
+                    <div class="footer">تم إنشاء التقرير بواسطة منصة FAROUK GRUP</div>
+                </body>
+                </html>
+            `;
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Scenario_Analysis_${company}_${new Date().toISOString().slice(0,10)}.doc`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // ============================================================
+        // ربط الأزرار
+        // ============================================================
+        document.getElementById('simulateBtn').addEventListener('click', runSimulation);
+        document.getElementById('exportWordBtn').addEventListener('click', exportWord);
+        document.getElementById('exportExcelBtn').addEventListener('click', exportExcel);
+
+        // ============================================================
+        // آلة حاسبة منبثقة
+        // ============================================================
+        const calcDisplay = document.getElementById('calcDisplay');
+        let currentCalcInput = '';
+        function safeEvaluate(expr) {
+            let e = expr.replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/');
+            if (!/^[0-9+\-*/().]+$/.test(e)) throw new Error('تعبير غير صالح');
+            return new Function('return ' + e)();
+        }
+        window.handleCalculatorInput = v => { currentCalcInput += v; calcDisplay.value = currentCalcInput; };
+        window.clearCalculator = () => { currentCalcInput = ''; calcDisplay.value = ''; };
+        window.backspaceCalculator = () => { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; };
+        window.calculateCalculatorResult = () => {
+            try { let r = safeEvaluate(currentCalcInput); calcDisplay.value = r; currentCalcInput = r.toString(); } catch { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
+        };
+        const modalCalc = document.getElementById('calculatorModal');
+        document.getElementById('calculatorBtn').onclick = e => { e.preventDefault(); modalCalc.style.display = 'block'; };
+        document.querySelector('#calculatorModal .close').onclick = () => { modalCalc.style.display = 'none'; };
+        window.onclick = e => { if (e.target == modalCalc) modalCalc.style.display = 'none'; };
+        document.addEventListener('keydown', function(e) {
+            if (modalCalc.style.display !== 'block') return;
+            const key = e.key;
+            e.preventDefault();
+            if (key >= '0' && key <= '9') handleCalculatorInput(key);
+            else if (key === '.') handleCalculatorInput('.');
+            else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
+            else if (key === 'Enter' || key === '=') calculateCalculatorResult();
+            else if (key === 'Backspace') backspaceCalculator();
+            else if (key === 'Escape') modalCalc.style.display = 'none';
+            else if (key === 'c' || key === 'C') clearCalculator();
+        });
+
+        // تشغيل محاكاة تلقائية عند التحميل لإظهار النتائج الافتراضية
+        window.addEventListener('load', function() {
+            setTimeout(runSimulation, 500);
+        });
+    </script>
+</body>
+</html>
