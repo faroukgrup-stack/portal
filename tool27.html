@@ -89,6 +89,26 @@
         .explain-section{background:rgba(180,140,80,.05);border-radius:20px;padding:1.5rem;margin:1.5rem 0}
         .hidden-section{display:none}
         @media(max-width:768px){.hero-mini h2{font-size:1.8rem}.calc-box{padding:1.2rem}.export-container{flex-direction:column;align-items:stretch}.export-btn{width:100%;justify-content:center}}
+
+        /* أنماط الآلة الحاسبة المنبثقة */
+        .modal{display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.8);backdrop-filter:blur(4px)}
+        .modal-content{background:var(--bg-panel);margin:5% auto;border:2px solid var(--border-subtle);border-radius:30px;width:90%;max-width:300px;box-shadow:0 15px 35px -10px rgba(0,0,0,.8),0 0 20px rgba(180,133,84,.3)}
+        .modal-header{background:rgba(180,140,80,.15);border-bottom:2px solid var(--border-subtle);padding:10px 15px;border-radius:28px 28px 0 0;display:flex;align-items:center;justify-content:space-between}
+        .modal-header h2{margin:0;color:var(--accent-soft);font-size:1rem;font-weight:900}
+        .close-calc{color:var(--text-soft);float:left;font-size:24px;font-weight:bold;cursor:pointer}
+        .close-calc:hover{color:var(--accent)}
+        .modal-body{padding:15px}
+        .calc-display{width:100%;height:45px;font-size:1.4rem;text-align:left;padding:0 10px;border:2px solid var(--border-subtle);border-radius:20px;margin-bottom:15px;background:rgba(8,13,22,.8);color:var(--accent-soft);font-family:'Inter',monospace;direction:ltr}
+        .calc-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+        .calc-btn{background:rgba(180,140,80,.1);border:1px solid var(--border-subtle);border-radius:15px;padding:10px 0;font-size:1rem;font-weight:700;color:var(--text-bright);cursor:pointer;font-family:'Tajawal',sans-serif}
+        .calc-btn:hover{background:rgba(180,140,80,.3);border-color:var(--accent)}
+        .calc-btn.operator{color:var(--accent-soft)}
+        .calc-btn.equals{background:rgba(180,140,80,.3);color:#fff;grid-column:span 2}
+        .calc-btn.equals:hover{background:rgba(180,140,80,.5)}
+
+        /* زر الآلة الحاسبة العائم */
+        .calc-floating-btn{position:fixed;bottom:20px;left:20px;background:rgba(180,140,80,.2);border:1px solid var(--border-subtle);border-radius:50px;padding:.8rem 1.2rem;color:var(--accent-soft);font-size:1rem;font-weight:700;z-index:100;backdrop-filter:blur(10px);cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:.5rem;font-family:'Tajawal',sans-serif}
+        .calc-floating-btn:hover{background:rgba(180,140,80,.4);color:#fff;border-color:var(--accent);box-shadow:0 0 15px rgba(180,140,80,.3)}
     </style>
 </head>
 <body>
@@ -201,6 +221,49 @@
 </section>
 
 <footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span> – حاسبة تقييم احترافية للشركات البرمجية الناشئة</footer>
+
+<!-- ========== نافذة الآلة الحاسبة المنبثقة ========== -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close-calc" id="closeCalcBtn">&times;</span>
+            <h2><i class="fas fa-calculator" style="color: var(--accent-soft);"></i> آلة حاسبة</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
+                <button class="calc-btn" onclick="clearCalculator()">C</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
+                <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
+                <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
+                <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
+                <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== زر الآلة الحاسبة العائم ========== -->
+<div class="calc-floating-btn" id="calculatorBtn">
+    <i class="fas fa-calculator"></i> آلة حاسبة
+</div>
+
+<!-- ========== زر الرئيسية العائم ========== -->
+<a href="index.html" style="position:fixed;bottom:20px;right:20px;background:rgba(180,140,80,0.9);color:white;padding:12px 20px;border-radius:50px;text-decoration:none;font-family:'Tajawal',sans-serif;font-weight:bold;backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,0.2);box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:9999;display:flex;align-items:center;gap:8px;transition:0.3s;" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,140,80,0.9)'; this.style.transform='scale(1)';">
+    <i class="fas fa-home"></i> الرئيسية
+</a>
 
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
@@ -390,7 +453,6 @@ async function exportExcel(){
         function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
         function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
 
-        // Cover
         const cv=wb.addWorksheet('غلاف التقرير',{views:[{rightToLeft:true,showGridLines:false}]});
         [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
         for(let r=1;r<=40;r++)cv.getRow(r).height=22;
@@ -418,7 +480,6 @@ async function exportExcel(){
             cv.getRow(ir).height=28;ir++;
         });
 
-        // Inputs sheet
         const inp=wb.addWorksheet('المدخلات والافتراضات',{views:[{rightToLeft:true,showGridLines:false}]});
         [5,38,22,22,5].forEach((w,i)=>inp.getColumn(i+1).width=w);
         mh(inp,1,5,1,'📋 جدول المدخلات والافتراضات الأساسية',DB,GL,14);inp.getRow(1).height=40;
@@ -455,7 +516,6 @@ async function exportExcel(){
             addInputRow('علاوة المخاطرة',(parseFloat(document.getElementById('riskPremium').value)||0)/100,np);
         }
 
-        // KPI sheet
         const ks=wb.addWorksheet('مؤشرات الأداء',{views:[{rightToLeft:true,showGridLines:false}]});
         [5,32,22,22,22,5].forEach((w,i)=>ks.getColumn(i+1).width=w);
         mh(ks,1,6,2,'📊 لوحة مؤشرات الأداء الرئيسية',DB,GL,15);ks.getRow(2).height=45;
@@ -493,7 +553,6 @@ async function exportExcel(){
             kr++;
         });
 
-        // Valuation range sheet
         const vs=wb.addWorksheet('نطاق التقييم',{views:[{rightToLeft:true,showGridLines:false}]});
         [5,35,22,22,22,5].forEach((w,i)=>vs.getColumn(i+1).width=w);
         mh(vs,1,6,1,'📊 نطاق التقييم',DB,GL,14);vs.getRow(1).height=40;
@@ -524,7 +583,6 @@ async function exportExcel(){
             });
         }
 
-        // Chart sheet (only for post-revenue)
         if(R.stage==='post'){
             const chartSheet=wb.addWorksheet('الرسم البياني',{views:[{rightToLeft:true,showGridLines:false}]});
             chartSheet.getColumn(1).width=5;chartSheet.getColumn(2).width=50;chartSheet.getColumn(3).width=5;
@@ -545,7 +603,6 @@ async function exportExcel(){
             }
         }
 
-        // Interpretation sheet
         const is=wb.addWorksheet('التفسير والتوصيات',{views:[{rightToLeft:true,showGridLines:false}]});
         [5,50,5].forEach((w,i)=>is.getColumn(i+1).width=w);
         mh(is,1,3,2,'📝 التفسير والتوصيات',DB,GL,14);is.getRow(2).height=45;
@@ -680,6 +737,68 @@ async function exportWord(){
 
 document.getElementById('exportExcelBtn').addEventListener('click',exportExcel);
 document.getElementById('exportWordBtn').addEventListener('click',exportWord);
+
+// ==================== آلة حاسبة منبثقة ====================
+const calcDisplayEl = document.getElementById('calcDisplay');
+const calcModalEl = document.getElementById('calculatorModal');
+let currentCalcInput = '';
+
+function safeEvaluate(expr) {
+    try {
+        if (!/^[0-9+\-*/().\s]+$/.test(expr)) throw new Error('غير مسموح');
+        expr = expr.replace(/÷/g, '/').replace(/×/g, '*');
+        return new Function('return (' + expr + ')')();
+    } catch {
+        return 'خطأ';
+    }
+}
+
+window.handleCalculatorInput = function(value) {
+    currentCalcInput += value;
+    calcDisplayEl.value = currentCalcInput;
+};
+window.clearCalculator = function() {
+    currentCalcInput = '';
+    calcDisplayEl.value = '';
+};
+window.backspaceCalculator = function() {
+    currentCalcInput = currentCalcInput.slice(0, -1);
+    calcDisplayEl.value = currentCalcInput;
+};
+window.calculateCalculatorResult = function() {
+    if (!currentCalcInput.trim()) return;
+    const result = safeEvaluate(currentCalcInput);
+    calcDisplayEl.value = result;
+    currentCalcInput = result.toString();
+};
+
+document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    calcModalEl.style.display = 'block';
+    calcDisplayEl.focus();
+});
+document.getElementById('closeCalcBtn').addEventListener('click', function() {
+    calcModalEl.style.display = 'none';
+});
+window.addEventListener('click', function(e) {
+    if (e.target === calcModalEl) {
+        calcModalEl.style.display = 'none';
+    }
+});
+document.addEventListener('keydown', function(e) {
+    if (calcModalEl.style.display !== 'block') return;
+    const key = e.key;
+    if (key >= '0' && key <= '9') { e.preventDefault();
+        handleCalculatorInput(key); } else if (key === '.') { e.preventDefault();
+        handleCalculatorInput('.'); } else if (key === '+' || key === '-' || key === '*' || key === '/') { e
+        .preventDefault();
+        handleCalculatorInput(key); } else if (key === 'Enter' || key === '=') { e.preventDefault();
+        calculateCalculatorResult(); } else if (key === 'Backspace') { e.preventDefault();
+        backspaceCalculator(); } else if (key === 'Escape') { e.preventDefault();
+        calcModalEl.style.display = 'none'; } else if (key.toLowerCase() === 'c') { e.preventDefault();
+        clearCalculator(); }
+});
+
 switchStage('post');
 </script>
 </body>
