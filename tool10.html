@@ -2,1243 +2,1070 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>حاسبة WACC المتقدمة | FAROUK GRUP</title>
-    <!-- حماية الصفحة -->
-    <script src="auth-check.js"></script>
+<!-- حماية الصفحة -->
+<script src="auth-check.js"></script>
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- AOS Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <!-- Chart.js للرسوم البيانية -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- html2canvas لتصدير الرسم البياني -->
+    <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- مكتبات Excel احترافية -->
+    <!-- ExcelJS & FileSaver -->
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
-        /* جميع الأنماط الأصلية محفوظة مع إضافة أنماط شاشة التحميل */
+        /* ===== RESET & BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg-dark: #0b0e17;
-            --bg-panel: rgba(18, 24, 36, 0.85);
-            --bg-card: rgba(22, 30, 46, 0.8);
-            --border-light: rgba(180, 133, 84, 0.25);
-            --accent-glow: #b48554;
-            --accent-soft: #cfa776;
-            --text-light: #f0f4fa;
-            --text-muted: #aab7d4;
-            --text-dark: #0b0e17;
-            --shadow-soft: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 133, 84, 0.15);
-            --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
-            --radius-md: 20px;
-            --radius-lg: 30px;
-            --transition: all 0.3s ease;
-            --gold: #b8860b;
-            --gold-light: #d4b15a;
-            --gold-soft: rgba(184,134,11,0.1);
-            --dark: #0f0f0f;
-            --dark-light: #1a1a1a;
-            --white: #ffffff;
-            --offwhite: #f9f9f9;
-            --text: #333;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
-        }
-
-        body {
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
             font-family: 'Tajawal', sans-serif;
-            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
-            color: var(--text-light);
-            line-height: 1.6;
-            min-height: 100vh;
-            position: relative;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
         }
 
-        /* خلفية متوهجة */
+        /* ===== إزالة كل ما يسبب الاهتزاز ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .collapsible, .hero-mini, .currency-row,
+        .featured-badge, .glow-bg, .floating-shape, .calc-floating-btn,
+        .home-floating-btn, .export-btn, .export-word-btn,
+        .form-group input, .form-group select, .capm-fields {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== خلفية ثابتة ===== */
         .glow-bg {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 0;
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
         }
         .glow-bg span {
             position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%);
             border-radius: 50%;
             filter: blur(80px);
-            animation: glowMove 20s infinite alternate ease-in-out;
+            opacity: 0.20;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.10) 0%, transparent 70%);
         }
-        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(180,133,84,0.12) 0%, transparent 70%); }
-        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
-        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.1) 0%, transparent 70%); animation-delay: -5s; }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.05) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.06) 0%, transparent 70%); }
+        .floating-shape { display: none; }
 
-        @keyframes glowMove {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-            100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; }
-        }
-
-        .floating-shape {
-            position: absolute;
-            width: 300px; height: 300px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%);
-            z-index: 0; pointer-events: none;
-        }
-        .shape-1 { top: -100px; right: -100px; animation: float 20s infinite ease-in-out; }
-        .shape-2 { bottom: -50px; left: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
-        @keyframes float {
-            0% { transform: translate(0,0) rotate(0deg); }
-            33% { transform: translate(30px,-30px) rotate(5deg); }
-            66% { transform: translate(-20px,20px) rotate(-5deg); }
-            100% { transform: translate(0,0) rotate(0deg); }
-        }
-
+        /* ===== HERO ===== */
         .hero-mini {
-            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
-            color: white;
-            text-align: center;
-            padding: 3rem 1rem;
-            border-bottom: 4px solid var(--gold);
-            position: relative;
-            overflow: hidden;
-            z-index: 2;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
         }
-        .hero-mini::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
-            animation: rotate 40s linear infinite;
+        .hero-mini h2 {
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .hero-mini h2 { font-size: 2.5rem; font-weight: 900; color: var(--gold-light); margin-bottom: 0.5rem; position: relative; z-index: 2; }
-        .hero-mini p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; opacity: 0.95; position: relative; z-index: 2; }
+        .hero-mini p {
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
+        }
 
-        .calc-wrapper { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; position: relative; z-index: 2; }
+        /* ===== WRAPPER ===== */
+        .calc-wrapper {
+            max-width: 1050px; margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+        }
 
+        /* ===== CARD ===== */
         .calc-box {
-            background: var(--bg-panel);
-            backdrop-filter: blur(15px);
-            border: 2px solid var(--border-light);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-soft);
-            position: relative;
-            overflow: hidden;
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
         }
-        .calc-box:hover {
-            box-shadow: var(--shadow-glow);
-            border-color: rgba(180,133,84,0.4);
-        }
-        .calc-box::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, transparent 0%, rgba(184,134,11,0.05) 100%);
-            z-index: -1;
+        .calc-box h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
         }
         .featured-badge {
+            display: none;
             position: absolute; top: -10px; left: -10px;
-            background: linear-gradient(135deg, var(--accent-glow), var(--gold-light));
+            background: linear-gradient(135deg, #b48554, #d4b15a);
             color: #111; width: 90px; height: 90px; border-radius: 50%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900; border: 3px solid white; z-index: 10;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
         }
         .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
         .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
 
-        .calc-box h2 {
-            font-size: 1.8rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #f0e6d2, #cfa776);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
+        /* ===== صف العملة ===== */
         .currency-row {
-            display: flex; align-items: center; justify-content: flex-start; gap: 1rem;
-            background: rgba(180,133,84,0.15);
-            border: 1px solid var(--border-light);
-            padding: 0.8rem 1rem;
-            border-radius: 50px;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.8rem; background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.2);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
         }
-        .currency-row label { font-weight: 700; color: var(--accent-soft); margin: 0; }
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
         .currency-row select, .currency-row input {
-            width: 150px; padding: 0.5rem 1rem; border: 2px solid var(--border-light); border-radius: 30px;
-            background: rgba(10,14,23,0.7); color: var(--text-light); font-weight: 700; font-family: 'Inter', sans-serif;
+            flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
         }
-        .currency-row input { width: 250px; }
+        .currency-row input { flex: 2 1 200px; }
         .currency-row select option { background: #0b0e17; color: #f0f4fa; }
 
+        /* ===== عناوين الأقسام ===== */
         .section-title-sm {
-            font-size: 1.3rem; font-weight: 900;
-            background: linear-gradient(135deg, #f0e6d2, #cfd9ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
             margin: 1.2rem 0 0.8rem 0;
-            border-bottom: 2px solid var(--border-light);
-            padding-bottom: 0.3rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== صفوف النماذج ===== */
+        .form-row {
+            display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;
+        }
+        .form-group {
+            flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
+        }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-left: 0.3rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
         }
 
-        .form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
-        .form-group { flex: 1 1 200px; margin-bottom: 0.8rem; position: relative; }
-        label { display: block; margin-bottom: 0.3rem; font-weight: 700; color: var(--accent-soft); font-size: 0.9rem; }
-        label i { color: var(--accent-soft); margin-left: 0.3rem; }
+        /* ===== حقول CAPM ===== */
+        .capm-fields { display: none; width: 100%; margin-top: 0.5rem; }
+        .capm-fields .form-row { margin-bottom: 0; }
 
-        input, select {
-            width: 100%; padding: 0.8rem 1rem; border: 2px solid var(--border-light); border-radius: 30px;
-            background: rgba(10,14,23,0.7); color: var(--text-light); font-family: 'Inter', sans-serif;
-            font-size: 0.95rem; transition: var(--transition);
-        }
-        input:focus, select:focus {
-            outline: none; border-color: var(--accent-glow);
-            box-shadow: 0 0 0 3px rgba(180,133,84,0.2); background: rgba(15,20,30,0.9);
-        }
-
-        .tooltip { position: relative; cursor: help; }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 220px;
-            background-color: var(--dark);
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px;
-            position: absolute;
-            z-index: 100;
-            bottom: 130%; left: 50%;
-            margin-left: -110px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.85rem;
-            border: 1px solid var(--gold);
-            pointer-events: none;
-        }
-        .tooltip .tooltiptext::after {
-            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
-            border-width: 5px; border-style: solid; border-color: var(--dark) transparent transparent transparent;
-        }
-        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
-
+        /* ===== زر الحساب ===== */
         .btn-calculate {
-            display: flex; align-items: center; justify-content: center; gap: 1rem;
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
             width: 100%; padding: 1.2rem; border-radius: 50px;
-            background: rgba(180,133,84,0.2);
-            border: 1px solid var(--border-light);
-            color: var(--accent-soft);
-            font-weight: 900; font-size: 1.2rem; cursor: pointer;
-            transition: var(--transition); backdrop-filter: blur(10px); margin: 1.5rem 0;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer; margin: 1.5rem 0; font-family: 'Tajawal', sans-serif;
         }
-        .btn-calculate:hover {
-            background: rgba(180,133,84,0.4);
-            color: #fff; border-color: var(--accent-glow);
-            box-shadow: 0 0 25px rgba(180,133,84,0.3);
-            transform: translateY(-3px);
-        }
+        .btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-calculate:active { transform: scale(0.97); }
 
-        .results-section { margin-top: 2rem; }
+        /* ===== النتائج ===== */
+        .results-section { margin-top: 1.5rem; }
         .results-cards {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
         }
-
         .result-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            padding: 1.2rem; text-align: center;
-            box-shadow: var(--shadow-soft); transition: var(--transition);
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.12);
+            border-radius: 20px; padding: 1rem; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
-        .result-card:hover {
-            transform: translateY(-5px); border-color: var(--accent-glow);
-            box-shadow: var(--shadow-glow);
+        .result-card i { font-size: 1.6rem; color: #cfa776; margin-bottom: 0.3rem; }
+        .result-card h4 { font-size: 0.85rem; font-weight: 700; color: #aab7d4; margin-bottom: 0.2rem; }
+        .result-card .value { font-size: 1.3rem; font-weight: 900; color: #cfa776; }
+        .result-card .unit { font-size: 0.75rem; color: #aab7d4; }
+        .result-card .status {
+            font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+            display: inline-block; margin-top: 0.2rem;
         }
-        .result-card i { font-size: 1.8rem; color: var(--accent-soft); margin-bottom: 0.5rem; }
-        .result-card h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem; }
-        .result-card .value { font-size: 1.5rem; font-weight: 900; color: var(--accent-soft); }
-        .result-card .unit { font-size: 0.8rem; color: var(--text-muted); margin-right: 0.2rem; }
+        .status-good { background: #28a745; color: white; }
+        .status-bad { background: #dc3545; color: white; }
+        .status-warning { background: #ffc107; color: #111; }
 
+        /* ===== جداول ===== */
         .table-container {
-            overflow-x: auto; margin-top: 1.5rem; border: 1px solid var(--border-light);
-            border-radius: var(--radius-md); background: var(--bg-card); padding: 0.8rem;
+            overflow-x: auto; margin-top: 1rem;
+            border: 1px solid rgba(180,133,84,0.1); border-radius: 20px;
+            background: rgba(22,30,46,0.6); padding: 0.5rem;
+            -webkit-overflow-scrolling: touch;
         }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.85rem;
+            min-width: 400px;
+        }
         th {
-            background: rgba(180,133,84,0.2); color: var(--accent-soft);
-            font-weight: 900; padding: 0.5rem; border-bottom: 2px solid var(--border-light);
+            background: rgba(180,133,84,0.15); color: #cfa776;
+            font-weight: 900; padding: 0.6rem 0.8rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15); white-space: nowrap;
         }
-        td { padding: 0.5rem; border-bottom: 1px solid rgba(180,133,84,0.2); text-align: center; color: var(--text-light); }
+        td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid rgba(180,133,84,0.06);
+            text-align: center; color: #f0f4fa;
+        }
         tr:last-child td { border-bottom: none; }
 
-        .export-container {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin: 1rem 0;
-        }
-        .export-btn, .export-word-btn {
-            background: rgba(180,133,84,0.2);
-            border: 1px solid var(--border-light);
-            color: var(--accent-soft);
-            border-radius: 50px;
-            padding: 0.8rem 2rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
-        .export-btn:hover, .export-word-btn:hover {
-            background: rgba(180,133,84,0.4);
-            color: #fff;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 15px rgba(180,133,84,0.3);
-        }
-
+        /* ===== رسوم بيانية ===== */
         .chart-container {
-            margin-top: 2rem;
-            background: var(--bg-card);
+            margin-top: 1.5rem;
+            background: rgba(22,30,46,0.6);
             border-radius: 20px;
             padding: 1rem;
-            border: 1px solid var(--border-light);
-            height: 300px;
+            border: 1px solid rgba(180,133,84,0.08);
+            height: 280px;
+            position: relative;
         }
+        .chart-container canvas { width: 100% !important; height: 100% !important; }
 
-        /* شاشة تحميل التصدير */
+        /* ===== أزرار التصدير ===== */
+        .export-container {
+            display: flex; justify-content: center; gap: 0.8rem;
+            flex-wrap: wrap; margin: 1.5rem 0;
+        }
+        .export-btn, .export-word-btn {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+            padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.9rem; font-family: 'Tajawal', sans-serif;
+            flex: 1 1 auto; justify-content: center; max-width: 220px;
+        }
+        .export-btn:hover, .export-word-btn:hover { background: rgba(180,133,84,0.25); }
+        .export-btn.excel { background: rgba(40,167,69,0.12); border-color: #28a745; color: #6fbf6f; }
+        .export-btn.excel:hover { background: rgba(40,167,69,0.25); }
+
+        /* ===== شاشة تحميل ===== */
         .export-loading {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            backdrop-filter: blur(6px);
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
         }
-        .export-loading.show {
-            display: flex;
-        }
+        .export-loading.show { display: flex; }
         .export-loading-box {
-            background: var(--bg-panel);
-            border: 2px solid var(--border-light);
-            border-radius: 24px;
-            padding: 2rem 3rem;
-            text-align: center;
-            box-shadow: var(--shadow-glow);
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
         }
         .export-loading-box i {
-            font-size: 3rem;
-            color: var(--accent-soft);
-            animation: spin 1s linear infinite;
-            display: block;
-            margin-bottom: 1rem;
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
         }
-        .export-loading-box h3 {
-            color: var(--accent-soft);
-            margin-bottom: 0.5rem;
-            font-size: 1.2rem;
-        }
-        .export-loading-box p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* فوتر مبسط */
+        /* ===== فوتر ===== */
         .footer-simple {
-            text-align: center;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            background: rgba(10,14,23,0.5);
-            backdrop-filter: blur(5px);
-            border-top: 1px solid var(--border-light);
-            color: var(--text-muted);
-            font-size: 0.85rem;
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
         }
-        .footer-simple span {
-            color: var(--accent-soft);
-            font-weight: 700;
-        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
 
-        /* الآلة الحاسبة المنبثقة */
+        /* ===== MODAL ===== */
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.8);
-            backdrop-filter: blur(4px);
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
         }
-
+        .modal.active { display: flex; }
         .modal-content {
-            background: var(--bg-panel);
-            margin: 5% auto;
-            padding: 0;
-            border: 2px solid var(--border-light);
-            border-radius: 30px;
-            width: 90%;
-            max-width: 300px;
-            box-shadow: var(--shadow-glow);
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
         }
-
         .modal-header {
-            background: rgba(180,133,84,0.15);
-            border-bottom: 2px solid var(--border-light);
-            padding: 10px 15px;
-            border-radius: 28px 28px 0 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
         }
-
-        .modal-header h2 {
-            margin: 0;
-            color: var(--accent-soft);
-            font-size: 1rem;
-            font-weight: 900;
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
         }
-
-        .close {
-            color: var(--text-muted);
-            float: left;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close:hover { color: var(--accent-glow); }
-
-        .modal-body { padding: 15px; }
-
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
         .calc-display {
-            width: 100%; height: 45px; font-size: 1.4rem; text-align: left; padding: 0 10px;
-            border: 2px solid var(--border-light); border-radius: 20px; margin-bottom: 15px;
-            background: rgba(10,14,23,0.8); color: var(--accent-soft);
-            font-family: 'Inter', monospace; direction: ltr;
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: left;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
         }
-
         .calc-buttons {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
         }
-
         .calc-btn {
-            background: rgba(180,133,84,0.1);
-            border: 1px solid var(--border-light);
-            border-radius: 15px; padding: 10px 0;
-            font-size: 1rem; font-weight: 700; color: var(--text-light); cursor: pointer;
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
         }
-        .calc-btn:hover {
-            background: rgba(180,133,84,0.3);
-            border-color: var(--accent-glow);
-        }
-        .calc-btn.operator { color: var(--accent-soft); }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
         .calc-btn.equals {
-            background: rgba(180,133,84,0.3);
-            color: white;
-            grid-column: span 2;
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
         }
-        .calc-btn.equals:hover { background: rgba(180,133,84,0.5); }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
 
-        /* زر الآلة الحاسبة العائم */
-        .calc-floating-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(180,133,84,0.2);
-            border: 1px solid var(--border-light);
-            border-radius: 50px;
-            padding: 0.8rem 1.2rem;
-            color: var(--accent-soft);
-            font-size: 1rem;
-            font-weight: 700;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        /* ===== الأزرار العائمة ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
         }
-        .calc-floating-btn:hover {
-            background: rgba(180,133,84,0.4);
-            color: #fff;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 15px rgba(180,133,84,0.3);
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== رسائل ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+        .tooltip .tooltiptext { display: none; }
+
+        /* ===================================================
+           تحسينات للشاشات المتوسطة والكبيرة (كمبيوتر)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .section-title-sm { font-size: 1.4rem; }
+            .form-group { flex: 1 1 220px; }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value { font-size: 1.5rem; }
+            .result-card h4 { font-size: 0.95rem; }
+            .result-card i { font-size: 1.8rem; }
+            table { font-size: 0.9rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .chart-container { height: 320px; }
         }
 
-        /* حقول CAPM (إخفاء/إظهار) */
-        .capm-fields {
-            display: none;
-            width: 100%;
-            margin-top: 0.5rem;
-        }
-        .capm-fields .form-row {
-            margin-bottom: 0;
-        }
-
-        /* تحسينات الجوال */
+        /* ===================================================
+           تحسينات للجوال (شاشات ≤ 768px)
+           =================================================== */
         @media (max-width: 768px) {
-            .hero-mini h2 { font-size: 2rem; }
-            .hero-mini p { font-size: 1rem; }
-            .calc-box { padding: 1.5rem; }
-            .featured-badge { width: 70px; height: 70px; }
-            .featured-badge i { font-size: 1.4rem; }
-            .featured-badge span { font-size: 0.6rem; }
-            .currency-row select, .currency-row input { width: 100%; margin-bottom: 0.3rem; }
-            .form-row { flex-direction: column; gap: 0.5rem; }
-            .export-container { flex-direction: column; align-items: stretch; }
-            .export-btn, .export-word-btn { width: 100%; justify-content: center; }
-            .results-cards { grid-template-columns: 1fr; }
-            .chart-container { height: 250px; }
-            .calc-floating-btn { padding: 0.6rem 1rem; font-size: 0.9rem; bottom: 15px; left: 15px; }
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; }
+            .currency-row label { font-size: 0.8rem; }
+            .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; }
+            .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+            .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-cards { grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 0.5rem; }
+            .result-card { padding: 0.6rem 0.4rem; }
+            .result-card i { font-size: 1.2rem; }
+            .result-card h4 { font-size: 0.65rem; }
+            .result-card .value { font-size: 1rem; }
+            .result-card .unit { font-size: 0.6rem; }
+            .chart-container { height: 200px; padding: 0.5rem; }
+            table { font-size: 0.7rem; min-width: 300px; }
+            th, td { padding: 0.3rem 0.4rem; }
+            .export-btn, .export-word-btn { font-size: 0.75rem; padding: 0.4rem 1rem; max-width: 160px; }
+            .modal-content { width: 95%; max-width: 320px; }
+            .calc-btn { padding: 8px 0; font-size: 0.9rem; }
+            .footer-simple { font-size: 0.7rem; padding: 0.6rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .capm-fields .form-row { flex-direction: column; }
+            .capm-fields .form-group { flex: 1 1 100%; }
         }
+
+        /* ===== تحسينات للشاشات الصغيرة جداً (≤ 400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+            .results-cards { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+            .chart-container { height: 160px; }
+        }
+
+        /* ===== منع التحديد العرضي ===== */
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        /* ===== تحسين التمرير ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
 
         /* إصلاح ظهور العناوين */
-        .section-title-sm,
-        .result-card h4,
-        .hero-mini h2 {
+        .section-title-sm, .result-card h4, .hero-mini h2 {
             -webkit-text-fill-color: initial !important;
-            color: var(--accent-soft) !important;
+            color: #cfa776 !important;
             background: none !important;
+            background-image: none !important;
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .note {
+            background: rgba(180,133,84,0.08); padding: 0.6rem 1rem;
+            border-radius: 16px; font-size: 0.85rem; color: #aab7d4;
+            margin-top: 0.5rem; border-right: 3px solid #b48554;
         }
     </style>
 </head>
-<body style="overflow-x: hidden;">
-    <!-- خلفية متوهجة -->
-    <div class="glow-bg">
-        <span></span><span></span><span></span>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">جاري إنشاء التقرير...</h3>
+        <p id="loadingMsg">يرجى الانتظار</p>
     </div>
-    <div class="floating-shape shape-1"></div>
-    <div class="floating-shape shape-2"></div>
+</div>
 
-    <section class="hero-mini">
-        <h2>📉 حاسبة معدل الخصم المتقدمة (WACC)
-</h2>
-        <p>المتوسط المرجح لتكلفة رأس المال – مع نموذج CAPM لحساب تكلفة حقوق الملكية.</p>
-    </section>
+<section class="hero-mini">
+    <h2>📉 حاسبة معدل الخصم المتقدمة (WACC)</h2>
+    <p>المتوسط المرجح لتكلفة رأس المال – مع نموذج CAPM لحساب تكلفة حقوق الملكية.</p>
+</section>
 
-    <!-- شاشة تحميل التصدير -->
-    <div class="export-loading" id="exportLoading">
-        <div class="export-loading-box">
-            <i class="fas fa-spinner"></i>
-            <h3 id="loadingTitle">جاري إنشاء التقرير الاحترافي...</h3>
-            <p id="loadingMsg">يرجى الانتظار — قد يستغرق ذلك لحظات</p>
+<div class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-scale-balanced"></i><span>WACC</span></div>
+        <h2><i class="fas fa-scale-balanced" style="color:#cfa776;margin-left:0.5rem;"></i>بيانات هيكل رأس المال</h2>
+
+        <!-- العملة واسم الجهة -->
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> العملة:</label>
+            <select id="currencySelect">
+                <option value="$" selected>دولار ($)</option>
+                <option value="€">يورو (€)</option>
+                <option value="₺">ليرة تركية (₺)</option>
+                <option value="ج.م">جنيه مصري (ج.م)</option>
+                <option value="د.ك">دينار كويتي (د.ك)</option>
+                <option value="ر.س">ريال سعودي (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> اسم الجهة:</label>
+            <input type="text" id="companyName" value="اسم الجهة المستفيدة من التقرير" placeholder="الجهة المستفيدة">
         </div>
-    </div>
 
-    <section class="calc-wrapper">
-        <div class="calc-box" data-aos="fade-up">
-            <div class="featured-badge">
-                <i class="fas fa-scale-balanced"></i>
-                <span>WACC</span>
+        <!-- المدخلات -->
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-chart-pie"></i> حقوق الملكية (Equity)</label>
+                <input type="number" id="equity" value="1000000" step="10000">
+                <span class="tooltiptext">القيمة السوقية لحقوق المساهمين.</span>
             </div>
-            <h2>بيانات هيكل رأس المال</h2>
-
-            <!-- العملة واسم الجهة -->
-            <div class="currency-row">
-                <label><i class="fas fa-coins"></i> العملة:</label>
-                <select id="currencySelect">
-                    <option value="$" selected>دولار ($)</option>
-                    <option value="€">يورو (€)</option>
-                    <option value="₺">ليرة تركية (₺)</option>
-                    <option value="ج.م">جنيه مصري (ج.م)</option>
-                    <option value="د.ك">دينار كويتي (د.ك)</option>
-                    <option value="ر.س">ريال سعودي (ر.س)</option>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> طريقة حساب تكلفة حقوق الملكية (Re)</label>
+                <select id="reMethod">
+                    <option value="manual">إدخال يدوي</option>
+                    <option value="capm">CAPM</option>
                 </select>
-                <label><i class="fas fa-building"></i> اسم الجهة:</label>
-                <input type="text" id="companyName" value="اسم الجهة المستفيدة من التقرير" placeholder="الجهة المستفيدة">
-            </div>
-
-            <div class="form-row">
-                <div class="form-group tooltip">
-                    <label><i class="fas fa-chart-pie"></i> حقوق الملكية (Equity)</label>
-                    <input type="number" id="equity" value="1000000" step="10000">
-                    <span class="tooltiptext">القيمة السوقية لحقوق المساهمين.</span>
-                </div>
-                <div class="form-group tooltip">
-                    <label><i class="fas fa-percent"></i> طريقة حساب تكلفة حقوق الملكية (Re)</label>
-                    <select id="reMethod">
-                        <option value="manual">إدخال يدوي</option>
-                        <option value="capm">CAPM (معدل خالي من المخاطر + بيتا * علاوة السوق)</option>
-                    </select>
-                    <span class="tooltiptext">اختر طريقة حساب تكلفة حقوق الملكية.</span>
-                </div>
-            </div>
-
-            <!-- حقل إدخال يدوي (يظهر افتراضياً) -->
-            <div id="manualReGroup" class="form-row">
-                <div class="form-group tooltip">
-                    <label><i class="fas fa-percent"></i> تكلفة حقوق الملكية (Re) (%)</label>
-                    <input type="number" id="costEquityManual" value="12" step="0.1">
-                    <span class="tooltiptext">العائد المتوقع من قبل المساهمين (يدوياً).</span>
-                </div>
-            </div>
-
-            <!-- حقول CAPM (مخفية) -->
-            <div id="capmFields" class="capm-fields">
-                <div class="form-row">
-                    <div class="form-group tooltip">
-                        <label><i class="fas fa-percent"></i> معدل خالي من المخاطر (Rf) (%)</label>
-                        <input type="number" id="rf" value="3" step="0.1">
-                        <span class="tooltiptext">معدل العائد على أصول خالية من المخاطر (مثل سندات حكومية).</span>
-                    </div>
-                    <div class="form-group tooltip">
-                        <label><i class="fas fa-chart-line"></i> بيتا (β)</label>
-                        <input type="number" id="beta" value="1.2" step="0.1">
-                        <span class="tooltiptext">مقياس مخاطر السهم مقارنة بالسوق.</span>
-                    </div>
-                    <div class="form-group tooltip">
-                        <label><i class="fas fa-percent"></i> علاوة مخاطرة السوق (Rm - Rf) (%)</label>
-                        <input type="number" id="marketRiskPremium" value="5" step="0.1">
-                        <span class="tooltiptext">الفرق بين عائد السوق المتوقع والمعدل الخالي من المخاطر.</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group tooltip">
-                    <label><i class="fas fa-hand-holding-usd"></i> الديون (Debt)</label>
-                    <input type="number" id="debt" value="500000" step="10000">
-                    <span class="tooltiptext">القيمة السوقية للديون (قروض وسندات).</span>
-                </div>
-                <div class="form-group tooltip">
-                    <label><i class="fas fa-percent"></i> تكلفة الديون (Rd) (%)</label>
-                    <input type="number" id="costDebt" value="5" step="0.1">
-                    <span class="tooltiptext">معدل الفائدة الذي تدفعه الشركة على ديونها.</span>
-                </div>
-                <div class="form-group tooltip">
-                    <label><i class="fas fa-percent"></i> معدل الضريبة (Tax Rate) (%)</label>
-                    <input type="number" id="taxRate" value="20" step="1">
-                    <span class="tooltiptext">نسبة ضريبة دخل الشركات.</span>
-                </div>
-            </div>
-
-            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> احسب WACC</button>
-
-            <!-- نتائج -->
-            <div class="results-section" id="resultsSection" style="display: none;">
-                <div class="results-cards" id="kpiCards"></div>
-
-                <!-- رسم بياني لهيكل رأس المال -->
-                <div class="section-title-sm">📊 هيكل رأس المال</div>
-                <div class="chart-container">
-                    <canvas id="capitalChart"></canvas>
-                </div>
-
-                <div class="section-title-sm">📊 تفاصيل الحساب</div>
-                <div class="table-container" id="detailsTable"></div>
-
-                <div class="section-title-sm">📝 تفسير النتيجة</div>
-                <div class="result-card" id="interpretation" style="text-align:right;"></div>
-
-                <div class="export-container">
-                    <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel احترافي</button>
-                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تقرير Word كامل + رسم بياني</button>
-                </div>
-            </div>
-
-            <div id="initialMessage" style="margin-top:1rem; color:var(--text-muted); text-align:center;">
-                <i class="fas fa-robot" style="color: var(--accent-soft);"></i> سيتم عرض النتائج بعد الضغط على زر الحساب
+                <span class="tooltiptext">اختر طريقة حساب تكلفة حقوق الملكية.</span>
             </div>
         </div>
-    </section>
 
-    <footer class="footer-simple">
-        جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
-    </footer>
-
-    <!-- زر الآلة الحاسبة العائم -->
-    <div class="calc-floating-btn" id="calculatorBtn">
-        <i class="fas fa-calculator"></i> آلة حاسبة
-    </div>
-
-    <!-- نافذة الآلة الحاسبة المنبثقة (Modal) -->
-    <div id="calculatorModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span class="close">&times;</span>
-                <h2><i class="fas fa-calculator" style="color: var(--accent-soft);"></i> آلة حاسبة</h2>
+        <!-- حقل إدخال يدوي -->
+        <div id="manualReGroup" class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> تكلفة حقوق الملكية (Re) (%)</label>
+                <input type="number" id="costEquityManual" value="12" step="0.1">
+                <span class="tooltiptext">العائد المتوقع من قبل المساهمين (يدوياً).</span>
             </div>
-            <div class="modal-body">
-                <input type="text" id="calcDisplay" class="calc-display" readonly>
-                <div class="calc-buttons">
-                    <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
-                    <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
-                    <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
-                    <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
-                    <button class="calc-btn" onclick="clearCalculator()">C</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
-                    <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
-                    <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
-                    <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
+        </div>
+
+        <!-- حقول CAPM -->
+        <div id="capmFields" class="capm-fields">
+            <div class="form-row">
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-percent"></i> معدل خالي من المخاطر (Rf) (%)</label>
+                    <input type="number" id="rf" value="3" step="0.1">
+                    <span class="tooltiptext">معدل العائد على أصول خالية من المخاطر.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-chart-line"></i> بيتا (β)</label>
+                    <input type="number" id="beta" value="1.2" step="0.1">
+                    <span class="tooltiptext">مقياس مخاطر السهم مقارنة بالسوق.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-percent"></i> علاوة مخاطرة السوق (Rm - Rf) (%)</label>
+                    <input type="number" id="marketRiskPremium" value="5" step="0.1">
+                    <span class="tooltiptext">الفرق بين عائد السوق المتوقع والمعدل الخالي من المخاطر.</span>
                 </div>
             </div>
         </div>
+
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-hand-holding-usd"></i> الديون (Debt)</label>
+                <input type="number" id="debt" value="500000" step="10000">
+                <span class="tooltiptext">القيمة السوقية للديون.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> تكلفة الديون (Rd) (%)</label>
+                <input type="number" id="costDebt" value="5" step="0.1">
+                <span class="tooltiptext">معدل الفائدة الذي تدفعه الشركة على ديونها.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> معدل الضريبة (Tax Rate) (%)</label>
+                <input type="number" id="taxRate" value="20" step="1">
+                <span class="tooltiptext">نسبة ضريبة دخل الشركات.</span>
+            </div>
+        </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> احسب WACC</button>
+
+        <!-- النتائج -->
+        <div class="results-section" id="resultsSection" style="display:none;">
+            <div class="results-cards" id="kpiCards"></div>
+
+            <div class="section-title-sm">📊 هيكل رأس المال</div>
+            <div class="chart-container"><canvas id="capitalChart"></canvas></div>
+
+            <div class="section-title-sm">📊 تفاصيل الحساب</div>
+            <div class="table-container" id="detailsTable"></div>
+
+            <div class="section-title-sm">📝 تفسير النتيجة</div>
+            <div class="result-card" id="interpretation" style="text-align:right;"></div>
+
+            <div class="export-container">
+                <button class="export-btn excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel شامل</button>
+                <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير Word</button>
+            </div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center;">
+            <i class="fas fa-robot" style="color:var(--accent-soft);"></i> سيتم عرض النتائج بعد الضغط على زر الحساب
+        </div>
     </div>
+</div>
 
-    <a href="index.html" style="position:fixed;bottom:20px;right:20px;background:rgba(180,133,84,0.9);color:white;padding:12px 20px;border-radius:50px;text-decoration:none;font-family:'Tajawal',sans-serif;font-weight:bold;backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,0.2);box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:9999;display:flex;align-items:center;gap:8px;transition:0.3s;" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';"><i class="fas fa-home"></i> الرئيسية</a>
+<footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({ duration: 800, once: true, offset: 100 });
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> حاسبة</button>
+<a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> الرئيسية</a>
 
-        let capitalChart;
-        let globalWaccData = null; // لتخزين البيانات للتصدير
+<!-- نافذة الآلة الحاسبة -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> آلة حاسبة</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // إظهار وإخفاء حقول CAPM
-        document.getElementById('reMethod').addEventListener('change', function() {
-            const method = this.value;
-            const manualGroup = document.getElementById('manualReGroup');
-            const capmFields = document.getElementById('capmFields');
-            if (method === 'manual') {
-                manualGroup.style.display = 'flex';
-                capmFields.style.display = 'none';
-            } else {
-                manualGroup.style.display = 'none';
-                capmFields.style.display = 'block';
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: true, offset: 100 });
+
+    // ===== آلة حاسبة =====
+    const calcDisplay = document.getElementById('calcDisplay');
+    let currentCalcInput = '';
+    function handleCalc(v) {
+        if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+        if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+        if (v === '=') {
+            try {
+                let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/'));
+                calcDisplay.value = r;
+                currentCalcInput = r.toString();
+            } catch(e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
+            return;
+        }
+        currentCalcInput += v;
+        calcDisplay.value = currentCalcInput;
+    }
+    document.querySelectorAll('.calc-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const v = this.dataset.val;
+            if (v !== undefined) handleCalc(v);
+        });
+    });
+    const modalEl = document.getElementById('calculatorModal');
+    document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        modalEl.classList.add('active');
+        calcDisplay.value = currentCalcInput;
+    });
+    document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+    modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+    document.addEventListener('keydown', function(e) {
+        if (!modalEl.classList.contains('active')) return;
+        e.preventDefault();
+        const k = e.key;
+        if (k >= '0' && k <= '9') handleCalc(k);
+        else if (k === '.') handleCalc('.');
+        else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+        else if (k === 'Enter' || k === '=') handleCalc('=');
+        else if (k === 'Backspace') handleCalc('⌫');
+        else if (k === 'Escape') modalEl.classList.remove('active');
+        else if (k.toLowerCase() === 'c') handleCalc('C');
+    });
+
+    // ===== شاشة تحميل =====
+    function showLoading(title, msg) {
+        document.getElementById('loadingTitle').textContent = title;
+        document.getElementById('loadingMsg').textContent = msg;
+        document.getElementById('exportLoading').classList.add('show');
+    }
+    function hideLoading() {
+        document.getElementById('exportLoading').classList.remove('show');
+    }
+
+    // ===== إظهار/إخفاء حقول CAPM =====
+    document.getElementById('reMethod').addEventListener('change', function() {
+        const method = this.value;
+        const manualGroup = document.getElementById('manualReGroup');
+        const capmFields = document.getElementById('capmFields');
+        if (method === 'manual') {
+            manualGroup.style.display = 'flex';
+            capmFields.style.display = 'none';
+        } else {
+            manualGroup.style.display = 'none';
+            capmFields.style.display = 'block';
+        }
+    });
+
+    // ===== الحساب الرئيسي =====
+    let capitalChart;
+    let globalWaccData = null;
+
+    document.getElementById('calculateBtn').addEventListener('click', function() {
+        const currency = document.getElementById('currencySelect').value;
+        const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+        const equity = parseFloat(document.getElementById('equity').value) || 0;
+        const debt = parseFloat(document.getElementById('debt').value) || 0;
+        const costDebt = parseFloat(document.getElementById('costDebt').value) / 100 || 0;
+        const taxRate = parseFloat(document.getElementById('taxRate').value) / 100 || 0;
+
+        let costEquity, reMethod = document.getElementById('reMethod').value;
+        let capmDetails = null;
+        if (reMethod === 'manual') {
+            costEquity = parseFloat(document.getElementById('costEquityManual').value) / 100 || 0;
+        } else {
+            const rf = parseFloat(document.getElementById('rf').value) / 100 || 0;
+            const beta = parseFloat(document.getElementById('beta').value) || 1;
+            const mrp = parseFloat(document.getElementById('marketRiskPremium').value) / 100 || 0;
+            costEquity = rf + beta * mrp;
+            capmDetails = { rf: rf*100, beta, mrp: mrp*100 };
+        }
+
+        if (equity <= 0 && debt <= 0) {
+            alert('الرجاء إدخال قيم صحيحة.');
+            return;
+        }
+
+        const total = equity + debt;
+        const weightEquity = equity / total;
+        const weightDebt = debt / total;
+        const afterTaxCostDebt = costDebt * (1 - taxRate);
+        const wacc = (weightEquity * costEquity) + (weightDebt * afterTaxCostDebt);
+
+        document.getElementById('initialMessage').style.display = 'none';
+        document.getElementById('resultsSection').style.display = 'block';
+
+        const waccPercent = (wacc * 100).toFixed(2);
+        let statusText = '';
+        if (wacc < 0.08) statusText = 'منخفض جداً';
+        else if (wacc < 0.12) statusText = 'منخفض إلى متوسط';
+        else if (wacc < 0.16) statusText = 'مرتفع نسبياً';
+        else statusText = 'مرتفع جداً';
+
+        document.getElementById('kpiCards').innerHTML = `
+            <div class="result-card"><i class="fas fa-chart-line"></i><h4>WACC</h4><div class="value">${waccPercent}%</div><div class="status ${wacc<0.12?'status-good':'status-warning'}">${statusText}</div></div>
+            <div class="result-card"><i class="fas fa-percent"></i><h4>وزن حقوق الملكية</h4><div class="value">${(weightEquity*100).toFixed(2)}%</div></div>
+            <div class="result-card"><i class="fas fa-percent"></i><h4>وزن الديون</h4><div class="value">${(weightDebt*100).toFixed(2)}%</div></div>
+            <div class="result-card"><i class="fas fa-percent"></i><h4>تكلفة حقوق الملكية (Re)</h4><div class="value">${(costEquity*100).toFixed(2)}%</div></div>
+            <div class="result-card"><i class="fas fa-percent"></i><h4>تكلفة الديون بعد الضريبة</h4><div class="value">${(afterTaxCostDebt*100).toFixed(2)}%</div></div>
+        `;
+
+        document.getElementById('detailsTable').innerHTML = `
+            <table>
+                <tr><th>العنصر</th><th>القيمة (${currency})</th><th>الوزن</th><th>التكلفة</th></tr>
+                <tr><td>حقوق الملكية</td><td>${currency}${equity.toFixed(0)}</td><td>${(weightEquity*100).toFixed(2)}%</td><td>${(costEquity*100).toFixed(2)}%</td></tr>
+                <tr><td>الديون (قبل الضريبة)</td><td>${currency}${debt.toFixed(0)}</td><td>${(weightDebt*100).toFixed(2)}%</td><td>${(costDebt*100).toFixed(2)}%</td></tr>
+                <tr><td>الديون (بعد الضريبة)</td><td>-</td><td>-</td><td>${(afterTaxCostDebt*100).toFixed(2)}%</td></tr>
+                <tr style="background:rgba(180,133,84,0.2);font-weight:900;"><td colspan="3">المتوسط المرجح WACC</td><td>${waccPercent}%</td></tr>
+            </table>
+        `;
+
+        // رسم بياني
+        const ctx = document.getElementById('capitalChart').getContext('2d');
+        if (capitalChart) capitalChart.destroy();
+        capitalChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['حقوق الملكية', 'الديون'],
+                datasets: [{
+                    data: [equity, debt],
+                    backgroundColor: ['#28a745', '#dc3545'],
+                    borderColor: 'white',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => {
+                                let label = context.label || '';
+                                let value = context.raw || 0;
+                                let percentage = (value / total * 100).toFixed(2);
+                                return `${label}: ${currency}${value.toFixed(0)} (${percentage}%)`;
+                            }
+                        }
+                    },
+                    legend: { labels: { color: '#f0f4fa' } }
+                }
             }
         });
 
-        // ------------------ آلة حاسبة منبثقة ------------------
-        const calcDisplay = document.getElementById('calcDisplay');
-        let currentCalcInput = '';
+        let interpretationText = '';
+        if (wacc < 0.08) interpretationText = '🔵 WACC منخفض جداً، يعني أن تكلفة تمويل الشركة رخيصة، وهذا إيجابي للمشاريع الاستثمارية.';
+        else if (wacc < 0.12) interpretationText = '🟢 WACC متوسط إلى منخفض، تكلفة تمويل معقولة.';
+        else if (wacc < 0.16) interpretationText = '🟡 WACC مرتفع نسبياً، يجب مقارنته مع العائد المتوقع للمشاريع.';
+        else interpretationText = '🔴 WACC مرتفع جداً، قد يكون من الصعب تحقيق عوائد تفوق هذه التكلفة.';
+        document.getElementById('interpretation').innerHTML = `<p><i class="fas fa-info-circle" style="color:var(--accent-soft);"></i> ${interpretationText}</p>`;
 
-        function safeEvaluate(expression) {
-            let expr = expression.replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/');
-            if (!/^[0-9+\-*/().]+$/.test(expr)) throw new Error('تعبير غير صالح');
-            return new Function('return ' + expr)();
-        }
+        // تخزين للتصدير
+        globalWaccData = {
+            currency, companyName,
+            equity, debt, costEquity: costEquity*100,
+            costDebt: costDebt*100, taxRate: taxRate*100,
+            weightEquity: weightEquity*100,
+            weightDebt: weightDebt*100,
+            afterTaxCostDebt: afterTaxCostDebt*100,
+            wacc: wacc*100,
+            interpretation: interpretationText,
+            reMethod, capmDetails, total,
+            kpiCardsHtml: document.getElementById('kpiCards').innerHTML,
+            detailsTableHtml: document.getElementById('detailsTable').innerHTML,
+            chart: capitalChart
+        };
+    });
 
-        window.handleCalculatorInput = function(value) {
-            currentCalcInput += value;
-            calcDisplay.value = currentCalcInput;
-        }
+    // ================================================================
+    // ========== تصدير Excel احترافي ==========
+    // ================================================================
+    document.getElementById('exportExcelBtn').addEventListener('click', async function() {
+        if (!globalWaccData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+        showLoading('جاري إنشاء تقرير Excel...', 'إنشاء الأوراق والرسوم');
+        try {
+            const D = globalWaccData;
+            const currency = D.currency;
+            const companyName = D.companyName;
 
-        window.clearCalculator = function() {
-            currentCalcInput = '';
-            calcDisplay.value = '';
-        }
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'FAROUK GRUP';
+            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+            const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA', GB = 'FFFFF3CD';
+            const PT = 'FF155724', NT = 'FF721C24';
+            const nc = '#,##0;(#,##0);"-"';
 
-        window.backspaceCalculator = function() {
-            currentCalcInput = currentCalcInput.slice(0, -1);
-            calcDisplay.value = currentCalcInput;
-        }
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
 
-        window.calculateCalculatorResult = function() {
-            try {
-                let result = safeEvaluate(currentCalcInput);
-                calcDisplay.value = result;
-                currentCalcInput = result.toString();
-            } catch (e) {
-                calcDisplay.value = 'خطأ';
-                currentCalcInput = '';
-            }
-        }
-
-        function handleKeyboard(e) {
-            if (modal.style.display !== 'block') return;
-            const key = e.key;
-            e.preventDefault();
-            e.stopPropagation();
-            if (key >= '0' && key <= '9') handleCalculatorInput(key);
-            else if (key === '.') handleCalculatorInput('.');
-            else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
-            else if (key === 'Enter' || key === '=') calculateCalculatorResult();
-            else if (key === 'Backspace') backspaceCalculator();
-            else if (key === 'Escape') modal.style.display = 'none';
-            else if (key === 'c' || key === 'C') clearCalculator();
-        }
-
-        document.addEventListener('keydown', handleKeyboard);
-
-        const modal = document.getElementById('calculatorModal');
-        const btn = document.getElementById('calculatorBtn');
-        const span = document.getElementsByClassName('close')[0];
-
-        btn.onclick = function(e) {
-            e.preventDefault();
-            modal.style.display = 'block';
-        }
-
-        span.onclick = function() {
-            modal.style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        // ------------------ الحساب ------------------
-        document.getElementById('calculateBtn').addEventListener('click', function() {
-            const currency = document.getElementById('currencySelect').value;
-            const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
-            const equity = parseFloat(document.getElementById('equity').value) || 0;
-            const debt = parseFloat(document.getElementById('debt').value) || 0;
-            const costDebt = parseFloat(document.getElementById('costDebt').value) / 100 || 0;
-            const taxRate = parseFloat(document.getElementById('taxRate').value) / 100 || 0;
-
-            let costEquity;
-            const reMethod = document.getElementById('reMethod').value;
-            let capmDetails = null;
-            if (reMethod === 'manual') {
-                costEquity = parseFloat(document.getElementById('costEquityManual').value) / 100 || 0;
-            } else {
-                const rf = parseFloat(document.getElementById('rf').value) / 100 || 0;
-                const beta = parseFloat(document.getElementById('beta').value) || 1;
-                const marketRiskPremium = parseFloat(document.getElementById('marketRiskPremium').value) / 100 || 0;
-                costEquity = rf + beta * marketRiskPremium;
-                capmDetails = { rf: rf*100, beta, mrp: marketRiskPremium*100 };
-            }
-
-            if (equity <= 0 && debt <= 0) {
-                alert('الرجاء إدخال قيم صحيحة.');
-                return;
-            }
-
-            const total = equity + debt;
-            const weightEquity = equity / total;
-            const weightDebt = debt / total;
-            const afterTaxCostDebt = costDebt * (1 - taxRate);
-            const wacc = (weightEquity * costEquity) + (weightDebt * afterTaxCostDebt);
-
-            // عرض النتائج
-            document.getElementById('initialMessage').style.display = 'none';
-            document.getElementById('resultsSection').style.display = 'block';
-
-            // بطاقة KPI
-            const waccPercent = (wacc * 100).toFixed(2);
-            let statusText = '';
-            if (wacc < 0.08) statusText = 'منخفض جداً';
-            else if (wacc < 0.12) statusText = 'منخفض إلى متوسط';
-            else if (wacc < 0.16) statusText = 'مرتفع نسبياً';
-            else statusText = 'مرتفع جداً';
-
-            document.getElementById('kpiCards').innerHTML = `
-                <div class="result-card">
-                    <i class="fas fa-chart-line"></i>
-                    <h4>WACC</h4>
-                    <div class="value">${waccPercent}%</div>
-                    <div class="unit">${statusText}</div>
-                </div>
-            `;
-
-            // جدول التفاصيل
-            const equityCostDisplay = (costEquity * 100).toFixed(2) + '%';
-            const debtCostBeforeDisplay = (costDebt * 100).toFixed(2) + '%';
-            const debtCostAfterDisplay = (afterTaxCostDebt * 100).toFixed(2) + '%';
-
-            document.getElementById('detailsTable').innerHTML = `
-                <table>
-                    <tr><th>العنصر</th><th>القيمة (${currency})</th><th>الوزن</th><th>التكلفة</th></tr>
-                    <tr>
-                        <td>حقوق الملكية</td>
-                        <td>${currency}${equity.toFixed(0)}</td>
-                        <td>${(weightEquity*100).toFixed(2)}%</td>
-                        <td>${equityCostDisplay}</td>
-                    </tr>
-                    <tr>
-                        <td>الديون (قبل الضريبة)</td>
-                        <td>${currency}${debt.toFixed(0)}</td>
-                        <td>${(weightDebt*100).toFixed(2)}%</td>
-                        <td>${debtCostBeforeDisplay}</td>
-                    </tr>
-                    <tr>
-                        <td>الديون (بعد الضريبة)</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>${debtCostAfterDisplay}</td>
-                    </tr>
-                    <tr style="background:rgba(180,133,84,0.2); font-weight:900;">
-                        <td colspan="3">المتوسط المرجح WACC</td>
-                        <td>${waccPercent}%</td>
-                    </tr>
-                </table>
-            `;
-
-            // رسم بياني دائري لهيكل رأس المال
-            const ctx = document.getElementById('capitalChart').getContext('2d');
-            if (capitalChart) capitalChart.destroy();
-            capitalChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['حقوق الملكية', 'الديون'],
-                    datasets: [{
-                        data: [equity, debt],
-                        backgroundColor: ['#28a745', '#dc3545'],
-                        borderColor: 'white',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: (context) => {
-                                    let label = context.label || '';
-                                    let value = context.raw || 0;
-                                    let percentage = (value / total * 100).toFixed(2);
-                                    return `${label}: ${currency}${value.toFixed(0)} (${percentage}%)`;
-                                }
-                            }
-                        },
-                        legend: { labels: { color: '#f0f4fa' } }
-                    }
-                }
+            // 1. غلاف التقرير
+            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+            [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+            cv.getRow(2).height=80; cv.getRow(4).height=60;
+            cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+            bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
+            mh(cv,1,4,4,`تقرير تحليل WACC\n${companyName}`,DB,GL,18);
+            const inf=[['📋 الجهة',companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',currency],['📊 WACC',`${D.wacc.toFixed(2)}%`],['🏷️ طريقة Re',D.reMethod==='manual'?'إدخال يدوي':'CAPM']];
+            let ir=6;
+            inf.forEach(([l,v],idx)=>{
+                cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+                const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+                const bg=idx%2===0?AR:'FFFEFCF6';
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                cv.getRow(ir).height=28; ir++;
             });
 
-            // تفسير النتيجة
-            let interpretationText = '';
-            if (wacc < 0.08) {
-                interpretationText = '🔵 WACC منخفض جداً، يعني أن تكلفة تمويل الشركة رخيصة، وهذا إيجابي للمشاريع الاستثمارية.';
-            } else if (wacc < 0.12) {
-                interpretationText = '🟢 WACC متوسط إلى منخفض، تكلفة تمويل معقولة.';
-            } else if (wacc < 0.16) {
-                interpretationText = '🟡 WACC مرتفع نسبياً، يجب مقارنته مع العائد المتوقع للمشاريع.';
-            } else {
-                interpretationText = '🔴 WACC مرتفع جداً، قد يكون من الصعب تحقيق عوائد تفوق هذه التكلفة.';
+            // 2. المدخلات
+            const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            inputsSheet.getColumn(1).width=5; inputsSheet.getColumn(2).width=38; inputsSheet.getColumn(3).width=22; inputsSheet.getColumn(4).width=22; inputsSheet.getColumn(5).width=5;
+            mh(inputsSheet,1,5,1,'📋 جدول المدخلات والافتراضات الأساسية',DB,GL,14);
+            inputsSheet.getRow(1).height=40;
+            mh(inputsSheet,2,4,2,'البيانات الأساسية لهيكل رأس المال',SB,'FFFFFFFF',11);
+            inputsSheet.getRow(2).height=28;
+            const inputFields = [
+                ['حقوق الملكية (Equity)', D.equity, `${currency} ${D.equity.toFixed(0)}`],
+                ['الديون (Debt)', D.debt, `${currency} ${D.debt.toFixed(0)}`],
+                ['إجمالي رأس المال', D.total, `${currency} ${D.total.toFixed(0)}`],
+                ['تكلفة حقوق الملكية (Re)', D.costEquity, `${D.costEquity.toFixed(2)}%`],
+                ['تكلفة الديون (Rd)', D.costDebt, `${D.costDebt.toFixed(2)}%`],
+                ['معدل الضريبة', D.taxRate, `${D.taxRate.toFixed(0)}%`]
+            ];
+            if (D.reMethod === 'capm' && D.capmDetails) {
+                inputFields.push(['معدل خالي من المخاطر (Rf)', D.capmDetails.rf, `${D.capmDetails.rf.toFixed(2)}%`]);
+                inputFields.push(['بيتا (β)', D.capmDetails.beta, '']);
+                inputFields.push(['علاوة مخاطرة السوق', D.capmDetails.mrp, `${D.capmDetails.mrp.toFixed(2)}%`]);
             }
-            document.getElementById('interpretation').innerHTML = `<p><i class="fas fa-info-circle" style="color:var(--accent-soft);"></i> ${interpretationText}</p>`;
+            inputFields.push(['طريقة حساب Re', D.reMethod==='manual'?'إدخال يدوي':'CAPM', '']);
+            let iRow=3;
+            inputFields.forEach(([label,val,note],idx)=>{
+                inputsSheet.getRow(iRow).height=24;
+                const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+                const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
+                lc.value=label; vc.value=val; nc.value=note;
+                ap(lc,cs(bg,DT,true,'right'));
+                ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?nc:null});
+                ap(nc,cs(bg,'00695C',false,'center'));
+                iRow++;
+            });
 
-            // تخزين البيانات للتصدير
-            globalWaccData = {
-                currency, companyName,
-                equity, debt, costEquity: costEquity * 100,
-                costDebt: costDebt * 100, taxRate: taxRate * 100,
-                weightEquity: weightEquity * 100,
-                weightDebt: weightDebt * 100,
-                afterTaxCostDebt: afterTaxCostDebt * 100,
-                wacc: wacc * 100,
-                interpretation: interpretationText,
-                reMethod, capmDetails,
-                total,
-                kpiCardsHtml: document.getElementById('kpiCards').innerHTML,
-                detailsTableHtml: document.getElementById('detailsTable').innerHTML,
-                chart: capitalChart
-            };
-        });
-
-        // ---------- دوال التصدير الاحترافية ----------
-        function showLoading(title, msg) {
-            document.getElementById('loadingTitle').textContent = title;
-            document.getElementById('loadingMsg').textContent = msg;
-            document.getElementById('exportLoading').classList.add('show');
-        }
-        function hideLoading() {
-            document.getElementById('exportLoading').classList.remove('show');
-        }
-
-        async function exportToFullExcel() {
-            if (!globalWaccData) {
-                alert('الرجاء إجراء التحليل أولاً.');
-                return;
-            }
-            showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'يرجى الانتظار');
-            try {
-                const D = globalWaccData;
-                const currency = D.currency;
-                const companyName = D.companyName;
-
-                const workbook = new ExcelJS.Workbook();
-                workbook.creator = 'FAROUK GRUP';
-                workbook.created = new Date();
-
-                const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
-                const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
-                const PT = 'FF155724', NT = 'FF721C24', GB = 'FFFFF3CD';
-                const nc = '#,##0;(#,##0);"-"', np = '0.00%';
-
-                function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
-                function cs(bg=W,tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
-                function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
-                function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
-
-                // 1. غلاف التقرير
-                const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
-                [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
-                for(let r=1;r<=40;r++) cv.getRow(r).height=22;
-                cv.getRow(2).height=80; cv.getRow(4).height=60;
-                cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
-                bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
-                bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'}; bc.border={bottom:{style:'thick',color:{argb:G}}};
-                mh(cv,1,4,4,`تقرير تحليل WACC\n${companyName}`,DB,GL,18);
-                const inf=[['📋 الجهة',companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',currency],['📊 WACC',`${D.wacc.toFixed(2)}%`],['🏷️ طريقة Re',D.reMethod==='manual'?'إدخال يدوي':'CAPM']];
-                let ir=6;
-                inf.forEach(([l,v],idx)=>{
-                    cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
-                    const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
-                    const bg=idx%2===0?AR:'FFFEFCF6';
-                    ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
-                    ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
-                    cv.getRow(ir).height=28; ir++;
-                });
-
-                // 2. المدخلات والافتراضات
-                const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true, showGridLines: false }] });
-                inputsSheet.getColumn(1).width = 5; inputsSheet.getColumn(2).width = 38; inputsSheet.getColumn(3).width = 22; inputsSheet.getColumn(4).width = 22; inputsSheet.getColumn(5).width = 5;
-                inputsSheet.getRow(1).height = 10;
-                mh(inputsSheet,1,5,1,'📋 جدول المدخلات والافتراضات الأساسية',DB,GL,14);
-                inputsSheet.getRow(1).height=40;
-                mh(inputsSheet,2,4,2,'البيانات الأساسية لهيكل رأس المال',SB,W,11);
-                inputsSheet.getRow(2).height=28;
-                const inputsData = [
-                    ['حقوق الملكية (Equity)', D.equity, `${currency} ${D.equity.toFixed(0)}`],
-                    ['الديون (Debt)', D.debt, `${currency} ${D.debt.toFixed(0)}`],
-                    ['إجمالي رأس المال', D.total, `${currency} ${D.total.toFixed(0)}`],
-                    ['تكلفة حقوق الملكية (Re)', D.costEquity, `${D.costEquity.toFixed(2)}%`],
-                    ['تكلفة الديون (Rd)', D.costDebt, `${D.costDebt.toFixed(2)}%`],
-                    ['معدل الضريبة', D.taxRate, `${D.taxRate.toFixed(0)}%`],
-                ];
-                if (D.reMethod === 'capm' && D.capmDetails) {
-                    inputsData.push(['معدل خالي من المخاطر (Rf)', D.capmDetails.rf, `${D.capmDetails.rf.toFixed(2)}%`]);
-                    inputsData.push(['بيتا (β)', D.capmDetails.beta, '']);
-                    inputsData.push(['علاوة مخاطرة السوق', D.capmDetails.mrp, `${D.capmDetails.mrp.toFixed(2)}%`]);
-                }
-                inputsData.push(['طريقة حساب Re', D.reMethod === 'manual' ? 'إدخال يدوي' : 'CAPM', '']);
-                inputsData.push(['العملة', currency, '']);
-                inputsData.push(['اسم الجهة', companyName, '']);
-
-                let iRow=3;
-                inputsData.forEach(([label,val,note],idx)=>{
-                    inputsSheet.getRow(iRow).height=24;
-                    const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
-                    const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
-                    lc.value=label; vc.value=val; nc.value=note;
-                    ap(lc,cs(bg,DT,true,'right'));
-                    ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?nc:null});
-                    ap(nc,cs(bg,'00695C',false,'center'));
-                    iRow++;
-                });
-
-                // 3. مؤشرات الأداء الرئيسية
-                const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true, showGridLines: false }] });
-                [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
-                mh(kpiSheet,1,6,1,'📊 لوحة مؤشرات الأداء الرئيسية',DB,GL,15);
-                kpiSheet.getRow(1).height=45;
-                mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('ar-EG')}`,HB,W,10);
-                kpiSheet.getRow(2).height=26;
-                const kpis = [
-                    { label: 'WACC', value: `${D.wacc.toFixed(2)}%`, good: D.wacc < 0.12 },
-                    { label: 'وزن حقوق الملكية', value: `${D.weightEquity.toFixed(2)}%`, good: true },
-                    { label: 'وزن الديون', value: `${D.weightDebt.toFixed(2)}%`, good: true },
-                    { label: 'تكلفة حقوق الملكية', value: `${D.costEquity.toFixed(2)}%`, good: true },
-                    { label: 'تكلفة الديون بعد الضريبة', value: `${D.afterTaxCostDebt.toFixed(2)}%`, good: true }
-                ];
-                let kRow=3;
-                kpis.forEach((k,idx)=>{
-                    kpiSheet.getRow(kRow).height=40;
-                    kpiSheet.mergeCells(kRow,2,kRow,2);
-                    kpiSheet.mergeCells(kRow,3,kRow,3);
-                    kpiSheet.mergeCells(kRow,4,kRow,4);
-                    kpiSheet.mergeCells(kRow,5,kRow,5);
-                    const ic=kpiSheet.getCell(kRow,2); ic.value=`🔹 ${idx+1}`;
-                    const lc2=kpiSheet.getCell(kRow,3); lc2.value=k.label;
-                    const vc3=kpiSheet.getCell(kRow,4); vc3.value=k.value;
-                    const nc2=kpiSheet.getCell(kRow,5); nc2.value='';
-                    const bg=k.good?PB:NB, tc=k.good?PT:NT;
-                    [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
-                    ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
-                    lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
-                    vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
-                    nc2.font={name:'Arial',size:9,color:{argb:'444444'}}; nc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
-                    kRow++;
-                });
-                kRow++;
-                kpiSheet.mergeCells(kRow,2,kRow,5);
-                const kFinal=kpiSheet.getCell(kRow,2);
-                kFinal.value=D.wacc < 0.12 ? '✅ WACC منخفض — تكلفة تمويل رخيصة' : '⚠️ WACC مرتفع نسبياً — يحتاج مراجعة';
-                kFinal.font={name:'Arial',bold:true,size:13,color:{argb:D.wacc<0.12?PT:'856404'}};
-                kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:D.wacc<0.12?PB:GB}};
-                kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
-                kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
+            // 3. مؤشرات الأداء
+            const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true, showGridLines: false }] });
+            [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
+            mh(kpiSheet,1,6,1,'📊 لوحة مؤشرات الأداء الرئيسية',DB,GL,15);
+            kpiSheet.getRow(1).height=45;
+            mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('ar-EG')}`,HB,'FFFFFFFF',10);
+            kpiSheet.getRow(2).height=26;
+            const kpis = [
+                { label: 'WACC', value: `${D.wacc.toFixed(2)}%`, good: D.wacc<0.12 },
+                { label: 'وزن حقوق الملكية', value: `${D.weightEquity.toFixed(2)}%`, good: true },
+                { label: 'وزن الديون', value: `${D.weightDebt.toFixed(2)}%`, good: true },
+                { label: 'تكلفة حقوق الملكية', value: `${D.costEquity.toFixed(2)}%`, good: true },
+                { label: 'تكلفة الديون بعد الضريبة', value: `${D.afterTaxCostDebt.toFixed(2)}%`, good: true }
+            ];
+            let kRow=3;
+            kpis.forEach((k,idx)=>{
                 kpiSheet.getRow(kRow).height=40;
+                kpiSheet.mergeCells(kRow,2,kRow,2); kpiSheet.mergeCells(kRow,3,kRow,3); kpiSheet.mergeCells(kRow,4,kRow,4); kpiSheet.mergeCells(kRow,5,kRow,5);
+                const ic=kpiSheet.getCell(kRow,2); ic.value=`🔹 ${idx+1}`;
+                const lc2=kpiSheet.getCell(kRow,3); lc2.value=k.label;
+                const vc3=kpiSheet.getCell(kRow,4); vc3.value=k.value;
+                const nc2=kpiSheet.getCell(kRow,5); nc2.value='';
+                const bg=k.good?PB:NB, tc=k.good?PT:NT;
+                [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
+                ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
+                lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
+                kRow++;
+            });
+            kRow++;
+            kpiSheet.mergeCells(kRow,2,kRow,5);
+            const kFinal=kpiSheet.getCell(kRow,2);
+            kFinal.value=D.wacc<0.12?'✅ WACC منخفض — تكلفة تمويل رخيصة':'⚠️ WACC مرتفع نسبياً — يحتاج مراجعة';
+            kFinal.font={name:'Arial',bold:true,size:13,color:{argb:D.wacc<0.12?PT:'856404'}};
+            kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:D.wacc<0.12?PB:GB}};
+            kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
+            kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
+            kpiSheet.getRow(kRow).height=40;
 
-                // 4. تفصيل الحساب
-                const detailSheet = workbook.addWorksheet('تفصيل الحساب', { views: [{ rightToLeft: true, showGridLines: false }] });
-                detailSheet.getColumn(1).width = 5; detailSheet.getColumn(2).width = 40; detailSheet.getColumn(3).width = 25; detailSheet.getColumn(4).width = 25; detailSheet.getColumn(5).width = 25; detailSheet.getColumn(6).width = 5;
-                mh(detailSheet,1,6,1,'📋 تفصيل حساب WACC',DB,GL,14);
-                detailSheet.getRow(1).height=40;
-                detailSheet.addRow(['العنصر', 'القيمة', 'الوزن', 'التكلفة']);
-                const detailRows = [
-                    ['حقوق الملكية', `${currency} ${D.equity.toFixed(0)}`, `${D.weightEquity.toFixed(2)}%`, `${D.costEquity.toFixed(2)}%`],
-                    ['الديون (قبل الضريبة)', `${currency} ${D.debt.toFixed(0)}`, `${D.weightDebt.toFixed(2)}%`, `${D.costDebt.toFixed(2)}%`],
-                    ['الديون (بعد الضريبة)', '-', '-', `${D.afterTaxCostDebt.toFixed(2)}%`],
-                    ['WACC', '', '', `${D.wacc.toFixed(2)}%`]
-                ];
-                detailRows.forEach(r => detailSheet.addRow(r));
-                const detHeader = detailSheet.getRow(2);
-                detHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-                detHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
-                detailSheet.getColumn(2).width = 30; detailSheet.getColumn(3).width = 20; detailSheet.getColumn(4).width = 20;
+            // 4. تفصيل الحساب
+            const detailSheet = workbook.addWorksheet('تفصيل الحساب', { views: [{ rightToLeft: true, showGridLines: false }] });
+            detailSheet.getColumn(1).width=5; detailSheet.getColumn(2).width=40; detailSheet.getColumn(3).width=22; detailSheet.getColumn(4).width=22; detailSheet.getColumn(5).width=22; detailSheet.getColumn(6).width=5;
+            mh(detailSheet,1,6,1,'📋 تفصيل حساب WACC',DB,GL,14);
+            detailSheet.getRow(1).height=40;
+            const detailRows = [
+                ['العنصر', 'القيمة', 'الوزن', 'التكلفة'],
+                ['حقوق الملكية', `${currency} ${D.equity.toFixed(0)}`, `${D.weightEquity.toFixed(2)}%`, `${D.costEquity.toFixed(2)}%`],
+                ['الديون (قبل الضريبة)', `${currency} ${D.debt.toFixed(0)}`, `${D.weightDebt.toFixed(2)}%`, `${D.costDebt.toFixed(2)}%`],
+                ['الديون (بعد الضريبة)', '-', '-', `${D.afterTaxCostDebt.toFixed(2)}%`],
+                ['WACC', '', '', `${D.wacc.toFixed(2)}%`]
+            ];
+            detailRows.forEach(r => detailSheet.addRow(r));
+            detailSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            detailSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
 
-                // 5. الرسم البياني
-                const chartsSheet = workbook.addWorksheet('هيكل رأس المال', { views: [{ rightToLeft: true, showGridLines: false }] });
-                chartsSheet.getColumn(1).width = 5; chartsSheet.getColumn(2).width = 50; chartsSheet.getColumn(3).width = 5;
-                mh(chartsSheet,1,3,1,'📊 هيكل رأس المال',DB,GL,14);
-                chartsSheet.getRow(1).height=40;
-                const chartContainer = document.querySelector('.chart-container');
-                if (chartContainer) {
-                    try {
-                        const origBg = chartContainer.style.backgroundColor;
-                        chartContainer.style.backgroundColor = '#ffffff';
-                        const canvasImg = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
-                        chartContainer.style.backgroundColor = origBg;
-                        const imgData = canvasImg.toDataURL('image/png');
-                        const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
-                        chartsSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 18 }, editAs: 'oneCell' });
-                    } catch (err) { /* */ }
-                }
-
-                // 6. التفسير والتوصيات
-                const intSheet = workbook.addWorksheet('التفسير والتوصيات', { views: [{ rightToLeft: true, showGridLines: false }] });
-                intSheet.getColumn(1).width = 5; intSheet.getColumn(2).width = 50; intSheet.getColumn(3).width = 5;
-                mh(intSheet,1,3,1,'📝 التفسير والتوصيات',DB,GL,14);
-                intSheet.getRow(1).height=45;
-                const sections = [
-                    { title: '1. ملخص التحليل', content: `الجهة: ${companyName}\nإجمالي رأس المال: ${currency} ${D.total.toFixed(0)}\nWACC المحسوب: ${D.wacc.toFixed(2)}%\nطريقة حساب Re: ${D.reMethod==='manual'?'إدخال يدوي':'CAPM'}` },
-                    { title: '2. تفسير النتيجة', content: D.interpretation },
-                    { title: '3. التوصيات', content: D.wacc < 0.12 ? '• يمكن استخدام هذا المعدل كحد أدنى للعائد المطلوب للمشاريع الجديدة.\n• يُنصح بالاستفادة من تكلفة التمويل المنخفضة للتوسع.' : '• يُنصح بمراجعة هيكل رأس المال لتخفيض تكلفة التمويل.\n• يمكن التفكير في إعادة هيكلة الديون أو زيادة حقوق الملكية.' },
-                    { title: '4. تنويه', content: 'هذا التحليل مبني على افتراضات تقديرية. النتائج الفعلية قد تختلف. يُنصح باستشارة خبير مالي قبل اتخاذ القرارات.' }
-                ];
-                let itRow=2;
-                sections.forEach((sec,idx)=>{
-                    itRow++;
-                    intSheet.getRow(itRow).height=30;
-                    intSheet.mergeCells(itRow,2,itRow,2);
-                    const tc3=intSheet.getCell(itRow,2);
-                    tc3.value=sec.title;
-                    tc3.font={name:'Arial',bold:true,size:12,color:{argb:GL}};
-                    tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?HB:SB}};
-                    tc3.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
-                    tc3.border={bottom:{style:'medium',color:{argb:G}}};
-                    itRow++;
-                    intSheet.getRow(itRow).height=Math.max(60, sec.content.split('\n').length*18);
-                    intSheet.mergeCells(itRow,2,itRow,2);
-                    const cc=intSheet.getCell(itRow,2);
-                    cc.value=sec.content;
-                    cc.font={name:'Arial',size:10,color:{argb:DT}};
-                    cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};
-                    cc.alignment={horizontal:'right',vertical:'top',wrapText:true,readingOrder:'rtl'};
-                    cc.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
-                });
-
-                const buffer = await workbook.xlsx.writeBuffer();
-                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                const now = new Date();
-                const fileName = `تقرير_WACC_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
-                saveAs(blob, fileName);
-            } catch(err){ console.error(err); alert('خطأ Excel: '+err.message); }
-            finally{ hideLoading(); }
-        }
-
-        async function exportToWord() {
-            if (!globalWaccData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-            showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات والرسم البياني');
-            try {
-                const D = globalWaccData;
-                const currency = D.currency;
-                const companyName = D.companyName;
-                const now = new Date();
-                const dateStr = now.toLocaleDateString('ar-EG');
-
-                const chartContainer = document.querySelector('.chart-container');
-                let chartImgBase64 = '';
-                if (chartContainer) {
+            // 5. هيكل رأس المال (رسم بياني)
+            const chartsSheet = workbook.addWorksheet('هيكل رأس المال', { views: [{ rightToLeft: true, showGridLines: false }] });
+            chartsSheet.getColumn(1).width=5; chartsSheet.getColumn(2).width=50; chartsSheet.getColumn(3).width=5;
+            mh(chartsSheet,1,3,1,'📊 هيكل رأس المال',DB,GL,14);
+            chartsSheet.getRow(1).height=40;
+            const chartContainer = document.querySelector('.chart-container');
+            if (chartContainer) {
+                try {
                     const origBg = chartContainer.style.backgroundColor;
                     chartContainer.style.backgroundColor = '#ffffff';
-                    const img = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
+                    const canvasImg = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
                     chartContainer.style.backgroundColor = origBg;
-                    chartImgBase64 = img.toDataURL('image/png');
-                }
+                    const imgData = canvasImg.toDataURL('image/png');
+                    const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                    chartsSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 18 }, editAs: 'oneCell' });
+                } catch(err) {}
+            }
 
-                const fullHtml = `<!DOCTYPE html>
-                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
-                <head><meta charset='utf-8'><title>تقرير WACC - FAROUK GRUP</title>
-                <style>
-                    body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;}
-                    .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                    .cover h1{font-size:32px;color:#b8860b;margin:0;}
-                    .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-                    table{width:100%;border-collapse:collapse;margin:20px 0;direction:rtl;}
-                    th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                    th{background:#fefcf6;color:#b8860b;font-weight:bold;}
-                    .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
-                    .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;}
-                </style></head>
-                <body>
-                    <div class="cover">
-                        <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                        <h2>تقرير تحليل WACC</h2>
-                        <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
-                        <p>العملة: ${currency} | WACC: ${D.wacc.toFixed(2)}%</p>
-                    </div>
-                    <h2 style="color:#b8860b;">المدخلات الأساسية</h2>
-                    <table><tbody>
-                        <tr><th>حقوق الملكية</th><td>${currency} ${D.equity.toFixed(0)}</td><th>الديون</th><td>${currency} ${D.debt.toFixed(0)}</td></tr>
-                        <tr><th>تكلفة حقوق الملكية (Re)</th><td>${D.costEquity.toFixed(2)}%</td><th>تكلفة الديون (Rd)</th><td>${D.costDebt.toFixed(2)}%</td></tr>
-                        <tr><th>معدل الضريبة</th><td>${D.taxRate.toFixed(0)}%</td><th>تكلفة الديون بعد الضريبة</th><td>${D.afterTaxCostDebt.toFixed(2)}%</td></tr>
-                    </tbody></table>
-                    <h2 style="color:#b8860b;">📊 مؤشرات الأداء</h2>
-                    <div style="margin:20px 0;padding:20px;background:#d4edda;border-radius:10px;text-align:center;">
-                        <span style="font-size:2rem;font-weight:bold;color:#155724;">WACC = ${D.wacc.toFixed(2)}%</span>
-                    </div>
-                    <h2 style="color:#b8860b;">📊 هيكل رأس المال</h2>
-                    <div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>
-                    <h2 style="color:#b8860b;">📋 تفاصيل الحساب</h2>
-                    ${D.detailsTableHtml}
-                    <h2 style="color:#b8860b;">💡 تفسير النتيجة</h2>
-                    <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">
-                        <p>${D.interpretation}</p>
-                    </div>
-                    <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
-                </body></html>`;
+            // 6. التفسير والتوصيات
+            const evalSheet = workbook.addWorksheet('التفسير والتوصيات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            evalSheet.getColumn(1).width=5; evalSheet.getColumn(2).width=50; evalSheet.getColumn(3).width=5;
+            mh(evalSheet,1,3,1,'📝 التفسير والتوصيات',DB,GL,14);
+            evalSheet.getRow(1).height=45;
+            const sections = [
+                { title: '1. ملخص التحليل', content: `الجهة: ${companyName}\nإجمالي رأس المال: ${currency} ${D.total.toFixed(0)}\nWACC المحسوب: ${D.wacc.toFixed(2)}%\nطريقة حساب Re: ${D.reMethod==='manual'?'إدخال يدوي':'CAPM'}` },
+                { title: '2. تفسير النتيجة', content: D.interpretation },
+                { title: '3. التوصيات', content: D.wacc<0.12 ? '• يمكن استخدام هذا المعدل كحد أدنى للعائد المطلوب للمشاريع الجديدة.\n• يُنصح بالاستفادة من تكلفة التمويل المنخفضة للتوسع.' : '• يُنصح بمراجعة هيكل رأس المال لتخفيض تكلفة التمويل.\n• يمكن التفكير في إعادة هيكلة الديون أو زيادة حقوق الملكية.' },
+                { title: '4. تنويه', content: 'هذا التحليل مبني على افتراضات تقديرية. النتائج الفعلية قد تختلف. يُنصح باستشارة خبير مالي قبل اتخاذ القرارات.' }
+            ];
+            let itRow=2;
+            sections.forEach((sec,idx)=>{
+                itRow++;
+                evalSheet.getRow(itRow).height=30;
+                evalSheet.mergeCells(itRow,2,itRow,2);
+                const tc3=evalSheet.getCell(itRow,2);
+                tc3.value=sec.title;
+                tc3.font={name:'Arial',bold:true,size:12,color:{argb:GL}};
+                tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?HB:SB}};
+                tc3.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                tc3.border={bottom:{style:'medium',color:{argb:G}}};
+                itRow++;
+                evalSheet.getRow(itRow).height=Math.max(60, sec.content.split('\n').length*18);
+                evalSheet.mergeCells(itRow,2,itRow,2);
+                const cc=evalSheet.getCell(itRow,2);
+                cc.value=sec.content;
+                cc.font={name:'Arial',size:10,color:{argb:DT}};
+                cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};
+                cc.alignment={horizontal:'right',vertical:'top',wrapText:true,readingOrder:'rtl'};
+                cc.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
+            });
 
-                const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `تقرير_WACC_${companyName}_${now.toISOString().slice(0,10)}.doc`;
-                link.click();
-                URL.revokeObjectURL(link.href);
-            } catch(err){ console.error(err); alert('خطأ Word: '+err.message); }
-            finally{ hideLoading(); }
-        }
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const now = new Date();
+            const fileName = `تقرير_WACC_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+            saveAs(blob, fileName);
+        } catch(err) { alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
+    });
 
-        document.getElementById('exportExcelBtn').addEventListener('click', exportToFullExcel);
-        document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
-    </script>
+    // ================================================================
+    // ========== تصدير Word احترافي ==========
+    // ================================================================
+    document.getElementById('exportWordBtn').addEventListener('click', async function() {
+        if (!globalWaccData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+        showLoading('جاري إنشاء تقرير Word...', 'جمع البيانات والرسوم');
+        try {
+            const D = globalWaccData;
+            const currency = D.currency;
+            const companyName = D.companyName;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ar-EG');
+
+            const chartContainer = document.querySelector('.chart-container');
+            let chartImgBase64 = '';
+            if (chartContainer) {
+                const origBg = chartContainer.style.backgroundColor;
+                chartContainer.style.backgroundColor = '#ffffff';
+                const img = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
+                chartContainer.style.backgroundColor = origBg;
+                chartImgBase64 = img.toDataURL('image/png');
+            }
+
+            const fullHtml = `<!DOCTYPE html>
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+            <head><meta charset='utf-8'><title>تقرير WACC - FAROUK GRUP</title>
+            <style>
+                body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;color:#333;}
+                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                .cover h1{font-size:32px;color:#b8860b;margin:0;}
+                .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                th{background:#fefcf6;color:#b8860b;}
+                .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
+                .highlight{font-size:2rem;font-weight:bold;color:#155724;}
+            </style></head>
+            <body>
+                <div class="cover">
+                    <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+                    <h2>تقرير تحليل WACC</h2>
+                    <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
+                    <p>العملة: ${currency} | WACC: ${D.wacc.toFixed(2)}%</p>
+                </div>
+                <h2 style="color:#b8860b;">المدخلات الأساسية</h2>
+                <table><tbody>
+                    <tr><th>حقوق الملكية</th><td>${currency} ${D.equity.toFixed(0)}</td><th>الديون</th><td>${currency} ${D.debt.toFixed(0)}</td></tr>
+                    <tr><th>تكلفة حقوق الملكية (Re)</th><td>${D.costEquity.toFixed(2)}%</td><th>تكلفة الديون (Rd)</th><td>${D.costDebt.toFixed(2)}%</td></tr>
+                    <tr><th>معدل الضريبة</th><td>${D.taxRate.toFixed(0)}%</td><th>تكلفة الديون بعد الضريبة</th><td>${D.afterTaxCostDebt.toFixed(2)}%</td></tr>
+                </tbody></table>
+                <h2 style="color:#b8860b;">📊 مؤشرات الأداء</h2>
+                <div style="margin:20px 0;padding:20px;background:#d4edda;border-radius:10px;text-align:center;">
+                    <span style="font-size:2rem;font-weight:bold;color:#155724;">WACC = ${D.wacc.toFixed(2)}%</span>
+                </div>
+                <h2 style="color:#b8860b;">📊 هيكل رأس المال</h2>
+                <div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>
+                <h2 style="color:#b8860b;">📋 تفاصيل الحساب</h2>
+                ${D.detailsTableHtml}
+                <h2 style="color:#b8860b;">💡 تفسير النتيجة</h2>
+                <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">
+                    <p>${D.interpretation}</p>
+                </div>
+                <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+            </body></html>`;
+
+            const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `تقرير_WACC_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        } catch(err) { alert('خطأ Word: ' + err.message); } finally { hideLoading(); }
+    });
+</script>
 </body>
 </html>
