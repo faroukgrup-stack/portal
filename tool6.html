@@ -2,8 +2,10 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>تحليل المخاطر المتقدم | FAROUK GRUP</title>
+<!-- حماية الصفحة -->
+<script src="auth-check.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -13,122 +15,486 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        :root{
-            --bg-panel:rgba(18,24,36,0.85);--bg-card:rgba(22,30,46,0.8);
-            --border-light:rgba(180,133,84,0.25);--accent-glow:#b48554;--accent-soft:#cfa776;
-            --text-light:#f0f4fa;--text-muted:#aab7d4;
-            --shadow-soft:0 15px 35px -10px rgba(0,0,0,0.6),0 0 0 1px rgba(180,133,84,0.15);
-            --shadow-glow:0 15px 35px -10px rgba(0,0,0,0.8),0 0 20px rgba(180,133,84,0.3);
-            --radius-md:20px;--radius-lg:30px;--transition:all 0.3s ease;
-            --success:#28a745;--warning:#ffc107;--danger:#dc3545;
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
         }
-        body{font-family:'Tajawal',sans-serif;background:radial-gradient(circle at 70% 30%,#141c2b,#0a0e16);color:var(--text-light);line-height:1.6;min-height:100vh;overflow-x:hidden}
-        .glow-bg{position:fixed;width:100%;height:100%;top:0;left:0;pointer-events:none;z-index:0}
-        .glow-bg span{position:absolute;border-radius:50%;filter:blur(80px);animation:glowMove 20s infinite alternate ease-in-out}
-        .glow-bg span:nth-child(1){top:-100px;right:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(180,133,84,.12) 0%,transparent 70%)}
-        .glow-bg span:nth-child(2){bottom:-150px;left:-150px;width:600px;height:600px;background:radial-gradient(circle,rgba(100,150,200,.1) 0%,transparent 70%)}
-        .glow-bg span:nth-child(3){top:30%;left:30%;width:300px;height:300px;background:radial-gradient(circle,rgba(180,133,84,.1) 0%,transparent 70%);animation-delay:-5s}
-        @keyframes glowMove{0%{transform:translate(0,0) scale(1);opacity:.5}100%{transform:translate(40px,-30px) scale(1.2);opacity:.8}}
-        .hero-mini{background:linear-gradient(135deg,#0f0f0f,#1a1a1a);color:#fff;text-align:center;padding:3rem 1rem;border-bottom:4px solid #b8860b;position:relative;overflow:hidden;z-index:2}
-        .hero-mini::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(184,134,11,.2) 0%,transparent 60%);animation:rotate 40s linear infinite}
-        @keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-        .hero-mini h2{font-size:2.5rem;font-weight:900;color:#d4b15a;margin-bottom:.5rem;position:relative;z-index:2}
-        .hero-mini p{font-size:1.2rem;max-width:700px;margin:0 auto;opacity:.95;position:relative;z-index:2}
-        .calc-wrapper{max-width:1200px;margin:2rem auto;padding:0 1rem;position:relative;z-index:2}
-        .calc-box{background:var(--bg-panel);backdrop-filter:blur(15px);border:2px solid var(--border-light);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow-soft);position:relative;overflow:hidden;transition:var(--transition)}
-        .calc-box:hover{box-shadow:var(--shadow-glow);border-color:rgba(180,133,84,.4)}
-        .featured-badge{position:absolute;top:-10px;left:-10px;background:linear-gradient(135deg,#b48554,#d4b15a);color:#111;width:90px;height:90px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 5px 20px rgba(0,0,0,.3);font-weight:900;border:3px solid #fff;z-index:10}
-        .featured-badge i{font-size:1.8rem;margin-bottom:.2rem;color:#0b0e17}
-        .featured-badge span{font-size:.8rem;text-align:center;color:#0b0e17}
-        .calc-box h2{font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#f0e6d2,#cfa776);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1.5rem;text-align:center}
-        .analysis-type{display:flex;gap:1rem;justify-content:center;margin-bottom:2rem;flex-wrap:wrap}
-        .analysis-option{background:rgba(180,133,84,.15);border:1px solid var(--border-light);border-radius:50px;padding:.8rem 2rem;cursor:pointer;transition:var(--transition);font-weight:700;color:var(--text-muted)}
-        .analysis-option.active{border-color:var(--accent-glow);background:rgba(180,133,84,.3);color:var(--accent-soft);box-shadow:0 0 15px rgba(180,133,84,.3)}
-        .currency-row{display:flex;align-items:center;gap:1rem;background:rgba(180,133,84,.15);border:1px solid var(--border-light);padding:.8rem 1rem;border-radius:50px;margin-bottom:2rem;flex-wrap:wrap}
-        .currency-row label{font-weight:700;color:var(--accent-soft);margin:0}
-        .currency-row select,.currency-row input{width:150px;padding:.5rem 1rem;border:2px solid var(--border-light);border-radius:30px;background:rgba(10,14,23,.7);color:var(--text-light);font-weight:700;font-family:'Inter',sans-serif}
-        .currency-row input{width:250px}
-        .currency-row select option{background:#0b0e17;color:#f0f4fa}
-        .section-title-sm{font-size:1.3rem;font-weight:900;color:var(--accent-soft)!important;-webkit-text-fill-color:initial!important;background:none!important;margin:1.2rem 0 .8rem;border-bottom:2px solid var(--border-light);padding-bottom:.3rem}
-        .form-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.5rem}
-        .form-group{flex:1 1 200px;margin-bottom:.8rem;position:relative}
-        label{display:block;margin-bottom:.3rem;font-weight:700;color:var(--accent-soft);font-size:.9rem}
-        input,select{width:100%;padding:.8rem 1rem;border:2px solid var(--border-light);border-radius:30px;background:rgba(10,14,23,.7);color:var(--text-light);font-family:'Inter',sans-serif;font-size:.95rem;transition:var(--transition)}
-        input:focus,select:focus{outline:none;border-color:var(--accent-glow);box-shadow:0 0 0 3px rgba(180,133,84,.2)}
-        .tooltip{position:relative;cursor:help}
-        .tooltip .tooltiptext{visibility:hidden;width:220px;background:#0f0f0f;color:#fff;text-align:center;border-radius:6px;padding:8px;position:absolute;z-index:100;bottom:130%;left:50%;margin-left:-110px;opacity:0;transition:opacity .3s;font-size:.85rem;border:1px solid #b8860b;pointer-events:none}
-        .tooltip:hover .tooltiptext{visibility:visible;opacity:1}
-        .btn-calculate{display:flex;align-items:center;justify-content:center;gap:1rem;width:100%;padding:1.2rem;border-radius:50px;background:rgba(180,133,84,.2);border:1px solid var(--border-light);color:var(--accent-soft);font-weight:900;font-size:1.2rem;cursor:pointer;transition:var(--transition);margin:1.5rem 0;font-family:'Tajawal',sans-serif}
-        .btn-calculate:hover{background:rgba(180,133,84,.4);color:#fff;border-color:var(--accent-glow);box-shadow:0 0 25px rgba(180,133,84,.3);transform:translateY(-3px)}
-        .results-section{margin-top:2rem}
-        .results-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem}
-        .result-card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-md);padding:1.2rem;text-align:center;box-shadow:var(--shadow-soft);transition:var(--transition)}
-        .result-card:hover{transform:translateY(-5px);border-color:var(--accent-glow)}
-        .result-card i{font-size:1.8rem;color:var(--accent-soft);margin-bottom:.5rem;display:block}
-        .result-card h4{font-size:.9rem;font-weight:700;color:var(--text-muted)!important;margin-bottom:.3rem;-webkit-text-fill-color:initial!important;background:none!important}
-        .result-card .value{font-size:1.5rem;font-weight:900;color:var(--accent-soft)}
-        .result-card .unit{font-size:.8rem;color:var(--text-muted)}
-        .table-container{overflow-x:auto;margin-top:1.5rem;border:1px solid var(--border-light);border-radius:var(--radius-md);background:var(--bg-card);padding:.8rem}
-        table{width:100%;border-collapse:collapse;font-size:.9rem}
-        th{background:rgba(180,133,84,.2);color:var(--accent-soft);font-weight:900;padding:.5rem;border-bottom:2px solid var(--border-light)}
-        td{padding:.5rem;border-bottom:1px solid rgba(180,133,84,.2);text-align:center;color:var(--text-light)}
-        tr:last-child td{border-bottom:none}
-        .positive{color:#4ade80;font-weight:700}
-        .negative{color:#f87171;font-weight:700}
-        .export-container{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin:1.5rem 0}
-        .export-btn,.export-word-btn{background:rgba(180,133,84,.2);border:1px solid var(--border-light);color:var(--accent-soft);border-radius:50px;padding:.9rem 2.2rem;font-weight:700;cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:.6rem;font-size:.95rem;font-family:'Tajawal',sans-serif}
-        .export-btn:hover,.export-word-btn:hover{background:rgba(180,133,84,.4);color:#fff;border-color:var(--accent-glow);box-shadow:0 0 15px rgba(180,133,84,.3);transform:translateY(-2px)}
-        .chart-container{margin-top:2rem;background:var(--bg-card);border-radius:20px;padding:1rem;border:1px solid var(--border-light);height:300px}
-        .footer-simple{text-align:center;padding:1.5rem;margin-top:2rem;background:rgba(10,14,23,.5);backdrop-filter:blur(5px);border-top:1px solid var(--border-light);color:var(--text-muted);font-size:.85rem}
-        .footer-simple span{color:var(--accent-soft);font-weight:700}
-        .export-loading{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;justify-content:center;align-items:center;flex-direction:column;backdrop-filter:blur(6px)}
-        .export-loading.show{display:flex}
-        .export-loading-box{background:var(--bg-panel);border:2px solid var(--border-light);border-radius:24px;padding:2.5rem 3.5rem;text-align:center;box-shadow:var(--shadow-glow)}
-        .export-loading-box i{font-size:3rem;color:var(--accent-soft);animation:spin 1s linear infinite;display:block;margin-bottom:1rem}
-        .export-loading-box h3{color:var(--accent-soft);margin-bottom:.5rem;font-size:1.2rem}
-        .export-loading-box p{color:var(--text-muted);font-size:.9rem}
-        @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-        .modal{display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.8);backdrop-filter:blur(4px)}
-        .modal-content{background:var(--bg-panel);margin:5% auto;border:2px solid var(--border-light);border-radius:30px;width:90%;max-width:300px;box-shadow:var(--shadow-glow)}
-        .modal-header{background:rgba(180,133,84,.15);border-bottom:2px solid var(--border-light);padding:10px 15px;border-radius:28px 28px 0 0;display:flex;align-items:center;justify-content:space-between}
-        .modal-header h2{margin:0;color:var(--accent-soft);font-size:1rem;font-weight:900}
-        .close{color:var(--text-muted);float:left;font-size:24px;font-weight:bold;cursor:pointer}
-        .close:hover{color:var(--accent-glow)}
-        .modal-body{padding:15px}
-        .calc-display{width:100%;height:45px;font-size:1.4rem;text-align:left;padding:0 10px;border:2px solid var(--border-light);border-radius:20px;margin-bottom:15px;background:rgba(10,14,23,.8);color:var(--accent-soft);font-family:'Inter',monospace;direction:ltr}
-        .calc-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
-        .calc-btn{background:rgba(180,133,84,.1);border:1px solid var(--border-light);border-radius:15px;padding:10px 0;font-size:1rem;font-weight:700;color:var(--text-light);cursor:pointer;font-family:'Tajawal',sans-serif}
-        .calc-btn:hover{background:rgba(180,133,84,.3);border-color:var(--accent-glow)}
-        .calc-btn.operator{color:var(--accent-soft)}
-        .calc-btn.equals{background:rgba(180,133,84,.3);color:#fff}
-        .calc-floating-btn{position:fixed;bottom:20px;left:20px;background:rgba(180,133,84,.2);border:1px solid var(--border-light);border-radius:50px;padding:.8rem 1.2rem;color:var(--accent-soft);font-size:1rem;font-weight:700;z-index:100;backdrop-filter:blur(10px);cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:.5rem;font-family:'Tajawal',sans-serif}
-        .calc-floating-btn:hover{background:rgba(180,133,84,.4);color:#fff}
-        .hidden-section{display:none}
-        @media(max-width:768px){.hero-mini h2{font-size:2rem}.form-row{flex-direction:column}.analysis-option{width:100%;text-align:center}.export-container{flex-direction:column;align-items:stretch}.export-btn,.export-word-btn{width:100%;justify-content:center}.results-cards{grid-template-columns:1fr}.chart-container{height:250px}}
+
+        /* ===== إزالة كل ما يسبب الاهتزاز ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .btn-sensitivity, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .export-btn, .export-word-btn,
+        .form-group input, .form-group select, .analysis-option {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== خلفية ثابتة ===== */
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.20;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.10) 0%, transparent 70%);
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.05) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.06) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
+        }
+
+        /* ===== WRAPPER ===== */
+        .calc-wrapper {
+            max-width: 1050px; margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+        }
+
+        /* ===== CARD ===== */
+        .calc-box {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .calc-box h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+        }
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== صف العملة ===== */
+        .currency-row {
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.8rem; background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.2);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
+        }
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
+        .currency-row select, .currency-row input {
+            flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
+        }
+        .currency-row input { flex: 2 1 200px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* ===== عناوين الأقسام ===== */
+        .section-title-sm {
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
+            margin: 1.2rem 0 0.8rem 0;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== صفوف النماذج ===== */
+        .form-row {
+            display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;
+        }
+        .form-group {
+            flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
+        }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-left: 0.3rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+        input[type="range"] {
+            padding: 0; height: 8px; border-radius: 10px;
+            background: rgba(180,133,84,0.2); -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 18px; height: 18px;
+            background: #b48554; border-radius: 50%; cursor: pointer;
+            border: 2px solid white;
+        }
+        .range-value { margin-top: 5px; font-weight: bold; color: #cfa776; }
+
+        /* ===== أزرار اختيار نوع التحليل ===== */
+        .analysis-type {
+            display: flex; gap: 0.8rem; justify-content: center;
+            margin-bottom: 1.5rem; flex-wrap: wrap;
+        }
+        .analysis-option {
+            background: rgba(180,133,84,0.12); border: 1px solid rgba(180,133,84,0.18);
+            border-radius: 50px; padding: 0.6rem 1.5rem;
+            cursor: pointer; font-weight: 700; color: #aab7d4;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+        }
+        .analysis-option.active {
+            border-color: #b48554; background: rgba(180,133,84,0.25);
+            color: #cfa776; box-shadow: 0 0 15px rgba(180,133,84,0.15);
+        }
+
+        /* ===== زر الحساب ===== */
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer; margin: 1.5rem 0; font-family: 'Tajawal', sans-serif;
+        }
+        .btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-calculate:active { transform: scale(0.97); }
+
+        /* ===== النتائج ===== */
+        .results-section { margin-top: 1.5rem; }
+        .results-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .result-card {
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.12);
+            border-radius: 20px; padding: 1rem; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .result-card i { font-size: 1.6rem; color: #cfa776; margin-bottom: 0.3rem; }
+        .result-card h4 { font-size: 0.85rem; font-weight: 700; color: #aab7d4; margin-bottom: 0.2rem; }
+        .result-card .value { font-size: 1.3rem; font-weight: 900; color: #cfa776; }
+        .result-card .unit { font-size: 0.75rem; color: #aab7d4; }
+        .result-card .status {
+            font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+            display: inline-block; margin-top: 0.2rem;
+        }
+        .status-good { background: #28a745; color: white; }
+        .status-bad { background: #dc3545; color: white; }
+        .status-warning { background: #ffc107; color: #111; }
+
+        /* ===== جداول ===== */
+        .table-container {
+            overflow-x: auto; margin-top: 1rem;
+            border: 1px solid rgba(180,133,84,0.1); border-radius: 20px;
+            background: rgba(22,30,46,0.6); padding: 0.5rem;
+            -webkit-overflow-scrolling: touch;
+            max-height: 400px;
+        }
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.85rem;
+            min-width: 400px;
+        }
+        th {
+            background: rgba(180,133,84,0.15); color: #cfa776;
+            font-weight: 900; padding: 0.6rem 0.8rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15); white-space: nowrap;
+            position: sticky; top: 0; z-index: 2; background: rgba(22,30,46,0.95);
+        }
+        td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid rgba(180,133,84,0.06);
+            text-align: center; color: #f0f4fa;
+        }
+        tr:last-child td { border-bottom: none; }
+        .positive { color: #4ade80; font-weight: 700; }
+        .negative { color: #f87171; font-weight: 700; }
+
+        /* ===== رسوم بيانية ===== */
+        .chart-container {
+            margin-top: 1.5rem;
+            background: rgba(22,30,46,0.6);
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid rgba(180,133,84,0.08);
+            height: 280px;
+            position: relative;
+        }
+        .chart-container canvas { width: 100% !important; height: 100% !important; }
+
+        /* ===== أزرار التصدير ===== */
+        .export-container {
+            display: flex; justify-content: center; gap: 0.8rem;
+            flex-wrap: wrap; margin: 1.5rem 0;
+        }
+        .export-btn, .export-word-btn {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+            padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.9rem; font-family: 'Tajawal', sans-serif;
+            flex: 1 1 auto; justify-content: center; max-width: 220px;
+        }
+        .export-btn:hover, .export-word-btn:hover { background: rgba(180,133,84,0.25); }
+        .export-btn.excel { background: rgba(40,167,69,0.12); border-color: #28a745; color: #6fbf6f; }
+        .export-btn.excel:hover { background: rgba(40,167,69,0.25); }
+
+        /* ===== شاشة تحميل ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== فوتر ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
+        .calc-display {
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: left;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
+
+        /* ===== الأزرار العائمة ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== رسائل ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+        .tooltip .tooltiptext { display: none; }
+
+        /* ===== أقسام مخفية ===== */
+        .hidden-section { display: none !important; }
+
+        /* ===================================================
+           تحسينات للشاشات المتوسطة والكبيرة (كمبيوتر)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .section-title-sm { font-size: 1.4rem; }
+            .form-group { flex: 1 1 220px; }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value { font-size: 1.5rem; }
+            .result-card h4 { font-size: 0.95rem; }
+            .result-card i { font-size: 1.8rem; }
+            table { font-size: 0.9rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .chart-container { height: 320px; }
+        }
+
+        /* ===================================================
+           تحسينات للجوال (شاشات ≤ 768px)
+           =================================================== */
+        @media (max-width: 768px) {
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; }
+            .currency-row label { font-size: 0.8rem; }
+            .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; }
+            .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+            .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-cards { grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 0.5rem; }
+            .result-card { padding: 0.6rem 0.4rem; }
+            .result-card i { font-size: 1.2rem; }
+            .result-card h4 { font-size: 0.65rem; }
+            .result-card .value { font-size: 1rem; }
+            .result-card .unit { font-size: 0.6rem; }
+            .chart-container { height: 200px; padding: 0.5rem; }
+            table { font-size: 0.7rem; min-width: 300px; }
+            th, td { padding: 0.3rem 0.4rem; }
+            .export-btn, .export-word-btn { font-size: 0.75rem; padding: 0.4rem 1rem; max-width: 160px; }
+            .modal-content { width: 95%; max-width: 320px; }
+            .calc-btn { padding: 8px 0; font-size: 0.9rem; }
+            .footer-simple { font-size: 0.7rem; padding: 0.6rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .analysis-type { flex-direction: column; align-items: stretch; }
+            .analysis-option { justify-content: center; }
+            .table-container { max-height: 250px; }
+            input[type="range"] { width: 100%; }
+        }
+
+        /* ===== تحسينات للشاشات الصغيرة جداً (≤ 400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+            .results-cards { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+            .chart-container { height: 160px; }
+        }
+
+        /* ===== منع التحديد العرضي ===== */
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        /* ===== تحسين التمرير ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+
+        /* إصلاح ظهور العناوين */
+        .section-title-sm, .result-card h4, .hero-mini h2 {
+            -webkit-text-fill-color: initial !important;
+            color: #cfa776 !important;
+            background: none !important;
+            background-image: none !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .note {
+            background: rgba(180,133,84,0.08); padding: 0.6rem 1rem;
+            border-radius: 16px; font-size: 0.85rem; color: #aab7d4;
+            margin-top: 0.5rem; border-right: 3px solid #b48554;
+        }
     </style>
 </head>
 <body>
 <div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">جاري إنشاء التقرير...</h3>
+        <p id="loadingMsg">يرجى الانتظار</p>
+    </div>
+</div>
 
 <section class="hero-mini">
     <h2>محاكاة المخاطر المتقدمة (Monte Carlo)</h2>
     <p>اختر نوع التحليل: حساسية تقليدية أو محاكاة احتمالية بآلاف السيناريوهات</p>
 </section>
 
-<div class="export-loading" id="exportLoading">
-    <div class="export-loading-box">
-        <i class="fas fa-spinner"></i>
-        <h3 id="loadingTitle">جاري إنشاء التقرير الاحترافي...</h3>
-        <p id="loadingMsg">يرجى الانتظار — قد يستغرق ذلك لحظات</p>
-    </div>
-</div>
-
-<section class="calc-wrapper">
+<div class="calc-wrapper">
     <div class="calc-box" data-aos="fade-up">
         <div class="featured-badge"><i class="fas fa-chart-line"></i><span>مونت كارلو</span></div>
-        <h2>تحليل المخاطر الاحتمالي</h2>
+        <h2><i class="fas fa-chart-line" style="color:#cfa776;margin-left:0.5rem;"></i>تحليل المخاطر الاحتمالي</h2>
 
+        <!-- العملة واسم الجهة -->
         <div class="currency-row">
             <label><i class="fas fa-coins"></i> العملة:</label>
             <select id="currencySelect">
@@ -140,14 +506,16 @@
                 <option value="ر.س">ريال سعودي (ر.س)</option>
             </select>
             <label><i class="fas fa-building"></i> اسم الجهة:</label>
-            <input type="text" id="companyName" value="اسم الجهة المستفيدة من التقرير">
+            <input type="text" id="companyName" value="اسم الجهة المستفيدة من التقرير" placeholder="الجهة المستفيدة">
         </div>
 
+        <!-- خيارات نوع التحليل -->
         <div class="analysis-type">
             <div class="analysis-option active" id="optSensitivity" onclick="setAnalysisType('sensitivity')"><i class="fas fa-table"></i> تحليل حساسية (Two-Way)</div>
             <div class="analysis-option" id="optMonteCarlo" onclick="setAnalysisType('montecarlo')"><i class="fas fa-random"></i> محاكاة مونت كارلو</div>
         </div>
 
+        <!-- الحالة الأساسية -->
         <div class="section-title-sm">📈 الحالة الأساسية (Base Case)</div>
         <div class="form-row">
             <div class="form-group tooltip"><label><i class="fas fa-coins"></i> الاستثمار الأولي</label><input type="number" id="initialInvestment" value="545200" step="1000"><span class="tooltiptext">التكلفة الأولية للمشروع.</span></div>
@@ -165,6 +533,7 @@
             <div class="form-group tooltip"><label><i class="fas fa-calendar-alt"></i> عدد السنوات</label><input type="number" id="years" value="8" min="1" max="30"><span class="tooltiptext">مدة المشروع بالسنوات.</span></div>
         </div>
 
+        <!-- مدخلات الحساسية -->
         <div id="sensitivityInputs">
             <div class="section-title-sm">⚡ متغيرات الحساسية</div>
             <div class="form-row">
@@ -173,6 +542,7 @@
             </div>
         </div>
 
+        <!-- مدخلات مونت كارلو -->
         <div id="monteCarloInputs" class="hidden-section">
             <div class="section-title-sm">🎲 معاملات محاكاة مونت كارلو</div>
             <div class="form-row">
@@ -184,6 +554,7 @@
 
         <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> تشغيل التحليل</button>
 
+        <!-- النتائج -->
         <div class="results-section" id="resultsSection" style="display:none">
             <div class="results-cards" id="kpiCards"></div>
             <div id="sensitivityResults">
@@ -197,398 +568,676 @@
                 <div class="table-container" id="monteCarloStats"></div>
             </div>
             <div class="export-container">
-                <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel احترافي</button>
-                <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تقرير Word كامل + رسوم بيانية</button>
+                <button class="export-btn excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel شامل</button>
+                <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير Word</button>
             </div>
             <div class="section-title-sm">📝 تفسير النتائج</div>
             <div class="result-card" id="interpretation" style="text-align:right"></div>
         </div>
+
         <div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center">
             <i class="fas fa-robot" style="color:var(--accent-soft)"></i> سيتم عرض النتائج بعد الضغط على زر التحليل
         </div>
     </div>
-</section>
+</div>
 
 <footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
 
-<div class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> آلة حاسبة</div>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> حاسبة</button>
+<a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> الرئيسية</a>
 
+<!-- نافذة الآلة الحاسبة -->
 <div id="calculatorModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><span class="close">&times;</span><h2><i class="fas fa-calculator" style="color:var(--accent-soft)"></i> آلة حاسبة</h2></div>
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> آلة حاسبة</h2>
+        </div>
         <div class="modal-body">
             <input type="text" id="calcDisplay" class="calc-display" readonly>
             <div class="calc-buttons">
-                <button class="calc-btn" onclick="ci('9')">9</button><button class="calc-btn" onclick="ci('8')">8</button><button class="calc-btn" onclick="ci('7')">7</button><button class="calc-btn operator" onclick="ci('/')">÷</button>
-                <button class="calc-btn" onclick="ci('6')">6</button><button class="calc-btn" onclick="ci('5')">5</button><button class="calc-btn" onclick="ci('4')">4</button><button class="calc-btn operator" onclick="ci('*')">×</button>
-                <button class="calc-btn" onclick="ci('3')">3</button><button class="calc-btn" onclick="ci('2')">2</button><button class="calc-btn" onclick="ci('1')">1</button><button class="calc-btn operator" onclick="ci('-')">-</button>
-                <button class="calc-btn" onclick="cc()">C</button><button class="calc-btn" onclick="ci('.')">.</button><button class="calc-btn" onclick="ci('0')">0</button><button class="calc-btn operator" onclick="ci('+')">+</button>
-                <button class="calc-btn" onclick="cb()">⌫</button><button class="calc-btn equals" onclick="cr()" style="grid-column:span 3">=</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
             </div>
         </div>
     </div>
 </div>
 
-<a href="index.html" style="position:fixed;bottom:20px;right:20px;background:rgba(180,133,84,0.9);color:white;padding:12px 20px;border-radius:50px;text-decoration:none;font-family:'Tajawal',sans-serif;font-weight:bold;backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,0.2);box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:9999;display:flex;align-items:center;gap:8px;transition:0.3s" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"><i class="fas fa-home"></i> الرئيسية</a>
-
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-AOS.init({duration:800,once:true,offset:100});
-let currentAnalysisType='sensitivity', globalResults={};
-function fmtNum(n){return Math.round(n).toLocaleString('en-US');}
-function fmtPct(n){return(n*100).toFixed(2)+'%';}
+AOS.init({ duration: 800, once: true, offset: 100 });
 
-window.setAnalysisType=function(type){
-    currentAnalysisType=type;
-    ['sensitivity','montecarlo'].forEach(t=>{
-        document.getElementById('opt'+(t==='sensitivity'?'Sensitivity':'MonteCarlo')).classList.toggle('active',type===t);
-    });
-    document.getElementById('sensitivityInputs').classList.toggle('hidden-section',type!=='sensitivity');
-    document.getElementById('monteCarloInputs').classList.toggle('hidden-section',type!=='montecarlo');
-    document.getElementById('sensitivityResults').classList.toggle('hidden-section',type!=='sensitivity');
-    document.getElementById('monteCarloResults').classList.toggle('hidden-section',type!=='montecarlo');
-};
-
-function computeNPV(I,r0,c0,d,gR,gC,t,Y,disc){
-    let n=-I;
-    for(let i=1;i<=Y;i++){
-        let r=r0*Math.pow(1+gR,i-1),c=c0*Math.pow(1+gC,i-1),e=r-c-d,tp=e>0?e*t:0,cf=(e-tp)+d;
-        n+=cf/Math.pow(1+disc,i);
+// ===== آلة حاسبة =====
+const calcDisplay = document.getElementById('calcDisplay');
+let currentCalcInput = '';
+function handleCalc(v) {
+    if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+    if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+    if (v === '=') {
+        try {
+            let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/'));
+            calcDisplay.value = r;
+            currentCalcInput = r.toString();
+        } catch(e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
+        return;
     }
-    return n;
+    currentCalcInput += v;
+    calcDisplay.value = currentCalcInput;
 }
-function computeIRR(I,r0,c0,d,gR,gC,t,Y){
-    let f=r=>{let n=-I;for(let i=1;i<=Y;i++){let r_=r0*Math.pow(1+gR,i-1),c=c0*Math.pow(1+gC,i-1),e=r_-c-d,tp=e>0?e*t:0,cf=(e-tp)+d;n+=cf/Math.pow(1+r,i);}return n;};
-    let lo=-0.99,hi=10;
-    for(let k=0;k<100;k++){let m=(lo+hi)/2;f(m)>0?lo=m:hi=m;if(hi-lo<1e-6)return m;}
-    return(lo+hi)/2;
+document.querySelectorAll('.calc-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const v = this.dataset.val;
+        if (v !== undefined) handleCalc(v);
+    });
+});
+const modalEl = document.getElementById('calculatorModal');
+document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    modalEl.classList.add('active');
+    calcDisplay.value = currentCalcInput;
+});
+document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+document.addEventListener('keydown', function(e) {
+    if (!modalEl.classList.contains('active')) return;
+    e.preventDefault();
+    const k = e.key;
+    if (k >= '0' && k <= '9') handleCalc(k);
+    else if (k === '.') handleCalc('.');
+    else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+    else if (k === 'Enter' || k === '=') handleCalc('=');
+    else if (k === 'Backspace') handleCalc('⌫');
+    else if (k === 'Escape') modalEl.classList.remove('active');
+    else if (k.toLowerCase() === 'c') handleCalc('C');
+});
+
+// ===== شاشة تحميل =====
+function showLoading(title, msg) {
+    document.getElementById('loadingTitle').textContent = title;
+    document.getElementById('loadingMsg').textContent = msg;
+    document.getElementById('exportLoading').classList.add('show');
 }
-function computeCF(I,r0,c0,d,gR,gC,t,Y,disc){
-    let rows=[],cum=-I;
-    for(let i=1;i<=Y;i++){
-        let rev=r0*Math.pow(1+gR,i-1),cost=c0*Math.pow(1+gC,i-1),ebit=rev-cost-d,tp=ebit>0?ebit*t:0,np=ebit-tp,cf=np+d,dcf=cf/Math.pow(1+disc,i);
-        cum+=cf; rows.push({year:i,rev,cost,ebit,taxPaid:tp,netProfit:np,depr:d,cf,dcf,cumCF:cum});
+function hideLoading() {
+    document.getElementById('exportLoading').classList.remove('show');
+}
+
+// ===== نوع التحليل =====
+let currentAnalysisType = 'sensitivity';
+
+function setAnalysisType(type) {
+    currentAnalysisType = type;
+    document.getElementById('optSensitivity').classList.toggle('active', type === 'sensitivity');
+    document.getElementById('optMonteCarlo').classList.toggle('active', type === 'montecarlo');
+    document.getElementById('sensitivityInputs').classList.toggle('hidden-section', type !== 'sensitivity');
+    document.getElementById('monteCarloInputs').classList.toggle('hidden-section', type !== 'montecarlo');
+    document.getElementById('sensitivityResults').classList.toggle('hidden-section', type !== 'sensitivity');
+    document.getElementById('monteCarloResults').classList.toggle('hidden-section', type !== 'montecarlo');
+}
+
+// ===== دوال الحساب الأساسية =====
+function fmtNum(n) { return Math.round(n).toLocaleString('en-US'); }
+function fmtPct(n) { return (n * 100).toFixed(2) + '%'; }
+
+function computeNPV(I, r0, c0, d, gR, gC, t, Y, disc) {
+    let npv = -I;
+    for (let i = 1; i <= Y; i++) {
+        let rev = r0 * Math.pow(1 + gR, i - 1);
+        let cost = c0 * Math.pow(1 + gC, i - 1);
+        let ebit = rev - cost - d;
+        let taxPaid = ebit > 0 ? ebit * t : 0;
+        let fcf = (ebit - taxPaid) + d;
+        npv += fcf / Math.pow(1 + disc, i);
+    }
+    return npv;
+}
+
+function computeIRR(I, r0, c0, d, gR, gC, t, Y) {
+    let fn = (r) => {
+        let npv = -I;
+        for (let i = 1; i <= Y; i++) {
+            let rev = r0 * Math.pow(1 + gR, i - 1);
+            let cost = c0 * Math.pow(1 + gC, i - 1);
+            let ebit = rev - cost - d;
+            let taxPaid = ebit > 0 ? ebit * t : 0;
+            let fcf = (ebit - taxPaid) + d;
+            npv += fcf / Math.pow(1 + r, i);
+        }
+        return npv;
+    };
+    let lo = -0.99, hi = 10;
+    for (let iter = 0; iter < 1000; iter++) {
+        let mid = (lo + hi) / 2;
+        let fmid = fn(mid);
+        if (Math.abs(fmid) < 1e-6) return mid;
+        if (fmid > 0) lo = mid;
+        else hi = mid;
+        if (hi - lo < 1e-6) break;
+    }
+    return (lo + hi) / 2;
+}
+
+function computeCF(I, r0, c0, d, gR, gC, t, Y, disc) {
+    let rows = [];
+    let cum = -I;
+    for (let i = 1; i <= Y; i++) {
+        let rev = r0 * Math.pow(1 + gR, i - 1);
+        let cost = c0 * Math.pow(1 + gC, i - 1);
+        let ebit = rev - cost - d;
+        let taxPaid = ebit > 0 ? ebit * t : 0;
+        let netProfit = ebit - taxPaid;
+        let fcf = netProfit + d;
+        let dcf = fcf / Math.pow(1 + disc, i);
+        cum += fcf;
+        rows.push({ year: i, rev, cost, ebit, taxPaid, netProfit, depr: d, fcf, dcf, cumCF: cum });
     }
     return rows;
 }
-function normalRandom(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
 
-document.getElementById('calculateBtn').addEventListener('click',function(){
-    const currency=document.getElementById('currencySelect').value;
-    const I=parseFloat(document.getElementById('initialInvestment').value)||0;
-    const r0=parseFloat(document.getElementById('annualRevenue').value)||0;
-    const c0=parseFloat(document.getElementById('annualCosts').value)||0;
-    const d=parseFloat(document.getElementById('depreciation').value)||0;
-    const gR=parseFloat(document.getElementById('growthRevenue').value)/100||0;
-    const gC=parseFloat(document.getElementById('growthCosts').value)/100||0;
-    const disc=parseFloat(document.getElementById('discountRate').value)/100||0;
-    const t=parseFloat(document.getElementById('taxRate').value)/100||0;
-    const Y=parseInt(document.getElementById('years').value)||8;
-    if(I<=0||r0<=0){alert('الرجاء إدخال قيم صحيحة');return;}
+function normalRandom() {
+    let u = 0, v = 0;
+    while (!u) u = Math.random();
+    while (!v) v = Math.random();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
 
-    const baseNPV=computeNPV(I,r0,c0,d,gR,gC,t,Y,disc);
-    const baseIRR=computeIRR(I,r0,c0,d,gR,gC,t,Y);
-    const cashflows=computeCF(I,r0,c0,d,gR,gC,t,Y,disc);
-    let payback=null,cum=-I;
-    for(let i=0;i<cashflows.length;i++){cum+=cashflows[i].cf;if(cum>=0&&payback===null)payback=i+1;}
-    const totalDCF=cashflows.reduce((s,r)=>s+r.dcf,0);
-    const pi=totalDCF/I;
+// ===== الحدث الرئيسي للحساب =====
+let globalResults = {};
+let npvChart = null;
 
-    globalResults={currency,investment:I,revenue0:r0,costs0:c0,depr:d,growthRev:gR,growthCost:gC,
-        discount:disc,tax:t,years:Y,baseNPV,baseIRR,cashflows,payback,pi,totalDCF,
-        companyName:document.getElementById('companyName').value||'الجهة المستفيدة',
-        analysisType:currentAnalysisType};
+document.getElementById('calculateBtn').addEventListener('click', function() {
+    const currency = document.getElementById('currencySelect').value;
+    const I = parseFloat(document.getElementById('initialInvestment').value) || 0;
+    const r0 = parseFloat(document.getElementById('annualRevenue').value) || 0;
+    const c0 = parseFloat(document.getElementById('annualCosts').value) || 0;
+    const d = parseFloat(document.getElementById('depreciation').value) || 0;
+    const gR = parseFloat(document.getElementById('growthRevenue').value) / 100 || 0;
+    const gC = parseFloat(document.getElementById('growthCosts').value) / 100 || 0;
+    const disc = parseFloat(document.getElementById('discountRate').value) / 100 || 0;
+    const t = parseFloat(document.getElementById('taxRate').value) / 100 || 0;
+    const Y = parseInt(document.getElementById('years').value) || 8;
 
-    document.getElementById('kpiCards').innerHTML=`
-        <div class="result-card"><i class="fas fa-coins"></i><h4>NPV الأساسي</h4><div class="value">${currency} ${fmtNum(baseNPV)}</div><div class="unit">${baseNPV>0?'✅ مربح':'❌ غير مربح'}</div></div>
-        <div class="result-card"><i class="fas fa-percent"></i><h4>IRR الأساسي</h4><div class="value">${isFinite(baseIRR)?(baseIRR*100).toFixed(2):'—'}%</div><div class="unit">${isFinite(baseIRR)&&baseIRR>disc?'✅ فوق الخصم':'⚠️'}</div></div>
-        <div class="result-card"><i class="fas fa-clock"></i><h4>فترة الاسترداد</h4><div class="value">${payback!==null?payback:'>'+Y} سنة</div><div class="unit">${payback!==null&&payback<=Y?'✅ ضمن المدة':'⚠️'}</div></div>
-        <div class="result-card"><i class="fas fa-balance-scale"></i><h4>مؤشر الربحية (PI)</h4><div class="value">${pi.toFixed(3)}</div><div class="unit">${pi>1?'✅ مقبول':'❌ مرفوض'}</div></div>`;
+    if (I <= 0 || r0 <= 0) { alert('الرجاء إدخال قيم صحيحة'); return; }
 
-    document.getElementById('initialMessage').style.display='none';
-    document.getElementById('resultsSection').style.display='block';
+    // الحالة الأساسية
+    const baseNPV = computeNPV(I, r0, c0, d, gR, gC, t, Y, disc);
+    const baseIRR = computeIRR(I, r0, c0, d, gR, gC, t, Y);
+    const cf = computeCF(I, r0, c0, d, gR, gC, t, Y, disc);
+    let payback = null;
+    let cum = -I;
+    for (let i = 0; i < cf.length; i++) {
+        cum += cf[i].fcf;
+        if (cum >= 0 && payback === null) payback = i + 1;
+    }
+    const totalDCF = cf.reduce((s, r) => s + r.dcf, 0);
+    const pi = totalDCF / I;
+    const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
 
-    if(currentAnalysisType==='sensitivity'){
+    globalResults = {
+        currency, companyName,
+        investment: I, revenue0: r0, costs0: c0, depr: d,
+        growthRev: gR, growthCost: gC,
+        discount: disc, tax: t, years: Y,
+        baseNPV, baseIRR, payback, totalDCF, pi,
+        cashflows: cf,
+        analysisType: currentAnalysisType
+    };
+
+    // عرض بطاقات KPI
+    document.getElementById('kpiCards').innerHTML = `
+        <div class="result-card"><i class="fas fa-coins"></i><h4>NPV الأساسي</h4><div class="value">${currency} ${fmtNum(baseNPV)}</div><div class="status ${baseNPV>0?'status-good':'status-bad'}">${baseNPV>0?'مربح':'غير مربح'}</div></div>
+        <div class="result-card"><i class="fas fa-percent"></i><h4>IRR الأساسي</h4><div class="value">${isFinite(baseIRR)?(baseIRR*100).toFixed(2):'—'}%</div><div class="status ${isFinite(baseIRR)&&baseIRR>disc?'status-good':'status-bad'}">${isFinite(baseIRR)&&baseIRR>disc?'✅ فوق الخصم':'⚠️'}</div></div>
+        <div class="result-card"><i class="fas fa-clock"></i><h4>فترة الاسترداد</h4><div class="value">${payback!==null?payback:'>'+Y} سنة</div><div class="status ${payback!==null&&payback<=Y?'status-good':'status-warning'}">${payback!==null&&payback<=Y?'ضمن المدة':'⚠️'}</div></div>
+        <div class="result-card"><i class="fas fa-balance-scale"></i><h4>مؤشر الربحية (PI)</h4><div class="value">${pi.toFixed(3)}</div><div class="status ${pi>1?'status-good':'status-bad'}">${pi>1?'مقبول':'مرفوض'}</div></div>
+    `;
+
+    document.getElementById('initialMessage').style.display = 'none';
+    document.getElementById('resultsSection').style.display = 'block';
+
+    // ===== تحليل الحساسية =====
+    if (currentAnalysisType === 'sensitivity') {
         document.getElementById('sensitivityResults').classList.remove('hidden-section');
         document.getElementById('monteCarloResults').classList.add('hidden-section');
-        const rC=parseFloat(document.getElementById('revChange').value)/100||0;
-        const cC=parseFloat(document.getElementById('costChange').value)/100||0;
-        const rM=[1-rC,1,1+rC],cM=[1-cC,1,1+cC];
-        const rL=['-'+(rC*100).toFixed(0)+'%','0%','+'+(rC*100).toFixed(0)+'%'];
-        const cL=['-'+(cC*100).toFixed(0)+'%','0%','+'+(cC*100).toFixed(0)+'%'];
-        let matrix=[];
-        for(let i=0;i<3;i++){let row=[];for(let j=0;j<3;j++)row.push(computeNPV(I,r0*rM[i],c0*cM[j],d,gR,gC,t,Y,disc));matrix.push(row);}
-        globalResults.sensitivity={matrix,revLabels:rL,costLabels:cL,revChange:rC,costChange:cC};
-        let tbl='<table><thead><tr><th>الإيرادات \ التكاليف</th>';
-        cL.forEach(l=>tbl+=`<th>${l}</th>`);
-        tbl+='</tr></thead><tbody>';
-        for(let i=0;i<3;i++){tbl+=`<tr><td><strong>${rL[i]}</strong></td>`;for(let j=0;j<3;j++){const n=matrix[i][j];tbl+=`<td class="${n>0?'positive':'negative'}">${currency} ${fmtNum(n)}</td>`;}tbl+='</tr>';}
-        tbl+='</tbody></table>';
-        document.getElementById('sensitivityTable').innerHTML=tbl;
-        const flat=matrix.flat();
-        document.getElementById('interpretation').innerHTML=`<p>📊 الحالة الأساسية <strong>${baseNPV>0?'مربح':'غير مربح'}</strong> — NPV = ${currency} ${fmtNum(baseNPV)}</p><p>🟢 أفضل سيناريو: ${currency} ${fmtNum(Math.max(...flat))}</p><p>🔴 أسوأ سيناريو: ${currency} ${fmtNum(Math.min(...flat))}</p><p>📐 IRR = ${(baseIRR*100).toFixed(2)}% مقابل WACC = ${(disc*100).toFixed(1)}%</p>`;
-    } else {
+
+        const rC = parseFloat(document.getElementById('revChange').value) / 100 || 0;
+        const cC = parseFloat(document.getElementById('costChange').value) / 100 || 0;
+        const rM = [1 - rC, 1, 1 + rC];
+        const cM = [1 - cC, 1, 1 + cC];
+        const rL = ['-' + (rC*100).toFixed(0) + '%', '0%', '+' + (rC*100).toFixed(0) + '%'];
+        const cL = ['-' + (cC*100).toFixed(0) + '%', '0%', '+' + (cC*100).toFixed(0) + '%'];
+        let matrix = [];
+        for (let i = 0; i < 3; i++) {
+            let row = [];
+            for (let j = 0; j < 3; j++) {
+                row.push(computeNPV(I, r0 * rM[i], c0 * cM[j], d, gR, gC, t, Y, disc));
+            }
+            matrix.push(row);
+        }
+        globalResults.sensitivity = { matrix, revLabels: rL, costLabels: cL, revChange: rC, costChange: cC };
+
+        let tbl = '<table><thead><tr><th>الإيرادات \\ التكاليف</th>';
+        cL.forEach(l => tbl += `<th>${l}</th>`);
+        tbl += '</tr></thead><tbody>';
+        for (let i = 0; i < 3; i++) {
+            tbl += `<tr><td><strong>${rL[i]}</strong></td>`;
+            for (let j = 0; j < 3; j++) {
+                const n = matrix[i][j];
+                tbl += `<td class="${n>0?'positive':'negative'}">${currency} ${fmtNum(n)}</td>`;
+            }
+            tbl += '</tr>';
+        }
+        tbl += '</tbody></table>';
+        document.getElementById('sensitivityTable').innerHTML = tbl;
+
+        const flat = matrix.flat();
+        document.getElementById('interpretation').innerHTML = `
+            <p>📊 الحالة الأساسية <strong>${baseNPV>0?'مربح':'غير مربح'}</strong> — NPV = ${currency} ${fmtNum(baseNPV)}</p>
+            <p>🟢 أفضل سيناريو: ${currency} ${fmtNum(Math.max(...flat))}</p>
+            <p>🔴 أسوأ سيناريو: ${currency} ${fmtNum(Math.min(...flat))}</p>
+            <p>📐 IRR = ${(baseIRR*100).toFixed(2)}% مقابل WACC = ${(disc*100).toFixed(1)}%</p>
+        `;
+
+    } else { // Monte Carlo
         document.getElementById('sensitivityResults').classList.add('hidden-section');
         document.getElementById('monteCarloResults').classList.remove('hidden-section');
-        const rV=parseFloat(document.getElementById('revVolatility').value)/100||0.15;
-        const cV=parseFloat(document.getElementById('costVolatility').value)/100||0.10;
-        const nS=parseInt(document.getElementById('numSimulations').value)||5000;
-        let npvR=[];
-        for(let s=0;s<nS;s++){let rr=Math.max(0,r0*(1+normalRandom()*rV)),rc=Math.max(0,c0*(1+normalRandom()*cV));npvR.push(computeNPV(I,rr,rc,d,gR,gC,t,Y,disc));}
-        npvR.sort((a,b)=>a-b);
-        const mean=npvR.reduce((a,b)=>a+b,0)/nS;
-        const med=npvR[Math.floor(nS*.5)],p5=npvR[Math.floor(nS*.05)],p25=npvR[Math.floor(nS*.25)],p75=npvR[Math.floor(nS*.75)],p95=npvR[Math.floor(nS*.95)];
-        const pL=(npvR.filter(v=>v<0).length/nS*100).toFixed(2);
-        const std=Math.sqrt(npvR.reduce((a,v)=>a+Math.pow(v-mean,2),0)/nS);
-        const skew=npvR.reduce((a,v)=>a+Math.pow((v-mean)/std,3),0)/nS;
-        const cv=(std/Math.abs(mean)*100).toFixed(2);
-        globalResults.monteCarlo={npvResults:npvR,numSims:nS,revVol:rV,costVol:cV,meanNPV:mean,medianNPV:med,p5NPV:p5,p25NPV:p25,p75NPV:p75,p95NPV:p95,probLoss:pL,stdNPV:std,skewness:skew,cv};
-        const ctx=document.getElementById('npvHistogram').getContext('2d');
-        const minV=npvR[0],maxV=npvR[npvR.length-1],bw=(maxV-minV)/30;
-        let bins=new Array(30).fill(0),bL=[],bC=[];
-        for(let i=0;i<30;i++){let bs=minV+i*bw,be=minV+(i+1)*bw,mid=(bs+be)/2;bL.push((mid/1000).toFixed(0)+'k');bC.push(mid<0?'rgba(248,113,113,.7)':'rgba(180,133,84,.7)');npvR.forEach(v=>{if(v>=bs&&v<be)bins[i]++;});}
-        if(window.npvChart)window.npvChart.destroy();
-        window.npvChart=new Chart(ctx,{type:'bar',data:{labels:bL,datasets:[{label:'عدد السيناريوهات',data:bins,backgroundColor:bC,borderColor:bC.map(c=>c.replace('.7',1)),borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{color:'#aab7d4'},grid:{color:'rgba(180,133,84,.2)'}},x:{ticks:{color:'#aab7d4',maxTicksLimit:10}}},plugins:{legend:{labels:{color:'#f0f4fa'}}}}});
-        const pLf=parseFloat(pL);
-        document.getElementById('monteCarloStats').innerHTML=`<table><thead><tr><th>المؤشر</th><th>القيمة</th><th>التفسير</th></tr></thead><tbody>
-            <tr><td>متوسط NPV</td><td class="${mean>0?'positive':'negative'}">${currency} ${fmtNum(mean)}</td><td>${mean>0?'✅ مربح':'❌ خاسر'}</td></tr>
-            <tr><td>الوسيط (Median)</td><td class="${med>0?'positive':'negative'}">${currency} ${fmtNum(med)}</td><td>50% من السيناريوهات أعلى</td></tr>
-            <tr><td>VaR 95%</td><td class="negative">${currency} ${fmtNum(p5)}</td><td>الخسارة القصوى المتوقعة</td></tr>
-            <tr><td>أفضل 5%</td><td class="positive">${currency} ${fmtNum(p95)}</td><td>الربح الأقصى المتوقع</td></tr>
-            <tr><td>احتمالية الخسارة</td><td class="${pLf>50?'negative':'positive'}">${pL}%</td><td>${pLf<20?'🟢 منخفضة':pLf<50?'🟡 متوسطة':'🔴 مرتفعة'}</td></tr>
-            <tr><td>الانحراف المعياري</td><td>${currency} ${fmtNum(std)}</td><td>مقياس التشتت</td></tr>
-            <tr><td>CV</td><td>${cv}%</td><td>${parseFloat(cv)<50?'🟢 معقول':'🔴 مرتفع'}</td></tr>
-            <tr><td>الالتواء</td><td>${skew.toFixed(3)}</td><td>${skew>0?'↗️ منحاز للأعلى':'↘️ منحاز للأسفل'}</td></tr>
-            <tr><td>عدد التكرارات</td><td>${nS.toLocaleString()}</td><td>سيناريو محاكى</td></tr>
-            </tbody></table>`;
-        document.getElementById('interpretation').innerHTML=`<p>🎲 متوسط NPV: <strong>${currency} ${fmtNum(mean)}</strong></p><p>📊 احتمالية الخسارة: <strong>${pL}%</strong></p><p>🛡️ VaR 95%: <strong>${currency} ${fmtNum(Math.abs(p5))}</strong></p><p>🚀 أفضل 5%: <strong>${currency} ${fmtNum(p95)}</strong></p>`;
+
+        const rV = parseFloat(document.getElementById('revVolatility').value) / 100 || 0.15;
+        const cV = parseFloat(document.getElementById('costVolatility').value) / 100 || 0.10;
+        const nS = parseInt(document.getElementById('numSimulations').value) || 5000;
+
+        let npvResults = [];
+        for (let s = 0; s < nS; s++) {
+            let rr = Math.max(0, r0 * (1 + normalRandom() * rV));
+            let cc = Math.max(0, c0 * (1 + normalRandom() * cV));
+            npvResults.push(computeNPV(I, rr, cc, d, gR, gC, t, Y, disc));
+        }
+        npvResults.sort((a, b) => a - b);
+
+        const mean = npvResults.reduce((a, b) => a + b, 0) / nS;
+        const med = npvResults[Math.floor(nS * 0.5)];
+        const p5 = npvResults[Math.floor(nS * 0.05)];
+        const p25 = npvResults[Math.floor(nS * 0.25)];
+        const p75 = npvResults[Math.floor(nS * 0.75)];
+        const p95 = npvResults[Math.floor(nS * 0.95)];
+        const probLoss = (npvResults.filter(v => v < 0).length / nS * 100).toFixed(2);
+        const std = Math.sqrt(npvResults.reduce((a, v) => a + Math.pow(v - mean, 2), 0) / nS);
+        const skew = npvResults.reduce((a, v) => a + Math.pow((v - mean) / std, 3), 0) / nS;
+        const cv = (std / Math.abs(mean) * 100).toFixed(2);
+
+        globalResults.monteCarlo = {
+            npvResults, numSims: nS, revVol: rV, costVol: cV,
+            meanNPV: mean, medianNPV: med, p5NPV: p5, p25NPV: p25, p75NPV: p75, p95NPV: p95,
+            probLoss, stdNPV: std, skewness: skew, cv
+        };
+
+        // رسم الهيستوغرام
+        const ctx = document.getElementById('npvHistogram').getContext('2d');
+        const minV = npvResults[0], maxV = npvResults[npvResults.length - 1];
+        const bw = (maxV - minV) / 30;
+        let bins = new Array(30).fill(0);
+        let binLabels = [];
+        let binColors = [];
+        for (let i = 0; i < 30; i++) {
+            let bs = minV + i * bw;
+            let be = minV + (i + 1) * bw;
+            let mid = (bs + be) / 2;
+            binLabels.push((mid / 1000).toFixed(0) + 'k');
+            binColors.push(mid < 0 ? 'rgba(248,113,113,0.7)' : 'rgba(180,133,84,0.7)');
+            npvResults.forEach(v => {
+                if (v >= bs && v < be) bins[i]++;
+            });
+        }
+        if (window.npvChart) window.npvChart.destroy();
+        window.npvChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: binLabels,
+                datasets: [{
+                    label: 'عدد السيناريوهات',
+                    data: bins,
+                    backgroundColor: binColors,
+                    borderColor: binColors.map(c => c.replace('0.7', '1')),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#aab7d4' }, grid: { color: 'rgba(180,133,84,0.2)' } },
+                    x: { ticks: { color: '#aab7d4', maxTicksLimit: 10 } }
+                },
+                plugins: { legend: { labels: { color: '#f0f4fa' } } }
+            }
+        });
+
+        // إحصائيات مونت كارلو
+        const pLoss = parseFloat(probLoss);
+        document.getElementById('monteCarloStats').innerHTML = `
+            <table><thead><tr><th>المؤشر</th><th>القيمة</th><th>التفسير</th></tr></thead><tbody>
+                <tr><td>متوسط NPV</td><td class="${mean>0?'positive':'negative'}">${currency} ${fmtNum(mean)}</td><td>${mean>0?'✅ مربح':'❌ خاسر'}</td></tr>
+                <tr><td>الوسيط (Median)</td><td class="${med>0?'positive':'negative'}">${currency} ${fmtNum(med)}</td><td>50% من السيناريوهات أعلى</td></tr>
+                <tr><td>VaR 95%</td><td class="negative">${currency} ${fmtNum(p5)}</td><td>الخسارة القصوى المتوقعة</td></tr>
+                <tr><td>أفضل 5%</td><td class="positive">${currency} ${fmtNum(p95)}</td><td>الربح الأقصى المتوقع</td></tr>
+                <tr><td>احتمالية الخسارة</td><td class="${pLoss>50?'negative':'positive'}">${probLoss}%</td><td>${pLoss<20?'🟢 منخفضة':pLoss<50?'🟡 متوسطة':'🔴 مرتفعة'}</td></tr>
+                <tr><td>الانحراف المعياري</td><td>${currency} ${fmtNum(std)}</td><td>مقياس التشتت</td></tr>
+                <tr><td>معامل الاختلاف (CV)</td><td>${cv}%</td><td>${parseFloat(cv)<50?'🟢 معقول':'🔴 مرتفع'}</td></tr>
+                <tr><td>الالتواء (Skewness)</td><td>${skew.toFixed(3)}</td><td>${skew>0?'↗️ منحاز للأعلى':'↘️ منحاز للأسفل'}</td></tr>
+                <tr><td>عدد التكرارات</td><td>${nS.toLocaleString()}</td><td>سيناريو محاكى</td></tr>
+            </tbody></table>
+        `;
+
+        document.getElementById('interpretation').innerHTML = `
+            <p>🎲 متوسط NPV: <strong>${currency} ${fmtNum(mean)}</strong></p>
+            <p>📊 احتمالية الخسارة: <strong>${probLoss}%</strong></p>
+            <p>🛡️ VaR 95%: <strong>${currency} ${fmtNum(Math.abs(p5))}</strong></p>
+            <p>🚀 أفضل 5%: <strong>${currency} ${fmtNum(p95)}</strong></p>
+        `;
     }
 });
 
-function showLoading(t,m){document.getElementById('loadingTitle').textContent=t;document.getElementById('loadingMsg').textContent=m;document.getElementById('exportLoading').classList.add('show');}
-function hideLoading(){document.getElementById('exportLoading').classList.remove('show');}
+// ================================================================
+// ========== تصدير Excel احترافي ==========
+// ================================================================
+document.getElementById('exportExcelBtn').addEventListener('click', async function() {
+    if (document.getElementById('resultsSection').style.display === 'none') {
+        alert('الرجاء إجراء التحليل أولاً.');
+        return;
+    }
+    showLoading('جاري إنشاء تقرير Excel...', 'إنشاء الأوراق والرسوم');
+    try {
+        const R = globalResults;
+        const currency = R.currency;
+        const companyName = R.companyName;
 
-// ================== EXPORT TO EXCEL (with chart image) ==================
-async function exportToExcel(){
-    if(document.getElementById('resultsSection').style.display==='none'){alert('الرجاء إجراء التحليل أولاً.');return;}
-    showLoading('جاري إنشاء تقرير Excel الاحترافي...','يرجى الانتظار');
-    try{
-        await new Promise(r=>setTimeout(r,100));
-        const R=globalResults;
-        const wb=new ExcelJS.Workbook();wb.creator='FAROUK GRUP';wb.created=new Date();
-        const G='FFB48554',GL='FFCFA776',DB='FF0B0E17',HB='FF1A2035',SB='FF243050';
-        const AR='FFF5F0E8',W='FFFFFFFF',DT='FF1A1A1A',PB='FFD4EDDA',NB='FFF8D7DA';
-        const PT='FF155724',NT='FF721C24',GB='FFFFF3CD',BI='FF0000FF';
-        const nc='#,##0;(#,##0);"-"',np='0.00%',ni='#,##0';
-        function hs(bg=HB,tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
-        function cs(bg=W,tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = 'FAROUK GRUP';
+        const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+        const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA', GB = 'FFFFF3CD';
+        const PT = 'FF155724', NT = 'FF721C24';
+
+        function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+        function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
         function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
         function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
 
-        // Cover
-        const cv=wb.addWorksheet('غلاف التقرير',{views:[{rightToLeft:true,showGridLines:false}]});
+        // 1. غلاف التقرير
+        const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
         [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
-        for(let r=1;r<=40;r++)cv.getRow(r).height=22;
-        cv.getRow(2).height=80;cv.getRow(4).height=60;
-        cv.mergeCells(2,1,2,4);const bc=cv.getCell(2,1);
+        cv.getRow(2).height=80; cv.getRow(4).height=60;
+        cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
         bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
-        bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}};bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}};bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};bc.border={bottom:{style:'thick',color:{argb:G}}};
+        bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
         mh(cv,1,4,4,`تقرير تحليل المخاطر\n(${R.analysisType==='sensitivity'?'تحليل الحساسية':'محاكاة مونت كارلو'})`,DB,GL,18);
-        const inf=[['📋 الجهة',R.companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',R.currency],['📊 المدة',`${R.years} سنوات`],['🏦 الاستثمار',`${R.currency} ${fmtNum(R.investment)}`],['📈 NPV',`${R.currency} ${fmtNum(R.baseNPV)}`],['🔢 IRR',`${(R.baseIRR*100).toFixed(2)}%`],['⚖️ PI',R.pi?R.pi.toFixed(3):'-']];
+        const inf=[['📋 الجهة',companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',currency],['📊 المدة',`${R.years} سنوات`],['🏦 الاستثمار',`${currency} ${fmtNum(R.investment)}`],['📈 NPV',`${currency} ${fmtNum(R.baseNPV)}`],['🔢 IRR',`${(R.baseIRR*100).toFixed(2)}%`],['⚖️ PI',R.pi?R.pi.toFixed(3):'-']];
         let ir=6;
         inf.forEach(([l,v],idx)=>{
-            cv.mergeCells(ir,1,ir,2);cv.mergeCells(ir,3,ir,4);
-            const lc=cv.getCell(ir,1),vc=cv.getCell(ir,3);lc.value=l;vc.value=v;
-            const bg=idx%2===0?'FFF5F0E8':'FFFEFCF6';
+            cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+            const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+            const bg=idx%2===0?AR:'FFFEFCF6';
             ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
             ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
-            cv.getRow(ir).height=28;ir++;
+            cv.getRow(ir).height=28; ir++;
         });
-        const vr=ir+1,isg=R.baseNPV>0&&R.baseIRR>R.discount&&R.pi>1;
-        cv.mergeCells(vr,1,vr,4);const vc2=cv.getCell(vr,1);
-        vc2.value=isg?'✅ الحكم: المشروع مجدٍ اقتصادياً':'⚠️ الحكم: يحتاج مراجعة';
-        vc2.font={name:'Arial',bold:true,size:14,color:{argb:isg?PT:'FF856404'}};
-        vc2.fill={type:'pattern',pattern:'solid',fgColor:{argb:isg?PB:GB}};
+        const vr=ir+1, isGood=R.baseNPV>0 && R.baseIRR>R.discount && R.pi>1;
+        cv.mergeCells(vr,1,vr,4); const vc2=cv.getCell(vr,1);
+        vc2.value=isGood?'✅ الحكم: المشروع مجدٍ اقتصادياً':'⚠️ الحكم: يحتاج مراجعة';
+        vc2.font={name:'Arial',bold:true,size:14,color:{argb:isGood?PT:'856404'}};
+        vc2.fill={type:'pattern',pattern:'solid',fgColor:{argb:isGood?PB:GB}};
         vc2.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
         vc2.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
         cv.getRow(vr).height=40;
 
-        // KPI Sheet
-        const ks=wb.addWorksheet('مؤشرات الأداء',{views:[{rightToLeft:true,showGridLines:false}]});
-        [5,32,22,22,22,5].forEach((w,i)=>ks.getColumn(i+1).width=w);
-        mh(ks,1,6,2,'📊 مؤشرات الأداء الرئيسية (KPI Dashboard)',DB,GL,15);ks.getRow(2).height=45;
-        const kd=[
-            {i:'💰',l:'NPV الأساسي',v:`${R.currency} ${fmtNum(R.baseNPV)}`,g:R.baseNPV>0},
-            {i:'📈',l:'IRR الأساسي',v:`${(R.baseIRR*100).toFixed(2)}%`,g:R.baseIRR>R.discount},
-            {i:'⏱️',l:'فترة الاسترداد',v:R.payback?`${R.payback} سنوات`:`>${R.years} سنة`,g:R.payback!==null&&R.payback<=R.years},
-            {i:'⚖️',l:'مؤشر الربحية (PI)',v:R.pi?R.pi.toFixed(3)+'x':'-',g:R.pi>1},
-            {i:'🏦',l:'إجمالي التدفقات المخصومة',v:`${R.currency} ${fmtNum(R.totalDCF)}`,g:R.totalDCF>R.investment},
+        // 2. المدخلات
+        const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true, showGridLines: false }] });
+        inputsSheet.getColumn(1).width=5; inputsSheet.getColumn(2).width=38; inputsSheet.getColumn(3).width=22; inputsSheet.getColumn(4).width=22; inputsSheet.getColumn(5).width=5;
+        mh(inputsSheet,1,5,1,'📋 جدول المدخلات والافتراضات الأساسية',DB,GL,14);
+        inputsSheet.getRow(1).height=40;
+        mh(inputsSheet,2,4,2,'البيانات الأساسية للمشروع',SB,'FFFFFFFF',11);
+        inputsSheet.getRow(2).height=28;
+        const inputFields = [
+            ['الاستثمار الأولي', R.investment, ''],
+            ['الإيرادات (س1)', R.revenue0, ''],
+            ['التكاليف (س1)', R.costs0, ''],
+            ['الإهلاك السنوي', R.depr, ''],
+            ['نمو الإيرادات', R.growthRev*100, '%'],
+            ['نمو التكاليف', R.growthCost*100, '%'],
+            ['معدل الخصم (WACC)', R.discount*100, '%'],
+            ['معدل الضريبة', R.tax*100, '%'],
+            ['عدد السنوات', R.years, ''],
+            ['نوع التحليل', R.analysisType==='sensitivity'?'تحليل حساسية':'مونت كارلو', '']
         ];
-        let kr=4;
-        kd.forEach(kpi=>{
-            ks.getRow(kr).height=34;
-            const ic=ks.getCell(kr,2),lc2=ks.getCell(kr,3),vc3=ks.getCell(kr,4),nc2=ks.getCell(kr,5);
-            ic.value=kpi.i;lc2.value=kpi.l;vc3.value=kpi.v;nc2.value=kpi.g?'✅ إيجابي':'⚠️ مراجعة';
-            const bg=kpi.g?PB:NB,tc=kpi.g?PT:NT;
-            [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
-            ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}};ic.alignment={horizontal:'center',vertical:'middle'};
-            lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}};lc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
-            vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}};vc3.alignment={horizontal:'center',vertical:'middle'};
-            nc2.font={name:'Arial',size:9,color:{argb:'444444'}};nc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
-            kr++;
+        let iRow=3;
+        inputFields.forEach(([label,val,note],idx)=>{
+            inputsSheet.getRow(iRow).height=24;
+            const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+            const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
+            lc.value=label; vc.value=val; nc.value=note;
+            ap(lc,cs(bg,DT,true,'right'));
+            ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?'#,##0.00':null});
+            ap(nc,cs(bg,'00695C',false,'center'));
+            iRow++;
         });
 
-        // Cashflows
-        const cfs=wb.addWorksheet('التدفقات النقدية',{views:[{rightToLeft:true,showGridLines:false}]});
-        [12,22,22,18,18,16,18,20,20,22].forEach((w,i)=>cfs.getColumn(i+1).width=w);
-        mh(cfs,1,10,1,'💵 جدول التدفقات النقدية السنوية',DB,GL,13);cfs.getRow(1).height=40;
-        cfs.getRow(2).height=28;
-        ['السنة','الإيرادات','التكاليف','الإهلاك','EBIT','الضريبة','صافي الربح','التدفق النقدي','التدفق المخصوم','التراكمي'].forEach((h,i)=>{const c=cfs.getCell(2,i+1);c.value=h;ap(c,hs());});
-        cfs.getRow(3).height=24;
-        ['سنة 0','—','—','—','—','—','—',`(${R.currency} ${fmtNum(R.investment)})`,`(${R.currency} ${fmtNum(R.investment)})`,`(${R.currency} ${fmtNum(R.investment)})`].forEach((v,i)=>{const c=cfs.getCell(3,i+1);c.value=v;ap(c,cs(NB,NT,true,'center'));});
+        // 3. مؤشرات الأداء
+        const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true, showGridLines: false }] });
+        [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
+        mh(kpiSheet,1,6,1,'📊 لوحة مؤشرات الأداء الرئيسية',DB,GL,15);
+        kpiSheet.getRow(1).height=45;
+        mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('ar-EG')}`,HB,'FFFFFFFF',10);
+        kpiSheet.getRow(2).height=26;
+        const kpis = [
+            { label: 'NPV', value: `${currency} ${fmtNum(R.baseNPV)}`, good: R.baseNPV>0 },
+            { label: 'IRR', value: `${(R.baseIRR*100).toFixed(2)}%`, good: R.baseIRR>R.discount },
+            { label: 'PI', value: R.pi.toFixed(3), good: R.pi>1 },
+            { label: 'فترة الاسترداد', value: R.payback?`${R.payback} سنة`:`>${R.years} سنة`, good: R.payback!==null&&R.payback<=R.years },
+            { label: 'معدل الخصم (WACC)', value: `${(R.discount*100).toFixed(2)}%`, good: true },
+        ];
+        let kRow=3;
+        kpis.forEach((k,idx)=>{
+            kpiSheet.getRow(kRow).height=40;
+            kpiSheet.mergeCells(kRow,2,kRow,2); kpiSheet.mergeCells(kRow,3,kRow,3); kpiSheet.mergeCells(kRow,4,kRow,4); kpiSheet.mergeCells(kRow,5,kRow,5);
+            const ic=kpiSheet.getCell(kRow,2); ic.value=`🔹 ${idx+1}`;
+            const lc2=kpiSheet.getCell(kRow,3); lc2.value=k.label;
+            const vc3=kpiSheet.getCell(kRow,4); vc3.value=k.value;
+            const nc2=kpiSheet.getCell(kRow,5); nc2.value=k.good?'✅ إيجابي':'⚠️ مراجعة';
+            const bg=k.good?PB:NB, tc=k.good?PT:NT;
+            [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
+            ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
+            lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+            vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
+            kRow++;
+        });
+        kRow++;
+        kpiSheet.mergeCells(kRow,2,kRow,5);
+        const kFinal=kpiSheet.getCell(kRow,2);
+        kFinal.value=isGood?'✅ المشروع مجدٍ اقتصادياً':'⚠️ المشروع يحتاج مراجعة';
+        kFinal.font={name:'Arial',bold:true,size:13,color:{argb:isGood?PT:'856404'}};
+        kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:isGood?PB:GB}};
+        kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
+        kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
+        kpiSheet.getRow(kRow).height=40;
+
+        // 4. التدفقات النقدية
+        const cashSheet = workbook.addWorksheet('التدفقات النقدية', { views: [{ rightToLeft: true, showGridLines: false }] });
+        cashSheet.getColumn(1).width=5; cashSheet.getColumn(2).width=15; cashSheet.getColumn(3).width=20; cashSheet.getColumn(4).width=20; cashSheet.getColumn(5).width=5;
+        mh(cashSheet,1,5,1,'💵 جدول التدفقات النقدية السنوية',DB,GL,14);
+        cashSheet.getRow(1).height=40;
+        cashSheet.addRow(['السنة', `التدفق النقدي (${currency})`, `التراكمي (${currency})`]);
+        let cum=-R.investment;
+        cashSheet.addRow(['الاستثمار', -R.investment, -R.investment]);
         R.cashflows.forEach((row,idx)=>{
-            const r=4+idx;cfs.getRow(r).height=24;
-            const bg=idx%2===0?W:AR,cB=row.cf>=0?PB:NB,cT=row.cf>=0?PT:NT,cumB=row.cumCF>=0?PB:NB,cumT=row.cumCF>=0?PT:NT;
-            [row.year,row.rev,row.cost,row.depr,row.ebit,row.taxPaid,row.netProfit,row.cf,row.dcf,row.cumCF].forEach((v,i)=>{
-                const c=cfs.getCell(r,i+1);c.value=v;
-                let ub=bg,ut=DT;if(i===7){ub=cB;ut=cT;}if(i===9){ub=cumB;ut=cumT;}
-                ap(c,{...cs(ub,ut,i===7||i===9,'center'),numFmt:i===0?'0':nc});
-                if(i===0){c.value=`السنة ${v}`;c.font={name:'Arial',bold:true,size:10,color:{argb:G}};c.numFmt='@';}
-            });
+            const yr = idx+1;
+            cum += row.fcf;
+            cashSheet.addRow([yr, row.fcf, cum]);
         });
-        const tr=4+R.cashflows.length;cfs.getRow(tr).height=30;
-        const tots=R.cashflows.reduce((a,r)=>({r:a.r+r.rev,c:a.c+r.cost,d:a.d+r.depr,e:a.e+r.ebit,t:a.t+r.taxPaid,n:a.n+r.netProfit,cf:a.cf+r.cf,dcf:a.dcf+r.dcf}),{r:0,c:0,d:0,e:0,t:0,n:0,cf:0,dcf:0});
-        cfs.getCell(tr,1).value='الإجمالي';ap(cfs.getCell(tr,1),hs(SB,W));
-        [tots.r,tots.c,tots.d,tots.e,tots.t,tots.n,tots.cf,tots.dcf,''].forEach((v,i)=>{const c=cfs.getCell(tr,i+2);c.value=v;ap(c,{...hs(SB,W),numFmt:nc});});
+        cashSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        cashSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+        cashSheet.getColumn(2).numFmt = '#,##0';
+        cashSheet.getColumn(3).numFmt = '#,##0';
 
-        // Analysis sheet (sensitivity or monte carlo)
-        if(R.analysisType==='sensitivity'&&R.sensitivity){
-            const ss=wb.addWorksheet('تحليل الحساسية',{views:[{rightToLeft:true,showGridLines:false}]});
-            [5,30,25,25,25,5].forEach((w,i)=>ss.getColumn(i+1).width=w);
-            mh(ss,1,6,1,'📊 مصفوفة الحساسية ثنائية الاتجاه',DB,GL,13);ss.getRow(1).height=40;
-            const gb2={style:'medium',color:{argb:G}};
-            ss.getRow(3).height=28;ss.getCell(3,2).value='الإيرادات \\ التكاليف';ap(ss.getCell(3,2),hs(SB,GL));
-            R.sensitivity.costLabels.forEach((l,j)=>{const c=ss.getCell(3,3+j);c.value=`التكاليف ${l}`;ap(c,hs(SB,GL));});
-            R.sensitivity.matrix.forEach((row,i)=>{
-                const r=4+i;ss.getRow(r).height=30;
-                const lc3=ss.getCell(r,2);lc3.value=`الإيرادات ${R.sensitivity.revLabels[i]}`;ap(lc3,hs(HB,GL));
-                row.forEach((npv,j)=>{
-                    const c=ss.getCell(r,3+j);c.value=npv;c.numFmt=nc;
-                    const isB=i===1&&j===1;
-                    c.font={name:'Arial',bold:isB,size:isB?12:10,color:{argb:npv>0?PT:NT}};
-                    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:isB?GB:(npv>0?PB:NB)}};
-                    c.alignment={horizontal:'center',vertical:'middle'};
-                    c.border={top:gb2,bottom:gb2,left:gb2,right:gb2};
-                });
-            });
-        } else if(R.analysisType==='montecarlo'&&R.monteCarlo){
-            const ms=wb.addWorksheet('مونت كارلو',{views:[{rightToLeft:true,showGridLines:false}]});
-            [5,38,25,30,5].forEach((w,i)=>ms.getColumn(i+1).width=w);
-            mh(ms,1,5,1,'🎲 نتائج محاكاة مونت كارلو',DB,GL,14);ms.getRow(1).height=40;
-            const mc=R.monteCarlo;
-            mh(ms,2,4,2,'الإحصائيات الوصفية لتوزيع NPV',SB,W,11);ms.getRow(2).height=28;
-            let mr=3;
-            [['متوسط NPV',mc.meanNPV,nc,mc.meanNPV>0?PT:NT,mc.meanNPV>0?PB:NB],
-             ['الوسيط (Median)',mc.medianNPV,nc,mc.medianNPV>0?PT:NT,mc.medianNPV>0?PB:NB],
-             ['P25',mc.p25NPV,nc,DT,AR],['P75',mc.p75NPV,nc,DT,AR],
-             ['VaR 95%',mc.p5NPV,nc,NT,NB],['أفضل 5%',mc.p95NPV,nc,PT,PB],
-             ['احتمالية الخسارة',parseFloat(mc.probLoss)/100,np,parseFloat(mc.probLoss)>40?NT:PT,parseFloat(mc.probLoss)>40?NB:PB],
-             ['الانحراف المعياري',mc.stdNPV,nc,DT,W],
-             ['معامل الاختلاف (CV)',parseFloat(mc.cv)/100,np,DT,W],
-             ['الالتواء (Skewness)',mc.skewness,'0.000',DT,W],
-             ['عدد التكرارات',mc.numSims,ni,DT,AR]
-            ].forEach(([l,v,fmt,tc,bg])=>{
-                mr++;ms.getRow(mr).height=26;
-                const lc4=ms.getCell(mr,2),vc4=ms.getCell(mr,3);lc4.value=l;vc4.value=v;vc4.numFmt=fmt;
-                ap(lc4,cs(bg,DT,true,'right'));
-                ap(vc4,{font:{name:'Arial',bold:true,size:12,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}},numFmt:fmt});
-            });
+        // 5. تحليل الحساسية أو مونت كارلو حسب النوع
+        if (R.analysisType === 'sensitivity' && R.sensitivity) {
+            const sensSheet = workbook.addWorksheet('تحليل الحساسية', { views: [{ rightToLeft: true, showGridLines: false }] });
+            sensSheet.getColumn(1).width=5; sensSheet.getColumn(2).width=25; sensSheet.getColumn(3).width=22; sensSheet.getColumn(4).width=22; sensSheet.getColumn(5).width=22; sensSheet.getColumn(6).width=5;
+            mh(sensSheet,1,6,1,'📊 مصفوفة الحساسية ثنائية الاتجاه (NPV)',DB,GL,14);
+            sensSheet.getRow(1).height=40;
+            const sM=R.sensitivity;
+            sensSheet.addRow(['الإيرادات \\ التكاليف', ...sM.costLabels]);
+            for (let i=0; i<3; i++) {
+                const row = [sM.revLabels[i], ...sM.matrix[i].map(v => v)];
+                sensSheet.addRow(row);
+            }
+            sensSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            sensSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+            sensSheet.getColumn(3).numFmt = '#,##0';
+            sensSheet.getColumn(4).numFmt = '#,##0';
+            sensSheet.getColumn(5).numFmt = '#,##0';
+        } else if (R.analysisType === 'montecarlo' && R.monteCarlo) {
+            const mc = R.monteCarlo;
+            const mcSheet = workbook.addWorksheet('مونت كارلو', { views: [{ rightToLeft: true, showGridLines: false }] });
+            mcSheet.getColumn(1).width=5; mcSheet.getColumn(2).width=38; mcSheet.getColumn(3).width=25; mcSheet.getColumn(4).width=30; mcSheet.getColumn(5).width=5;
+            mh(mcSheet,1,5,1,'🎲 إحصائيات محاكاة مونت كارلو',DB,GL,14);
+            mcSheet.getRow(1).height=40;
+            const mcData = [
+                ['متوسط NPV', mc.meanNPV, mc.meanNPV>0?'مربح':'خاسر'],
+                ['الوسيط (Median)', mc.medianNPV, ''],
+                ['VaR 95%', mc.p5NPV, 'الخسارة القصوى'],
+                ['أفضل 5%', mc.p95NPV, 'الربح الأقصى'],
+                ['احتمالية الخسارة', parseFloat(mc.probLoss), '%'],
+                ['الانحراف المعياري', mc.stdNPV, ''],
+                ['معامل الاختلاف (CV)', parseFloat(mc.cv), '%'],
+                ['الالتواء (Skewness)', mc.skewness, ''],
+                ['عدد التكرارات', mc.numSims, '']
+            ];
+            mcSheet.addRow(['المؤشر', 'القيمة', 'التفسير']);
+            mcData.forEach(row => mcSheet.addRow(row));
+            mcSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            mcSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+            mcSheet.getColumn(3).numFmt = '#,##0';
+        }
 
-            // ---------- NEW: CHART SHEET ----------
-            const chartSheet = wb.addWorksheet('الرسوم البيانية', { views: [{ rightToLeft: true, showGridLines: false }] });
-            chartSheet.getColumn(1).width = 5;
-            chartSheet.getColumn(2).width = 50;
-            chartSheet.getColumn(3).width = 5;
-            mh(chartSheet, 1, 3, 1, '📈 الرسم البياني للتوزيع الاحتمالي لـ NPV', DB, GL, 14);
-            chartSheet.getRow(1).height = 40;
-            const canvasElem = document.getElementById('npvHistogram');
-            if (canvasElem) {
-                try {
-                    const origBg = canvasElem.style.backgroundColor;
-                    canvasElem.style.backgroundColor = '#ffffff';
-                    const canvasImg = await html2canvas(canvasElem, { scale: 2, backgroundColor: '#ffffff' });
-                    canvasElem.style.backgroundColor = origBg;
-                    const imgData = canvasImg.toDataURL('image/png');
-                    const imageId = wb.addImage({ base64: imgData, extension: 'png' });
-                    chartSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 18 }, editAs: 'oneCell' });
-                } catch (err) {
-                    const errCell = chartSheet.getCell(3, 2);
-                    errCell.value = 'لم نتمكن من التقاط الرسم البياني. تأكد من ظهوره على الصفحة.';
-                    errCell.font = { name: 'Arial', italic: true, color: { argb: NT } };
-                }
-            } else {
-                chartSheet.getCell(3,2).value = 'الرسم البياني غير متاح.';
+        // 6. الرسوم البيانية (صورة الرسم البياني)
+        const chartsSheet = workbook.addWorksheet('الرسوم البيانية', { views: [{ rightToLeft: true, showGridLines: false }] });
+        chartsSheet.getColumn(1).width=5; chartsSheet.getColumn(2).width=50; chartsSheet.getColumn(3).width=5;
+        mh(chartsSheet,1,3,1,'📈 الرسم البياني للتحليل',DB,GL,14);
+        chartsSheet.getRow(1).height=40;
+
+        let chartCanvas = null;
+        if (R.analysisType === 'montecarlo') {
+            chartCanvas = document.getElementById('npvHistogram');
+        } else {
+            // يمكن إضافة رسم بياني آخر للحساسية إن أردت
+        }
+        if (chartCanvas) {
+            try {
+                const origBg = chartCanvas.style.backgroundColor;
+                chartCanvas.style.backgroundColor = '#ffffff';
+                const canvasImg = await html2canvas(chartCanvas, { scale: 2, backgroundColor: '#ffffff' });
+                chartCanvas.style.backgroundColor = origBg;
+                const imgData = canvasImg.toDataURL('image/png');
+                const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                chartsSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 28 }, editAs: 'oneCell' });
+            } catch(err) {}
+        } else {
+            chartsSheet.getCell(3,2).value = 'الرسم البياني غير متاح.';
+        }
+
+        // 7. التفسير والتوصيات
+        const evalSheet = workbook.addWorksheet('التفسير والتوصيات', { views: [{ rightToLeft: true, showGridLines: false }] });
+        evalSheet.getColumn(1).width=5; evalSheet.getColumn(2).width=50; evalSheet.getColumn(3).width=5;
+        mh(evalSheet,1,3,1,'📝 التفسير والتوصيات',DB,GL,14);
+        evalSheet.getRow(1).height=45;
+        const sections = [
+            { title: '1. ملخص', content: `الجهة: ${companyName} | الاستثمار: ${currency} ${fmtNum(R.investment)} | المدة: ${R.years} سنوات` },
+            { title: '2. المؤشرات', content: `NPV = ${currency} ${fmtNum(R.baseNPV)} | IRR = ${(R.baseIRR*100).toFixed(2)}% | PI = ${R.pi.toFixed(3)}` },
+            { title: '3. التوصيات', content: isGood ? 'المشروع مجدٍ اقتصادياً. يُنصح بالمضي في التنفيذ مع وضع خطة إدارة مخاطر. مراقبة المؤشرات دورياً.' : 'المشروع يحتاج مراجعة شاملة. إعادة دراسة التكاليف أو الإيرادات. طلب استشارة متخصصة.' },
+        ];
+        let itRow=2;
+        sections.forEach((sec,idx)=>{
+            itRow++;
+            evalSheet.getRow(itRow).height=30;
+            evalSheet.mergeCells(itRow,2,itRow,2);
+            const tc3=evalSheet.getCell(itRow,2);
+            tc3.value=sec.title;
+            tc3.font={name:'Arial',bold:true,size:12,color:{argb:GL}};
+            tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?HB:SB}};
+            tc3.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+            tc3.border={bottom:{style:'medium',color:{argb:G}}};
+            itRow++;
+            evalSheet.getRow(itRow).height=Math.max(60, sec.content.split('\n').length*18);
+            evalSheet.mergeCells(itRow,2,itRow,2);
+            const cc=evalSheet.getCell(itRow,2);
+            cc.value=sec.content;
+            cc.font={name:'Arial',size:10,color:{argb:DT}};
+            cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};
+            cc.alignment={horizontal:'right',vertical:'top',wrapText:true,readingOrder:'rtl'};
+            cc.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
+        });
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const now = new Date();
+        const fileName = `تقرير_مخاطر_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+        saveAs(blob, fileName);
+    } catch(err) { alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
+});
+
+// ================================================================
+// ========== تصدير Word احترافي ==========
+// ================================================================
+document.getElementById('exportWordBtn').addEventListener('click', async function() {
+    if (document.getElementById('resultsSection').style.display === 'none') {
+        alert('الرجاء إجراء التحليل أولاً.');
+        return;
+    }
+    showLoading('جاري إنشاء تقرير Word...', 'جمع البيانات والرسوم');
+    try {
+        const R = globalResults;
+        const currency = R.currency;
+        const companyName = R.companyName;
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('ar-EG');
+
+        // صورة الرسم البياني إن وجدت
+        let chartImg = '';
+        if (R.analysisType === 'montecarlo') {
+            const canvas = document.getElementById('npvHistogram');
+            if (canvas) {
+                const origBg = canvas.style.backgroundColor;
+                canvas.style.backgroundColor = '#ffffff';
+                const img = await html2canvas(canvas, { scale: 2, backgroundColor: '#ffffff' });
+                canvas.style.backgroundColor = origBg;
+                chartImg = img.toDataURL('image/png');
             }
         }
 
-        // Interpretation
-        const is=wb.addWorksheet('التفسير والتوصيات',{views:[{rightToLeft:true,showGridLines:false}]});
-        [5,50,5].forEach((w,i)=>is.getColumn(i+1).width=w);
-        mh(is,1,3,2,'📝 التفسير والتوصيات',DB,GL,14);is.getRow(2).height=45;
-        const isgF=R.baseNPV>0&&R.baseIRR>R.discount&&R.pi>1;
-        const secs=[
-            {t:'1. ملخص',c:`الجهة: ${R.companyName} | الاستثمار: ${R.currency} ${fmtNum(R.investment)} | المدة: ${R.years} سنوات`},
-            {t:'2. المؤشرات',c:`NPV=${R.currency} ${fmtNum(R.baseNPV)} | IRR=${(R.baseIRR*100).toFixed(2)}% | PI=${R.pi.toFixed(3)}`},
-            {t:'3. التوصيات',c:isgF?'المضي في التنفيذ | وضع خطة إدارة مخاطر | مراقبة الأداء دورياً':'مراجعة التكاليف | البحث عن إيرادات إضافية | طلب استشارة متخصصة'},
+        // بطاقات KPI
+        const kpiData = [
+            { label: 'صافي القيمة الحالية (NPV)', value: `${currency} ${fmtNum(R.baseNPV)}`, good: R.baseNPV>0 },
+            { label: 'معدل العائد الداخلي (IRR)', value: `${(R.baseIRR*100).toFixed(2)}%`, good: R.baseIRR>R.discount },
+            { label: 'مؤشر الربحية (PI)', value: R.pi.toFixed(3), good: R.pi>1 },
+            { label: 'فترة الاسترداد', value: R.payback?`${R.payback} سنوات`:`>${R.years} سنة`, good: R.payback!==null&&R.payback<=R.years },
         ];
-        let itr=3;
-        secs.forEach((s,idx)=>{
-            itr++;is.getRow(itr).height=28;is.mergeCells(itr,2,itr,2);
-            const tc3=is.getCell(itr,2);tc3.value=s.t;tc3.font={name:'Arial',bold:true,size:12,color:{argb:GL}};tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?HB:SB}};tc3.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
-            itr++;is.getRow(itr).height=40;is.mergeCells(itr,2,itr,2);
-            const cc=is.getCell(itr,2);cc.value=s.c;cc.font={name:'Arial',size:10,color:{argb:DT}};cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};cc.alignment={horizontal:'right',vertical:'top',wrapText:true,readingOrder:'rtl'};
-        });
-
-        const tag=new Date().toISOString().slice(0,10).replace(/-/g,'');
-        const buf=await wb.xlsx.writeBuffer();
-        saveAs(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),`تقرير_مخاطر_${R.companyName}_${tag}.xlsx`);
-    }catch(err){console.error(err);alert('خطأ Excel: '+err.message);}
-    finally{hideLoading();}
-}
-
-// ================== EXPORT TO WORD (HTML-based, professional) ==================
-async function exportToWord(){
-    if(document.getElementById('resultsSection').style.display==='none'){alert('الرجاء إجراء التحليل أولاً.');return;}
-    showLoading('جاري إنشاء تقرير Word الاحترافي...','جمع البيانات والرسوم البيانية');
-    try{
-        const R=globalResults;
-        const currency=R.currency;
-        const companyName=R.companyName;
-        const now=new Date();
-        const dateStr=now.toLocaleDateString('ar-EG');
-
-        // Capture chart if Monte Carlo
-        let chartImgBase64='';
-        if(R.analysisType==='montecarlo' && document.getElementById('npvHistogram')){
-            const canvas=document.getElementById('npvHistogram');
-            const origBg=canvas.style.backgroundColor;
-            canvas.style.backgroundColor='#ffffff';
-            const img=await html2canvas(canvas,{scale:2,backgroundColor:'#ffffff'});
-            canvas.style.backgroundColor=origBg;
-            chartImgBase64=img.toDataURL('image/png');
-        }
-
-        // Build KPIs table
-        const kpiData=[
-            {label:'صافي القيمة الحالية (NPV)',value:`${currency} ${fmtNum(R.baseNPV)}`,good:R.baseNPV>0},
-            {label:'معدل العائد الداخلي (IRR)',value:`${(R.baseIRR*100).toFixed(2)}%`,good:R.baseIRR>R.discount},
-            {label:'مؤشر الربحية (PI)',value:R.pi?R.pi.toFixed(3):'-',good:R.pi>1},
-            {label:'فترة الاسترداد',value:R.payback?`${R.payback} سنوات`:`> ${R.years} سنة`,good:R.payback!==null&&R.payback<=R.years},
-            {label:'معدل الخصم (WACC)',value:`${(R.discount*100).toFixed(2)}%`,good:true},
-        ];
-        let kpiRows='';
-        kpiData.forEach(k=>{
-            kpiRows+=`
+        let kpiRows = '';
+        kpiData.forEach(k => {
+            kpiRows += `
                 <tr style="border:1px solid #b8860b;">
                     <td style="padding:12px;background:${k.good?'#d4edda':'#f8d7da'};text-align:right;">${k.label}</td>
                     <td style="padding:12px;background:${k.good?'#d4edda':'#f8d7da'};text-align:center;"><strong style="font-size:1.2rem;color:${k.good?'#155724':'#721c24'}">${k.value}</strong></td>
@@ -596,65 +1245,59 @@ async function exportToWord(){
                 </tr>`;
         });
 
-        // Cashflows table
-        let cfRows='';
-        let cumCF=-R.investment;
-        for(let i=0;i<=R.years;i++){
-            const cf=i===0? -R.investment : R.cashflows[i-1].cf;
-            cumCF+=i===0?0:cf;
-            const cfClass=cf>=0?'positive':'negative';
-            const cumClass=cumCF>=0?'positive':'negative';
-            cfRows+=`
-                <tr style="border:1px solid #b8860b;">
-                    <td style="padding:8px;text-align:center;">${i===0?'سنة 0 (الاستثمار)':i}</td>
-                    <td style="padding:8px;text-align:center;" class="${cfClass}">${currency} ${fmtNum(cf)}</td>
-                    <td style="padding:8px;text-align:center;" class="${cumClass}">${currency} ${fmtNum(cumCF)}</td>
-                </tr>`;
-        }
+        // التدفقات النقدية
+        let cfRows = '';
+        let cum = -R.investment;
+        cfRows += `<tr><td>الاستثمار</td><td>${currency} ${fmtNum(-R.investment)}</td><td>${currency} ${fmtNum(-R.investment)}</td></tr>`;
+        R.cashflows.forEach(row => {
+            cum += row.fcf;
+            cfRows += `
+                <tr><td>${row.year}</td><td class="${row.fcf>=0?'positive':'negative'}">${currency} ${fmtNum(row.fcf)}</td><td class="${cum>=0?'positive':'negative'}">${currency} ${fmtNum(cum)}</td></tr>`;
+        });
 
-        // Sensitivity matrix (if any)
-        let sensHtml='';
-        if(R.analysisType==='sensitivity' && R.sensitivity){
-            sensHtml='<h3 style="color:#b8860b;">📊 مصفوفة الحساسية (NPV حسب تغير الإيرادات والتكاليف)</h3>';
-            sensHtml+='<table style="width:100%;border-collapse:collapse;direction:rtl;"><thead><tr><th style="border:1px solid #b8860b;padding:8px;">الإيرادات \\ التكاليف</th>';
-            R.sensitivity.costLabels.forEach(l=>sensHtml+=`<th style="border:1px solid #b8860b;padding:8px;">التكاليف ${l}</th>`);
-            sensHtml+='</tr></thead><tbody>';
-            for(let i=0;i<3;i++){
-                sensHtml+=`<tr><td style="border:1px solid #b8860b;padding:8px;background:#fefcf6;"><strong>الإيرادات ${R.sensitivity.revLabels[i]}</strong></td>`;
-                for(let j=0;j<3;j++){
-                    const npv=R.sensitivity.matrix[i][j];
-                    const cls=npv>0?'positive':'negative';
-                    sensHtml+=`<td style="border:1px solid #b8860b;padding:8px;text-align:center;" class="${cls}">${currency} ${fmtNum(npv)}</td>`;
+        // جدول الحساسية (إن وجد)
+        let sensHtml = '';
+        if (R.analysisType === 'sensitivity' && R.sensitivity) {
+            const sM = R.sensitivity;
+            sensHtml += '<h3 style="color:#b8860b;">📊 مصفوفة الحساسية (NPV)</h3>';
+            sensHtml += '<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="border:1px solid #b8860b;padding:8px;">الإيرادات \\ التكاليف</th>';
+            sM.costLabels.forEach(l => sensHtml += `<th style="border:1px solid #b8860b;padding:8px;">التكاليف ${l}</th>`);
+            sensHtml += '</tr></thead><tbody>';
+            for (let i=0; i<3; i++) {
+                sensHtml += `<tr><td style="border:1px solid #b8860b;padding:8px;background:#fefcf6;"><strong>الإيرادات ${sM.revLabels[i]}</strong></td>`;
+                for (let j=0; j<3; j++) {
+                    const npv = sM.matrix[i][j];
+                    sensHtml += `<td style="border:1px solid #b8860b;padding:8px;text-align:center;" class="${npv>0?'positive':'negative'}">${currency} ${fmtNum(npv)}</td>`;
                 }
-                sensHtml+='</tr>';
+                sensHtml += '</tr>';
             }
-            sensHtml+='</tbody></table>';
+            sensHtml += '</tbody></table>';
         }
 
-        // Monte Carlo stats
-        let mcHtml='';
-        if(R.analysisType==='montecarlo' && R.monteCarlo){
-            const mc=R.monteCarlo;
-            mcHtml='<h3 style="color:#b8860b;">🎲 إحصائيات محاكاة مونت كارلو</h3>';
-            mcHtml+=`<table style="width:100%;border-collapse:collapse;">`;
-            mcHtml+=`<thead><tr><th style="border:1px solid #b8860b;padding:8px;">المؤشر</th><th style="border:1px solid #b8860b;padding:8px;">القيمة</th></tr></thead><tbody>`;
-            mcHtml+=`<tr><td>متوسط NPV</td><td class="${mc.meanNPV>0?'positive':'negative'}">${currency} ${fmtNum(mc.meanNPV)}</td></tr>`;
-            mcHtml+=`<tr><td>الوسيط (Median)</td><td class="${mc.medianNPV>0?'positive':'negative'}">${currency} ${fmtNum(mc.medianNPV)}</td></tr>`;
-            mcHtml+=`<tr><td>VaR 95%</td><td class="negative">${currency} ${fmtNum(mc.p5NPV)}</td></tr>`;
-            mcHtml+=`<tr><td>أفضل 5%</td><td class="positive">${currency} ${fmtNum(mc.p95NPV)}</td></tr>`;
-            mcHtml+=`<tr><td>احتمالية الخسارة</td><td class="${parseFloat(mc.probLoss)>50?'negative':'positive'}">${mc.probLoss}%</td></tr>`;
-            mcHtml+=`<tr><td>الانحراف المعياري</td><td>${currency} ${fmtNum(mc.stdNPV)}</td></tr>`;
-            mcHtml+=`<tr><td>معامل الاختلاف (CV)</td><td>${mc.cv}%</td></tr>`;
-            mcHtml+=`<tr><td>عدد التكرارات</td><td>${mc.numSims.toLocaleString()}</td></tr>`;
-            mcHtml+=`</tbody></table>`;
+        // إحصائيات مونت كارلو
+        let mcHtml = '';
+        if (R.analysisType === 'montecarlo' && R.monteCarlo) {
+            const mc = R.monteCarlo;
+            mcHtml = '<h3 style="color:#b8860b;">🎲 إحصائيات محاكاة مونت كارلو</h3>';
+            mcHtml += `<table style="width:100%;border-collapse:collapse;"><thead><tr><th>المؤشر</th><th>القيمة</th></tr></thead><tbody>
+                <tr><td>متوسط NPV</td><td class="${mc.meanNPV>0?'positive':'negative'}">${currency} ${fmtNum(mc.meanNPV)}</td></tr>
+                <tr><td>الوسيط (Median)</td><td class="${mc.medianNPV>0?'positive':'negative'}">${currency} ${fmtNum(mc.medianNPV)}</td></tr>
+                <tr><td>VaR 95%</td><td class="negative">${currency} ${fmtNum(mc.p5NPV)}</td></tr>
+                <tr><td>أفضل 5%</td><td class="positive">${currency} ${fmtNum(mc.p95NPV)}</td></tr>
+                <tr><td>احتمالية الخسارة</td><td class="${parseFloat(mc.probLoss)>50?'negative':'positive'}">${mc.probLoss}%</td></tr>
+                <tr><td>الانحراف المعياري</td><td>${currency} ${fmtNum(mc.stdNPV)}</td></tr>
+                <tr><td>معامل الاختلاف (CV)</td><td>${mc.cv}%</td></tr>
+                <tr><td>عدد التكرارات</td><td>${mc.numSims.toLocaleString()}</td></tr>
+            </tbody></table>`;
+            if (chartImg) {
+                mcHtml += `<div style="text-align:center;margin:20px 0;"><img src="${chartImg}" style="max-width:100%;border:1px solid #b8860b;border-radius:10px;" /></div>`;
+            }
         }
 
-        // Verdict
-        const isGood=R.baseNPV>0 && R.baseIRR>R.discount && R.pi>1;
-        const verdictHtml=`<div style="margin:20px 0;padding:15px;background:${isGood?'#d4edda':'#f8d7da'};border-radius:10px;border:1px solid #b8860b;text-align:center;"><h3 style="margin:0;color:${isGood?'#155724':'#721c24'};">${isGood?'✅ الحكم: المشروع مجدٍ اقتصادياً ويُنصح بالمضي فيه':'⚠️ الحكم: المشروع يحتاج مراجعة — بعض المؤشرات سلبية'}</h3></div>`;
+        const isGood = R.baseNPV>0 && R.baseIRR>R.discount && R.pi>1;
+        const verdictHtml = `<div style="margin:20px 0;padding:15px;background:${isGood?'#d4edda':'#f8d7da'};border-radius:10px;border:1px solid #b8860b;text-align:center;"><h3 style="margin:0;color:${isGood?'#155724':'#721c24'};">${isGood?'✅ الحكم: المشروع مجدٍ اقتصادياً ويُنصح بالمضي فيه':'⚠️ الحكم: المشروع يحتاج مراجعة — بعض المؤشرات سلبية'}</h3></div>`;
 
-        // Full HTML
-        const fullHtml=`<!DOCTYPE html>
+        const fullHtml = `<!DOCTYPE html>
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
         <head><meta charset='utf-8'><title>تقرير تحليل المخاطر - FAROUK GRUP</title>
         <style>
@@ -663,13 +1306,12 @@ async function exportToWord(){
             .cover h1{font-size:32px;color:#b8860b;margin:0;}
             .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
             .cover p{color:#666;}
-            table{width:100%;border-collapse:collapse;margin:20px 0;direction:rtl;}
+            table{width:100%;border-collapse:collapse;margin:20px 0;}
             th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
             th{background:#fefcf6;color:#b8860b;font-weight:bold;}
             .positive{color:#155724;background:#d4edda;}
             .negative{color:#721c24;background:#f8d7da;}
-            .kpi-table td{text-align:right;}
-            .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+            .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
             .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;font-size:10pt;}
         </style></head>
         <body>
@@ -688,16 +1330,14 @@ async function exportToWord(){
             </tbody></table>
 
             <h2 style="color:#b8860b;">📊 مؤشرات الأداء الرئيسية</h2>
-            <table class="kpi-table">${kpiRows}</table>
+            <table>${kpiRows}</table>
             ${verdictHtml}
 
             <h2 style="color:#b8860b;">💵 التدفقات النقدية السنوية</h2>
-            <table><thead><tr><th>السنة</th><th>التدفق النقدي للمستثمر (${currency})</th><th>التراكمي (${currency})</th></tr></thead><tbody>${cfRows}</tbody></table>
+            <table><thead><tr><th>السنة</th><th>التدفق النقدي (${currency})</th><th>التراكمي (${currency})</th></tr></thead><tbody>${cfRows}</tbody></table>
 
             ${sensHtml}
             ${mcHtml}
-
-            ${R.analysisType==='montecarlo' && chartImgBase64 ? `<h2 style="color:#b8860b;">📈 التوزيع الاحتمالي لـ NPV</h2><div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>` : ''}
 
             <h2 style="color:#b8860b;">📝 التوصيات والخلاصة</h2>
             <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">
@@ -705,52 +1345,17 @@ async function exportToWord(){
                 <p><strong>النتائج:</strong> NPV = ${currency} ${fmtNum(R.baseNPV)} (${R.baseNPV>0?'إيجابي':'سلبي'})، IRR = ${(R.baseIRR*100).toFixed(2)}%، PI = ${R.pi.toFixed(3)}.</p>
                 <p><strong>التوصيات:</strong> ${isGood?'المشروع مجدٍ اقتصادياً – يُنصح بالمضي في التنفيذ مع إدارة المخاطر.':'المشروع يحتاج مراجعة شاملة – إعادة دراسة الافتراضات والتكاليف.'}</p>
             </div>
-            <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()} | www.farouk-grup.com</div>
+            <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
         </body></html>`;
 
-        const blob=new Blob(['\uFEFF'+fullHtml],{type:'application/msword'});
-        const link=document.createElement('a');
-        link.href=URL.createObjectURL(blob);
-        link.download=`تقرير_مخاطر_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+        const blob = new Blob(['\uFEFF'+fullHtml], { type: 'application/msword' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `تقرير_مخاطر_${companyName}_${now.toISOString().slice(0,10)}.doc`;
         link.click();
         URL.revokeObjectURL(link.href);
-    }catch(err){console.error(err);alert('خطأ Word: '+err.message);}
-    finally{hideLoading();}
-}
-
-document.getElementById('exportExcelBtn').addEventListener('click',exportToExcel);
-document.getElementById('exportWordBtn').addEventListener('click',exportToWord);
-
-    // ------------------ آلة حاسبة منبثقة ------------------
-    const calcDisplay = document.getElementById('calcDisplay');
-    let currentCalcInput = '';
-    function safeEvaluate(expr) {
-        let e = expr.replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/');
-        if (!/^[0-9+\-*/().]+$/.test(e)) throw new Error('تعبير غير صالح');
-        return new Function('return ' + e)();
-    }
-    window.handleCalculatorInput = v => { currentCalcInput += v; calcDisplay.value = currentCalcInput; };
-    window.clearCalculator = () => { currentCalcInput = ''; calcDisplay.value = ''; };
-    window.backspaceCalculator = () => { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; };
-    window.calculateCalculatorResult = () => {
-        try { let r = safeEvaluate(currentCalcInput); calcDisplay.value = r; currentCalcInput = r.toString(); } catch { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
-    };
-    const modalCalc = document.getElementById('calculatorModal');
-    document.getElementById('calculatorBtn').onclick = e => { e.preventDefault(); modalCalc.style.display = 'block'; };
-    document.querySelector('#calculatorModal .close').onclick = () => { modalCalc.style.display = 'none'; };
-    window.onclick = e => { if (e.target == modalCalc) modalCalc.style.display = 'none'; };
-    document.addEventListener('keydown', function(e) {
-        if (modalCalc.style.display !== 'block') return;
-        const key = e.key;
-        e.preventDefault();
-        if (key >= '0' && key <= '9') handleCalculatorInput(key);
-        else if (key === '.') handleCalculatorInput('.');
-        else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
-        else if (key === 'Enter' || key === '=') calculateCalculatorResult();
-        else if (key === 'Backspace') backspaceCalculator();
-        else if (key === 'Escape') modalCalc.style.display = 'none';
-        else if (key === 'c' || key === 'C') clearCalculator();
-    });
+    } catch(err) { alert('خطأ Word: ' + err.message); } finally { hideLoading(); }
+});
 </script>
 </body>
 </html>
