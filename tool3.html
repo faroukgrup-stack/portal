@@ -2,10 +2,10 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
 <title>دراسة الجدوى الفنية المتقدمة للمطاعم | FAROUK GRUP</title>
 <!-- حماية الصفحة -->
-    <script src="auth-check.js"></script>
+<script src="auth-check.js"></script>
 <!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,534 +20,472 @@
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <style>
+/* ===== RESET & BASE ===== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
-:root {
-    --bg-dark: #0b0e17;
-    --bg-panel: rgba(18, 24, 36, 0.85);
-    --bg-card: rgba(22, 30, 46, 0.8);
-    --border-light: rgba(180, 133, 84, 0.25);
-    --accent-glow: #b48554;
-    --accent-soft: #cfa776;
-    --text-light: #f0f4fa;
-    --text-muted: #aab7d4;
-    --text-dark: #0b0e17;
-    --shadow-soft: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 133, 84, 0.15);
-    --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
-    --radius-md: 20px;
-    --radius-lg: 30px;
-    --transition: all 0.3s ease;
-    --gold: #b8860b;
-    --gold-light: #d4b15a;
-    --gold-soft: rgba(184,134,11,0.1);
-    --dark: #0f0f0f;
-    --dark-light: #1a1a1a;
-    --white: #ffffff;
-    --offwhite: #f9f9f9;
-    --text: #333;
-    --success: #28a745;
-    --warning: #ffc107;
-    --danger: #dc3545;
-}
-
-body {
+html, body {
+    width: 100%; max-width: 100vw; overflow-x: hidden;
     font-family: 'Tajawal', sans-serif;
-    background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
-    color: var(--text-light);
-    line-height: 1.6;
-    min-height: 100vh;
-    position: relative;
+    background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    padding-bottom: 140px !important;
 }
 
-/* خلفية متوهجة */
+/* ===== إزالة كل ما يسبب الاهتزاز ===== */
+.calc-box, .result-card, .chart-container, canvas, .table-container,
+.btn-calculate, .chart-card, .scenario-card, .collapsible, .hero-mini,
+.currency-row, .featured-badge, .glow-bg, .floating-shape,
+.calc-floating-btn, .home-floating-btn, .equipment-row,
+.add-equipment-btn, .remove-equipment, .alert,
+.export-word-btn, .export-excel-full-btn {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    animation: none !important;
+    transition: none !important;
+}
+
+/* ===== خلفية ثابتة بدون أنيميشن ===== */
 .glow-bg {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    z-index: 0;
+    position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+    pointer-events: none; z-index: 0; overflow: hidden;
 }
 .glow-bg span {
     position: absolute;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%);
     border-radius: 50%;
     filter: blur(80px);
-    animation: glowMove 20s infinite alternate ease-in-out;
+    opacity: 0.20;
+    background: radial-gradient(circle, rgba(180, 133, 84, 0.10) 0%, transparent 70%);
 }
-.glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(180,133,84,0.12) 0%, transparent 70%); }
-.glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
-.glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.1) 0%, transparent 70%); animation-delay: -5s; }
+.glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+.glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.05) 0%, transparent 70%); }
+.glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.06) 0%, transparent 70%); }
+.floating-shape { display: none; }
 
-@keyframes glowMove {
-    0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-    100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; }
-}
-
-.floating-shape {
-    position: absolute;
-    width: 300px; height: 300px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%);
-    z-index: 0; pointer-events: none;
-}
-.shape-1 { top: -100px; right: -100px; animation: float 20s infinite ease-in-out; }
-.shape-2 { bottom: -50px; left: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
-@keyframes float {
-    0% { transform: translate(0,0) rotate(0deg); }
-    33% { transform: translate(30px,-30px) rotate(5deg); }
-    66% { transform: translate(-20px,20px) rotate(-5deg); }
-    100% { transform: translate(0,0) rotate(0deg); }
-}
-
-/* تم إزالة الـ NAV بالكامل */
-
+/* ===== HERO ===== */
 .hero-mini {
-    background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
     color: white; text-align: center; padding: 3rem 1rem;
-    border-bottom: 4px solid var(--gold); position: relative; overflow: hidden;
+    border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
 }
-.hero-mini::before {
-    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%);
-    animation: rotate 40s linear infinite;
+.hero-mini h2 {
+    font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+    margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
-@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-.hero-mini h2 { font-size: 2.5rem; font-weight: 900; color: var(--gold-light); margin-bottom: 0.5rem; position: relative; z-index: 2; }
-.hero-mini p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; opacity: 0.95; position: relative; z-index: 2; }
+.hero-mini p {
+    font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+    opacity: 0.95; padding: 0 0.5rem;
+}
 
+/* ===== WRAPPER ===== */
 .calc-wrapper {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    position: relative;
-    z-index: 2;
+    max-width: 1050px; margin: 2rem auto; padding: 0 1rem;
+    position: relative; z-index: 2;
 }
 
-/* البطاقة الرئيسية */
+/* ===== CARD ===== */
 .calc-box {
-    background: var(--bg-panel);
-    backdrop-filter: blur(15px);
-    border: 2px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    box-shadow: var(--shadow-soft);
-    position: relative;
-    overflow: hidden;
-}
-.calc-box:hover {
-    box-shadow: var(--shadow-glow);
-    border-color: rgba(180,133,84,0.4);
+    background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+    border-radius: 30px; padding: 1.5rem;
+    box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+    position: relative; overflow: hidden;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
 }
 .calc-box h2 {
-    font-size: 1.8rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, #f0e6d2, #cfa776);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 1.5rem;
-    text-align: center;
+    font-size: 1.8rem; font-weight: 900; color: #cfa776;
+    text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
 }
 .featured-badge {
-    position: absolute;
-    top: -10px;
-    left: -10px;
-    background: linear-gradient(135deg, var(--accent-glow), var(--gold-light));
-    color: #111;
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-    font-weight: 900;
-    border: 3px solid white;
-    z-index: 10;
+    display: none;
+    position: absolute; top: -10px; left: -10px;
+    background: linear-gradient(135deg, #b48554, #d4b15a);
+    color: #111; width: 90px; height: 90px; border-radius: 50%;
+    flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+    border: 3px solid white; z-index: 10;
 }
 .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
 .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
 
+/* ===== صف العملة ===== */
 .currency-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(180,133,84,0.15);
-    border: 1px solid var(--border-light);
-    padding: 0.8rem 1rem;
-    border-radius: 50px;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.8rem; background: rgba(180,133,84,0.12);
+    border: 1px solid rgba(180,133,84,0.2);
+    padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
 }
-.currency-row label { font-weight: 700; color: var(--accent-soft); margin: 0; }
+.currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
 .currency-row select, .currency-row input {
-    width: 150px;
-    padding: 0.5rem 1rem;
-    border: 2px solid var(--border-light);
-    border-radius: 30px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    background: rgba(10,14,23,0.7);
-    color: var(--text-light);
+    flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+    border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+    font-family: 'Tajawal', sans-serif; font-weight: 700;
+    background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
 }
-.currency-row input { width: 250px; }
+.currency-row input { flex: 2 1 200px; }
 .currency-row select option { background: #0b0e17; color: #f0f4fa; }
 
+/* ===== عناوين الأقسام ===== */
 .section-title-sm {
-    font-size: 1.3rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, #f0e6d2, #cfd9ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 1.3rem; font-weight: 900; color: #cfa776;
     margin: 1.2rem 0 0.8rem 0;
-    border-bottom: 2px solid var(--border-light);
-    padding-bottom: 0.3rem;
+    border-bottom: 2px solid rgba(180,133,84,0.15);
+    padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
 }
-.form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
-.form-group { flex: 1 1 200px; margin-bottom: 0.8rem; position: relative; }
-label { display: block; margin-bottom: 0.3rem; font-weight: 700; color: var(--accent-soft); font-size: 0.9rem; }
-label i { color: var(--accent-soft); margin-left: 0.3rem; }
-input, select {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    border: 2px solid var(--border-light);
-    border-radius: 30px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.95rem;
-    transition: var(--transition);
-    background: rgba(10,14,23,0.7);
-    color: var(--text-light);
+.section-title-sm i { color: #cfa776; }
+
+/* ===== صفوف النماذج ===== */
+.form-row {
+    display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;
 }
-input:focus, select:focus {
-    outline: none;
-    border-color: var(--accent-glow);
-    box-shadow: 0 0 0 3px rgba(180,133,84,0.2);
-    background: rgba(15,20,30,0.9);
+.form-group {
+    flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
 }
-.tooltip {
-    position: relative;
-    cursor: help;
+.form-group label {
+    display: block; font-weight: 700; color: #cfa776;
+    font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 220px;
-    background-color: var(--dark);
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 8px;
-    position: absolute;
-    z-index: 100;
-    bottom: 130%; left: 50%;
-    margin-left: -110px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    font-size: 0.85rem;
-    border: 1px solid var(--gold);
-    pointer-events: none;
+.form-group label i { margin-left: 0.3rem; }
+.form-group input, .form-group select {
+    width: 100%; padding: 0.7rem 1rem;
+    border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+    font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+    background: rgba(10,14,23,0.6); color: #f0f4fa;
+    transition: border 0.15s;
 }
-.tooltip .tooltiptext::after {
-    content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
-    border-width: 5px; border-style: solid; border-color: var(--dark) transparent transparent transparent;
+.form-group input:focus, .form-group select:focus {
+    outline: none; border-color: #b48554;
+    box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
 }
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
+
+/* ===== زر الحساب ===== */
 .btn-calculate {
-    display: flex; align-items: center; justify-content: center; gap: 1rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.8rem;
     width: 100%; padding: 1.2rem; border-radius: 50px;
-    background: rgba(180,133,84,0.2);
-    border: 1px solid var(--border-light);
-    color: var(--accent-soft);
-    font-weight: 900; font-size: 1.2rem; cursor: pointer;
-    transition: var(--transition); backdrop-filter: blur(10px); margin: 1.5rem 0;
+    background: rgba(180,133,84,0.18);
+    border: 2px solid rgba(180,133,84,0.25);
+    color: #cfa776; font-weight: 900; font-size: 1.2rem;
+    cursor: pointer; margin: 1.5rem 0; font-family: 'Tajawal', sans-serif;
 }
-.btn-calculate:hover {
-    background: rgba(180,133,84,0.4);
-    color: #fff; border-color: var(--accent-glow);
-    box-shadow: 0 0 25px rgba(180,133,84,0.3);
-    transform: translateY(-3px);
-}
-.results-section { margin-top: 2rem; }
+.btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+.btn-calculate:active { transform: scale(0.97); }
+
+/* ===== النتائج ===== */
+.results-section { margin-top: 1.5rem; }
 .results-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
     gap: 1rem; margin-bottom: 1.5rem;
 }
 .result-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
-    padding: 1.2rem; text-align: center;
-    box-shadow: var(--shadow-soft); transition: var(--transition);
+    background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.15);
+    border-radius: 20px; padding: 1rem; text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
-.result-card:hover {
-    transform: translateY(-5px); border-color: var(--accent-glow);
-    box-shadow: var(--shadow-glow);
-}
-.result-card i { font-size: 1.8rem; color: var(--accent-soft); margin-bottom: 0.5rem; }
-.result-card h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem; }
-.result-card .value { font-size: 1.4rem; font-weight: 900; color: var(--accent-soft); }
-.result-card .unit { font-size: 0.8rem; color: var(--text-muted); margin-right: 0.2rem; }
+.result-card i { font-size: 1.6rem; color: #cfa776; margin-bottom: 0.3rem; }
+.result-card h4 { font-size: 0.85rem; font-weight: 700; color: #aab7d4; margin-bottom: 0.2rem; }
+.result-card .value { font-size: 1.3rem; font-weight: 900; color: #cfa776; }
+.result-card .unit { font-size: 0.75rem; color: #aab7d4; }
 .result-card .status {
-    font-size: 0.8rem; margin-top: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 20px; display: inline-block;
+    font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+    display: inline-block; margin-top: 0.2rem;
 }
-.status-good { background: var(--success); color: white; }
-.status-bad { background: var(--danger); color: white; }
-.status-warning { background: var(--warning); color: #111; }
+.status-good { background: #28a745; color: white; }
+.status-bad { background: #dc3545; color: white; }
+.status-warning { background: #ffc107; color: #111; }
 
+/* ===== جداول ===== */
 .table-container {
-    overflow-x: auto; margin-top: 1.5rem; border: 1px solid var(--border-light);
-    border-radius: var(--radius-md); background: var(--bg-card); padding: 0.8rem;
+    overflow-x: auto; margin-top: 1rem;
+    border: 1px solid rgba(180,133,84,0.1); border-radius: 20px;
+    background: rgba(22,30,46,0.6); padding: 0.5rem;
+    -webkit-overflow-scrolling: touch;
 }
-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+table {
+    width: 100%; border-collapse: collapse; font-size: 0.85rem;
+    min-width: 400px;
+}
 th {
-    background: rgba(180,133,84,0.2); color: var(--accent-soft);
-    font-weight: 900; padding: 0.5rem; border-bottom: 2px solid var(--border-light);
+    background: rgba(180,133,84,0.15); color: #cfa776;
+    font-weight: 900; padding: 0.6rem 0.8rem;
+    border-bottom: 2px solid rgba(180,133,84,0.15); white-space: nowrap;
 }
-td { padding: 0.5rem; border-bottom: 1px solid rgba(180,133,84,0.2); text-align: center; color: var(--text-light); }
+td {
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid rgba(180,133,84,0.06);
+    text-align: center; color: #f0f4fa;
+}
 tr:last-child td { border-bottom: none; }
 .positive { color: #4ade80; font-weight: 700; }
 .negative { color: #f87171; font-weight: 700; }
 
-.export-container {
-    display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; margin: 1.5rem 0;
-}
-.export-word-btn, .export-excel-full-btn {
-    background: rgba(180,133,84,0.15);
-    border: 1px solid var(--border-light); border-radius: 40px; padding: 0.8rem 1.5rem;
-    color: var(--accent-soft); font-weight: 700; cursor: pointer; transition: var(--transition);
-    display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;
-}
-.export-word-btn:hover, .export-excel-full-btn:hover {
-    background: rgba(180,133,84,0.3); color: #fff;
-    border-color: var(--accent-glow); box-shadow: 0 0 15px rgba(180,133,84,0.3);
-}
-
+/* ===== رسوم بيانية ===== */
 .chart-container {
-    margin-top: 2rem;
-    background: var(--bg-card);
+    margin-top: 1.5rem;
+    background: rgba(22,30,46,0.6);
     border-radius: 20px;
     padding: 1rem;
-    border: 1px solid var(--border-light);
-    height: 300px;
+    border: 1px solid rgba(180,133,84,0.08);
+    height: 280px;
+    position: relative;
 }
+.chart-container canvas { width: 100% !important; height: 100% !important; }
 
-/* فوتر مبسط */
+/* ===== عناصر قابلة للطي ===== */
+.collapsible {
+    background: rgba(180,133,84,0.10); color: #cfa776; cursor: pointer;
+    padding: 0.8rem 1.2rem; width: 100%;
+    border: 1px solid rgba(180,133,84,0.15); text-align: right; outline: none;
+    font-size: 1.1rem; font-weight: 900; border-radius: 30px;
+    margin-top: 0.8rem; display: flex; justify-content: space-between;
+    align-items: center; font-family: 'Tajawal', sans-serif;
+}
+.collapsible:hover { background: rgba(180,133,84,0.20); }
+.collapsible i.fa-chevron-down { transition: transform 0.2s; }
+.collapsible.active i.fa-chevron-down { transform: rotate(180deg); }
+.collapsible-content {
+    padding: 0 0.8rem; max-height: 0; overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: rgba(0,0,0,0.08); border-radius: 0 0 16px 16px;
+}
+.collapsible-content .form-row { padding-top: 0.5rem; }
+
+/* ===== أزرار التصدير ===== */
+.export-container {
+    display: flex; justify-content: center; gap: 0.8rem;
+    flex-wrap: wrap; margin: 1.5rem 0;
+}
+.export-word-btn, .export-excel-full-btn {
+    background: rgba(180,133,84,0.10);
+    border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+    padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.9rem; font-family: 'Tajawal', sans-serif;
+    flex: 1 1 auto; justify-content: center; max-width: 220px;
+}
+.export-word-btn:hover, .export-excel-full-btn:hover { background: rgba(180,133,84,0.25); }
+
+/* ===== شاشة تحميل ===== */
+.export-loading {
+    display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+    z-index: 9999; justify-content: center; align-items: center;
+    flex-direction: column; backdrop-filter: blur(4px);
+}
+.export-loading.show { display: flex; }
+.export-loading-box {
+    background: rgba(18,24,36,0.95);
+    border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+    padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+}
+.export-loading-box i {
+    font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+    display: block; margin-bottom: 0.6rem;
+}
+.export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+.export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* ===== فوتر ===== */
 .footer-simple {
-    text-align: center; padding: 1.5rem; margin-top: 2rem;
-    background: rgba(10,14,23,0.5); backdrop-filter: blur(5px);
-    border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.85rem;
+    text-align: center; padding: 1rem; margin-top: 1.5rem;
+    background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+    color: #aab7d4; font-size: 0.8rem;
 }
-.footer-simple span { color: var(--accent-soft); font-weight: 700; }
+.footer-simple span { color: #cfa776; font-weight: 700; }
 
-/* الآلة الحاسبة المنبثقة (تتناسق مع الهوية) */
+/* ===== MODAL ===== */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.8);
-    backdrop-filter: blur(4px);
+    display: none; position: fixed; z-index: 9999;
+    left: 0; top: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
 }
+.modal.active { display: flex; }
 .modal-content {
-    background: var(--bg-panel);
-    margin: 5% auto;
-    padding: 0;
-    border: 2px solid var(--border-light);
-    border-radius: 30px;
-    width: 90%;
-    max-width: 300px;
-    box-shadow: var(--shadow-glow);
+    background: rgba(18,24,36,0.96);
+    border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+    width: 92%; max-width: 360px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
 }
 .modal-header {
-    background: rgba(180,133,84,0.15);
-    border-bottom: 2px solid var(--border-light);
-    padding: 10px 15px;
-    border-radius: 28px 28px 0 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    background: rgba(180,133,84,0.10);
+    border-bottom: 1px solid rgba(180,133,84,0.10);
+    padding: 0.7rem 1.2rem;
+    display: flex; align-items: center; justify-content: space-between;
 }
-.modal-header h2 {
-    margin: 0;
-    color: var(--accent-soft);
-    font-size: 1rem;
-    font-weight: 900;
+.modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+.modal-header .close {
+    color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
 }
-.close {
-    color: var(--text-muted);
-    float: left;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
-}
-.close:hover { color: var(--accent-glow); }
-.modal-body { padding: 15px; }
+.modal-header .close:hover { color: #cfa776; }
+.modal-body { padding: 1rem; }
 .calc-display {
-    width: 100%;
-    height: 45px;
-    font-size: 1.4rem;
-    text-align: left;
-    padding: 0 10px;
-    border: 2px solid var(--border-light);
-    border-radius: 20px;
-    margin-bottom: 15px;
-    background: rgba(10,14,23,0.8);
-    color: var(--accent-soft);
-    font-family: 'Inter', monospace;
-    direction: ltr;
+    width: 100%; height: 42px; font-size: 1.2rem; text-align: left;
+    padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+    border-radius: 16px; margin-bottom: 12px;
+    background: rgba(10,14,23,0.7); color: #cfa776;
+    font-family: 'Courier New', monospace; direction: ltr;
 }
 .calc-buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 5px;
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
 }
 .calc-btn {
-    background: rgba(180,133,84,0.1);
-    border: 1px solid var(--border-light);
-    border-radius: 15px;
-    padding: 10px 0;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text-light);
-    cursor: pointer;
+    background: rgba(180,133,84,0.08);
+    border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+    padding: 10px 0; font-size: 1rem; font-weight: 700;
+    color: #f0f4fa; cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
 }
-.calc-btn:hover {
-    background: rgba(180,133,84,0.3);
-    border-color: var(--accent-glow);
-}
-.calc-btn.operator { color: var(--accent-soft); }
+.calc-btn:hover { background: rgba(180,133,84,0.20); }
+.calc-btn.operator { color: #cfa776; }
 .calc-btn.equals {
-    background: rgba(180,133,84,0.3);
-    color: white;
-    grid-column: span 2;
+    background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
 }
-.calc-btn.equals:hover { background: rgba(180,133,84,0.5); }
+.calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
 
-/* زر الآلة الحاسبة العائم */
-.calc-floating-btn {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    background: rgba(180,133,84,0.2);
-    border: 1px solid var(--border-light);
-    border-radius: 50px;
-    padding: 0.8rem 1.2rem;
-    color: var(--accent-soft);
-    font-size: 1rem;
-    font-weight: 700;
-    z-index: 100;
-    backdrop-filter: blur(10px);
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+/* ===== الأزرار العائمة ===== */
+.calc-floating-btn, .home-floating-btn {
+    position: fixed !important; top: auto !important; bottom: 25px !important;
+    z-index: 9998 !important; margin: 0 !important;
+    transform: none !important; -webkit-transform: none !important;
+    pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+    border: none !important; border-radius: 50px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+    display: flex !important; align-items: center !important;
+    justify-content: center !important; gap: 6px !important;
+    padding: 12px 20px !important; font-size: 1rem !important;
+    font-weight: 700 !important;
 }
-.calc-floating-btn:hover {
-    background: rgba(180,133,84,0.4);
-    color: #fff;
-    border-color: var(--accent-glow);
-    box-shadow: 0 0 15px rgba(180,133,84,0.3);
-}
+.calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+.home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+.calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+.calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
 
-/* أنماط المعدات الديناميكي */
+/* ===== رسائل ===== */
+#initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+#initialMessage i { color: #cfa776; }
+.tooltip .tooltiptext { display: none; }
+
+/* ===== أنماط المعدات ===== */
 .equipment-row {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    align-items: center;
-    background: rgba(10,14,23,0.7);
-    border: 1px solid var(--border-light);
-    padding: 0.5rem;
-    border-radius: 15px;
+    display: flex; flex-wrap: wrap; gap: 0.4rem;
+    margin-bottom: 0.5rem; align-items: center;
+    background: rgba(10,14,23,0.7); border: 1px solid rgba(180,133,84,0.15);
+    padding: 0.5rem; border-radius: 15px;
 }
 .equipment-row input {
-    flex: 1;
-    min-width: 0;
-    background: rgba(10,14,23,0.7);
-    border: 1px solid var(--border-light);
-    color: var(--text-light);
+    flex: 1 1 120px; min-width: 70px;
+    background: rgba(10,14,23,0.7); border: 1px solid rgba(180,133,84,0.2);
+    border-radius: 20px; padding: 0.4rem 0.6rem;
+    color: #f0f4fa; font-family: 'Tajawal', sans-serif; font-size: 0.85rem;
 }
-.equipment-row .eq-name { flex: 2; }
-.equipment-row .eq-power { flex: 1; }
-.equipment-row .eq-cost { flex: 1; }
-.equipment-row .eq-space { flex: 1; }
+.equipment-row .eq-name { flex: 2 1 140px; }
+.equipment-row .eq-power { flex: 1 1 80px; }
+.equipment-row .eq-cost { flex: 1 1 100px; }
+.equipment-row .eq-space { flex: 1 1 80px; }
 .remove-equipment {
-    background: var(--danger);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    font-weight: bold;
+    background: #dc3545; color: white; border: none;
+    border-radius: 50%; width: 30px; height: 30px;
+    cursor: pointer; font-weight: bold; font-size: 1.1rem;
+    flex: 0 0 30px;
 }
+.remove-equipment:hover { background: #c82333; }
 .add-equipment-btn {
-    background: var(--accent-soft);
-    color: #111;
-    border: none;
-    border-radius: 20px;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    margin-top: 0.5rem;
-    font-weight: 700;
+    background: #cfa776; color: #111; border: none;
+    border-radius: 30px; padding: 0.6rem 1.2rem;
+    cursor: pointer; margin-top: 0.5rem; font-weight: 700;
+    font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
 }
-.add-equipment-btn:hover {
-    background: var(--accent-glow);
+.add-equipment-btn:hover { background: #b48554; }
+.alert { padding: 0.8rem; border-radius: 20px; margin: 0.5rem 0; font-weight: 700; }
+.alert-danger { background: rgba(220,53,69,0.2); color: #f87171; border: 1px solid #dc3545; }
+.alert-warning { background: rgba(255,193,7,0.2); color: #fbbf24; border: 1px solid #ffc107; }
+.alert-success { background: rgba(40,167,69,0.2); color: #4ade80; border: 1px solid #28a745; }
+
+/* ===================================================
+   تحسينات للشاشات المتوسطة والكبيرة (كمبيوتر)
+   =================================================== */
+@media (min-width: 1024px) {
+    .featured-badge { display: flex; }
+    .hero-mini h2 { font-size: 2.8rem; }
+    .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+    .calc-box { padding: 2rem 2.5rem; }
+    .calc-box h2 { font-size: 2rem; }
+    .section-title-sm { font-size: 1.4rem; }
+    .form-group { flex: 1 1 220px; }
+    .form-group label { font-size: 1rem; }
+    .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+    .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+    .result-card .value { font-size: 1.5rem; }
+    .result-card h4 { font-size: 0.95rem; }
+    .result-card i { font-size: 1.8rem; }
+    table { font-size: 0.9rem; }
+    .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+    .chart-container { height: 320px; }
 }
 
-.alert {
-    padding: 0.8rem;
-    border-radius: 20px;
-    margin: 0.5rem 0;
-    font-weight: 700;
-}
-.alert-danger {
-    background: rgba(220,53,69,0.2);
-    color: #f87171;
-    border: 1px solid var(--danger);
-}
-.alert-warning {
-    background: rgba(255,193,7,0.2);
-    color: #fbbf24;
-    border: 1px solid var(--warning);
-}
-.alert-success {
-    background: rgba(40,167,69,0.2);
-    color: #4ade80;
-    border: 1px solid var(--success);
-}
-
-/* تحسينات الجوال */
+/* ===================================================
+   تحسينات للجوال (شاشات ≤ 768px)
+   =================================================== */
 @media (max-width: 768px) {
-    .hero-mini h2 { font-size: 2rem; }
-    .hero-mini p { font-size: 1rem; }
-    .calc-box { padding: 1.5rem; }
-    .featured-badge { width: 70px; height: 70px; }
-    .featured-badge i { font-size: 1.4rem; }
-    .featured-badge span { font-size: 0.6rem; }
-    .currency-row select, .currency-row input { width: 100%; }
-    .equipment-row { flex-wrap: wrap; }
-    .equipment-row input { min-width: 100px; }
+    .hero-mini { padding: 1.8rem 1rem; }
+    .hero-mini h2 { font-size: 1.6rem; }
+    .hero-mini p { font-size: 0.95rem; }
+    .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+    .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+    .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+    .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; }
+    .currency-row label { font-size: 0.8rem; }
+    .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; }
+    .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+    .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+    .form-group label { font-size: 0.7rem; }
+    .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+    .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+    .results-cards { grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.5rem; }
+    .result-card { padding: 0.6rem 0.4rem; }
+    .result-card i { font-size: 1.2rem; }
+    .result-card h4 { font-size: 0.65rem; }
+    .result-card .value { font-size: 1rem; }
+    .result-card .unit { font-size: 0.6rem; }
+    .chart-container { height: 200px; padding: 0.5rem; }
+    table { font-size: 0.7rem; min-width: 300px; }
+    th, td { padding: 0.3rem 0.4rem; }
+    .export-word-btn, .export-excel-full-btn { font-size: 0.75rem; padding: 0.4rem 1rem; max-width: 160px; }
+    .modal-content { width: 95%; max-width: 320px; }
+    .calc-btn { padding: 8px 0; font-size: 0.9rem; }
+    .footer-simple { font-size: 0.7rem; padding: 0.6rem; }
+    .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+    .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+    .featured-badge { display: none !important; }
+    .equipment-row { flex-direction: column; align-items: stretch; }
+    .equipment-row input { flex: 1 1 auto; min-width: 0; }
+    .remove-equipment { align-self: center; width: 36px; height: 36px; }
 }
-/* إصلاح ظهور العناوين التي تختفي */
-.section-title-sm,
-.panel-header,
-.collapsible span,
-.result-card h4,
-.hero-mini h2 {
+
+/* ===== تحسينات للشاشات الصغيرة جداً (≤ 400px) ===== */
+@media (max-width: 400px) {
+    .hero-mini h2 { font-size: 1.2rem; }
+    .hero-mini p { font-size: 0.8rem; }
+    .calc-box h2 { font-size: 1.1rem; }
+    .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+    .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+    .results-cards { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+    .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+    .chart-container { height: 160px; }
+}
+
+/* ===== منع التحديد العرضي ===== */
+.no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+/* ===== تحسين التمرير ===== */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+
+.section-title-sm, .panel-header, .collapsible span, .result-card h4, .hero-mini h2 {
     -webkit-text-fill-color: initial !important;
-    color: var(--accent-soft) !important;
+    color: #cfa776 !important;
     background: none !important;
     background-image: none !important;
     text-shadow: 0 1px 2px rgba(0,0,0,0.2);
@@ -555,15 +493,9 @@ tr:last-child td { border-bottom: none; }
 </style>
 </head>
 <body>
-<body style="overflow-x: hidden;">
-<!-- خلفية متوهجة -->
-<div class="glow-bg">
-    <span></span><span></span><span></span>
-</div>
+<div class="glow-bg"><span></span><span></span><span></span></div>
 <div class="floating-shape shape-1"></div>
 <div class="floating-shape shape-2"></div>
-
-<!-- تم إزالة الـ NAV بالكامل -->
 
 <section class="hero-mini">
     <h2>دراسة الجدوى الفنية المتقدمة للمطاعم</h2>
@@ -572,13 +504,10 @@ tr:last-child td { border-bottom: none; }
 
 <section class="calc-wrapper">
     <div class="calc-box" data-aos="fade-up">
-        <div class="featured-badge">
-            <i class="fas fa-utensils"></i>
-            <span>فني</span>
-        </div>
-        <h2>بيانات المشروع</h2>
+        <div class="featured-badge"><i class="fas fa-utensils"></i><span>فني</span></div>
+        <h2><i class="fas fa-utensils" style="color:#cfa776;margin-left:0.5rem;"></i>بيانات المشروع</h2>
 
-        <!-- اختيار العملة واسم الجهة -->
+        <!-- العملة واسم الجهة -->
         <div class="currency-row">
             <label><i class="fas fa-coins"></i> العملة:</label>
             <select id="currencySelect">
@@ -593,218 +522,83 @@ tr:last-child td { border-bottom: none; }
             <input type="text" id="companyName" value="اسم الجهة المستفيدة من التقرير" placeholder="الجهة المستفيدة">
         </div>
 
-        <!-- قسم النطاق والمواصفات -->
+        <!-- النطاق والمواصفات -->
         <div class="section-title-sm">📋 النطاق والمواصفات</div>
         <div class="form-row">
-            <div class="form-group tooltip">
-                <label><i class="fas fa-utensils"></i> نوع المطبخ</label>
-                <select id="kitchenType">
-                    <option value="fastfood">وجبات سريعة</option>
-                    <option value="fine">مطعم فاخر</option>
-                    <option value="eastern">شرقي</option>
-                    <option value="italian">إيطالي</option>
-                    <option value="grill">مشاوي</option>
-                    <option value="seafood">أسماك</option>
-                    <option value="cafe">كافيه</option>
-                </select>
-                <span class="tooltiptext">نوع المطبخ الرئيسي للمطعم</span>
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-chair"></i> عدد الكراسي</label>
-                <input type="number" id="seats" value="50" min="1" step="5">
-                <span class="tooltiptext">سعة الجلوس الإجمالية</span>
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-concierge-bell"></i> نموذج الخدمة</label>
-                <select id="serviceModel">
-                    <option value="waiter">خدمة طاولات</option>
-                    <option value="self">سيلف سيرفس</option>
-                    <option value="delivery">توصيل فقط</option>
-                    <option value="mixed">مزيج</option>
-                </select>
-                <span class="tooltiptext">طريقة تقديم الخدمة</span>
-            </div>
+            <div class="form-group tooltip"><label><i class="fas fa-utensils"></i> نوع المطبخ</label><select id="kitchenType"><option value="fastfood">وجبات سريعة</option><option value="fine">مطعم فاخر</option><option value="eastern">شرقي</option><option value="italian">إيطالي</option><option value="grill">مشاوي</option><option value="seafood">أسماك</option><option value="cafe">كافيه</option></select><span class="tooltiptext">نوع المطبخ الرئيسي</span></div>
+            <div class="form-group tooltip"><label><i class="fas fa-chair"></i> عدد الكراسي</label><input type="number" id="seats" value="50" min="1" step="5"><span class="tooltiptext">سعة الجلوس الإجمالية</span></div>
+            <div class="form-group tooltip"><label><i class="fas fa-concierge-bell"></i> نموذج الخدمة</label><select id="serviceModel"><option value="waiter">خدمة طاولات</option><option value="self">سيلف سيرفس</option><option value="delivery">توصيل فقط</option><option value="mixed">مزيج</option></select><span class="tooltiptext">طريقة تقديم الخدمة</span></div>
         </div>
         <div class="form-row">
-            <div class="form-group tooltip">
-                <label><i class="fas fa-clock"></i> ساعات العمل اليومية</label>
-                <input type="number" id="hoursOpen" value="12" min="1" max="24">
-                <span class="tooltiptext">عدد ساعات العمل في اليوم</span>
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-moon"></i> فترات التشغيل</label>
-                <select id="shifts">
-                    <option value="1">فترة واحدة (غداء)</option>
-                    <option value="2">فترتين (غداء وعشاء)</option>
-                    <option value="3">فترات متعددة (فطور + غداء + عشاء)</option>
-                </select>
-                <span class="tooltiptext">عدد فترات العمل اليومية</span>
-            </div>
+            <div class="form-group tooltip"><label><i class="fas fa-clock"></i> ساعات العمل اليومية</label><input type="number" id="hoursOpen" value="12" min="1" max="24"><span class="tooltiptext">عدد ساعات العمل في اليوم</span></div>
+            <div class="form-group tooltip"><label><i class="fas fa-moon"></i> فترات التشغيل</label><select id="shifts"><option value="1">فترة واحدة (غداء)</option><option value="2">فترتين (غداء وعشاء)</option><option value="3">فترات متعددة</option></select><span class="tooltiptext">عدد فترات العمل اليومية</span></div>
         </div>
 
         <!-- تحليل الموقع -->
         <div class="section-title-sm">📍 تحليل الموقع</div>
         <div class="form-row">
-            <div class="form-group tooltip">
-                <label><i class="fas fa-vector-square"></i> المساحة الإجمالية (م²)</label>
-                <input type="number" id="totalArea" value="150" min="20" step="10">
-                <span class="tooltiptext">المساحة الكلية للمطعم</span>
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-percent"></i> نسبة منطقة المطبخ (%)</label>
-                <input type="number" id="kitchenPercent" value="35" min="20" max="60" step="5">
-                <span class="tooltiptext">نسبة مساحة المطبخ من الإجمالي</span>
-            </div>
+            <div class="form-group tooltip"><label><i class="fas fa-vector-square"></i> المساحة الإجمالية (م²)</label><input type="number" id="totalArea" value="150" min="20" step="10"><span class="tooltiptext">المساحة الكلية للمطعم</span></div>
+            <div class="form-group tooltip"><label><i class="fas fa-percent"></i> نسبة منطقة المطبخ (%)</label><input type="number" id="kitchenPercent" value="35" min="20" max="60" step="5"><span class="tooltiptext">نسبة مساحة المطبخ من الإجمالي</span></div>
         </div>
         <div class="form-row">
-            <div class="form-group tooltip">
-                <label><i class="fas fa-bolt"></i> قدرة الكهرباء المتوفرة (أمبير)</label>
-                <input type="number" id="electricalCapacity" value="200" min="50" step="10">
-                <span class="tooltiptext">السعة الكهربائية للموقع</span>
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-water"></i> مصدر المياه</label>
-                <select id="waterAvailability">
-                    <option value="yes">نعم - مناسب</option>
-                    <option value="partial">بحاجة تطوير</option>
-                    <option value="no">لا - غير مناسب</option>
-                </select>
-            </div>
+            <div class="form-group tooltip"><label><i class="fas fa-bolt"></i> قدرة الكهرباء (أمبير)</label><input type="number" id="electricalCapacity" value="200" min="50" step="10"><span class="tooltiptext">السعة الكهربائية للموقع</span></div>
+            <div class="form-group tooltip"><label><i class="fas fa-water"></i> مصدر المياه</label><select id="waterAvailability"><option value="yes">نعم - مناسب</option><option value="partial">بحاجة تطوير</option><option value="no">لا - غير مناسب</option></select></div>
         </div>
         <div class="form-row">
-            <div class="form-group tooltip">
-                <label><i class="fas fa-wind"></i> نظام تهوية</label>
-                <select id="ventilation">
-                    <option value="yes">نعم - مناسب</option>
-                    <option value="partial">يحتاج تطوير</option>
-                    <option value="no">لا - غير مناسب</option>
-                </select>
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-truck"></i> سهولة التوصيل</label>
-                <select id="deliveryAccess">
-                    <option value="yes">نعم - ممتاز</option>
-                    <option value="partial">متوسط</option>
-                    <option value="no">صعب</option>
-                </select>
-            </div>
+            <div class="form-group tooltip"><label><i class="fas fa-wind"></i> نظام تهوية</label><select id="ventilation"><option value="yes">نعم - مناسب</option><option value="partial">يحتاج تطوير</option><option value="no">لا - غير مناسب</option></select></div>
+            <div class="form-group tooltip"><label><i class="fas fa-truck"></i> سهولة التوصيل</label><select id="deliveryAccess"><option value="yes">نعم - ممتاز</option><option value="partial">متوسط</option><option value="no">صعب</option></select></div>
         </div>
 
-        <!-- متطلبات المعدات (نظام ديناميكي) -->
+        <!-- المعدات -->
         <div class="section-title-sm">🔧 متطلبات المعدات</div>
         <div id="equipmentContainer"></div>
         <button class="add-equipment-btn" id="addEquipmentBtn">➕ إضافة معدة</button>
         <div id="powerAlert" class="alert" style="display:none;"></div>
 
-        <!-- الطاقة الإنتاجية والتكاليف -->
+        <!-- الطاقة الإنتاجية -->
         <div class="section-title-sm">⚡ الطاقة الإنتاجية وكفاءة التشغيل</div>
         <div class="form-row">
-            <div class="form-group tooltip">
-                <label><i class="fas fa-rotate-left"></i> معدل دوران الطاولة</label>
-                <input type="number" id="turnoverRate" value="2" min="0.5" step="0.5">
-                <span class="tooltiptext">عدد مرات شغل الطاولة في ساعة الذروة</span>
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-clock"></i> ساعات الذروة اليومية</label>
-                <input type="number" id="peakHours" value="4" min="1" max="12">
-                <span class="tooltiptext">عدد ساعات الذروة في اليوم</span>
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-percent"></i> نسبة الإشغال المتوقعة %</label>
-                <input type="number" id="occupancyRate" value="70" min="10" max="100" step="5">
-                <span class="tooltiptext">نسبة الإشغال المتوقعة من الطاقة القصوى</span>
-            </div>
+            <div class="form-group tooltip"><label><i class="fas fa-rotate-left"></i> معدل دوران الطاولة</label><input type="number" id="turnoverRate" value="2" min="0.5" step="0.5"><span class="tooltiptext">عدد مرات شغل الطاولة في ساعة الذروة</span></div>
+            <div class="form-group tooltip"><label><i class="fas fa-clock"></i> ساعات الذروة اليومية</label><input type="number" id="peakHours" value="4" min="1" max="12"><span class="tooltiptext">عدد ساعات الذروة في اليوم</span></div>
+            <div class="form-group tooltip"><label><i class="fas fa-percent"></i> نسبة الإشغال المتوقعة %</label><input type="number" id="occupancyRate" value="70" min="10" max="100" step="5"><span class="tooltiptext">نسبة الإشغال المتوقعة من الطاقة القصوى</span></div>
         </div>
         <div class="form-row">
-            <div class="form-group tooltip">
-                <label><i class="fas fa-hamburger"></i> متوسط سعر الوجبة</label>
-                <input type="number" id="avgMealPrice" value="50" step="5">
-                <span class="tooltiptext">متوسط سعر الوجبة للعميل</span>
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-percent"></i> تكلفة الطعام (%)</label>
-                <input type="number" id="foodCostPercent" value="30" min="10" max="80">
-                <span class="tooltiptext">نسبة تكلفة الطعام من سعر الوجبة</span>
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-briefcase"></i> عدد الموظفين</label>
-                <input type="number" id="employeesCount" value="6" min="1" step="1">
-                <span class="tooltiptext">عدد الموظفين العاملين</span>
-            </div>
+            <div class="form-group tooltip"><label><i class="fas fa-hamburger"></i> متوسط سعر الوجبة</label><input type="number" id="avgMealPrice" value="50" step="5"><span class="tooltiptext">متوسط سعر الوجبة للعميل</span></div>
+            <div class="form-group tooltip"><label><i class="fas fa-percent"></i> تكلفة الطعام (%)</label><input type="number" id="foodCostPercent" value="30" min="10" max="80"><span class="tooltiptext">نسبة تكلفة الطعام من سعر الوجبة</span></div>
+            <div class="form-group tooltip"><label><i class="fas fa-briefcase"></i> عدد الموظفين</label><input type="number" id="employeesCount" value="6" min="1" step="1"><span class="tooltiptext">عدد الموظفين العاملين</span></div>
         </div>
         <div class="form-row">
-            <div class="form-group tooltip">
-                <label><i class="fas fa-user-tie"></i> متوسط الراتب الشهري</label>
-                <input type="number" id="avgSalary" value="2000" step="100">
-                <span class="tooltiptext">متوسط الراتب الشهري للموظف</span>
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-home"></i> الإيجار الشهري</label>
-                <input type="number" id="monthlyRent" value="4000" step="100">
-                <span class="tooltiptext">الإيجار الشهري للمطعم</span>
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-tools"></i> مصاريف تشغيل أخرى</label>
-                <input type="number" id="otherOpCost" value="2000" step="100">
-                <span class="tooltiptext">مصاريف شهرية أخرى (كهرباء، ماء، إنترنت، تسويق)</span>
-            </div>
+            <div class="form-group tooltip"><label><i class="fas fa-user-tie"></i> متوسط الراتب الشهري</label><input type="number" id="avgSalary" value="2000" step="100"><span class="tooltiptext">متوسط الراتب الشهري للموظف</span></div>
+            <div class="form-group tooltip"><label><i class="fas fa-home"></i> الإيجار الشهري</label><input type="number" id="monthlyRent" value="4000" step="100"><span class="tooltiptext">الإيجار الشهري للمطعم</span></div>
+            <div class="form-group tooltip"><label><i class="fas fa-tools"></i> مصاريف تشغيل أخرى</label><input type="number" id="otherOpCost" value="2000" step="100"><span class="tooltiptext">مصاريف شهرية أخرى</span></div>
         </div>
-
-        <!-- إهلاك المعدات -->
         <div class="form-row">
-            <div class="form-group tooltip">
-                <label><i class="fas fa-calendar-alt"></i> العمر الإنتاجي للمعدات (سنوات)</label>
-                <input type="number" id="equipmentLife" value="10" min="1" max="30" step="1">
-                <span class="tooltiptext">العمر الافتراضي للمعدات لحساب الإهلاك</span>
-            </div>
+            <div class="form-group tooltip"><label><i class="fas fa-calendar-alt"></i> العمر الإنتاجي للمعدات (سنوات)</label><input type="number" id="equipmentLife" value="10" min="1" max="30" step="1"><span class="tooltiptext">العمر الافتراضي للمعدات</span></div>
         </div>
 
         <!-- التكاليف التأسيسية -->
         <div class="section-title-sm">💰 التكاليف التأسيسية (مرة واحدة)</div>
         <div class="form-row">
-            <div class="form-group tooltip">
-                <label><i class="fas fa-hammer"></i> تكلفة الديكور والإنشاءات</label>
-                <input type="number" id="constructionCost" value="50000" step="1000">
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-file-signature"></i> التراخيص والرسوم</label>
-                <input type="number" id="licensesCost" value="5000" step="500">
-            </div>
-            <div class="form-group tooltip">
-                <label><i class="fas fa-hand-holding-usd"></i> رأس المال العامل (3 أشهر)</label>
-                <input type="number" id="workingCapital" value="15000" step="1000">
-            </div>
+            <div class="form-group tooltip"><label><i class="fas fa-hammer"></i> تكلفة الديكور والإنشاءات</label><input type="number" id="constructionCost" value="50000" step="1000"></div>
+            <div class="form-group tooltip"><label><i class="fas fa-file-signature"></i> التراخيص والرسوم</label><input type="number" id="licensesCost" value="5000" step="500"></div>
+            <div class="form-group tooltip"><label><i class="fas fa-hand-holding-usd"></i> رأس المال العامل (3 أشهر)</label><input type="number" id="workingCapital" value="15000" step="1000"></div>
         </div>
 
         <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> احسب الدراسة الفنية</button>
 
-        <!-- منطقة عرض النتائج -->
+        <!-- النتائج -->
         <div class="results-section" id="resultsSection" style="display: none;">
             <div class="results-cards" id="kpiCards"></div>
             <div id="warnings" class="alert" style="display:none;"></div>
-
-            <!-- رسوم بيانية -->
             <div class="section-title-sm">📊 تحليل الأداء المالي</div>
-            <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
-                <div style="flex: 1; min-width: 300px;">
-                    <div class="chart-container">
-                        <canvas id="financeChart"></canvas>
-                    </div>
-                </div>
-                <div style="flex: 1; min-width: 300px;">
-                    <div class="chart-container">
-                        <canvas id="riskChart"></canvas>
-                    </div>
-                </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+                <div style="flex: 1; min-width: 280px;"><div class="chart-container"><canvas id="financeChart"></canvas></div></div>
+                <div style="flex: 1; min-width: 280px;"><div class="chart-container"><canvas id="riskChart"></canvas></div></div>
             </div>
-
-            <!-- تقييم المشروع -->
             <div id="projectRatingCard" class="result-card" style="background:var(--bg-card);"></div>
-
-            <!-- أزرار التصدير -->
             <div class="export-container">
                 <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير تقرير Word</button>
-                <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i>  تصدير إلى Excel شامل (مدخلات + نتائج + رسوم)</button>
+                <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> تصدير إلى Excel</button>
             </div>
         </div>
 
@@ -814,44 +608,22 @@ tr:last-child td { border-bottom: none; }
     </div>
 </section>
 
-<!-- فوتر مبسط -->
-<footer class="footer-simple">
-    جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
-</footer>
+<footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> حاسبة</button>
+<a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> الرئيسية</a>
 
-<!-- زر الآلة الحاسبة العائم (بديل عن الـ nav) -->
-<div class="calc-floating-btn" id="calculatorBtn">
-    <i class="fas fa-calculator"></i> آلة حاسبة
-</div>
-
-<!-- نافذة الآلة الحاسبة المنبثقة -->
+<!-- Modal -->
 <div id="calculatorModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <span class="close">&times;</span>
-            <h2><i class="fas fa-calculator" style="color: var(--accent-soft);"></i> آلة حاسبة</h2>
-        </div>
+        <div class="modal-header"><span class="close" id="modalClose">&times;</span><h2><i class="fas fa-calculator" style="color:#cfa776;"></i> آلة حاسبة</h2></div>
         <div class="modal-body">
             <input type="text" id="calcDisplay" class="calc-display" readonly>
             <div class="calc-buttons">
-                <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
-                <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
-                <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
-                <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
-                <button class="calc-btn" onclick="clearCalculator()">C</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
-                <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
-                <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
-                <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
+                <button class="calc-btn" data-val="9">9</button><button class="calc-btn" data-val="8">8</button><button class="calc-btn" data-val="7">7</button><button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="6">6</button><button class="calc-btn" data-val="5">5</button><button class="calc-btn" data-val="4">4</button><button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="3">3</button><button class="calc-btn" data-val="2">2</button><button class="calc-btn" data-val="1">1</button><button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button><button class="calc-btn" data-val="0">0</button><button class="calc-btn" data-val=".">.</button><button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button><button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
             </div>
         </div>
     </div>
@@ -861,100 +633,39 @@ tr:last-child td { border-bottom: none; }
 <script>
 AOS.init({ duration: 800, once: true, offset: 100 });
 
-// ------------------ آلة حاسبة منبثقة ------------------
+// ===== آلة حاسبة =====
 const calcDisplay = document.getElementById('calcDisplay');
 let currentCalcInput = '';
-
-function safeEvaluate(expression) {
-    let expr = expression.replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/');
-    if (!/^[0-9+\-*/().]+$/.test(expr)) {
-        throw new Error('تعبير غير صالح');
-    }
-    return new Function('return ' + expr)();
+function handleCalc(v) {
+    if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+    if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+    if (v === '=') { try { let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/')); calcDisplay.value = r; currentCalcInput = r.toString(); } catch(e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; } return; }
+    currentCalcInput += v; calcDisplay.value = currentCalcInput;
 }
+document.querySelectorAll('.calc-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); const v = this.dataset.val; if (v !== undefined) handleCalc(v); });
+});
+const modalEl = document.getElementById('calculatorModal');
+document.getElementById('calculatorBtn').addEventListener('click', function(e) { e.stopPropagation(); modalEl.classList.add('active'); calcDisplay.value = currentCalcInput; });
+document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+document.addEventListener('keydown', function(e) {
+    if (!modalEl.classList.contains('active')) return;
+    e.preventDefault(); const k = e.key;
+    if (k >= '0' && k <= '9') handleCalc(k); else if (k === '.') handleCalc('.'); else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+    else if (k === 'Enter' || k === '=') handleCalc('='); else if (k === 'Backspace') handleCalc('⌫');
+    else if (k === 'Escape') modalEl.classList.remove('active'); else if (k.toLowerCase() === 'c') handleCalc('C');
+});
 
-window.handleCalculatorInput = function(value) {
-    currentCalcInput += value;
-    calcDisplay.value = currentCalcInput;
-}
-
-window.clearCalculator = function() {
-    currentCalcInput = '';
-    calcDisplay.value = '';
-}
-
-window.backspaceCalculator = function() {
-    currentCalcInput = currentCalcInput.slice(0, -1);
-    calcDisplay.value = currentCalcInput;
-}
-
-window.calculateCalculatorResult = function() {
-    try {
-        let result = safeEvaluate(currentCalcInput);
-        calcDisplay.value = result;
-        currentCalcInput = result.toString();
-    } catch (e) {
-        calcDisplay.value = 'خطأ';
-        currentCalcInput = '';
-    }
-}
-
-function handleKeyboard(e) {
-    if (modal.style.display !== 'block') return;
-    const key = e.key;
-    e.preventDefault();
-    e.stopPropagation();
-    if (key >= '0' && key <= '9') handleCalculatorInput(key);
-    else if (key === '.') handleCalculatorInput('.');
-    else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
-    else if (key === 'Enter' || key === '=') calculateCalculatorResult();
-    else if (key === 'Backspace') backspaceCalculator();
-    else if (key === 'Escape') modal.style.display = 'none';
-    else if (key === 'c' || key === 'C') clearCalculator();
-}
-
-document.addEventListener('keydown', handleKeyboard);
-
-const modal = document.getElementById('calculatorModal');
-const btn = document.getElementById('calculatorBtn');
-const span = document.getElementsByClassName('close')[0];
-
-btn.onclick = function(e) {
-    e.preventDefault();
-    modal.style.display = 'block';
-}
-
-span.onclick = function() {
-    modal.style.display = 'none';
-}
-
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = 'none';
-    }
-}
-
-// ------------------ منطق المعدات الديناميكي ------------------
+// ===== المعدات الديناميكي =====
 const equipmentContainer = document.getElementById('equipmentContainer');
-
 function addEquipmentRow(name = '', power = '', cost = '', space = '') {
-    const row = document.createElement('div');
-    row.className = 'equipment-row';
-    row.innerHTML = `
-        <input type="text" class="eq-name" placeholder="اسم المعدة" value="${name}">
-        <input type="number" class="eq-power" placeholder="القدرة (kW)" value="${power}" step="0.1" min="0">
-        <input type="number" class="eq-cost" placeholder="السعر (بالعملة)" value="${cost}" step="100" min="0">
-        <input type="number" class="eq-space" placeholder="المساحة (م²)" value="${space}" step="0.1" min="0">
-        <button class="remove-equipment" onclick="this.parentElement.remove()">×</button>
-    `;
+    const row = document.createElement('div'); row.className = 'equipment-row';
+    row.innerHTML = `<input type="text" class="eq-name" placeholder="اسم المعدة" value="${name}"><input type="number" class="eq-power" placeholder="القدرة (kW)" value="${power}" step="0.1" min="0"><input type="number" class="eq-cost" placeholder="السعر" value="${cost}" step="100" min="0"><input type="number" class="eq-space" placeholder="المساحة (م²)" value="${space}" step="0.1" min="0"><button class="remove-equipment" onclick="this.parentElement.remove()">×</button>`;
     equipmentContainer.appendChild(row);
 }
-
-addEquipmentRow('', '', '', '');
-addEquipmentRow('', '', '', '');
-
+addEquipmentRow('', '', '', ''); addEquipmentRow('', '', '', '');
 document.getElementById('addEquipmentBtn').addEventListener('click', () => addEquipmentRow());
-
 function getEquipmentData() {
     const rows = document.querySelectorAll('#equipmentContainer .equipment-row');
     const equipment = [];
@@ -967,18 +678,12 @@ function getEquipmentData() {
     });
     return equipment;
 }
-
 function calculateEquipmentTotals() {
     const equipment = getEquipmentData();
     let totalPower = 0, totalCost = 0, totalSpace = 0;
-    equipment.forEach(eq => {
-        totalPower += eq.power;
-        totalCost += eq.cost;
-        totalSpace += eq.space;
-    });
+    equipment.forEach(eq => { totalPower += eq.power; totalCost += eq.cost; totalSpace += eq.space; });
     return { totalPower, totalCost, totalSpace };
 }
-
 function updatePowerAlert() {
     const electricalCapacity = parseFloat(document.getElementById('electricalCapacity').value) || 200;
     const { totalPower } = calculateEquipmentTotals();
@@ -987,23 +692,17 @@ function updatePowerAlert() {
     if (requiredAmps > electricalCapacity) {
         powerAlert.style.display = 'block';
         powerAlert.className = 'alert alert-danger';
-        powerAlert.innerHTML = `⚠️ تحذير: إجمالي القدرة الكهربائية المطلوبة (${requiredAmps.toFixed(0)} أمبير) أعلى من قدرة الموقع (${electricalCapacity} أمبير).`;
-    } else {
-        powerAlert.style.display = 'none';
-    }
+        powerAlert.innerHTML = `⚠️ تحذير: إجمالي القدرة المطلوبة (${requiredAmps.toFixed(0)} أمبير) أعلى من قدرة الموقع (${electricalCapacity} أمبير).`;
+    } else { powerAlert.style.display = 'none'; }
 }
-
 document.getElementById('electricalCapacity').addEventListener('input', updatePowerAlert);
 equipmentContainer.addEventListener('input', updatePowerAlert);
 
-// ------------------ الحساب الرئيسي ------------------
+// ===== الحساب الرئيسي =====
 let financeChart, riskChart;
-
 function calculateAll() {
     const currency = document.getElementById('currencySelect').value;
     const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
-
-    // قراءة المدخلات
     const seats = parseFloat(document.getElementById('seats').value) || 50;
     const hoursOpen = parseFloat(document.getElementById('hoursOpen').value) || 12;
     const totalArea = parseFloat(document.getElementById('totalArea').value) || 150;
@@ -1012,10 +711,7 @@ function calculateAll() {
     const waterAvailabilityText = document.getElementById('waterAvailability').options[document.getElementById('waterAvailability').selectedIndex].text;
     const ventilationText = document.getElementById('ventilation').options[document.getElementById('ventilation').selectedIndex].text;
     const deliveryAccessText = document.getElementById('deliveryAccess').options[document.getElementById('deliveryAccess').selectedIndex].text;
-
-    // بيانات المعدات
     const { totalPower, totalCost: equipmentCost, totalSpace } = calculateEquipmentTotals();
-
     const turnoverRate = parseFloat(document.getElementById('turnoverRate').value) || 2;
     const peakHours = parseFloat(document.getElementById('peakHours').value) || 4;
     const occupancyRate = parseFloat(document.getElementById('occupancyRate').value) / 100 || 0.7;
@@ -1030,13 +726,10 @@ function calculateAll() {
     const licensesCost = parseFloat(document.getElementById('licensesCost').value) || 5000;
     const workingCapital = parseFloat(document.getElementById('workingCapital').value) || 15000;
 
-    // المساحات
     const kitchenArea = totalArea * (kitchenPercent / 100);
     const remainingArea = totalArea - kitchenArea;
     const diningArea = remainingArea * 0.75;
     const seatDensity = diningArea / seats;
-
-    // الطاقة والإيرادات
     const maxCustomersDaily = seats * turnoverRate;
     const actualCustomersDaily = maxCustomersDaily * occupancyRate;
     const monthlyRevenue = actualCustomersDaily * avgMealPrice * 26;
@@ -1045,72 +738,38 @@ function calculateAll() {
     const monthlyFixedCosts = monthlyRent + otherOpCost;
     const totalMonthlyExpenses = monthlyFoodCost + monthlyLaborCost + monthlyFixedCosts;
     const netProfit = monthlyRevenue - totalMonthlyExpenses;
-
-    // إجمالي الاستثمار
     const totalInvestment = constructionCost + licensesCost + equipmentCost + workingCapital;
-
-    // الإهلاك الشهري (القسط الثابت)
     const monthlyDepreciation = equipmentCost / (equipmentLife * 12);
     const netProfitAfterDepreciation = netProfit - monthlyDepreciation;
     const accountingProfit = netProfitAfterDepreciation;
-
-    // نقطة التعادل (معادلة محسنة: التكاليف الثابتة + العمالة)
     const contributionPerMeal = avgMealPrice * (1 - foodCostPercent);
     const breakEvenMeals = (monthlyFixedCosts + monthlyLaborCost) / contributionPerMeal;
     const breakEvenRevenue = breakEvenMeals * avgMealPrice;
-
-    // مؤشرات
     const revenuePerSeat = monthlyRevenue / seats;
     const primeCost = monthlyFoodCost + monthlyLaborCost;
     const primePercent = (primeCost / monthlyRevenue) * 100;
     const laborCostPercent = (monthlyLaborCost / monthlyRevenue) * 100;
     const fixedCostPercent = (monthlyFixedCosts / monthlyRevenue) * 100;
-
-    // تحليل المخاطر (انخفاض 20%)
     const riskRevenue = monthlyRevenue * 0.8;
     const riskProfit = riskRevenue - (riskRevenue * foodCostPercent) - monthlyLaborCost - monthlyFixedCosts - monthlyDepreciation;
-
-    // فترة الاسترداد
     const paybackMonths = (accountingProfit > 0) ? totalInvestment / accountingProfit : Infinity;
 
-    // تحذيرات ذكية
     const warnings = [];
     if (seatDensity < 1.2) warnings.push("⚠️ الكراسي كثيرة والمساحة ضيقة (كثافة مرتفعة)");
-    const staffRatio = seats / employeesCount;
-    if (staffRatio < 8) warnings.push("⚠️ عدد الموظفين مرتفع مقارنة بعدد الكراسي");
+    if (seats / employeesCount < 8) warnings.push("⚠️ عدد الموظفين مرتفع مقارنة بعدد الكراسي");
     if (primePercent > 65) warnings.push("⚠️ Prime Cost مرتفع (>65%)");
     if (accountingProfit < 0) warnings.push("🔴 المشروع خاسر حسب التقديرات الحالية");
-    if (monthlyFixedCosts < monthlyRevenue * 0.15) warnings.push("⚠️ التكاليف الثابتة منخفضة جداً (أقل من 15% من الإيرادات)");
+    if (monthlyFixedCosts < monthlyRevenue * 0.15) warnings.push("⚠️ التكاليف الثابتة منخفضة جداً (<15% من الإيرادات)");
     if (laborCostPercent < 15) warnings.push("⚠️ نسبة تكلفة العمالة منخفضة جداً (<15%)");
     if (totalInvestment / seats > 5000) warnings.push("💡 استثمار مرتفع لكل كرسي، تأكد من جدوى ذلك");
 
     // التقييم الفني
-    let technicalScore = 0;
-    const requiredAmps = (totalPower * 1000) / 220;
-
-    // 1. الكهرباء (40 نقطة)
-    if (electricalCapacity >= requiredAmps * 1.2) technicalScore += 40;
-    else if (electricalCapacity >= requiredAmps) technicalScore += 30;
-    else if (electricalCapacity >= requiredAmps * 0.8) technicalScore += 15;
-    else technicalScore += 5;
-
-    // 2. المياه (15 نقطة)
-    if (waterAvailabilityText.includes('مناسب')) technicalScore += 15;
-    else if (waterAvailabilityText.includes('تطوير')) technicalScore += 5;
-
-    // 3. التهوية (15 نقطة)
-    if (ventilationText.includes('مناسب')) technicalScore += 15;
-    else if (ventilationText.includes('تطوير')) technicalScore += 5;
-
-    // 4. كثافة الجلوس (15 نقطة)
-    if (seatDensity >= 1.2 && seatDensity <= 1.8) technicalScore += 15;
-    else if (seatDensity >= 1.0 && seatDensity < 1.2) technicalScore += 8;
-    else if (seatDensity > 1.8 && seatDensity <= 2.2) technicalScore += 8;
-
-    // 5. مساحة المعدات مقارنة بالمطبخ (15 نقطة)
-    if (totalSpace <= kitchenArea * 0.5) technicalScore += 15;
-    else if (totalSpace <= kitchenArea * 0.7) technicalScore += 8;
-
+    let technicalScore = 0; const requiredAmps = (totalPower * 1000) / 220;
+    if (electricalCapacity >= requiredAmps * 1.2) technicalScore += 40; else if (electricalCapacity >= requiredAmps) technicalScore += 30; else if (electricalCapacity >= requiredAmps * 0.8) technicalScore += 15; else technicalScore += 5;
+    if (waterAvailabilityText.includes('مناسب')) technicalScore += 15; else if (waterAvailabilityText.includes('تطوير')) technicalScore += 5;
+    if (ventilationText.includes('مناسب')) technicalScore += 15; else if (ventilationText.includes('تطوير')) technicalScore += 5;
+    if (seatDensity >= 1.2 && seatDensity <= 1.8) technicalScore += 15; else if (seatDensity >= 1.0 && seatDensity < 1.2) technicalScore += 8; else if (seatDensity > 1.8 && seatDensity <= 2.2) technicalScore += 8;
+    if (totalSpace <= kitchenArea * 0.5) technicalScore += 15; else if (totalSpace <= kitchenArea * 0.7) technicalScore += 8;
     technicalScore = Math.min(technicalScore, 100);
     let technicalRating = '', technicalColor = '';
     if (technicalScore >= 85) { technicalRating = '🟢 ممتاز'; technicalColor = 'alert-success'; }
@@ -1120,35 +779,11 @@ function calculateAll() {
 
     // التقييم المالي
     let financialScore = 0;
-    if (primePercent <= 55) financialScore += 30;
-    else if (primePercent <= 65) financialScore += 20;
-    else if (primePercent <= 75) financialScore += 10;
-
-    if (accountingProfit > 0) {
-        const profitMargin = accountingProfit / monthlyRevenue;
-        if (profitMargin >= 0.2) financialScore += 30;
-        else if (profitMargin >= 0.1) financialScore += 20;
-        else if (profitMargin >= 0.05) financialScore += 15;
-        else financialScore += 10;
-    } else {
-        financialScore += 0;
-    }
-
-    if (accountingProfit > 0 && totalInvestment > 0) {
-        if (paybackMonths <= 12) financialScore += 20;
-        else if (paybackMonths <= 24) financialScore += 15;
-        else if (paybackMonths <= 36) financialScore += 10;
-        else financialScore += 5;
-    } else if (accountingProfit <= 0) {
-        financialScore = Math.max(0, financialScore - 10);
-    }
-
+    if (primePercent <= 55) financialScore += 30; else if (primePercent <= 65) financialScore += 20; else if (primePercent <= 75) financialScore += 10;
+    if (accountingProfit > 0) { const profitMargin = accountingProfit / monthlyRevenue; if (profitMargin >= 0.2) financialScore += 30; else if (profitMargin >= 0.1) financialScore += 20; else if (profitMargin >= 0.05) financialScore += 15; else financialScore += 10; }
+    if (accountingProfit > 0 && totalInvestment > 0) { if (paybackMonths <= 12) financialScore += 20; else if (paybackMonths <= 24) financialScore += 15; else if (paybackMonths <= 36) financialScore += 10; else financialScore += 5; } else if (accountingProfit <= 0) { financialScore = Math.max(0, financialScore - 10); }
     const maxMonthlyMeals = maxCustomersDaily * 26;
-    if (breakEvenMeals <= maxMonthlyMeals * 0.5) financialScore += 20;
-    else if (breakEvenMeals <= maxMonthlyMeals * 0.7) financialScore += 15;
-    else if (breakEvenMeals <= maxMonthlyMeals * 0.9) financialScore += 10;
-    else if (breakEvenMeals <= maxMonthlyMeals) financialScore += 5;
-
+    if (breakEvenMeals <= maxMonthlyMeals * 0.5) financialScore += 20; else if (breakEvenMeals <= maxMonthlyMeals * 0.7) financialScore += 15; else if (breakEvenMeals <= maxMonthlyMeals * 0.9) financialScore += 10; else if (breakEvenMeals <= maxMonthlyMeals) financialScore += 5;
     financialScore = Math.min(financialScore, 100);
     let financialRating = '', financialColor = '';
     if (financialScore >= 85) { financialRating = '🟢 ممتاز'; financialColor = 'alert-success'; }
@@ -1159,122 +794,69 @@ function calculateAll() {
     // عرض النتائج
     document.getElementById('initialMessage').style.display = 'none';
     document.getElementById('resultsSection').style.display = 'block';
-
     document.getElementById('kpiCards').innerHTML = `
-        <div class="result-card">
-            <i class="fas fa-dollar-sign"></i>
-            <h4>الإيرادات الشهرية</h4>
-            <div class="value">${currency}${Math.round(monthlyRevenue)}</div>
-        </div>
-        <div class="result-card">
-            <i class="fas fa-file-invoice"></i>
-            <h4>صافي الربح (بعد الإهلاك)</h4>
-            <div class="value">${currency}${Math.round(accountingProfit)}</div>
-            <div class="status ${accountingProfit > 0 ? 'status-good' : 'status-bad'}">${accountingProfit > 0 ? 'مربح' : 'خاسر'}</div>
-        </div>
-        <div class="result-card">
-            <i class="fas fa-chart-line"></i>
-            <h4>نقطة التعادل (إيرادات)</h4>
-            <div class="value">${currency}${Math.round(breakEvenRevenue)}</div>
-        </div>
-        <div class="result-card">
-            <i class="fas fa-hand-holding-usd"></i>
-            <h4>فترة الاسترداد</h4>
-            <div class="value">${paybackMonths === Infinity ? '∞' : paybackMonths.toFixed(1)}</div>
-            <div class="unit">شهر</div>
-        </div>
+        <div class="result-card"><i class="fas fa-dollar-sign"></i><h4>الإيرادات الشهرية</h4><div class="value">${currency}${Math.round(monthlyRevenue)}</div></div>
+        <div class="result-card"><i class="fas fa-file-invoice"></i><h4>صافي الربح (بعد الإهلاك)</h4><div class="value">${currency}${Math.round(accountingProfit)}</div><div class="status ${accountingProfit > 0 ? 'status-good' : 'status-bad'}">${accountingProfit > 0 ? 'مربح' : 'خاسر'}</div></div>
+        <div class="result-card"><i class="fas fa-chart-line"></i><h4>نقطة التعادل (إيرادات)</h4><div class="value">${currency}${Math.round(breakEvenRevenue)}</div></div>
+        <div class="result-card"><i class="fas fa-hand-holding-usd"></i><h4>فترة الاسترداد</h4><div class="value">${paybackMonths === Infinity ? '∞' : paybackMonths.toFixed(1)}</div><div class="unit">شهر</div></div>
     `;
-
     if (warnings.length > 0) {
         document.getElementById('warnings').style.display = 'block';
         document.getElementById('warnings').innerHTML = `<strong>⚠️ تحذيرات:</strong><br>${warnings.join('<br>')}`;
         document.getElementById('warnings').className = 'alert alert-warning';
-    } else {
-        document.getElementById('warnings').style.display = 'none';
-    }
-
+    } else { document.getElementById('warnings').style.display = 'none'; }
     document.getElementById('projectRatingCard').innerHTML = `
         <h3><i class="fas fa-star"></i> تقييم المشروع</h3>
         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-            <div style="flex: 1; min-width: 200px;">
-                <h4>التقييم الفني</h4>
-                <div class="alert ${technicalColor}" style="font-size:1.2rem;">${technicalRating}</div>
-                <p>الدرجة الفنية: ${technicalScore}/100</p>
-            </div>
-            <div style="flex: 1; min-width: 200px;">
-                <h4>التقييم المالي</h4>
-                <div class="alert ${financialColor}" style="font-size:1.2rem;">${financialRating}</div>
-                <p>الدرجة المالية: ${financialScore}/100</p>
-            </div>
+            <div style="flex: 1; min-width: 200px;"><h4>التقييم الفني</h4><div class="alert ${technicalColor}" style="font-size:1.2rem;">${technicalRating}</div><p>الدرجة الفنية: ${technicalScore}/100</p></div>
+            <div style="flex: 1; min-width: 200px;"><h4>التقييم المالي</h4><div class="alert ${financialColor}" style="font-size:1.2rem;">${financialRating}</div><p>الدرجة المالية: ${financialScore}/100</p></div>
         </div>
     `;
-
-    // رسوم بيانية
     if (financeChart) financeChart.destroy();
     const ctx1 = document.getElementById('financeChart').getContext('2d');
     financeChart = new Chart(ctx1, {
         type: 'bar',
-        data: {
-            labels: ['الإيرادات', 'تكلفة الطعام', 'الرواتب', 'التكاليف الثابتة', 'صافي الربح'],
-            datasets: [{
-                label: `القيمة (${currency})`,
-                data: [monthlyRevenue, monthlyFoodCost, monthlyLaborCost, monthlyFixedCosts, accountingProfit],
-                backgroundColor: ['#28a745', '#ffc107', '#17a2b8', '#fd7e14', '#b8860b']
-            }]
-        },
+        data: { labels: ['الإيرادات', 'تكلفة الطعام', 'الرواتب', 'التكاليف الثابتة', 'صافي الربح'], datasets: [{ label: `القيمة (${currency})`, data: [monthlyRevenue, monthlyFoodCost, monthlyLaborCost, monthlyFixedCosts, accountingProfit], backgroundColor: ['#28a745', '#ffc107', '#17a2b8', '#fd7e14', '#b8860b'] }] },
         options: { responsive: true, maintainAspectRatio: false }
     });
-
     if (riskChart) riskChart.destroy();
     const ctx2 = document.getElementById('riskChart').getContext('2d');
     riskChart = new Chart(ctx2, {
         type: 'bar',
-        data: {
-            labels: ['عادي', 'انخفاض 20%'],
-            datasets: [{
-                label: `صافي الربح (${currency})`,
-                data: [accountingProfit, riskProfit],
-                backgroundColor: ['#28a745', '#dc3545']
-            }]
-        },
+        data: { labels: ['عادي', 'انخفاض 20%'], datasets: [{ label: `صافي الربح (${currency})`, data: [accountingProfit, riskProfit], backgroundColor: ['#28a745', '#dc3545'] }] },
         options: { responsive: true, maintainAspectRatio: false }
     });
 
-    // تخزين جميع النتائج للتصدير
     window.lastResults = {
-        currency, companyName,
-        seats, hoursOpen, totalArea, kitchenPercent, electricalCapacity,
-        waterAvailabilityText, ventilationText, deliveryAccessText,
-        equipment: getEquipmentData(),
-        totalPower, equipmentCost, totalSpace,
-        turnoverRate, peakHours, occupancyRate, avgMealPrice, foodCostPercent,
-        employeesCount, avgSalary, monthlyRent, otherOpCost, equipmentLife,
-        constructionCost, licensesCost, workingCapital,
-        kitchenArea, diningArea, seatDensity,
-        maxCustomersDaily, actualCustomersDaily,
+        currency, companyName, seats, hoursOpen, totalArea, kitchenPercent, electricalCapacity,
+        waterAvailabilityText, ventilationText, deliveryAccessText, equipment: getEquipmentData(),
+        totalPower, equipmentCost, totalSpace, turnoverRate, peakHours, occupancyRate,
+        avgMealPrice, foodCostPercent, employeesCount, avgSalary, monthlyRent, otherOpCost,
+        equipmentLife, constructionCost, licensesCost, workingCapital,
+        kitchenArea, diningArea, seatDensity, maxCustomersDaily, actualCustomersDaily,
         monthlyRevenue, monthlyFoodCost, monthlyLaborCost, monthlyFixedCosts,
-        totalMonthlyExpenses, netProfit,
-        totalInvestment, monthlyDepreciation, netProfitAfterDepreciation,
-        accountingProfit, contributionPerMeal, breakEvenMeals, breakEvenRevenue,
-        revenuePerSeat, primeCost, primePercent, laborCostPercent, fixedCostPercent,
-        riskRevenue, riskProfit, paybackMonths,
+        totalMonthlyExpenses, netProfit, totalInvestment, monthlyDepreciation,
+        netProfitAfterDepreciation, accountingProfit, contributionPerMeal,
+        breakEvenMeals, breakEvenRevenue, revenuePerSeat, primeCost, primePercent,
+        laborCostPercent, fixedCostPercent, riskRevenue, riskProfit, paybackMonths,
         warnings, technicalScore, technicalRating, technicalColor,
         financialScore, financialRating, financialColor
     };
 }
-
 document.getElementById('calculateBtn').addEventListener('click', calculateAll);
 
-// ------------------ تصدير Word ------------------
+// ================================================================
+// ========== تصدير Word احترافي (متطابق مع المالي) ==========
+// ================================================================
 async function exportToWord() {
-    const currency = document.getElementById('currencySelect').value;
-    const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
-    if (document.getElementById('resultsSection').style.display === 'none') {
-        alert('الرجاء إجراء التحليل أولاً.');
-        return;
-    }
-
+    if (document.getElementById('resultsSection').style.display === 'none') { alert('الرجاء إجراء التحليل أولاً.'); return; }
+    showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات والرسوم البيانية');
     try {
+        const currency = document.getElementById('currencySelect').value;
+        const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+        const res = window.lastResults;
+        if (!res) { alert('الرجاء إجراء التحليل أولاً.'); hideLoading(); return; }
+
         // التقاط صور الرسوم البيانية
         const chart1 = document.getElementById('financeChart');
         const chart2 = document.getElementById('riskChart');
@@ -1285,365 +867,327 @@ async function exportToWord() {
         const img1 = canvas1.toDataURL('image/png');
         const img2 = canvas2.toDataURL('image/png');
 
-        // جمع جميع المدخلات
+        // بناء جدول المدخلات
         const kitchenType = document.getElementById('kitchenType').options[document.getElementById('kitchenType').selectedIndex].text;
-        const seats = document.getElementById('seats').value;
         const serviceModel = document.getElementById('serviceModel').options[document.getElementById('serviceModel').selectedIndex].text;
-        const hoursOpen = document.getElementById('hoursOpen').value;
         const shifts = document.getElementById('shifts').options[document.getElementById('shifts').selectedIndex].text;
-        const totalArea = document.getElementById('totalArea').value;
-        const kitchenPercent = document.getElementById('kitchenPercent').value;
-        const electricalCapacity = document.getElementById('electricalCapacity').value;
         const water = document.getElementById('waterAvailability').options[document.getElementById('waterAvailability').selectedIndex].text;
         const ventilation = document.getElementById('ventilation').options[document.getElementById('ventilation').selectedIndex].text;
-        const deliveryAccess = document.getElementById('deliveryAccess').options[document.getElementById('deliveryAccess').selectedIndex].text;
+        const delivery = document.getElementById('deliveryAccess').options[document.getElementById('deliveryAccess').selectedIndex].text;
 
-        // بيانات المعدات
-        const equipmentRows = document.querySelectorAll('#equipmentContainer .equipment-row');
-        let equipmentHTML = '';
-        equipmentRows.forEach(row => {
-            const name = row.querySelector('.eq-name')?.value || '';
-            const power = row.querySelector('.eq-power')?.value || 0;
-            const cost = row.querySelector('.eq-cost')?.value || 0;
-            const space = row.querySelector('.eq-space')?.value || 0;
-            if (name) {
-                equipmentHTML += `<tr><td>${name}</td><td>${power} kW</td><td>${currency} ${cost}</td><td>${space} م²</td> </tr>`;
-            }
+        // جدول المعدات
+        let equipHTML = '';
+        res.equipment.forEach(eq => {
+            if (eq.name) equipHTML += `<tr><td>${eq.name}</td><td>${eq.power} kW</td><td>${currency} ${eq.cost}</td><td>${eq.space} م²</td></tr>`;
         });
 
-        const turnoverRate = document.getElementById('turnoverRate').value;
-        const peakHours = document.getElementById('peakHours').value;
-        const occupancyRate = document.getElementById('occupancyRate').value;
-        const avgMealPrice = document.getElementById('avgMealPrice').value;
-        const foodCostPercent = document.getElementById('foodCostPercent').value;
-        const employeesCount = document.getElementById('employeesCount').value;
-        const avgSalary = document.getElementById('avgSalary').value;
-        const monthlyRent = document.getElementById('monthlyRent').value;
-        const otherOpCost = document.getElementById('otherOpCost').value;
-        const equipmentLife = document.getElementById('equipmentLife').value;
-        const constructionCost = document.getElementById('constructionCost').value;
-        const licensesCost = document.getElementById('licensesCost').value;
-        const workingCapital = document.getElementById('workingCapital').value;
-
-        // بطاقات KPI وتحويلها إلى جدول
+        // بطاقات KPI
         const kpiCards = document.querySelectorAll('.result-card');
-        let kpiRows = '';
-        let row = '';
-        let count = 0;
+        let kpiRows = ''; let row = ''; let count = 0;
         kpiCards.forEach((card, index) => {
             const icon = card.querySelector('i') ? card.querySelector('i').outerHTML : '';
             const title = card.querySelector('h4') ? card.querySelector('h4').innerText : '';
             const value = card.querySelector('.value') ? card.querySelector('.value').innerText : '';
             const unit = card.querySelector('.unit') ? card.querySelector('.unit').innerText : '';
             const status = card.querySelector('.status') ? card.querySelector('.status').outerHTML : '';
-            const cell = `
-                <td style="border:1px solid #b8860b; padding:10px; text-align:center; background:#fefcf6;">
-                    ${icon}
-                    <h4 style="margin:0.5rem 0; color:#666;">${title}</h4>
-                    <div style="font-size:1.8rem; font-weight:900; color:#b8860b;">${value}</div>
-                    ${unit ? `<div style="font-size:0.9rem; color:#777;">${unit}</div>` : ''}
-                    ${status ? status.replace(/class="status/g, 'style="margin-top:0.3rem; padding:0.2rem 0.5rem; border-radius:20px; display:inline-block;') : ''}
-                  </td>
-            `;
-            row += cell;
-            count++;
-            if (count % 2 === 0 || index === kpiCards.length - 1) {
-                kpiRows += `<tr>${row}</tr>`;
-                row = '';
-            }
+            const cell = `<td style="border:1px solid #b8860b; padding:12px; text-align:center; background:#fefcf6;">${icon}<h4 style="margin:0.5rem 0; color:#666;">${title}</h4><div style="font-size:1.6rem; font-weight:900; color:#b8860b;">${value}</div>${unit ? `<div style="font-size:0.9rem; color:#777;">${unit}</div>` : ''}${status ? status.replace(/class="status/g, 'style="margin-top:0.3rem; padding:0.2rem 0.6rem; border-radius:20px; display:inline-block;') : ''}</td>`;
+            row += cell; count++;
+            if (count % 2 === 0 || index === kpiCards.length - 1) { kpiRows += `<tr>${row}</tr>`; row = ''; }
         });
 
         const ratingHTML = document.getElementById('projectRatingCard').innerHTML;
         const warningsHTML = document.getElementById('warnings').innerHTML;
-
         const now = new Date();
         const dateStr = now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
 
-        // بناء التقرير الكامل
-        const reportHTML = `
-            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-            <head>
-                <meta charset='utf-8'>
-                <title>تقرير الجدوى الفنية - FAROUK GRUP</title>
-                <style>
-                    body { font-family: 'Arial', sans-serif; direction: rtl; margin: 2rem; }
-                    .header { text-align: center; border-bottom: 3px solid #b8860b; padding-bottom: 10px; margin-bottom: 20px; }
-                    h2, h3 { color: #b8860b; }
-                    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-                    th, td { border: 1px solid #b8860b; padding: 8px; text-align: center; }
-                    th { background: #fefcf6; color: #b8860b; }
-                    .alert { padding: 10px; border-radius: 10px; margin: 10px 0; }
-                    .alert-warning { background: #fff3cd; color: #856404; }
-                    .chart-container { text-align: center; margin: 20px 0; }
-                    .footer { text-align: center; margin-top: 40px; color: #888; border-top: 1px dashed #b8860b; padding-top: 10px; }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h1 style="color:#b8860b;">مجموعة فاروق للاستشارات والأعمال</h1>
-                    <p>تقرير الجدوى الفنية للمطاعم</p>
-                    <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
-                    <p>العملة: ${currency}</p>
-                </div>
+        const fullHtml = `<!DOCTYPE html>
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>تقرير الجدوى الفنية - FAROUK GRUP</title>
+        <style>
+            body{font-family:'Arial',sans-serif;direction:rtl;margin:2rem;background:#fff;color:#333;}
+            .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+            .cover h1{font-size:32px;color:#b8860b;margin:0;}.cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+            table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+            th{background:#fefcf6;color:#b8860b;}
+            .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+            .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
+        </style></head>
+        <body>
+            <div class="cover">
+                <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+                <h2>تقرير الجدوى الفنية المتقدمة للمطاعم</h2>
+                <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
+                <p>العملة: ${currency}</p>
+            </div>
+            <h2 style="color:#b8860b;">المدخلات الأساسية</h2>
+            <table>
+                <tr><th>نوع المطبخ</th><td>${kitchenType}</td><th>عدد الكراسي</th><td>${res.seats}</td></tr>
+                <tr><th>نموذج الخدمة</th><td>${serviceModel}</td><th>ساعات العمل</th><td>${res.hoursOpen} ساعة/يوم</td></tr>
+                <tr><th>فترات التشغيل</th><td>${shifts}</td><th>المساحة الإجمالية</th><td>${res.totalArea} م²</td></tr>
+                <tr><th>نسبة المطبخ</th><td>${res.kitchenPercent}%</td><th>قدرة الكهرباء</th><td>${res.electricalCapacity} أمبير</td></tr>
+                <tr><th>المياه</th><td>${water}</td><th>التهوية</th><td>${ventilation}</td></tr>
+                <tr><th>سهولة التوصيل</th><td>${delivery}</td><th></th><td></td></tr>
+            </table>
+            <h3 style="color:#b8860b;">المعدات</h3>
+            <table><thead><tr><th>المعدة</th><th>القدرة (kW)</th><th>التكلفة</th><th>المساحة (م²)</th></tr></thead><tbody>${equipHTML}</tbody></table>
+            <h2 style="color:#b8860b;">مؤشرات الأداء الرئيسية</h2>
+            <table>${kpiRows}</table>
+            ${warningsHTML ? `<div style="background:#fff3cd;padding:15px;border-radius:10px;border-right:4px solid #ffc107;margin:20px 0;">${warningsHTML}</div>` : ''}
+            <h2 style="color:#b8860b;">📈 الرسوم البيانية</h2>
+            <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;">
+                <div style="flex:1;min-width:300px;"><h3>تحليل الأداء المالي</h3><img src="${img1}" class="chart-img"/></div>
+                <div style="flex:1;min-width:300px;"><h3>تحليل المخاطر</h3><img src="${img2}" class="chart-img"/></div>
+            </div>
+            <h2 style="color:#b8860b;">💡 تقييم المشروع والتوصيات</h2>
+            <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">${ratingHTML}</div>
+            <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+        </body></html>`;
 
-                <h2>المعطيات الأساسية</h2>
-                <table>
-                    <tr><th>نوع المطبخ</th><td>${kitchenType}</td><th>عدد الكراسي</th><td>${seats}</td> </tr>
-                    <tr><th>نموذج الخدمة</th><td>${serviceModel}</td><th>ساعات العمل</th><td>${hoursOpen} ساعة/يوم</td> </tr>
-                    <tr><th>فترات التشغيل</th><td>${shifts}</td><th>المساحة الإجمالية</th><td>${totalArea} م²</td> </tr>
-                    <tr><th>نسبة المطبخ</th><td>${kitchenPercent}%</td><th>قدرة الكهرباء</th><td>${electricalCapacity} أمبير</td> </tr>
-                    <tr><th>المياه</th><td>${water}</td><th>التهوية</th><td>${ventilation}</td> </tr>
-                    <tr><th>سهولة التوصيل</th><td>${deliveryAccess}</td><th></th><td></td> </tr>
-                </table>
-
-                <h3>المعدات</h3>
-                <table>
-                    <thead><tr><th>المعدة</th><th>القدرة (kW)</th><th>التكلفة</th><th>المساحة (م²)</th></tr></thead>
-                    <tbody>${equipmentHTML}</tbody>
-                </table>
-
-                <h3>الطاقة الإنتاجية والتكاليف</h3>
-                <table>
-                    <tr><th>معدل دوران الطاولة</th><td>${turnoverRate}</td><th>ساعات الذروة</th><td>${peakHours}</td> </tr>
-                    <tr><th>نسبة الإشغال</th><td>${occupancyRate}%</td><th>متوسط سعر الوجبة</th><td>${currency} ${avgMealPrice}</td> </tr>
-                    <tr><th>تكلفة الطعام (%)</th><td>${foodCostPercent}%</td><th>عدد الموظفين</th><td>${employeesCount}</td> </tr>
-                    <tr><th>متوسط الراتب</th><td>${currency} ${avgSalary}</td><th>الإيجار الشهري</th><td>${currency} ${monthlyRent}</td> </tr>
-                    <tr><th>مصاريف أخرى</th><td>${currency} ${otherOpCost}</td><th>العمر الإنتاجي للمعدات</th><td>${equipmentLife} سنة</td> </tr>
-                    <tr><th>تكلفة الديكور</th><td>${currency} ${constructionCost}</td><th>التراخيص</th><td>${currency} ${licensesCost}</td> </tr>
-                    <tr><th>رأس المال العامل</th><td>${currency} ${workingCapital}</td><th></th><td></td> </tr>
-                </table>
-
-                <h2>مؤشرات الأداء الرئيسية</h2>
-                <table>${kpiRows}</table>
-
-                ${warningsHTML ? `<div class="alert alert-warning">${warningsHTML}</div>` : ''}
-
-                <h2>تقييم المشروع</h2>
-                <div style="border:1px solid #b8860b; border-radius:10px; padding:1rem;">${ratingHTML}</div>
-
-                <h2>الرسوم البيانية</h2>
-                <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
-                    <div style="flex:1;"><img src="${img1}" style="max-width:100%;" /></div>
-                    <div style="flex:1;"><img src="${img2}" style="max-width:100%;" /></div>
-                </div>
-
-                <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال - جميع الحقوق محفوظة</div>
-            </body>
-            </html>
-        `;
-
-        const blob = new Blob(['\uFEFF' + reportHTML], { type: 'application/msword' });
+        const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `تقرير_فني_مطعم_${companyName}.doc`;
+        link.download = `تقرير_فني_مطعم_${companyName}_${now.toISOString().slice(0,10)}.doc`;
         link.click();
         URL.revokeObjectURL(link.href);
-    } catch (error) {
-        console.error(error);
-        alert('حدث خطأ أثناء إنشاء تقرير Word');
-    }
+    } catch (error) { console.error(error); alert('خطأ في إنشاء تقرير Word'); } finally { hideLoading(); }
 }
 
-// ------------------ تصدير Excel شامل ------------------
+// ================================================================
+// ========== تصدير Excel احترافي (متطابق مع المالي) ==========
+// ================================================================
 async function exportToFullExcel() {
-    if (!window.lastResults) {
-        alert('الرجاء إجراء التحليل أولاً (اضغط على "احسب الدراسة الفنية").');
-        return;
-    }
-    const res = window.lastResults;
-    const currency = res.currency;
-    const companyName = res.companyName;
+    if (!window.lastResults) { alert('الرجاء إجراء التحليل أولاً (اضغط على "احسب الدراسة الفنية").'); return; }
+    showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والرسوم البيانية');
+    try {
+        const res = window.lastResults;
+        const currency = res.currency;
+        const companyName = res.companyName;
 
-    const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'FAROUK GRUP';
-    workbook.created = new Date();
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = 'FAROUK GRUP';
+        const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+        const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA', GB = 'FFFFF3CD';
+        const PT = 'FF155724', NT = 'FF721C24';
 
-    // ---------- ورقة المدخلات ----------
-    const inputsSheet = workbook.addWorksheet('المدخلات');
-    inputsSheet.mergeCells('A1:D1');
-    inputsSheet.getCell('A1').value = 'بيانات المشروع الأساسية';
-    inputsSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
-    inputsSheet.getCell('A1').alignment = { horizontal: 'center' };
+        function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+        function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+        function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
+        function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
 
-    const inputsData = [
-        ['نوع المطبخ', document.getElementById('kitchenType').options[document.getElementById('kitchenType').selectedIndex].text],
-        ['عدد الكراسي', res.seats],
-        ['نموذج الخدمة', document.getElementById('serviceModel').options[document.getElementById('serviceModel').selectedIndex].text],
-        ['ساعات العمل اليومية', res.hoursOpen],
-        ['فترات التشغيل', document.getElementById('shifts').options[document.getElementById('shifts').selectedIndex].text],
-        ['المساحة الإجمالية (م²)', res.totalArea],
-        ['نسبة منطقة المطبخ (%)', res.kitchenPercent],
-        ['قدرة الكهرباء المتوفرة (أمبير)', res.electricalCapacity],
-        ['مصدر المياه', res.waterAvailabilityText],
-        ['نظام التهوية', res.ventilationText],
-        ['سهولة التوصيل', res.deliveryAccessText],
-        ['عدد المعدات', res.equipment.length],
-        ['إجمالي قدرة المعدات (kW)', res.totalPower],
-        ['إجمالي تكلفة المعدات', `${currency} ${res.equipmentCost.toFixed(0)}`],
-        ['المساحة التي تشغلها المعدات (م²)', res.totalSpace],
-        ['معدل دوران الطاولة', res.turnoverRate],
-        ['ساعات الذروة اليومية', res.peakHours],
-        ['نسبة الإشغال المتوقعة (%)', res.occupancyRate * 100],
-        ['متوسط سعر الوجبة', `${currency} ${res.avgMealPrice}`],
-        ['تكلفة الطعام (%)', res.foodCostPercent * 100],
-        ['عدد الموظفين', res.employeesCount],
-        ['متوسط الراتب الشهري', `${currency} ${res.avgSalary}`],
-        ['الإيجار الشهري', `${currency} ${res.monthlyRent}`],
-        ['مصاريف تشغيل أخرى', `${currency} ${res.otherOpCost}`],
-        ['العمر الإنتاجي للمعدات (سنوات)', res.equipmentLife],
-        ['تكلفة الديكور والإنشاءات', `${currency} ${res.constructionCost}`],
-        ['التراخيص والرسوم', `${currency} ${res.licensesCost}`],
-        ['رأس المال العامل (3 أشهر)', `${currency} ${res.workingCapital}`]
-    ];
+        // 1. غلاف التقرير
+        const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+        [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+        cv.getRow(2).height=80; cv.getRow(4).height=60;
+        cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+        bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+        bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
+        mh(cv,1,4,4,`تقرير الجدوى الفنية المتقدمة للمطاعم\n${companyName}`,DB,GL,18);
+        const inf=[['📋 الجهة',companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',currency],['📊 صافي الربح',`${currency} ${res.accountingProfit.toFixed(0)}`],['📈 فترة الاسترداد',res.paybackMonths===Infinity?'غير محددة':`${res.paybackMonths.toFixed(1)} شهر`]];
+        let ir=6;
+        inf.forEach(([l,v],idx)=>{
+            cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+            const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+            const bg=idx%2===0?AR:'FFFEFCF6';
+            ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+            ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+            cv.getRow(ir).height=28; ir++;
+        });
 
-    inputsSheet.addRows([['البند', 'القيمة']]);
-    inputsData.forEach(row => inputsSheet.addRow(row));
-    inputsSheet.getRow(2).font = { bold: true, color: { argb: 'ffffff' } };
-    inputsSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'b8860b' } };
-    inputsSheet.getColumn(1).width = 40;
-    inputsSheet.getColumn(2).width = 30;
+        // 2. المدخلات والافتراضات
+        const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true, showGridLines: false }] });
+        inputsSheet.getColumn(1).width=5; inputsSheet.getColumn(2).width=38; inputsSheet.getColumn(3).width=22; inputsSheet.getColumn(4).width=22; inputsSheet.getColumn(5).width=5;
+        mh(inputsSheet,1,5,1,'📋 جدول المدخلات والافتراضات الأساسية',DB,GL,14);
+        inputsSheet.getRow(1).height=40;
+        mh(inputsSheet,2,4,2,'البيانات الأساسية للمشروع',SB,'FFFFFFFF',11);
+        inputsSheet.getRow(2).height=28;
+        const inputFields = [
+            ['نوع المطبخ', document.getElementById('kitchenType').options[document.getElementById('kitchenType').selectedIndex].text, ''],
+            ['عدد الكراسي', res.seats, ''],
+            ['نموذج الخدمة', document.getElementById('serviceModel').options[document.getElementById('serviceModel').selectedIndex].text, ''],
+            ['ساعات العمل اليومية', res.hoursOpen, 'ساعة'],
+            ['فترات التشغيل', document.getElementById('shifts').options[document.getElementById('shifts').selectedIndex].text, ''],
+            ['المساحة الإجمالية', res.totalArea, 'م²'],
+            ['نسبة المطبخ', res.kitchenPercent, '%'],
+            ['قدرة الكهرباء', res.electricalCapacity, 'أمبير'],
+            ['مصدر المياه', res.waterAvailabilityText, ''],
+            ['نظام التهوية', res.ventilationText, ''],
+            ['سهولة التوصيل', res.deliveryAccessText, ''],
+            ['عدد المعدات', res.equipment.length, ''],
+            ['إجمالي قدرة المعدات', res.totalPower, 'kW'],
+            ['إجمالي تكلفة المعدات', `${currency} ${res.equipmentCost.toFixed(0)}`, ''],
+            ['مساحة المعدات', res.totalSpace, 'م²'],
+            ['معدل دوران الطاولة', res.turnoverRate, ''],
+            ['ساعات الذروة', res.peakHours, ''],
+            ['نسبة الإشغال', res.occupancyRate*100, '%'],
+            ['متوسط سعر الوجبة', `${currency} ${res.avgMealPrice}`, ''],
+            ['تكلفة الطعام', res.foodCostPercent*100, '%'],
+            ['عدد الموظفين', res.employeesCount, ''],
+            ['متوسط الراتب', `${currency} ${res.avgSalary}`, ''],
+            ['الإيجار الشهري', `${currency} ${res.monthlyRent}`, ''],
+            ['مصاريف تشغيل أخرى', `${currency} ${res.otherOpCost}`, ''],
+            ['العمر الإنتاجي للمعدات', res.equipmentLife, 'سنة'],
+            ['تكلفة الديكور', `${currency} ${res.constructionCost}`, ''],
+            ['التراخيص', `${currency} ${res.licensesCost}`, ''],
+            ['رأس المال العامل', `${currency} ${res.workingCapital}`, '']
+        ];
+        let iRow=3;
+        inputFields.forEach(([label,val,note],idx)=>{
+            inputsSheet.getRow(iRow).height=24;
+            const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+            const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
+            lc.value=label; vc.value=val; nc.value=note;
+            ap(lc,cs(bg,DT,true,'right'));
+            ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?'#,##0':null});
+            ap(nc,cs(bg,'00695C',false,'center'));
+            iRow++;
+        });
 
-    // ---------- ورقة مؤشرات الأداء ----------
-    const kpiSheet = workbook.addWorksheet('مؤشرات الأداء');
-    kpiSheet.mergeCells('A1:C1');
-    kpiSheet.getCell('A1').value = 'مؤشرات الأداء الرئيسية';
-    kpiSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
-    kpiSheet.getCell('A1').alignment = { horizontal: 'center' };
+        // 3. مؤشرات الأداء
+        const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true, showGridLines: false }] });
+        [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
+        mh(kpiSheet,1,6,1,'📊 لوحة مؤشرات الأداء الرئيسية',DB,GL,15);
+        kpiSheet.getRow(1).height=45;
+        mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('ar-EG')}`,HB,'FFFFFFFF',10);
+        kpiSheet.getRow(2).height=26;
+        const kpis = [
+            { label: 'الإيرادات الشهرية', value: `${currency} ${Math.round(res.monthlyRevenue)}`, good: true },
+            { label: 'صافي الربح', value: `${currency} ${Math.round(res.accountingProfit)}`, good: res.accountingProfit>0 },
+            { label: 'نقطة التعادل', value: `${currency} ${Math.round(res.breakEvenRevenue)}`, good: true },
+            { label: 'فترة الاسترداد', value: res.paybackMonths===Infinity?'غير محددة':`${res.paybackMonths.toFixed(1)} شهر`, good: res.paybackMonths<24 },
+            { label: 'Prime Cost', value: `${res.primePercent.toFixed(1)}%`, good: res.primePercent<65 },
+            { label: 'هامش الربح', value: `${((res.accountingProfit/res.monthlyRevenue)*100).toFixed(1)}%`, good: res.accountingProfit>0 }
+        ];
+        let kRow=3;
+        kpis.forEach((k,idx)=>{
+            kpiSheet.getRow(kRow).height=40;
+            kpiSheet.mergeCells(kRow,2,kRow,2); kpiSheet.mergeCells(kRow,3,kRow,3); kpiSheet.mergeCells(kRow,4,kRow,4); kpiSheet.mergeCells(kRow,5,kRow,5);
+            const ic=kpiSheet.getCell(kRow,2); ic.value=`🔹 ${idx+1}`;
+            const lc2=kpiSheet.getCell(kRow,3); lc2.value=k.label;
+            const vc3=kpiSheet.getCell(kRow,4); vc3.value=k.value;
+            const nc2=kpiSheet.getCell(kRow,5); nc2.value='';
+            const bg=k.good?PB:NB, tc=k.good?PT:NT;
+            [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
+            ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
+            lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+            vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
+            kRow++;
+        });
+        kRow++;
+        kpiSheet.mergeCells(kRow,2,kRow,5);
+        const kFinal=kpiSheet.getCell(kRow,2);
+        kFinal.value=res.accountingProfit>0?'✅ المشروع مجدٍ مالياً (ربح موجب)':'⚠️ المشروع غير مجدٍ (خسارة)';
+        kFinal.font={name:'Arial',bold:true,size:13,color:{argb:res.accountingProfit>0?PT:'856404'}};
+        kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:res.accountingProfit>0?PB:GB}};
+        kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
+        kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
+        kpiSheet.getRow(kRow).height=40;
 
-    const kpiData = [
-        ['الإيرادات الشهرية', `${currency} ${Math.round(res.monthlyRevenue)}`, ''],
-        ['صافي الربح (بعد الإهلاك)', `${currency} ${Math.round(res.accountingProfit)}`, res.accountingProfit > 0 ? 'مربح' : 'خاسر'],
-        ['نقطة التعادل (إيرادات)', `${currency} ${Math.round(res.breakEvenRevenue)}`, ''],
-        ['فترة الاسترداد', res.paybackMonths === Infinity ? '∞ شهر' : `${res.paybackMonths.toFixed(1)} شهر`, ''],
-        ['هامش الربح', `${((res.accountingProfit / res.monthlyRevenue) * 100).toFixed(1)}%`, ''],
-        ['Prime Cost', `${res.primePercent.toFixed(1)}%`, ''],
-        ['تكلفة العمالة (%)', `${res.laborCostPercent.toFixed(1)}%`, ''],
-        ['تكلفة الطعام (%)', `${res.foodCostPercent * 100}%`, ''],
-        ['إيرادات لكل كرسي', `${currency} ${Math.round(res.revenuePerSeat)}`, ''],
-        ['الاستثمار لكل كرسي', `${currency} ${Math.round(res.totalInvestment / res.seats)}`, '']
-    ];
+        // 4. الملخص المالي
+        const summarySheet = workbook.addWorksheet('الملخص المالي', { views: [{ rightToLeft: true, showGridLines: false }] });
+        summarySheet.getColumn(1).width=5; summarySheet.getColumn(2).width=35; summarySheet.getColumn(3).width=25; summarySheet.getColumn(4).width=25; summarySheet.getColumn(5).width=5;
+        mh(summarySheet,1,5,1,'📋 الملخص المالي والفني',DB,GL,14);
+        summarySheet.getRow(1).height=40;
+        const summData = [
+            ['الاستثمار الإجمالي', `${currency} ${res.totalInvestment.toFixed(0)}`, '', ''],
+            ['الإيرادات الشهرية', `${currency} ${res.monthlyRevenue.toFixed(0)}`, 'التقييم الفني', `${res.technicalScore}/100 (${res.technicalRating})`],
+            ['إجمالي التكاليف', `${currency} ${res.totalMonthlyExpenses.toFixed(0)}`, 'التقييم المالي', `${res.financialScore}/100 (${res.financialRating})`],
+            ['صافي الربح', `${currency} ${res.accountingProfit.toFixed(0)}`, 'نقطة التعادل', `${currency} ${res.breakEvenRevenue.toFixed(0)}`],
+            ['فترة الاسترداد', res.paybackMonths===Infinity?'غير محددة':`${res.paybackMonths.toFixed(1)} شهر`, 'هامش الأمان', `${((res.monthlyRevenue - res.breakEvenRevenue) / res.monthlyRevenue * 100).toFixed(1)}%`]
+        ];
+        let sRow=2;
+        summData.forEach(([l1,v1,l2,v2],idx)=>{
+            summarySheet.getRow(sRow).height=30;
+            const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+            const c1=summarySheet.getCell(sRow,2); c1.value=l1; ap(c1,cs(bg,DT,true,'right'));
+            const c2=summarySheet.getCell(sRow,3); c2.value=v1; ap(c2,{...cs(bg,'0000FF',false,'center'),numFmt:typeof v1==='number'?'#,##0':null});
+            if(l2){ const c3=summarySheet.getCell(sRow,4); c3.value=l2; ap(c3,cs(bg,DT,true,'right'));
+            const c4=summarySheet.getCell(sRow,5); c4.value=v2; ap(c4,cs(bg,'00695C',false,'center')); }
+            sRow++;
+        });
 
-    kpiSheet.addRows([['المؤشر', 'القيمة', 'التقييم']]);
-    kpiData.forEach(row => kpiSheet.addRow(row));
-    const kpiHeader = kpiSheet.getRow(2);
-    kpiHeader.font = { bold: true, color: { argb: 'ffffff' } };
-    kpiHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'b8860b' } };
-    kpiSheet.getColumn(1).width = 30;
-    kpiSheet.getColumn(2).width = 20;
-    kpiSheet.getColumn(3).width = 15;
-
-    // ---------- ورقة الملخص المالي ----------
-    const summarySheet = workbook.addWorksheet('الملخص المالي');
-    summarySheet.mergeCells('A1:C1');
-    summarySheet.getCell('A1').value = 'الملخص المالي والتقييم';
-    summarySheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
-    summarySheet.getCell('A1').alignment = { horizontal: 'center' };
-
-    const summaryData = [
-        ['الاستثمار الإجمالي', `${currency} ${res.totalInvestment.toFixed(0)}`],
-        ['الإيرادات الشهرية', `${currency} ${res.monthlyRevenue.toFixed(0)}`],
-        ['إجمالي التكاليف الشهرية', `${currency} ${res.totalMonthlyExpenses.toFixed(0)}`],
-        ['صافي الربح الشهري', `${currency} ${res.accountingProfit.toFixed(0)}`],
-        ['نقطة التعادل (إيرادات)', `${currency} ${res.breakEvenRevenue.toFixed(0)}`],
-        ['هامش الأمان', `${((res.monthlyRevenue - res.breakEvenRevenue) / res.monthlyRevenue * 100).toFixed(1)}%`],
-        ['فترة الاسترداد', res.paybackMonths === Infinity ? 'غير محددة' : `${res.paybackMonths.toFixed(1)} شهر`],
-        ['التقييم الفني', `${res.technicalScore}/100 (${res.technicalRating})`],
-        ['التقييم المالي', `${res.financialScore}/100 (${res.financialRating})`]
-    ];
-
-    summarySheet.addRows([['البند', 'القيمة']]);
-    summaryData.forEach(row => summarySheet.addRow(row));
-    summarySheet.getRow(2).font = { bold: true, color: { argb: 'ffffff' } };
-    summarySheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'b8860b' } };
-    summarySheet.getColumn(1).width = 35;
-    summarySheet.getColumn(2).width = 25;
-
-    // إضافة التحذيرات إن وجدت
-    if (res.warnings && res.warnings.length) {
-        summarySheet.addRow([]);
-        summarySheet.addRow(['التحذيرات', '']);
-        res.warnings.forEach(w => summarySheet.addRow([w, '']));
-    }
-
-    // ---------- ورقة الرسوم البيانية ----------
-    const chartsSheet = workbook.addWorksheet('الرسوم البيانية');
-    chartsSheet.mergeCells('A1:C1');
-    chartsSheet.getCell('A1').value = 'الرسوم البيانية للمشروع';
-    chartsSheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'b8860b' } };
-    chartsSheet.getCell('A1').alignment = { horizontal: 'center' };
-
-    const chartCanvases = [document.getElementById('financeChart'), document.getElementById('riskChart')];
-    const titles = ['تحليل الأداء المالي', 'تحليل المخاطر (انخفاض 20%)'];
-    let rowIdx = 3;
-
-    for (let i = 0; i < chartCanvases.length; i++) {
-        if (chartCanvases[i]) {
-            const titleCell = chartsSheet.getCell(`A${rowIdx}`);
-            titleCell.value = titles[i];
-            titleCell.font = { bold: true, size: 12 };
-            titleCell.alignment = { horizontal: 'center' };
-            chartsSheet.mergeCells(`A${rowIdx}:C${rowIdx}`);
-            rowIdx++;
-
+        // 5. الرسوم البيانية
+        const chartsSheet = workbook.addWorksheet('الرسوم البيانية', { views: [{ rightToLeft: true, showGridLines: false }] });
+        chartsSheet.getColumn(1).width=5; chartsSheet.getColumn(2).width=50; chartsSheet.getColumn(3).width=5;
+        mh(chartsSheet,1,3,1,'📊 الرسوم البيانية للمشروع',DB,GL,14);
+        chartsSheet.getRow(1).height=40;
+        const chartContainer = document.querySelectorAll('.chart-container');
+        if (chartContainer.length) {
             try {
-                const canvas = chartCanvases[i];
-                const imgData = await html2canvas(canvas, { scale: 2, backgroundColor: '#ffffff' });
-                const imageId = workbook.addImage({
-                    base64: imgData.toDataURL('image/png'),
-                    extension: 'png'
-                });
-                chartsSheet.addImage(imageId, {
-                    tl: { col: 0, row: rowIdx - 1 },
-                    br: { col: 3, row: rowIdx + 10 },
-                    editAs: 'oneCell'
-                });
-                rowIdx += 12;
-            } catch (err) {
-                const failCell = chartsSheet.getCell(`A${rowIdx}`);
-                failCell.value = `فشل في إضافة الرسم البياني: ${titles[i]}`;
-                failCell.font = { italic: true };
-                rowIdx += 2;
-            }
+                const parent = chartContainer[0].parentElement;
+                const origBg = parent.style.backgroundColor;
+                parent.style.backgroundColor = '#ffffff';
+                const canvasImg = await html2canvas(parent, { scale: 2, backgroundColor: '#ffffff' });
+                parent.style.backgroundColor = origBg;
+                const imgData = canvasImg.toDataURL('image/png');
+                const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                chartsSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 28 }, editAs: 'oneCell' });
+            } catch (err) {}
         }
-    }
 
-    // حفظ الملف
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const now = new Date();
-    const fileName = `تقرير_فني_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
-    saveAs(blob, fileName);
+        // 6. التقييم والتوصيات
+        const evalSheet = workbook.addWorksheet('التقييم والتوصيات', { views: [{ rightToLeft: true, showGridLines: false }] });
+        evalSheet.getColumn(1).width=5; evalSheet.getColumn(2).width=50; evalSheet.getColumn(3).width=5;
+        mh(evalSheet,1,3,1,'📝 التقييم والتوصيات',DB,GL,14);
+        evalSheet.getRow(1).height=45;
+        const warningsText = res.warnings && res.warnings.length ? res.warnings.join('\n') : 'لا توجد تحذيرات حالياً.';
+        const sections = [
+            { title: '1. التقييم الفني والمالي', content: `الدرجة الفنية: ${res.technicalScore}/100 (${res.technicalRating})\nالدرجة المالية: ${res.financialScore}/100 (${res.financialRating})` },
+            { title: '2. التحذيرات', content: warningsText },
+            { title: '3. التوصيات', content: res.accountingProfit>0 ? '• المشروع مجدٍ فنياً ومالياً، يُنصح بالمضي قدماً.\n• راقب Prime Cost للحفاظ على الربحية.\n• تأكد من توفير رأس المال العامل المطلوب.' : '• المشروع غير مجدٍ بالشكل الحالي.\n• ابحث عن خفض التكاليف أو زيادة الإيرادات.\n• أعد تقييم الافتراضات (الإشغال، الأسعار، التكاليف).' },
+            { title: '4. تنويه', content: 'هذا التحليل مبني على افتراضات تقديرية. النتائج الفعلية قد تختلف. يُنصح باستشارة خبير مالي وفني.' }
+        ];
+        let itRow=2;
+        sections.forEach((sec,idx)=>{
+            itRow++;
+            evalSheet.getRow(itRow).height=30;
+            evalSheet.mergeCells(itRow,2,itRow,2);
+            const tc3=evalSheet.getCell(itRow,2);
+            tc3.value=sec.title;
+            tc3.font={name:'Arial',bold:true,size:12,color:{argb:GL}};
+            tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?HB:SB}};
+            tc3.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+            tc3.border={bottom:{style:'medium',color:{argb:G}}};
+            itRow++;
+            evalSheet.getRow(itRow).height=Math.max(60, sec.content.split('\n').length*18);
+            evalSheet.mergeCells(itRow,2,itRow,2);
+            const cc=evalSheet.getCell(itRow,2);
+            cc.value=sec.content;
+            cc.font={name:'Arial',size:10,color:{argb:DT}};
+            cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};
+            cc.alignment={horizontal:'right',vertical:'top',wrapText:true,readingOrder:'rtl'};
+            cc.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
+        });
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const now = new Date();
+        const fileName = `تقرير_فني_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+        saveAs(blob, fileName);
+    } catch(err) { console.error(err); alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
 }
 
-// ربط الأحداث
+// ===== شاشة تحميل التصدير =====
+function showLoading(title, msg) {
+    document.getElementById('loadingTitle').textContent = title;
+    document.getElementById('loadingMsg').textContent = msg;
+    document.getElementById('exportLoading').classList.add('show');
+}
+function hideLoading() {
+    document.getElementById('exportLoading').classList.remove('show');
+}
+
+// إضافة عنصر التحميل إذا لم يكن موجوداً
+if (!document.getElementById('exportLoading')) {
+    const loadDiv = document.createElement('div');
+    loadDiv.className = 'export-loading';
+    loadDiv.id = 'exportLoading';
+    loadDiv.innerHTML = `<div class="export-loading-box"><i class="fas fa-spinner"></i><h3 id="loadingTitle">جاري الإنشاء...</h3><p id="loadingMsg">يرجى الانتظار</p></div>`;
+    document.body.appendChild(loadDiv);
+}
+
 document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
 document.getElementById('exportFullExcelBtn').addEventListener('click', exportToFullExcel);
-
-// تحديث تحذير الطاقة
 updatePowerAlert();
 </script>
-<!-- زر العودة إلى الرئيسية (عائم في اليمين) -->
-<a href="index.html" style="
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(180,133,84,0.9);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-family: 'Tajawal', sans-serif;
-    font-weight: bold;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.3s;
-" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';">
-    <i class="fas fa-home"></i> الرئيسية
-</a>
 </body>
 </html>
