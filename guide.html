@@ -2,52 +2,306 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دليل المستخدم الشامل – المنصة الشاملة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>دليل المستخدم – المنصة الشاملة</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Tajawal',sans-serif;background:#0b0e17;color:#f0f4fa;line-height:1.7;min-height:100vh;padding:2rem}
-        .container{max-width:1200px;margin:0 auto}
-        header{text-align:center;margin-bottom:2.5rem}
-        header h1{font-size:2.2rem;background:linear-gradient(135deg,#f0e6d2,#cfd9ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-flex;align-items:center;gap:.5rem}
-        header h1 i{color:#b48554;-webkit-text-fill-color:initial;background:0 0}
-        .search-wrapper{position:relative;max-width:600px;margin:2rem auto}
-        .search-wrapper i{position:absolute;top:50%;right:15px;transform:translateY(-50%);color:#b48554;font-size:1.1rem}
-        #searchInput{width:100%;padding:1rem 3rem 1rem 1.5rem;border-radius:50px;border:1px solid rgba(180,133,84,.3);background:rgba(18,24,36,.7);backdrop-filter:blur(10px);color:#f0f4fa;font-family:inherit;font-size:1rem;transition:all .3s}
-        #searchInput:focus{outline:0;border-color:#b48554;box-shadow:0 0 0 3px rgba(180,133,84,.2);background:rgba(22,30,46,.9)}
-        .tools-grid{display:flex;flex-direction:column;gap:1.5rem}
-        .tool-card{background:rgba(22,30,46,.7);backdrop-filter:blur(15px);border:1px solid rgba(180,133,84,.2);border-radius:20px;padding:1.8rem;transition:all .3s;box-shadow:0 10px 30px -10px rgba(0,0,0,.5)}
-        .tool-card:hover{border-color:#b48554;box-shadow:0 0 25px rgba(180,133,84,.2);transform:translateY(-3px)}
-        .tool-card h2{font-size:1.5rem;font-weight:800;color:#cfa776;margin-bottom:1rem;border-bottom:1px solid rgba(180,133,84,.3);padding-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
-        .tool-card h2 i{color:#b48554}
-        .tool-content{color:#d0d9e8;line-height:1.8;white-space:pre-wrap}
-        .tool-content h3{font-size:1.2rem;margin:1.5rem 0 .8rem;color:#e2c5a3}
-        .tool-content table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.9rem}
-        .tool-content th,.tool-content td{border:1px solid rgba(180,133,84,.25);padding:.5rem .8rem;text-align:right}
-        .tool-content th{background:rgba(180,133,84,.1);color:#f0e6d2}
-        .no-results{text-align:center;font-size:1.3rem;color:#aab7d4;margin-top:3rem;display:none}
-        .back-btn{display:inline-flex;align-items:center;gap:.5rem;background:rgba(180,133,84,.2);border:1px solid #b48554;color:#cfa776;padding:.7rem 1.8rem;border-radius:50px;text-decoration:none;font-weight:700;margin-bottom:1.5rem;transition:all .3s}
-        .back-btn:hover{background:rgba(180,133,84,.4);color:#fff;box-shadow:0 0 20px rgba(180,133,84,.3)}
-        footer{text-align:center;color:#aab7d4;margin-top:3rem;font-size:.9rem}
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        /* ===== إزالة كل ما يسبب الاهتزاز ===== */
+        .container, header, .search-wrapper, .tool-card, .back-btn,
+        .tool-content, .no-results, footer, .collapsible-header {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== خلفية ثابتة ===== */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
+            z-index: -1;
+        }
+
+        /* ===== الحاوية ===== */
+        .container {
+            max-width: 1100px; margin: 0 auto;
+            position: relative; z-index: 1;
+        }
+
+        /* ===== الهيدر ===== */
+        header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-top: 0.5rem;
+        }
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #d4b15a;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        header h1 i { color: #b48554; }
+        header p {
+            color: #aab7d4;
+            font-size: 0.95rem;
+            margin-top: 0.3rem;
+        }
+
+        /* ===== زر العودة ===== */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(180,133,84,0.12);
+            border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 50px;
+            padding: 0.4rem 1.2rem;
+            color: #cfa776;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+        .back-btn:hover { background: rgba(180,133,84,0.25); border-color: #b48554; }
+        .back-btn i { color: #b48554; }
+
+        /* ===== البحث ===== */
+        .search-wrapper {
+            position: relative;
+            max-width: 100%;
+            margin: 0.8rem auto 1.5rem;
+        }
+        .search-wrapper i {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            color: #b48554;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 0.8rem 3rem 0.8rem 1.2rem;
+            border-radius: 50px;
+            border: 2px solid rgba(180,133,84,0.2);
+            background: rgba(18,24,36,0.8);
+            backdrop-filter: blur(8px);
+            color: #f0f4fa;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            outline: none;
+        }
+        #searchInput:focus {
+            border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+            background: rgba(22,30,46,0.9);
+        }
+        #searchInput::placeholder {
+            color: #6a7a8e;
+        }
+
+        /* ===== شبكة الأدوات ===== */
+        .tools-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* ===== بطاقة الأداة (قابلة للطي) ===== */
+        .tool-card {
+            background: rgba(22,30,46,0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.4);
+        }
+        .tool-card:hover {
+            border-color: rgba(180,133,84,0.3);
+        }
+
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.2rem;
+            cursor: pointer;
+            gap: 0.8rem;
+            user-select: none;
+            background: rgba(15,20,30,0.3);
+        }
+        .collapsible-header h2 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #cfa776;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+        .collapsible-header h2 i {
+            color: #b48554;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .collapsible-header .toggle-icon {
+            color: #aab7d4;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            transition: transform 0.15s;
+        }
+        .collapsible-header .toggle-icon.open {
+            transform: rotate(180deg);
+        }
+
+        .tool-content {
+            padding: 0 1.2rem 1.2rem;
+            color: #d0d9e8;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            display: none;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .tool-content.open {
+            display: block;
+        }
+
+        .tool-content h3 {
+            font-size: 1.1rem;
+            margin: 1.2rem 0 0.6rem;
+            color: #e2c5a3;
+        }
+        .tool-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.6rem 0;
+            font-size: 0.85rem;
+            background: rgba(10,14,23,0.4);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .tool-content th,
+        .tool-content td {
+            border: 1px solid rgba(180,133,84,0.15);
+            padding: 0.4rem 0.6rem;
+            text-align: right;
+        }
+        .tool-content th {
+            background: rgba(180,133,84,0.1);
+            color: #f0e6d2;
+            font-weight: 700;
+        }
+        .tool-content td {
+            color: #d0d9e8;
+        }
+
+        /* ===== لا توجد نتائج ===== */
+        .no-results {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #aab7d4;
+            margin-top: 2rem;
+            display: none;
+        }
+        .no-results i {
+            color: #b48554;
+            margin-left: 0.5rem;
+        }
+
+        /* ===== الفوتر ===== */
+        footer {
+            text-align: center;
+            color: #aab7d4;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            padding-bottom: 0.5rem;
+        }
+        footer span {
+            color: #cfa776;
+            font-weight: 700;
+        }
+
+        /* ===================================================
+           تحسينات الجوال
+           =================================================== */
+        @media (max-width: 768px) {
+            body { padding: 0.8rem; }
+            header h1 { font-size: 1.5rem; }
+            header p { font-size: 0.85rem; }
+            .back-btn { font-size: 0.8rem; padding: 0.3rem 1rem; }
+            #searchInput { font-size: 0.9rem; padding: 0.7rem 2.8rem 0.7rem 1rem; }
+            .collapsible-header { padding: 0.8rem 1rem; }
+            .collapsible-header h2 { font-size: 1rem; }
+            .collapsible-header h2 i { font-size: 1rem; }
+            .tool-content { font-size: 0.9rem; padding: 0 0.8rem 0.8rem; }
+            .tool-content table { font-size: 0.8rem; }
+            .tool-content th, .tool-content td { padding: 0.3rem 0.5rem; }
+        }
+
+        @media (max-width: 400px) {
+            header h1 { font-size: 1.2rem; }
+            .collapsible-header h2 { font-size: 0.9rem; flex-wrap: wrap; }
+            .collapsible-header .toggle-icon { font-size: 1rem; }
+            .tool-content { font-size: 0.85rem; }
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <a href="index.html" class="back-btn"><i class="fas fa-arrow-right"></i> العودة للرئيسية</a>
-    <header>
-        <h1><i class="fas fa-book-open"></i> دليل المستخدم الشامل</h1>
-        <p style="color:#aab7d4;margin-top:.5rem">ابحث عن أي أداة أو تصفح الأدوات بالأسفل</p>
-    </header>
-    <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="ابحث عن اسم الأداة ..." autofocus></div>
-    <div id="noResults" class="no-results"><i class="fas fa-exclamation-circle"></i> لا توجد أدوات مطابقة للبحث</div>
-    <div class="tools-grid" id="toolsContainer"></div>
-    <footer>© 2026 FAROUK GRUP · جميع الحقوق محفوظة</footer>
-</div>
-<script>
-    const tools = [
-        {
+    <div class="container">
+        <!-- زر العودة -->
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-right"></i> العودة للرئيسية</a>
+
+        <!-- الهيدر -->
+        <header>
+            <h1><i class="fas fa-book-open"></i> دليل المستخدم الشامل</h1>
+            <p>ابحث عن أي أداة أو تصفح الأدوات بالأسفل</p>
+        </header>
+
+        <!-- البحث -->
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="ابحث عن اسم الأداة ..." autofocus>
+        </div>
+
+        <!-- رسالة لا توجد نتائج -->
+        <div id="noResults" class="no-results">
+            <i class="fas fa-exclamation-circle"></i> لا توجد أدوات مطابقة للبحث
+        </div>
+
+        <!-- قائمة الأدوات -->
+        <div class="tools-grid" id="toolsContainer"></div>
+
+        <!-- الفوتر -->
+        <footer>© 2026 <span>FAROUK GRUP</span> · جميع الحقوق محفوظة</footer>
+    </div>
+
+    <script>
+        // ============================================================
+        // البيانات – جميع الأدوات مع محتواها
+        // ============================================================
+        const tools = [{
             name: "أداة دراسة الجدوى المالية الشاملة",
             icon: "fa-chart-pie",
             content: `
@@ -119,8 +373,7 @@
 - يمكنك التعديل على أي رقم والضغط "احسب" مرة أخرى.  
 - استخدم الآلة الحاسبة العائمة (أسفل اليسار).  
 - لا تنس كتابة اسم الجهة.`
-        },
-        {
+        }, {
             name: "حاسبة تكاليف المطاعم الشاملة",
             icon: "fa-utensils",
             content: `
@@ -191,8 +444,7 @@
 6. تصدير التقارير: 📄 Word و 📊 Excel (بأوراق متعددة).
 
 💡 نصائح إضافية: استخدم القيم الافتراضية إذا لم تكن متأكداً، وجرب تغيير عدد العملاء.`
-        },
-        {
+        }, {
             name: "أداة دراسة الجدوى الفنية المتقدمة للمطاعم",
             icon: "fa-gear",
             content: `
@@ -237,8 +489,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (4 أوراق).
 
 💡 نصائح: أدخل بيانات المعدات بدقة، وراقب تحذيرات الكهرباء.`
-        },
-        {
+        }, {
             name: "أداة دراسة الجدوى التسويقية الشاملة",
             icon: "fa-chart-simple",
             content: `
@@ -263,8 +514,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (عدة أوراق).
 
 💡 نصائح: تأكد من سعر البيع > تكلفة الوجبة، اجعل LTV/CAC > 3.`
-        },
-        {
+        }, {
             name: "حاسبة العائد على الاستثمار العقاري",
             icon: "fa-building",
             content: `
@@ -290,8 +540,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (5 أوراق).
 
 💡 نصائح: إذا اشتريت نقداً اجعل القرض 0%، جرب أزرار الحساسية.`
-        },
-        {
+        }, {
             name: "أداة تحليل المخاطر المتقدم (مونت كارلو)",
             icon: "fa-wave-square",
             content: `
@@ -315,8 +564,7 @@
 5. تصدير التقارير: 📊 Excel (5 أوراق) و 📄 Word.
 
 💡 نصائح: زد التكرارات للدقة، احتمالية خسارة >40% تعني خطر.`
-        },
-        {
+        }, {
             name: "حاسبة نقطة التعادل (Break-Even Point)",
             icon: "fa-chart-line",
             content: `
@@ -342,8 +590,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (6 أوراق).
 
 💡 نصائح: إذا كانت نقطة التعادل قريبة من طاقتك القصوى، اخفض التكاليف أو ارفع السعر.`
-        },
-        {
+        }, {
             name: "حاسبة التدفق النقدي المتقدمة",
             icon: "fa-coins",
             content: `
@@ -366,8 +613,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (7 أوراق).
 
 💡 نصائح: FCFF سالب كبير؟ راجع CAPEX أو رأس المال العامل.`
-        },
-        {
+        }, {
             name: "حاسبة الإهلاك المتقدمة",
             icon: "fa-chart-simple",
             content: `
@@ -394,8 +640,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (6 أوراق).
 
 💡 نصائح: طريقة مضاعف الرصيد لا تترك قيمة إنقاذ عادةً وتتوقف تلقائياً.`
-        },
-        {
+        }, {
             name: "حاسبة WACC",
             icon: "fa-scale-balanced",
             content: `
@@ -419,8 +664,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (6 أوراق).
 
 💡 نصائح: WACC هو الحد الأدنى للعائد المطلوب للمشاريع.`
-        },
-        {
+        }, {
             name: "حاسبة العائد على الاستثمار (ROI)",
             icon: "fa-chart-line",
             content: `
@@ -445,8 +689,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (5 أوراق).
 
 💡 نصائح: فترة استرداد > 5 سنوات تعني مخاطرة عالية.`
-        },
-        {
+        }, {
             name: "حاسبة جدولة القروض المتقدمة",
             icon: "fa-hand-holding-usd",
             content: `
@@ -470,8 +713,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (6 أوراق).
 
 💡 نصائح: جرب دفعة إضافية صغيرة لترى كم توفر.`
-        },
-        {
+        }, {
             name: "حاسبة تكلفة العمالة المثالية",
             icon: "fa-users",
             content: `
@@ -496,8 +738,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (6 أوراق).
 
 💡 نصائح: نسبة العمالة المثالية 20-30% للمطاعم.`
-        },
-        {
+        }, {
             name: "نظام تدقيق HACCP المتقدم",
             icon: "fa-exclamation-triangle",
             content: `
@@ -516,8 +757,7 @@
 5. تصدير التقارير: 📊 Excel (3 أوراق) و 📄 Word.
 
 💡 نصائح: ركز على البنود عالية الخطورة (الحمراء).`
-        },
-        {
+        }, {
             name: "نظام تدقيق إجراءات التشغيل القياسية (SOPs)",
             icon: "fa-clipboard-list",
             content: `
@@ -533,8 +773,7 @@
 4. تصدير تقرير Word: جميع البنود والتوصيات، جاهز للطباعة.
 
 💡 نصائح: ابدأ بالبنود عالية الخطورة.`
-        },
-        {
+        }, {
             name: "الحاسبة المالية والاستشارية",
             icon: "fa-calculator",
             content: `
@@ -553,8 +792,7 @@
 3. لوحة سجل العمليات: تصفية، تصدير CSV، مسح.
 
 💡 نصائح: استخدم لوحة المفاتيح مباشرة، زر M+ لتجميع الأرقام في الذاكرة.`
-        },
-        {
+        }, {
             name: "تحليل نقطة التعادل متعددة المنتجات",
             icon: "fa-chart-line",
             content: `
@@ -579,8 +817,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (6 أوراق).
 
 💡 نصائح: ركز على المنتجات ذات أعلى هامش مساهمة.`
-        },
-        {
+        }, {
             name: "حاسبة النسب المالية الشاملة",
             icon: "fa-percentage",
             content: `
@@ -604,8 +841,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (5 أوراق).
 
 💡 نصائح: النسبة المتداولة < 1 إنذار خطر، ROE ينبغي > 15%.`
-        },
-        {
+        }, {
             name: "أداة التنبؤ المالي المتقدم",
             icon: "fa-arrow-trend-up",
             content: `
@@ -630,8 +866,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (7 أوراق).
 
 💡 نصائح: إذا NPV سالب راجع الافتراضات.`
-        },
-        {
+        }, {
             name: "نموذج تقييم الموظفين",
             icon: "fa-user-check",
             content: `
@@ -649,8 +884,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel.
 
 💡 نصائح: استخدم التوصيات كخطة تطوير فردية.`
-        },
-        {
+        }, {
             name: "مقياس تحديد الإداري (عقلية الاحتفاظ بالمواهب)",
             icon: "fa-user-check",
             content: `
@@ -668,8 +902,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel.
 
 💡 نصائح: كن صريحاً، إذا كنت في المنطقة البرتقالية أو الحمراء ابدأ بالتوصيات فوراً.`
-        },
-        {
+        }, {
             name: "هندسة قوائم الطعام (Menu Engineering)",
             icon: "fa-object-group",
             content: `
@@ -692,8 +925,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel.
 
 💡 نصائح: حول علامات الاستفهام إلى نجوم بالتسويق، واحذف الكلاب غير الاستراتيجية.`
-        },
-        {
+        }, {
             name: "حاسبة CAC و CLV",
             icon: "fas fa-users",
             content: `
@@ -714,8 +946,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel.
 
 💡 نصائح: اسعَ لنسبة > 3.`
-        },
-        {
+        }, {
             name: "أداة التحليل وتوليد المحتوى الذكي",
             icon: "fas fa-robot",
             content: `
@@ -734,8 +965,7 @@
 4. تصدير المحتوى: 📄 زر "تصدير إلى Word".
 
 💡 نصائح: كن محدداً في الوصف.`
-        },
-        {
+        }, {
             name: "حاسبة الفجوة النقدية (CCC)",
             icon: "fas fa-money-bill-wave",
             content: `
@@ -759,8 +989,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (6 أوراق).
 
 💡 نصائح: CCC سالب يعني تمويل ممتاز من الموردين.`
-        },
-        {
+        }, {
             name: "تحليل الاستثمار (NPV / IRR / Payback)",
             icon: "fa-wave-square",
             content: `
@@ -782,8 +1011,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel (ورقتان).
 
 💡 نصائح: كلما زاد NPV كان أفضل، IRR يجب > معدل الخصم.`
-        },
-        {
+        }, {
             name: "تحليل السيناريوهات (What-If Analysis)",
             icon: "fas fa-lightbulb",
             content: `
@@ -807,8 +1035,7 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel.
 
 💡 نصائح: جرب تغيير عامل واحد في كل مرة.`
-        },
-        {
+        }, {
             name: "تقييم المعارف والمهارات الشخصية",
             icon: "fa-award",
             content: `
@@ -824,8 +1051,7 @@
 4. تصدير التقارير: 📄 Word و 📊 Excel مع تظليل الدرجات.
 
 💡 نصائح: ركز على الجوانب الحمراء أولاً.`
-        },
-        {
+        }, {
             name: "حاسبة تقييم المطاعم",
             icon: "fa-ranking-star",
             content: `
@@ -850,160 +1076,74 @@
 5. تصدير التقارير: 📄 Word و 📊 Excel.
 
 💡 نصائح: المضاعف الطبيعي 2.5 – 3.5.`
-        },
-        {
-            name: "حاسبة تقييم الشركات البرمجية الناشئة",
-            icon: "fa-rocket",
-            content: `
-📌 ما هذه الأداة ومتى تستخدمها؟
-تساعدك هذه الحاسبة في تقدير القيمة العادلة لشركتك البرمجية الناشئة باستخدام طريقتين معتمدتين: طريقة بيركوس (Berkus Method) وطريقة التكلفة المستبدلة المعدلة بالمخاطر. مثالية للجولات التأسيسية وما قبل الإيرادات.
+        }];
 
-1. قبل أن تبدأ
-- اختر العملة واكتب اسم الشركة في الشريط العلوي.
-- الأداة تدعم مرحلتين: ما بعد الإيرادات (باستخدام مضاعف ARR وطريقة VC) وما قبل الإيرادات (باستخدام بيركوس والتكلفة المستبدلة).
-- اختر المرحلة المناسبة من الأزرار في الأعلى.
+        // ============================================================
+        // عرض الأدوات مع خاصية الطي
+        // ============================================================
+        const container = document.getElementById('toolsContainer');
+        const searchInput = document.getElementById('searchInput');
+        const noResults = document.getElementById('noResults');
 
-2. شرح المدخلات – مرحلة ما قبل الإيرادات
-هذه المرحلة تستخدم طريقتين أساسيتين لتقييم الشركات الناشئة التي لم تحقق إيرادات بعد:
-
-🟡 أولاً: طريقة بيركوس (Berkus Method)
-الحد الأقصى لكل عنصر هو 500,000 دولار، ويتم تقييم كل بند من أصل هذا المبلغ بناءً على التالي:
-
-🔹 الفكرة وجودة الحل (Idea & Basic Value):
-كيف تقيمها؟ هل المشكلة التي تحلها حقيقية وكبيرة؟ هل الحل مبتكر (Unique) أم مجرد تقليد؟
-التقدير:
-- فكرة عادية ومكررة: 100,000$ - 200,000$
-- فكرة قوية ولها سوق واضح: 250,000$ - 350,000$
-- فكرة ثورية ذات ملكية فكرية أو ميزة تنافسية فريدة: 400,000$ - 500,000$
-
-🔹 النموذج الأولي والتقنية (Prototype / Technology):
-كيف تقيمها؟ هل لديك نموذج أولي (MVP) يعمل فعلياً؟ هل بنيت التقنية بشكل نظيف وقابل للتوسع (Scalable)؟
-التقدير:
-- مجرد تصاميم واجهات (UI/UX) أو فكرة على ورق: 50,000$ - 150,000$
-- نموذج أولي يعمل (MVP) ولكنه يحتاج تحسين: 200,000$ - 350,000$
-- منتج تقني جاهز ومختبر ويعمل بكفاءة عالية: 400,000$ - 500,000$
-
-🔹 قوة الفريق المؤسس (Quality of Management Team):
-كيف تقيمها؟ هل لدى المؤسسين خبرة سابقة في نفس المجال؟ هل هناك مطور تقني (CTO) قوي ومؤسس تجاري ذو خبرة؟
-التقدير:
-- مؤسس واحد منفرد وبخبرة قليلة: 100,000$ - 200,000$
-- فريق متكامل يغطي الجانب التقني والتجاري بخبرة متوسطة: 250,000$ - 350,000$
-- فريق استثنائي سبق له بناء وبيع شركات ناجحة أو خبراء بارزون في القطاع: 400,000$ - 500,000$
-
-🔹 العلاقات الاستراتيجية (Strategic Relationships):
-كيف تقيمها؟ هل لديك شراكات مبدئية، خطابات نوايا (LOI) مع عملاء محتملين، أو جهات دعم ومستشارين استراتيجيين؟
-التقدير:
-- لا توجد علاقات أو شراكات بعد: 0$ - 100,000$
-- محادثات متقدمة أو شراكات غير رسمية: 150,000$ - 300,000$
-- شراكات استراتيجية موقعة أو التزامات واضحة من جهات كبرى: 350,000$ - 500,000$
-
-🔹 التنفيذ والمبيعات الأولية (Execution / Rollout):
-كيف تقيمها؟ هل بدأت باختبار السوق؟ هل هناك مستخدمون تجريبيون (Beta Users) حتى لو لم يدفعوا، أو مؤشرات اهتمام حقيقية؟
-التقدير:
-- لم يبدأ الإطلاق التجريبي بعد: 0$ - 100,000$
-- إطلاق تجريبي مع عدد محدود من المستخدمين التجريبيين: 150,000$ - 300,000$
-- قاعدة مستخدمين تجريبيين تنمو بسرعة أو طلبات مسبقة (Waitlist) قوية: 350,000$ - 500,000$
-
-
-🟡 ثانياً: طريقة التكلفة المستبدلة المعدلة بالمخاطر (Risk Factor Summing)
-هذه الطريقة تحسب التقييم بناءً على "كم تكلفنا إعادة بناء هذا المشروع من الصفر؟" مضافاً إليها نسبة تعكس حجم المخاطر المحيطة بالشركة.
-
-🔹 تكلفة إعادة بناء التقنية (Rebuild Cost):
-كيف تحسبها؟ احسب إجمالي ساعات العمل التي استغرقها (أو سيستغرقها) الفريق لبناء المنتج البرمجي، واضربها في متوسط أجر المطور أو وكالة التطوير بالساعة.
-مثال عملي: إذا احتاج المشروع إلى 3 مطورين لمدة 6 أشهر (حوالي 3,000 ساعة عمل)، وكان معدل تكلفة الساعة 100 دولار، تكون التكلفة:
-3,000 × 100 = 300,000 دولار
-
-🔹 علاوة المخاطرة (Risk Premium %):
-كيف تحددها؟ هي نسبة مئوية تزيد كلما زادت المخاطر (مخاطر المنافسة، التنظيم القانوني، صعوبة التسويق، أو المخاطر التقنية).
-التقدير النموذجي:
-- مخاطر منخفضة جداً (فريق خبير وسوق سهل): 10% - 20%
-- مخاطر متوسطة (سوق تنافسي وتحت التطوير): 25% - 40%
-- مخاطر عالية جداً (تقنية معقدة جداً أو تنظيم حكومي معقد): 50% فما فوق
-
-معادلة الحساب النهائية لهذا البند:
-التكلفة المعرضة للمخاطر = تكلفة الإعادة × (1 + نسبة المخاطر / 100)
-بناءً على المثال السابق (300,000$ تكلفة و 25% مخاطر):
-300,000 × 1.25 = 375,000 دولار
-
-
-🟡 ثالثاً: النتيجة النهائية (التقييم المدمج)
-بعد حساب إجمالي طريقة بيركوس (مثلاً طلع معنا 1,500,000$) وإجمالي التكلفة المستبدلة بالمخاطر (مثلاً 375,000$)، تقوم الحاسبة بأخذ المتوسط ليكون هو التقييم التقريبي العادل للجولة التأسيسية:
-التقييم النهائي = (1,500,000 + 375,000) / 2 = 937,500 دولار
-
-
-3. شرح المدخلات – مرحلة ما بعد الإيرادات
-في هذه المرحلة، يتم استخدام مضاعف الإيراد المتكرر (ARR Multiple) وطريقة رأس المال الجريء (VC Method).
-
-🟢 الإيرادات والنمو:
-- الإيراد السنوي المتكرر (ARR): إجمالي الإيرادات السنوية من الاشتراكات والعقود.
-- معدل النمو السنوي (%): نسبة نمو الإيرادات سنة بعد سنة.
-- هامش الربح الإجمالي (%): (الإيرادات - تكلفة الخدمة) / الإيرادات. البرمجيات القوية تتجاوز 70%.
-- هامش الربح التشغيلي (%): يستخدم لحساب قاعدة الـ 40. قد يكون سالباً للشركات الناشئة.
-- معدل التسرب الشهري (%): نسبة العملاء الذين يلغون اشتراكاتهم شهرياً. أقل من 2% صحي.
-- صافي الاحتفاظ بالإيرادات NRR (%): نسبة الإيرادات المحتفظ بها من العملاء الحاليين. فوق 110% يعني توسعاً.
-
-🟢 اقتصاديات الوحدة:
-- عدد العملاء الحاليين، تكلفة اكتساب العميل (CAC)، القيمة الدائمة للعميل (LTV).
-- صافي الحرق الشهري، النقد المتاح.
-
-🟢 مؤشرات متقدمة (اختيارية):
-- ARR الربع الحالي والربع السابق، مصاريف مبيعات وتسويق (لحساب الرقم السحري Magic Number).
-
-🟢 طريقة رأس المال الجريء (VC):
-- قيمة التخارج المتوقعة، مضاعف العائد المستهدف (ROI)، سنوات التخارج.
-
-
-4. اضغط على زر "احسب نطاق التقييم"
-بعد إدخال البيانات، اضغط الزر الكبير. ستظهر النتائج كاملة أسفل الزر.
-
-5. كيف تقرأ النتائج؟
-🟩 بطاقات مؤشرات الأداء: الإيراد المتكرر، معدل النمو، صافي الاحتفاظ، LTV/CAC، استرداد الاكتساب، الرقم السحري، مضاعف الحرق، المدرج النقدي.
-🎯 قاعدة الـ 40: تظهر ما إذا كان مجموع النمو والهامش التشغيلي يتجاوز 40%.
-📊 نطاق التقييم: جدول يوضح القيمة المنخفضة والأساسية والمرتفعة حسب طريقتي المضاعف وVC.
-📈 رسم بياني: يقارن نطاق التقييم بين الطريقتين بصرياً.
-📝 تفسير النتائج: تحليل مفصل لكل مؤشر مع توصيات.
-
-6. تصدير التقارير
-📄 تقرير Word كامل + رسم بياني: ملف منسق يحتوي على الغلاف، المؤشرات، نطاق التقييم، الرسم البياني، والتوصيات.
-📊 تصدير Excel احترافي: 5 أوراق (غلاف، مدخلات، مؤشرات، نطاق التقييم، تفسير وتوصيات) مع تنسيق احترافي كامل.
-
-
-💡 نصائح مهمة
-- للجولات التأسيسية (ما قبل الإيرادات)، استخدم طريقة بيركوس والتكلفة المستبدلة. القيم النموذجية للشركات الناشئة الواعدة تتراوح بين 500,000$ و 2,500,000$.
-- عند استخدام طريقة بيركوس، كن واقعياً في تقدير كل عنصر. المبالغة في التقييم قد تؤثر على مصداقيتك أمام المستثمرين.
-- قاعدة الـ 40 هي مؤشر سريع: اجمع نسبة النمو مع هامش الربح التشغيلي. إذا تجاوزت 40% فأنت في وضع صحي.
-- الرقم السحري (Magic Number) يقيس كفاءة الإنفاق التسويقي: الرقم أعلى من 1 يعني أن كل دولار تنفقه على التسويق يعود عليك بدولار من الإيرادات الجديدة.
-- نسبة LTV/CAC الأعلى من 3x تعني أن نموذج عملك مستدام.
-- استخدم نطاق التقييم (منخفض/أساسي/مرتفع) في المفاوضات مع المستثمرين بدلاً من رقم واحد.
-- في مرحلة ما قبل الإيرادات، ركز على بناء فريق قوي ومنتج أولي (MVP) وعلاقات استراتيجية قبل البحث عن تمويل.
-- الأداة تدعم 6 عملات مختلفة (دولار، يورو، ليرة تركية، جنيه مصري، دينار كويتي، ريال سعودي).
-- الآلة الحاسبة العائمة (أسفل يسار الشاشة) متاحة دائماً لإجراء عمليات حسابية سريعة.
-`
-        }
-    ];
-
-    const container = document.getElementById('toolsContainer');
-    const searchInput = document.getElementById('searchInput');
-    const noResults = document.getElementById('noResults');
-
-    function renderTools(filter = '') {
-        const filtered = tools.filter(tool => tool.name.includes(filter) || filter === '');
-        container.innerHTML = '';
-        if (filtered.length === 0) {
-            noResults.style.display = 'block';
-        } else {
+        // دالة لعرض الأدوات
+        function renderTools(filter = '') {
+            const filtered = tools.filter(tool =>
+                tool.name.includes(filter) || filter === ''
+            );
+            container.innerHTML = '';
+            if (filtered.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            }
             noResults.style.display = 'none';
-            filtered.forEach(tool => {
+
+            filtered.forEach((tool, index) => {
                 const card = document.createElement('div');
                 card.className = 'tool-card';
-                card.innerHTML = `<h2><i class="fas ${tool.icon}"></i> ${tool.name}</h2><div class="tool-content">${tool.content}</div>`;
+
+                // رأس قابل للطي
+                const header = document.createElement('div');
+                header.className = 'collapsible-header';
+                header.innerHTML = `
+                    <h2><i class="fas ${tool.icon}"></i> ${tool.name}</h2>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                `;
+
+                // المحتوى
+                const content = document.createElement('div');
+                content.className = 'tool-content';
+                content.innerHTML = tool.content;
+
+                // إضافة حدث الطي
+                header.addEventListener('click', function() {
+                    const isOpen = content.classList.contains('open');
+                    content.classList.toggle('open');
+                    const icon = this.querySelector('.toggle-icon');
+                    if (icon) {
+                        icon.classList.toggle('open');
+                    }
+                });
+
+                // فتح البطاقة الأولى افتراضياً
+                if (index === 0 && filter === '') {
+                    content.classList.add('open');
+                    header.querySelector('.toggle-icon').classList.add('open');
+                }
+
+                card.appendChild(header);
+                card.appendChild(content);
                 container.appendChild(card);
             });
         }
-    }
 
-    searchInput.addEventListener('input', e => renderTools(e.target.value.trim()));
-    renderTools();
-</script>
+        // البحث المباشر
+        searchInput.addEventListener('input', function(e) {
+            const val = e.target.value.trim();
+            renderTools(val);
+        });
+
+        // التهيئة – عرض جميع الأدوات
+        renderTools();
+    </script>
 </body>
 </html>
