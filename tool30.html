@@ -2,476 +2,187 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
-    <title>حاسبة تقييم المطاعم | FAROUK GRUP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>تقييم المطاعم | FAROUK GRUP</title>
     <!-- حماية الصفحة -->
-    <script src="auth-check.js">
-    </script>
-    <!-- Fonts & Icons -->
+    <script src="auth-check.js"></script>
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js">
-    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        :root {
-            --bg-dark: #0b0e17;
-            --bg-panel: rgba(18, 24, 36, 0.85);
-            --bg-card: rgba(22, 30, 46, 0.8);
-            --border-light: rgba(180, 133, 84, 0.25);
-            --accent-glow: #b48554;
-            --accent-soft: #cfa776;
-            --text-light: #f0f4fa;
-            --text-muted: #aab7d4;
-            --text-dark: #0b0e17;
-            --shadow-soft: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 133, 84, 0.15);
-            --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
-            --radius-md: 20px;
-            --radius-lg: 30px;
-            --transition: all 0.3s ease;
-            --gold: #b8860b;
-            --gold-light: #d4b15a;
-        }
-        body {
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
             font-family: 'Tajawal', sans-serif;
-            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
-            color: var(--text-light);
-            line-height: 1.6;
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
         }
+
+        /* ===== إزالة كل ما يسبب الاهتزاز ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .chart-card, .scenario-card, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .capital-injection,
+        .export-word-btn, .export-excel-full-btn {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== خلفية ثابتة بدون أنيميشن ===== */
         .glow-bg {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 0;
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
         }
         .glow-bg span {
             position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(180, 133, 84, 0.15) 0%, transparent 70%);
             border-radius: 50%;
             filter: blur(80px);
-            animation: glowMove 20s infinite alternate ease-in-out;
+            opacity: 0.25;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.12) 0%, transparent 70%);
         }
-        .glow-bg span:nth-child(1) {
-            top: -100px;
-            right: -100px;
-            width: 500px;
-            height: 500px;
-        }
-        .glow-bg span:nth-child(2) {
-            bottom: -150px;
-            left: -150px;
-            width: 600px;
-            height: 600px;
-        }
-        .glow-bg span:nth-child(3) {
-            top: 30%;
-            left: 30%;
-            width: 300px;
-            height: 300px;
-            animation-delay: -5s;
-        }
-        @keyframes glowMove {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 0.5;
-            }
-            100% {
-                transform: translate(40px, -30px) scale(1.2);
-                opacity: 0.8;
-            }
-        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.06) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.08) 0%, transparent 70%); }
+        .floating-shape { display: none; }
 
-        /* أشكال عائمة إضافية */
-        .floating-shape {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(184, 134, 11, 0.1) 0%, transparent 70%);
-            z-index: 0;
-            pointer-events: none;
-        }
-        .shape-1 {
-            top: -100px;
-            right: -100px;
-            animation: float 20s infinite ease-in-out;
-        }
-        .shape-2 {
-            bottom: -50px;
-            left: -50px;
-            width: 200px;
-            height: 200px;
-            animation: float 15s infinite ease-in-out reverse;
-        }
-        @keyframes float {
-            0% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-            33% {
-                transform: translate(30px, -30px) rotate(5deg);
-            }
-            66% {
-                transform: translate(-20px, 20px) rotate(-5deg);
-            }
-            100% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-        }
-
+        /* ===== HERO ===== */
         .hero-mini {
             background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-            color: white;
-            text-align: center;
-            padding: 2.5rem 1rem;
-            border-bottom: 4px solid var(--gold);
-            position: relative;
-            overflow: hidden;
-            z-index: 2;
-        }
-        .hero-mini::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(184, 134, 11, 0.2) 0%, transparent 60%);
-            animation: rotate 30s linear infinite;
-        }
-        @keyframes rotate {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
         }
         .hero-mini h2 {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--gold-light);
-            margin-bottom: 0.5rem;
-            position: relative;
-            z-index: 2;
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
         .hero-mini p {
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto;
-            opacity: 0.95;
-            position: relative;
-            z-index: 2;
-            color: #e0d7c6;
-        }
-        .calc-wrapper {
-            max-width: 1100px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            position: relative;
-            z-index: 2;
-        }
-        .calc-box {
-            background: var(--bg-panel);
-            backdrop-filter: blur(15px);
-            border: 2px solid var(--border-light);
-            border-radius: var(--radius-lg);
-            padding: 1.8rem;
-            box-shadow: var(--shadow-soft);
-            position: relative;
-            overflow: hidden;
-        }
-        .calc-box:hover {
-            box-shadow: var(--shadow-glow);
-            border-color: rgba(180, 133, 84, 0.4);
-        }
-        .currency-row {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-            background: rgba(180, 133, 84, 0.15);
-            border: 1px solid var(--border-light);
-            padding: 0.8rem 1rem;
-            border-radius: 50px;
-            margin-bottom: 1.5rem;
-        }
-        .currency-row label {
-            font-weight: 700;
-            color: var(--accent-soft);
-            margin: 0;
-        }
-        .currency-row select,
-        .currency-row input {
-            padding: 0.5rem 1rem;
-            border: 2px solid var(--border-light);
-            border-radius: 30px;
-            font-family: 'Tajawal', sans-serif;
-            font-weight: 700;
-            background: rgba(10, 14, 23, 0.7);
-            color: var(--text-light);
-        }
-        .section-title-sm {
-            font-size: 1.3rem;
-            font-weight: 900;
-            color: var(--accent-soft);
-            margin: 1.5rem 0 0.8rem 0;
-            border-bottom: 2px solid var(--border-light);
-            padding-bottom: 0.3rem;
-        }
-        .form-row {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 0.5rem;
-        }
-        .form-group {
-            flex: 1 1 180px;
-            margin-bottom: 0.8rem;
-            position: relative;
-        }
-        label {
-            display: block;
-            margin-bottom: 0.3rem;
-            font-weight: 700;
-            color: var(--accent-soft);
-            font-size: 0.9rem;
-        }
-        label i {
-            color: var(--accent-soft);
-            margin-left: 0.3rem;
-        }
-        input,
-        select {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 2px solid var(--border-light);
-            border-radius: 30px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            background: rgba(10, 14, 23, 0.7);
-            color: var(--text-light);
-            transition: var(--transition);
-        }
-        input:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 0 3px rgba(180, 133, 84, 0.2);
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
         }
 
-        /* Tooltip */
+        /* ===== WRAPPER ===== */
+        .calc-wrapper {
+            max-width: 1050px;
+            margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+        }
+
+        /* ===== CARD ===== */
+        .calc-box {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .calc-box h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+        }
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== صف العملة ===== */
+        .currency-row {
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.8rem; background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.2);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
+        }
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
+        .currency-row select, .currency-row input {
+            flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
+        }
+        .currency-row input { flex: 2 1 200px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* ===== عناوين الأقسام ===== */
+        .section-title-sm {
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
+            margin: 1.2rem 0 0.8rem 0;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== صفوف النماذج ===== */
+        .form-row {
+            display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;
+        }
+        .form-group {
+            flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
+        }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-left: 0.3rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+
+        /* ===== Tooltip ===== */
         .tooltip {
-            position: relative;
-            cursor: help;
+            position: relative; cursor: help;
         }
         .tooltip .tooltiptext {
             visibility: hidden;
             width: 220px;
-            background-color: #1a1a2e;
-            color: #f0f4fa;
-            text-align: center;
-            border-radius: 8px;
-            padding: 8px;
+            background: #121a2b;
+            color: #eef3ff;
+            text-align: right;
+            border-radius: 10px;
+            padding: 8px 10px;
             position: absolute;
             z-index: 100;
             bottom: 130%;
-            left: 50%;
-            margin-left: -110px;
+            right: 0;
             opacity: 0;
-            transition: opacity 0.3s;
             font-size: 0.8rem;
-            border: 1px solid var(--gold);
+            border: 1px solid #b48554;
             pointer-events: none;
-        }
-        .tooltip .tooltiptext::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #1a1a2e transparent transparent transparent;
+            line-height: 1.5;
         }
         .tooltip:hover .tooltiptext {
             visibility: visible;
             opacity: 1;
         }
 
-        .btn-calculate {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            width: 100%;
-            padding: 1.2rem;
-            border-radius: 50px;
-            background: rgba(180, 133, 84, 0.2);
-            border: 1px solid var(--border-light);
-            color: var(--accent-soft);
-            font-weight: 900;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: var(--transition);
-            backdrop-filter: blur(10px);
-            margin: 1.5rem 0;
-        }
-        .btn-calculate:hover {
-            background: rgba(180, 133, 84, 0.4);
-            color: #fff;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 25px rgba(180, 133, 84, 0.3);
-            transform: translateY(-3px);
-        }
-        .results-section {
-            margin-top: 2rem;
-        }
-        .results-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .result-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            padding: 1.2rem;
-            text-align: center;
-            box-shadow: var(--shadow-soft);
-            transition: var(--transition);
-        }
-        .result-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-glow);
-        }
-        .result-card i {
-            font-size: 1.8rem;
-            color: var(--accent-soft);
-            margin-bottom: 0.5rem;
-        }
-        .result-card h4 {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            margin-bottom: 0.3rem;
-        }
-        .result-card .value {
-            font-size: 1.4rem;
-            font-weight: 900;
-            color: var(--accent-soft);
-        }
-        .result-card .unit {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-        .status {
-            font-size: 0.8rem;
-            margin-top: 0.3rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 20px;
-            display: inline-block;
-        }
-        .status-good {
-            background: #28a745;
-            color: white;
-        }
-        .status-bad {
-            background: #dc3545;
-            color: white;
-        }
-        .status-warning {
-            background: #ffc107;
-            color: #111;
-        }
-        .table-container {
-            overflow-x: auto;
-            margin-top: 1.5rem;
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            background: var(--bg-card);
-            padding: 0.8rem;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
-        th {
-            background: rgba(180, 133, 84, 0.2);
-            color: var(--accent-soft);
-            font-weight: 900;
-            padding: 0.5rem;
-            border-bottom: 2px solid var(--border-light);
-        }
-        td {
-            padding: 0.5rem;
-            border-bottom: 1px solid rgba(180, 133, 84, 0.2);
-            text-align: center;
-            color: var(--text-light);
-        }
-        .export-container {
-            display: flex;
-            justify-content: center;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-            margin: 1.5rem 0;
-        }
-        .export-btn {
-            background: rgba(180, 133, 84, 0.15);
-            border: 1px solid var(--border-light);
-            border-radius: 40px;
-            padding: 0.8rem 1.5rem;
-            color: var(--accent-soft);
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
-        .export-btn:hover {
-            background: rgba(180, 133, 84, 0.3);
-            color: #fff;
-            border-color: var(--accent-glow);
-        }
-        .footer-simple {
-            text-align: center;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            background: rgba(10, 14, 23, 0.5);
-            backdrop-filter: blur(5px);
-            border-top: 1px solid var(--border-light);
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-        .footer-simple span {
-            color: var(--accent-soft);
-            font-weight: 700;
-        }
+        /* ===== حاوية ضخ رأس المال ===== */
         .capital-injection {
-            background: rgba(42, 122, 90, 0.1);
-            border: 1px solid rgba(42, 122, 90, 0.3);
-            border-radius: var(--radius-md);
+            background: rgba(42,122,90,0.1);
+            border: 1px solid rgba(42,122,90,0.3);
+            border-radius: 20px;
             padding: 1rem;
             margin: 1rem 0;
         }
@@ -479,8 +190,13 @@
             color: #7fc9a5;
             margin-bottom: 0.8rem;
         }
+        .capital-injection input[type="checkbox"] {
+            width: auto; margin-left: 0.5rem;
+        }
+
+        /* ===== تحذير ===== */
         .warning-note {
-            background: rgba(220, 53, 69, 0.1);
+            background: rgba(220,53,69,0.1);
             border-right: 4px solid #dc3545;
             padding: 0.8rem;
             border-radius: 8px;
@@ -488,169 +204,286 @@
             color: #f8d7da;
         }
 
-        /* ========== أنماط الآلة الحاسبة المنبثقة ========== */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(4px);
+        /* ===== زر الحساب ===== */
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer;
+            margin: 1.5rem 0; font-family: 'Tajawal', sans-serif;
         }
+        .btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-calculate:active { transform: scale(0.97); }
+
+        /* ===== النتائج ===== */
+        .results-section { margin-top: 1.5rem; }
+        .results-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .result-card {
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 20px; padding: 1rem; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .result-card i { font-size: 1.6rem; color: #cfa776; margin-bottom: 0.3rem; }
+        .result-card h4 { font-size: 0.85rem; font-weight: 700; color: #aab7d4; margin-bottom: 0.2rem; }
+        .result-card .value { font-size: 1.3rem; font-weight: 900; color: #cfa776; }
+        .result-card .unit { font-size: 0.75rem; color: #aab7d4; }
+        .result-card .status {
+            font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+            display: inline-block; margin-top: 0.2rem;
+        }
+        .status-good { background: #28a745; color: white; }
+        .status-bad { background: #dc3545; color: white; }
+        .status-warning { background: #ffc107; color: #111; }
+
+        /* ===== جدول الحساسية ===== */
+        .table-container {
+            overflow-x: auto; margin-top: 1rem;
+            border: 1px solid rgba(180,133,84,0.1); border-radius: 20px;
+            background: rgba(22,30,46,0.6); padding: 0.5rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.85rem;
+            min-width: 400px;
+        }
+        th {
+            background: rgba(180,133,84,0.15); color: #cfa776;
+            font-weight: 900; padding: 0.6rem 0.8rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15); white-space: nowrap;
+        }
+        td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid rgba(180,133,84,0.06);
+            text-align: center; color: #f0f4fa;
+        }
+        tr:last-child td { border-bottom: none; }
+
+        /* ===== أزرار التصدير ===== */
+        .export-container {
+            display: flex; justify-content: center; gap: 0.8rem;
+            flex-wrap: wrap; margin: 1.5rem 0;
+        }
+        .export-word-btn, .export-excel-full-btn {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+            padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.9rem; font-family: 'Tajawal', sans-serif;
+            flex: 1 1 auto; justify-content: center; max-width: 220px;
+        }
+        .export-word-btn:hover, .export-excel-full-btn:hover { background: rgba(180,133,84,0.25); }
+
+        /* ===== شاشة تحميل ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== فوتر ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
         .modal-content {
-            background: var(--bg-panel);
-            margin: 8% auto;
-            padding: 0;
-            border: 2px solid var(--border-light);
-            border-radius: 30px;
-            width: 90%;
-            max-width: 320px;
-            box-shadow: var(--shadow-glow);
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
         }
         .modal-header {
-            background: rgba(180, 133, 84, 0.15);
-            border-bottom: 2px solid var(--border-light);
-            padding: 10px 15px;
-            border-radius: 28px 28px 0 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
         }
-        .modal-header h2 {
-            margin: 0;
-            color: var(--accent-soft);
-            font-size: 1rem;
-            font-weight: 900;
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
         }
-        .close-calc {
-            color: var(--text-muted);
-            float: left;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close-calc:hover {
-            color: var(--accent-glow);
-        }
-        .modal-body {
-            padding: 15px;
-        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
         .calc-display {
-            width: 100%;
-            height: 48px;
-            font-size: 1.4rem;
-            text-align: left;
-            padding: 0 12px;
-            border: 2px solid var(--border-light);
-            border-radius: 20px;
-            margin-bottom: 15px;
-            background: rgba(10, 14, 23, 0.8);
-            color: var(--accent-soft);
-            font-family: 'Inter', monospace;
-            direction: ltr;
-            outline: none;
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: left;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
         }
         .calc-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
         }
         .calc-btn {
-            background: rgba(180, 133, 84, 0.1);
-            border: 1px solid var(--border-light);
-            border-radius: 15px;
-            padding: 10px 0;
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-light);
-            cursor: pointer;
-            transition: var(--transition);
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
         }
-        .calc-btn:hover {
-            background: rgba(180, 133, 84, 0.3);
-            border-color: var(--accent-glow);
-        }
-        .calc-btn.operator {
-            color: var(--accent-soft);
-        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
         .calc-btn.equals {
-            background: rgba(180, 133, 84, 0.3);
-            color: white;
-            grid-column: span 2;
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
         }
-        .calc-btn.equals:hover {
-            background: rgba(180, 133, 84, 0.5);
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
+
+        /* ===== الأزرار العائمة ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== رسائل ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+
+        /* ===================================================
+           تحسينات للشاشات المتوسطة والكبيرة (كمبيوتر)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .section-title-sm { font-size: 1.4rem; }
+            .form-group { flex: 1 1 220px; }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value { font-size: 1.5rem; }
+            .result-card h4 { font-size: 0.95rem; }
+            .result-card i { font-size: 1.8rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 1rem; padding: 0.8rem 2rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .table-container { padding: 1rem; }
+            .capital-injection .form-group { flex: 1 1 250px; }
         }
 
-        /* زر الآلة الحاسبة العائم */
-        .calc-floating-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(180, 133, 84, 0.2);
-            border: 1px solid var(--border-light);
-            border-radius: 50px;
-            padding: 0.8rem 1.2rem;
-            color: var(--accent-soft);
-            font-size: 1rem;
-            font-weight: 700;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .calc-floating-btn:hover {
-            background: rgba(180, 133, 84, 0.4);
-            color: #fff;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 15px rgba(180, 133, 84, 0.3);
-        }
-
-        /* تحسينات الجوال */
+        /* ===================================================
+           تحسينات للجوال (شاشات ≤ 768px)
+           =================================================== */
         @media (max-width: 768px) {
-            .hero-mini h2 {
-                font-size: 2rem;
-            }
-            .calc-box {
-                padding: 1rem;
-            }
-            .tooltip .tooltiptext {
-                width: 160px;
-                margin-left: -80px;
-                font-size: 0.7rem;
-            }
-            .calc-floating-btn {
-                bottom: 15px;
-                left: 10px;
-                padding: 0.6rem 1rem;
-                font-size: 0.85rem;
-            }
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; }
+            .currency-row label { font-size: 0.8rem; }
+            .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; }
+            .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+            .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-cards { grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.5rem; }
+            .result-card { padding: 0.6rem 0.4rem; }
+            .result-card i { font-size: 1.2rem; }
+            .result-card h4 { font-size: 0.65rem; }
+            .result-card .value { font-size: 1rem; }
+            .result-card .unit { font-size: 0.6rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 0.75rem; padding: 0.4rem 1rem; max-width: 160px; }
+            .modal-content { width: 95%; max-width: 320px; }
+            .calc-btn { padding: 8px 0; font-size: 0.9rem; }
+            .footer-simple { font-size: 0.7rem; padding: 0.6rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .capital-injection .form-row { flex-direction: column; }
+            .tooltip .tooltiptext { width: 160px; right: -20px; font-size: 0.7rem; }
         }
+
+        /* ===== تحسينات للشاشات الصغيرة جداً (≤ 400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+            .results-cards { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+        }
+
+        /* ===== منع التحديد العرضي ===== */
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        /* ===== تحسين التمرير ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
     </style>
 </head>
 <body>
-
-    <!-- خلفية متوهجة -->
+    <!-- خلفية ثابتة -->
     <div class="glow-bg"><span></span><span></span><span></span></div>
-    <!-- أشكال عائمة -->
-    <div class="floating-shape shape-1"></div>
-    <div class="floating-shape shape-2"></div>
 
+    <!-- شاشة تحميل التصدير -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">جاري إنشاء التقرير...</h3>
+            <p id="loadingMsg">يرجى الانتظار</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
     <section class="hero-mini">
-        <h2>حاسبة تقييم المطاعم</h2>
+        <h2>🍽️ حاسبة تقييم المطاعم</h2>
         <p>قيمة عادلة مبنية على الأرباح والديون – مع تحليل الحساسية وعوامل الخطر</p>
     </section>
 
+    <!-- WRAPPER -->
     <section class="calc-wrapper">
-        <div class="calc-box" data-aos="fade-up">
-            <!-- اختيار العملة -->
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-store"></i><span>تقييم</span></div>
+            <h2><i class="fas fa-store" style="color:#cfa776;margin-left:0.5rem;"></i>تقييم المطاعم</h2>
+
+            <!-- العملة واسم المطعم -->
             <div class="currency-row">
                 <label><i class="fas fa-coins"></i> العملة:</label>
                 <select id="currencySelect">
@@ -662,462 +495,786 @@
                     <option value="ر.س">ريال سعودي (ر.س)</option>
                 </select>
                 <label><i class="fas fa-store"></i> اسم المطعم:</label>
-                <input type="text" id="restaurantName" value="مطعم النخبة" style="width:200px;">
+                <input type="text" id="restaurantName" value="مطعم النخبة" placeholder="اسم المطعم">
             </div>
 
-            <!-- بيانات المطعم الأساسية مع شرح -->
-            <div class="section-title-sm"><i class="fas fa-store"></i> بيانات المطعم الأساسية</div>
+            <!-- بيانات المطعم الأساسية -->
+            <div class="section-title-sm">📋 بيانات المطعم الأساسية</div>
             <div class="form-row">
                 <div class="form-group tooltip">
                     <label><i class="fas fa-calendar-alt"></i> سنة التأسيس</label>
                     <input type="number" id="estYear" value="2018" min="1990" max="2026">
-                    <span class="tooltiptext">السنة التي بدأ فيها المطعم نشاطه التجاري. تستخدم لتقييم الاستمرارية.</span>
+                    <span class="tooltiptext">السنة التي بدأ فيها المطعم نشاطه التجاري.</span>
                 </div>
                 <div class="form-group tooltip">
                     <label><i class="fas fa-file-contract"></i> سنة انتهاء عقد الإيجار</label>
                     <input type="number" id="leaseExpiry" value="2029" min="2025" max="2050">
-                    <span class="tooltiptext">إذا كان متبقي على العقد أقل من 3 سنوات، يتم تخفيض المضاعف تلقائياً ليعكس المخاطر العالية.</span>
+                    <span class="tooltiptext">إذا كان متبقي على العقد أقل من 3 سنوات، يتم تخفيض المضاعف تلقائياً.</span>
                 </div>
             </div>
 
-            <!-- البيانات المالية مع شرح لكل حقل -->
-            <div class="section-title-sm"><i class="fas fa-coins"></i> البيانات المالية (سنوية)</div>
+            <!-- البيانات المالية -->
+            <div class="section-title-sm">💰 البيانات المالية (سنوية)</div>
             <div class="form-row">
                 <div class="form-group tooltip">
                     <label><i class="fas fa-receipt"></i> إجمالي الإيرادات</label>
                     <input type="number" id="revenue" value="500000" step="1000">
-                    <span class="tooltiptext">إجمالي مبيعات المطعم السنوية قبل خصم أي تكاليف.</span>
+                    <span class="tooltiptext">إجمالي مبيعات المطعم السنوية.</span>
                 </div>
                 <div class="form-group tooltip">
                     <label><i class="fas fa-shopping-cart"></i> تكلفة البضاعة المباعة (COGS)</label>
                     <input type="number" id="cogs" value="200000" step="1000">
-                    <span class="tooltiptext">تكلفة المواد الخام والمكونات المستخدمة في إعداد الأطباق والمشروبات.</span>
+                    <span class="tooltiptext">تكلفة المواد الخام والمكونات.</span>
                 </div>
                 <div class="form-group tooltip">
                     <label><i class="fas fa-tools"></i> المصاريف التشغيلية (OPEX)</label>
                     <input type="number" id="opex" value="150000" step="1000">
-                    <span class="tooltiptext">الإيجار، الرواتب، الكهرباء، التسويق، الصيانة وغيرها من التكاليف التشغيلية.</span>
+                    <span class="tooltiptext">الإيجار، الرواتب، الكهرباء، التسويق، إلخ.</span>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group tooltip">
                     <label><i class="fas fa-chart-line"></i> الإهلاك والاستهلاك (D&A)</label>
                     <input type="number" id="depreciation" value="20000" step="1000">
-                    <span class="tooltiptext">التناقص السنوي في قيمة الأصول مثل معدات المطبخ والأثاث.</span>
+                    <span class="tooltiptext">التناقص السنوي في قيمة الأصول.</span>
                 </div>
                 <div class="form-group tooltip">
                     <label><i class="fas fa-hand-holding-usd"></i> الفوائد المدفوعة</label>
                     <input type="number" id="interest" value="10000" step="1000">
-                    <span class="tooltiptext">الفوائد السنوية المدفوعة على القروض البنكية.</span>
+                    <span class="tooltiptext">الفوائد السنوية على القروض.</span>
                 </div>
                 <div class="form-group tooltip">
                     <label><i class="fas fa-file-invoice-dollar"></i> الضرائب المدفوعة</label>
                     <input type="number" id="taxes" value="15000" step="1000">
-                    <span class="tooltiptext">إجمالي الضرائب السنوية (دخل، مبيعات، إلخ).</span>
+                    <span class="tooltiptext">إجمالي الضرائب السنوية.</span>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group tooltip">
                     <label><i class="fas fa-university"></i> إجمالي الديون القائمة</label>
                     <input type="number" id="totalDebt" value="200000" step="1000">
-                    <span class="tooltiptext">المبلغ المتبقي من القروض والفوائد المتراكمة المستحقة على المطعم.</span>
+                    <span class="tooltiptext">المبلغ المتبقي من القروض.</span>
                 </div>
                 <div class="form-group tooltip">
                     <label><i class="fas fa-couch"></i> القيمة السوقية للمعدات والأثاث</label>
-                    <input type="number" id="assetValue" value="80000" step="1000" placeholder="اختياري">
-                    <span class="tooltiptext">القيمة التقديرية لو بيعت المعدات والأثاث اليوم، وليس سعر الشراء الأصلي.</span>
+                    <input type="number" id="assetValue" value="80000" step="1000">
+                    <span class="tooltiptext">القيمة التقديرية لو بيعت المعدات اليوم.</span>
                 </div>
                 <div class="form-group tooltip">
                     <label><i class="fas fa-sliders-h"></i> مضاعف السوق (2 - 4)</label>
                     <input type="number" id="multiplier" value="3" min="2" max="4" step="0.1">
-                    <span class="tooltiptext">يعكس قوة العلامة التجارية ونمو الأرباح. العالي يعني تقييم أقوى.</span>
+                    <span class="tooltiptext">يعكس قوة العلامة التجارية ونمو الأرباح.</span>
                 </div>
             </div>
 
-            <!-- خيار ضخ رأس مال -->
+            <!-- ضخ رأس مال -->
             <div class="capital-injection">
                 <h3><i class="fas fa-money-bill-wave"></i> سيناريو ضخ رأس مال إضافي</h3>
                 <div class="form-row">
-                    <div class="form-group">
-                        <label><input type="checkbox" id="capitalInjectionEnabled" style="width:auto; margin-left:0.5rem;"> تفعيل ضخ رأس مال</label>
+                    <div class="form-group" style="flex:0 0 auto;">
+                        <label><input type="checkbox" id="capitalInjectionEnabled" style="width:auto; margin-left:0.5rem;"> تفعيل الضخ</label>
                     </div>
                     <div class="form-group tooltip">
                         <label><i class="fas fa-coins"></i> قيمة الضخ</label>
                         <input type="number" id="injectionAmount" value="50000" step="1000" disabled>
-                        <span class="tooltiptext">المبلغ الإضافي الذي سيتم استثماره في المطعم لتطويره أو توسيعه.</span>
+                        <span class="tooltiptext">المبلغ الإضافي المستثمر.</span>
                     </div>
                     <div class="form-group tooltip">
-                        <label><i class="fas fa-percent"></i> العائد المتوقع على الضخ (%)</label>
+                        <label><i class="fas fa-percent"></i> العائد المتوقع (%)</label>
                         <input type="number" id="injectionROI" value="20" step="0.5" disabled>
-                        <span class="tooltiptext">النسبة المئوية للعائد السنوي المتوقع من المبلغ المستثمر حديثاً.</span>
+                        <span class="tooltiptext">العائد السنوي المتوقع من الضخ.</span>
                     </div>
                 </div>
             </div>
 
             <!-- حصة المستثمر -->
-            <div class="section-title-sm"><i class="fas fa-user-friends"></i> حصتك في المطعم</div>
+            <div class="section-title-sm">👤 حصتك في المطعم</div>
             <div class="form-row">
-                <div class="form-group tooltip">
+                <div class="form-group tooltip" style="flex: 1 1 200px;">
                     <label><i class="fas fa-percent"></i> نسبة الملكية (%)</label>
                     <input type="number" id="ownershipPercent" value="50" min="1" max="100" step="0.1">
-                    <span class="tooltiptext">النسبة التي تملكها من المطعم. إذا كنت شريكاً بنسبة 50% أدخل 50.</span>
+                    <span class="tooltiptext">النسبة التي تملكها من المطعم.</span>
                 </div>
             </div>
 
             <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> احسب التقييم</button>
 
-            <!-- نتائج التقييم -->
-            <div id="resultsSection" style="display:none;">
+            <!-- منطقة النتائج -->
+            <div class="results-section" id="resultsSection" style="display: none;">
                 <div class="results-cards" id="kpiCards"></div>
 
-                <!-- تحذير عقد الإيجار -->
                 <div id="leaseWarning" class="warning-note" style="display:none;"></div>
 
-                <!-- تقييم الكفاءة -->
-                <div class="result-card" id="efficiencyCard" style="text-align:right; padding:1.2rem;"></div>
+                <div class="result-card" id="efficiencyCard" style="text-align:right; padding:1.2rem; margin-bottom:1.5rem;"></div>
 
-                <!-- تحليل الحساسية للمضاعف -->
                 <div class="section-title-sm">📈 تحليل الحساسية (تأثير المضاعف على القيمة العادلة)</div>
                 <div class="table-container" id="sensitivityTable"></div>
 
-                <!-- أزرار التصدير -->
                 <div class="export-container">
-                    <button class="export-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تقرير Word</button>
-                    <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير تقرير كامل (Word)</button>
+                    <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> تصدير إلى Excel شامل</button>
                 </div>
             </div>
-            <div id="initialMessage" style="margin-top:1rem; color:var(--text-muted); text-align:center;">
-                <i class="fas fa-robot" style="color: var(--accent-soft);"></i> أدخل البيانات واضغط على الزر للبدء
+
+            <div id="initialMessage" style="margin-top:1rem; color:#aab7d4; text-align:center;">
+                <i class="fas fa-robot" style="color:#cfa776;"></i> أدخل البيانات واضغط على زر الحساب
             </div>
         </div>
     </section>
 
-    <footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
+    <footer class="footer-simple">
+        جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
+    </footer>
 
-    <!-- ========== نافذة الآلة الحاسبة المنبثقة ========== -->
+    <button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> حاسبة</button>
+    <a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> الرئيسية</a>
+
     <div id="calculatorModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <span class="close-calc" id="closeCalcBtn">&times;</span>
-                <h2><i class="fas fa-calculator" style="color: var(--accent-soft);"></i> آلة حاسبة</h2>
+                <span class="close" id="modalClose">&times;</span>
+                <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> آلة حاسبة</h2>
             </div>
             <div class="modal-body">
                 <input type="text" id="calcDisplay" class="calc-display" readonly>
                 <div class="calc-buttons">
-                    <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
-                    <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
-                    <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
-                    <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
-                    <button class="calc-btn" onclick="clearCalculator()">C</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
-                    <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
-                    <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
-                    <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn" data-val="C">C</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn" data-val="⌫">⌫</button>
+                    <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ========== زر الآلة الحاسبة العائم ========== -->
-    <div class="calc-floating-btn" id="calculatorBtn">
-        <i class="fas fa-calculator"></i> آلة حاسبة
-    </div>
-
-    <!-- ========== زر الرئيسية العائم ========== -->
-    <a href="index.html" style="position:fixed;bottom:20px;right:20px;background:rgba(180,133,84,0.9);color:white;padding:12px 20px;border-radius:50px;text-decoration:none;font-family:'Tajawal',sans-serif;font-weight:bold;backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,0.2);box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:9999;display:flex;align-items:center;gap:8px;transition:0.3s;" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';">
-        <i class="fas fa-home"></i> الرئيسية
-    </a>
-
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js">
-    </script>
     <script>
-        AOS.init({ duration: 800, once: true, offset: 100 });
+        (function() {
+            'use strict';
 
-        // تفعيل/تعطيل حقول ضخ رأس المال
-        document.getElementById('capitalInjectionEnabled').addEventListener('change', function(e) {
-            const disabled = !e.target.checked;
-            document.getElementById('injectionAmount').disabled = disabled;
-            document.getElementById('injectionROI').disabled = disabled;
-        });
+            // ===== آلة حاسبة =====
+            const calcDisplay = document.getElementById('calcDisplay');
+            let currentCalcInput = '';
 
-        // ===================== الآلة الحاسبة المنبثقة =====================
-        const calcDisplayEl = document.getElementById('calcDisplay');
-        const calcModal = document.getElementById('calculatorModal');
-        let currentCalcInput = '';
-
-        function safeEvaluate(expr) {
-            try {
-                if (!/^[0-9+\-*/().\s]+$/.test(expr)) throw new Error('غير مسموح');
-                expr = expr.replace(/÷/g, '/').replace(/×/g, '*');
-                return new Function('return (' + expr + ')')();
-            } catch {
-                return 'خطأ';
-            }
-        }
-
-        window.handleCalculatorInput = function(value) {
-            currentCalcInput += value;
-            calcDisplayEl.value = currentCalcInput;
-        };
-        window.clearCalculator = function() {
-            currentCalcInput = '';
-            calcDisplayEl.value = '';
-        };
-        window.backspaceCalculator = function() {
-            currentCalcInput = currentCalcInput.slice(0, -1);
-            calcDisplayEl.value = currentCalcInput;
-        };
-        window.calculateCalculatorResult = function() {
-            if (!currentCalcInput.trim()) return;
-            const result = safeEvaluate(currentCalcInput);
-            calcDisplayEl.value = result;
-            currentCalcInput = result.toString();
-        };
-
-        // فتح/إغلاق الآلة الحاسبة
-        document.getElementById('calculatorBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            calcModal.style.display = 'block';
-            calcDisplayEl.focus();
-        });
-        document.getElementById('closeCalcBtn').addEventListener('click', function() {
-            calcModal.style.display = 'none';
-        });
-        window.addEventListener('click', function(e) {
-            if (e.target === calcModal) {
-                calcModal.style.display = 'none';
-            }
-        });
-        // دعم لوحة المفاتيح داخل الآلة الحاسبة
-        document.addEventListener('keydown', function(e) {
-            if (calcModal.style.display !== 'block') return;
-            const key = e.key;
-            if (key >= '0' && key <= '9') { e.preventDefault();
-                handleCalculatorInput(key); } else if (key === '.') { e.preventDefault();
-                handleCalculatorInput('.'); } else if (key === '+' || key === '-' || key === '*' || key === '/') { e
-                .preventDefault();
-                handleCalculatorInput(key); } else if (key === 'Enter' || key === '=') { e.preventDefault();
-                calculateCalculatorResult(); } else if (key === 'Backspace') { e.preventDefault();
-                backspaceCalculator(); } else if (key === 'Escape') { e.preventDefault();
-                calcModal.style.display = 'none'; } else if (key.toLowerCase() === 'c') { e.preventDefault();
-                clearCalculator(); }
-        });
-
-        // ===================== دالة حساب مؤشرات المطعم =====================
-        function computeValuation() {
-            const rev = parseFloat(document.getElementById('revenue').value) || 0;
-            const cogs = parseFloat(document.getElementById('cogs').value) || 0;
-            const opex = parseFloat(document.getElementById('opex').value) || 0;
-            const depr = parseFloat(document.getElementById('depreciation').value) || 0;
-            const interest = parseFloat(document.getElementById('interest').value) || 0;
-            const taxes = parseFloat(document.getElementById('taxes').value) || 0;
-            const totalDebt = parseFloat(document.getElementById('totalDebt').value) || 0;
-            const assetValue = parseFloat(document.getElementById('assetValue').value) || 0;
-            const multiplier = parseFloat(document.getElementById('multiplier').value) || 3;
-            const ownership = parseFloat(document.getElementById('ownershipPercent').value) || 100;
-            const estYear = parseInt(document.getElementById('estYear').value) || 2018;
-            const leaseExpiry = parseInt(document.getElementById('leaseExpiry').value) || 2029;
-
-            // EBITDA = الإيرادات - COGS - OPEX
-            const EBITDA = rev - cogs - opex;
-            const netProfit = EBITDA - depr - interest - taxes;
-            const enterpriseValue = EBITDA * multiplier;
-            const equityValue = enterpriseValue - totalDebt;
-            const fairValue = equityValue > 0 ? equityValue : 0;
-            const sharePrice = (fairValue * ownership) / 100;
-            const paybackYears = netProfit > 0 ? equityValue / netProfit : Infinity;
-            const efficiencyIndex = assetValue > 0 ? fairValue / assetValue : 0;
-
-            // معالجة عقد الإيجار
-            const currentYear = new Date().getFullYear();
-            const remainingLease = leaseExpiry - currentYear;
-            let leaseWarning = '';
-            let adjustedMultiplier = multiplier;
-            if (remainingLease < 3) {
-                adjustedMultiplier *= Math.max(0.2, remainingLease / 10);
-                leaseWarning =
-                    `⚠️ تنبيه: عقد الإيجار متبقي عليه ${remainingLease} سنة/سنوات فقط. تم تعديل المضاعف تلقائياً إلى ${adjustedMultiplier.toFixed(2)} ليعكس المخاطر العالية.`;
+            function handleCalc(v) {
+                if (v === 'C') { currentCalcInput = '';
+                    calcDisplay.value = ''; return; }
+                if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1);
+                    calcDisplay.value = currentCalcInput; return; }
+                if (v === '=') {
+                    try {
+                        let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
+                        calcDisplay.value = r;
+                        currentCalcInput = r.toString();
+                    } catch (e) { calcDisplay.value = 'خطأ';
+                        currentCalcInput = ''; }
+                    return;
+                }
+                currentCalcInput += v;
+                calcDisplay.value = currentCalcInput;
             }
 
-            const finalEV = EBITDA * adjustedMultiplier;
-            const finalEquity = finalEV - totalDebt;
-            const finalFairValue = finalEquity > 0 ? finalEquity : 0;
+            document.querySelectorAll('.calc-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const v = this.dataset.val;
+                    if (v !== undefined) handleCalc(v);
+                });
+            });
 
-            // معالجة ضخ رأس المال
-            const injectionEnabled = document.getElementById('capitalInjectionEnabled').checked;
-            let injectionImpact = null;
-            if (injectionEnabled) {
-                const injectionAmount = parseFloat(document.getElementById('injectionAmount').value) || 0;
-                const injectionROI = parseFloat(document.getElementById('injectionROI').value) || 20;
-                const incrementalEBITDA = injectionAmount * (injectionROI / 100);
-                const newEBITDA = EBITDA + incrementalEBITDA;
-                const newEV = newEBITDA * adjustedMultiplier;
-                const newEquity = newEV - totalDebt;
-                injectionImpact = {
-                    newFairValue: newEquity > 0 ? newEquity : 0,
-                    incrementalEBITDA: incrementalEBITDA,
-                    newPayback: netProfit + incrementalEBITDA - depr - interest - taxes > 0 ? newEquity / (
-                        netProfit + incrementalEBITDA) : Infinity
+            const modalEl = document.getElementById('calculatorModal');
+            document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                modalEl.classList.add('active');
+                calcDisplay.value = currentCalcInput;
+            });
+            document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+            modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+            document.addEventListener('keydown', function(e) {
+                if (!modalEl.classList.contains('active')) return;
+                e.preventDefault();
+                const k = e.key;
+                if (k >= '0' && k <= '9') handleCalc(k);
+                else if (k === '.') handleCalc('.');
+                else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+                else if (k === 'Enter' || k === '=') handleCalc('=');
+                else if (k === 'Backspace') handleCalc('⌫');
+                else if (k === 'Escape') modalEl.classList.remove('active');
+                else if (k.toLowerCase() === 'c') handleCalc('C');
+            });
+
+            // ===== تفعيل/تعطيل حقول ضخ رأس المال =====
+            document.getElementById('capitalInjectionEnabled').addEventListener('change', function(e) {
+                const disabled = !e.target.checked;
+                document.getElementById('injectionAmount').disabled = disabled;
+                document.getElementById('injectionROI').disabled = disabled;
+            });
+
+            // ===== دوال التحميل =====
+            function showLoading(title, msg) {
+                document.getElementById('loadingTitle').textContent = title;
+                document.getElementById('loadingMsg').textContent = msg;
+                document.getElementById('exportLoading').classList.add('show');
+            }
+
+            function hideLoading() {
+                document.getElementById('exportLoading').classList.remove('show');
+            }
+
+            // ===== الحساب الرئيسي =====
+            function computeValuation() {
+                const rev = parseFloat(document.getElementById('revenue').value) || 0;
+                const cogs = parseFloat(document.getElementById('cogs').value) || 0;
+                const opex = parseFloat(document.getElementById('opex').value) || 0;
+                const depr = parseFloat(document.getElementById('depreciation').value) || 0;
+                const interest = parseFloat(document.getElementById('interest').value) || 0;
+                const taxes = parseFloat(document.getElementById('taxes').value) || 0;
+                const totalDebt = parseFloat(document.getElementById('totalDebt').value) || 0;
+                const assetValue = parseFloat(document.getElementById('assetValue').value) || 0;
+                const multiplier = parseFloat(document.getElementById('multiplier').value) || 3;
+                const ownership = parseFloat(document.getElementById('ownershipPercent').value) || 100;
+                const estYear = parseInt(document.getElementById('estYear').value) || 2018;
+                const leaseExpiry = parseInt(document.getElementById('leaseExpiry').value) || 2029;
+
+                const EBITDA = rev - cogs - opex;
+                const netProfit = EBITDA - depr - interest - taxes;
+                const enterpriseValue = EBITDA * multiplier;
+                const equityValue = enterpriseValue - totalDebt;
+                const fairValue = equityValue > 0 ? equityValue : 0;
+                const sharePrice = (fairValue * ownership) / 100;
+                const paybackYears = netProfit > 0 ? equityValue / netProfit : Infinity;
+                const efficiencyIndex = assetValue > 0 ? fairValue / assetValue : 0;
+
+                // عقد الإيجار
+                const currentYear = new Date().getFullYear();
+                const remainingLease = leaseExpiry - currentYear;
+                let leaseWarning = '';
+                let adjustedMultiplier = multiplier;
+                if (remainingLease < 3 && remainingLease >= 0) {
+                    adjustedMultiplier = Math.max(0.2, remainingLease / 10) * multiplier;
+                    leaseWarning =
+                        `⚠️ تنبيه: عقد الإيجار متبقي عليه ${remainingLease} سنة/سنوات فقط. تم تعديل المضاعف تلقائياً إلى ${adjustedMultiplier.toFixed(2)} ليعكس المخاطر العالية.`;
+                } else if (remainingLease < 0) {
+                    leaseWarning = '⛔ انتهى عقد الإيجار! يجب تجديده فوراً. تم اعتبار المضاعف 0.5.';
+                    adjustedMultiplier = 0.5;
+                }
+
+                const finalEV = EBITDA * adjustedMultiplier;
+                const finalEquity = finalEV - totalDebt;
+                const finalFairValue = finalEquity > 0 ? finalEquity : 0;
+
+                // ضخ رأس المال
+                const injectionEnabled = document.getElementById('capitalInjectionEnabled').checked;
+                let injectionImpact = null;
+                if (injectionEnabled) {
+                    const injectionAmount = parseFloat(document.getElementById('injectionAmount').value) || 0;
+                    const injectionROI = parseFloat(document.getElementById('injectionROI').value) || 20;
+                    const incrementalEBITDA = injectionAmount * (injectionROI / 100);
+                    const newEBITDA = EBITDA + incrementalEBITDA;
+                    const newEV = newEBITDA * adjustedMultiplier;
+                    const newEquity = newEV - totalDebt;
+                    injectionImpact = {
+                        newFairValue: newEquity > 0 ? newEquity : 0,
+                        incrementalEBITDA: incrementalEBITDA,
+                        newPayback: (netProfit + incrementalEBITDA) > 0 ? newEquity / (netProfit +
+                            incrementalEBITDA) : Infinity
+                    };
+                }
+
+                return {
+                    EBITDA,
+                    netProfit,
+                    enterpriseValue,
+                    equityValue,
+                    fairValue: finalFairValue,
+                    sharePrice,
+                    paybackYears,
+                    efficiencyIndex,
+                    assetValue,
+                    multiplier: adjustedMultiplier,
+                    remainingLease,
+                    leaseWarning,
+                    injectionImpact,
+                    rev,
+                    cogs,
+                    opex,
+                    depr,
+                    interest,
+                    taxes,
+                    totalDebt,
+                    ownership,
+                    estYear,
+                    leaseExpiry,
+                    originalMultiplier: multiplier
                 };
             }
 
-            return {
-                EBITDA,
-                netProfit,
-                enterpriseValue,
-                equityValue,
-                fairValue: finalFairValue,
-                sharePrice,
-                paybackYears,
-                efficiencyIndex,
-                assetValue,
-                multiplier: adjustedMultiplier,
-                remainingLease,
-                leaseWarning,
-                injectionImpact,
-                rev,
-                cogs,
-                opex,
-                depr,
-                interest,
-                taxes,
-                totalDebt,
-                ownership
-            };
-        }
+            // ===== عرض النتائج =====
+            function displayResults(res) {
+                const currency = document.getElementById('currencySelect').value;
+                document.getElementById('initialMessage').style.display = 'none';
+                document.getElementById('resultsSection').style.display = 'block';
 
-        // عرض النتائج مع استخدام رمز العملة
-        function displayResults(res) {
-            const currency = document.getElementById('currencySelect').value;
-            document.getElementById('initialMessage').style.display = 'none';
-            document.getElementById('resultsSection').style.display = 'block';
+                // بطاقات KPI
+                document.getElementById('kpiCards').innerHTML = `
+                    <div class="result-card"><i class="fas fa-chart-bar"></i><h4>EBITDA</h4><div class="value">${currency}${res.EBITDA.toFixed(0)}</div></div>
+                    <div class="result-card"><i class="fas fa-building"></i><h4>قيمة الكيان (EV)</h4><div class="value">${currency}${(res.EBITDA * res.multiplier).toFixed(0)}</div><div class="unit">بالمضاعف ${res.multiplier.toFixed(2)}</div></div>
+                    <div class="result-card"><i class="fas fa-hand-holding-usd"></i><h4>القيمة العادلة</h4><div class="value">${currency}${res.fairValue.toFixed(0)}</div><div class="status ${res.fairValue > res.totalDebt ? 'status-good' : 'status-bad'}">${res.fairValue > 0 ? 'إيجابية' : 'سالبة'}</div></div>
+                    <div class="result-card"><i class="fas fa-user-check"></i><h4>سعر حصتك (${res.ownership}%)</h4><div class="value">${currency}${res.sharePrice.toFixed(0)}</div></div>
+                    <div class="result-card"><i class="fas fa-clock"></i><h4>فترة الاسترداد</h4><div class="value">${isFinite(res.paybackYears) ? res.paybackYears.toFixed(2)+' سنة' : 'لا نهائي'}</div></div>
+                    <div class="result-card"><i class="fas fa-balance-scale"></i><h4>مؤشر الكفاءة</h4><div class="value">${res.efficiencyIndex.toFixed(2)}</div><div class="status ${res.efficiencyIndex >= 1 ? 'status-good' : 'status-bad'}">${res.efficiencyIndex >= 1 ? 'مجدٍ' : 'غير مجدٍ'}</div></div>
+                `;
 
-            const kpiContainer = document.getElementById('kpiCards');
-            kpiContainer.innerHTML = `
-            <div class="result-card"><i class="fas fa-chart-bar"></i><h4>EBITDA</h4><div class="value">${currency}${res.EBITDA.toFixed(0)}</div></div>
-            <div class="result-card"><i class="fas fa-building"></i><h4>قيمة الكيان (EV)</h4><div class="value">${currency}${(res.EBITDA * res.multiplier).toFixed(0)}</div><div class="unit">بالمضاعف ${res.multiplier.toFixed(2)}</div></div>
-            <div class="result-card"><i class="fas fa-hand-holding-usd"></i><h4>القيمة العادلة للمطعم</h4><div class="value">${currency}${res.fairValue.toFixed(0)}</div><div class="status ${res.fairValue > res.totalDebt ? 'status-good' : 'status-bad'}">${res.fairValue > 0 ? 'قيمة إيجابية' : 'قيمة سالبة'}</div></div>
-            <div class="result-card"><i class="fas fa-user-check"></i><h4>سعر حصتك (${res.ownership}%)</h4><div class="value">${currency}${res.sharePrice.toFixed(0)}</div></div>
-            <div class="result-card"><i class="fas fa-clock"></i><h4>فترة استرداد رأس المال</h4><div class="value">${isFinite(res.paybackYears) ? res.paybackYears.toFixed(2)+' سنة' : 'لا نهائي'}</div></div>
-            <div class="result-card"><i class="fas fa-balance-scale"></i><h4>مؤشر الكفاءة</h4><div class="value">${res.efficiencyIndex.toFixed(2)}</div><div class="status ${res.efficiencyIndex >= 1 ? 'status-good' : 'status-bad'}">${res.efficiencyIndex >= 1 ? 'تشغيلياً مجدٍ' : 'غير مجدٍ'}</div></div>
-        `;
+                // تحذير الإيجار
+                const leaseDiv = document.getElementById('leaseWarning');
+                if (res.leaseWarning) {
+                    leaseDiv.style.display = 'block';
+                    leaseDiv.innerHTML = res.leaseWarning;
+                } else {
+                    leaseDiv.style.display = 'none';
+                }
 
-            // تحذير الإيجار
-            const leaseDiv = document.getElementById('leaseWarning');
-            if (res.leaseWarning) {
-                leaseDiv.style.display = 'block';
-                leaseDiv.innerHTML = res.leaseWarning;
-            } else {
-                leaseDiv.style.display = 'none';
+                // بطاقة الكفاءة
+                const effCard = document.getElementById('efficiencyCard');
+                let effHtml = `<strong><i class="fas fa-info-circle"></i> مقارنة القيمة العادلة بالأصول:</strong> `;
+                if (res.assetValue > 0) {
+                    effHtml += `القيمة السوقية للأصول ${currency}${res.assetValue.toFixed(0)} | `;
+                    effHtml += `القيمة العادلة ${currency}${res.fairValue.toFixed(0)} | `;
+                    effHtml += res.fairValue >= res.assetValue ?
+                        '✅ المطعم يحقق قيمة أعلى من أصوله (تشغيل مربح)' :
+                        '❌ القيمة أقل من قيمة الأصول – المطعم غير مجدٍ تشغيلياً';
+                } else {
+                    effHtml += 'لم يتم إدخال قيمة سوقية للأصول لإجراء المقارنة.';
+                }
+
+                // تأثير ضخ رأس المال
+                if (res.injectionImpact) {
+                    const inj = res.injectionImpact;
+                    effHtml += `<br><br><strong>💉 بعد ضخ رأس المال:</strong> `;
+                    effHtml += `القيمة العادلة المتوقعة ${currency}${inj.newFairValue.toFixed(0)} | `;
+                    effHtml +=
+                        `فترة الاسترداد الجديدة ${isFinite(inj.newPayback) ? inj.newPayback.toFixed(2)+' سنة' : 'غير محسوبة'}`;
+                }
+                effCard.innerHTML = effHtml;
+
+                // جدول الحساسية
+                const sensDiv = document.getElementById('sensitivityTable');
+                const mults = [2, 2.5, 3, 3.5, 4];
+                let sensRows = '';
+                mults.forEach(m => {
+                    const ev = res.EBITDA * m;
+                    const eq = ev - res.totalDebt;
+                    const fair = eq > 0 ? eq : 0;
+                    sensRows += `<tr>
+                        <td>${m}</td>
+                        <td>${currency}${ev.toFixed(0)}</td>
+                        <td>${currency}${fair.toFixed(0)}</td>
+                        <td>${currency}${((fair * res.ownership)/100).toFixed(0)}</td>
+                    </tr>`;
+                });
+                sensDiv.innerHTML = `
+                    <table>
+                        <thead><tr><th>المضاعف</th><th>قيمة الكيان</th><th>القيمة العادلة</th><th>سعر حصتك</th></tr></thead>
+                        <tbody>${sensRows}</tbody>
+                    </table>
+                `;
+
+                // تخزين النتائج للتصدير
+                window.lastValuation = res;
             }
 
-            // كفاءة التقييم
-            const effCard = document.getElementById('efficiencyCard');
-            if (res.assetValue > 0) {
-                effCard.innerHTML = `
-                <strong><i class="fas fa-info-circle"></i> مقارنة القيمة العادلة بالأصول:</strong>
-                القيمة السوقية للأصول ${currency}${res.assetValue.toFixed(0)} |
-                القيمة العادلة ${currency}${res.fairValue.toFixed(0)} |
-                ${res.fairValue >= res.assetValue ? '✅ المطعم يحقق قيمة أعلى من أصوله (تشغيل مربح)' : '❌ القيمة أقل من قيمة الأصول – المطعم غير مجدٍ تشغيلياً'}
-            `;
-            } else {
-                effCard.innerHTML = 'لم يتم إدخال قيمة سوقية للأصول لإجراء المقارنة.';
-            }
-
-            // تأثير ضخ رأس المال
-            if (res.injectionImpact) {
-                const inj = res.injectionImpact;
-                effCard.innerHTML +=
-                    `<br><br><strong>💉 بعد ضخ رأس المال:</strong> القيمة العادلة المتوقعة ${currency}${inj.newFairValue.toFixed(0)} |
-            فترة الاسترداد الجديدة ${isFinite(inj.newPayback) ? inj.newPayback.toFixed(2)+' سنة' : 'غير محسوبة'}`;
-            }
-
-            // جدول تحليل الحساسية
-            const sensDiv = document.getElementById('sensitivityTable');
-            const mults = [2, 2.5, 3, 3.5, 4];
-            let sensRows = '';
-            mults.forEach(m => {
-                const ev = res.EBITDA * m;
-                const eq = ev - res.totalDebt;
-                const fair = eq > 0 ? eq : 0;
-                sensRows += `<tr>
-                <td>${m}</td>
-                <td>${currency}${ev.toFixed(0)}</td>
-                <td>${currency}${fair.toFixed(0)}</td>
-                <td>${currency}${((fair * res.ownership)/100).toFixed(0)}</td>
-            </tr>`;
+            // ===== ربط زر الحساب =====
+            document.getElementById('calculateBtn').addEventListener('click', function() {
+                const res = computeValuation();
+                displayResults(res);
             });
-            sensDiv.innerHTML = `
-            <table>
-                <thead><tr><th>المضاعف</th><th>قيمة الكيان</th><th>القيمة العادلة</th><th>سعر حصتك</th></tr></thead>
-                <tbody>${sensRows}</tbody>
-            </table>
-        `;
-        }
 
-        document.getElementById('calculateBtn').addEventListener('click', function() {
-            const res = computeValuation();
-            window.lastValuation = res;
-            displayResults(res);
-        });
+            // ========== تصدير Excel ==========
+            async function exportToFullExcel() {
+                if (!window.lastValuation) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+                showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والجداول');
+                try {
+                    const D = window.lastValuation;
+                    const currency = document.getElementById('currencySelect').value;
+                    const name = document.getElementById('restaurantName').value || 'المطعم';
 
-        // تصدير Word
-        document.getElementById('exportWordBtn').addEventListener('click', function() {
-            if (!window.lastValuation) { alert('الرجاء إجراء الحساب أولاً'); return; }
-            const res = window.lastValuation;
-            const name = document.getElementById('restaurantName').value || 'مطعم';
-            const currency = document.getElementById('currencySelect').value;
-            const content = `
-        <html dir="rtl">
-        <head><meta charset="utf-8"><title>تقييم ${name}</title>
-        <style>body{font-family:'Tajawal',sans-serif;padding:30px;}h1{color:#b48554;}table{width:100%;border-collapse:collapse;}td,th{border:1px solid #aaa;padding:8px;}th{background:#f4ebd9;}</style>
-        </head><body>
-        <h1>تقرير تقييم مطعم: ${name}</h1>
-        <p>تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG')}</p>
-        <h2>النتائج</h2>
-        <table>
-        <tr><th>EBITDA</th><td>${currency}${res.EBITDA.toFixed(0)}</td></tr>
-        <tr><th>القيمة العادلة</th><td>${currency}${res.fairValue.toFixed(0)}</td></tr>
-        <tr><th>سعر حصة ${res.ownership}%</th><td>${currency}${res.sharePrice.toFixed(0)}</td></tr>
-        <tr><th>فترة الاسترداد</th><td>${isFinite(res.paybackYears) ? res.paybackYears.toFixed(2)+' سنة' : 'لا نهائي'}</td></tr>
-        </table>
-        <p style="text-align:center;color:#888;">تم بواسطة FAROUK GRUP © ${new Date().getFullYear()}</p>
-        </body></html>`;
-            const blob = new Blob([content], { type: 'application/msword' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `تقييم_${name}.doc`;
-            a.click();
-        });
+                    const workbook = new ExcelJS.Workbook();
+                    workbook.creator = 'FAROUK GRUP';
+                    workbook.created = new Date();
 
-        // تصدير Excel
-        document.getElementById('exportExcelBtn').addEventListener('click', async function() {
-            if (!window.lastValuation) { alert('الرجاء إجراء الحساب أولاً'); return; }
-            const res = window.lastValuation;
-            const name = document.getElementById('restaurantName').value || 'مطعم';
-            const currency = document.getElementById('currencySelect').value;
-            const workbook = new ExcelJS.Workbook();
-            const ws = workbook.addWorksheet('تقييم المطعم', { views: [{ rightToLeft: true }] });
-            ws.columns = [{ width: 35 }, { width: 25 }];
-            ws.addRow(['المؤشر', 'القيمة']);
-            ws.addRow(['EBITDA', `${currency}${res.EBITDA.toFixed(0)}`]);
-            ws.addRow(['القيمة العادلة', `${currency}${res.fairValue.toFixed(0)}`]);
-            ws.addRow(['سعر الحصة', `${currency}${res.sharePrice.toFixed(0)}`]);
-            const buffer = await workbook.xlsx.writeBuffer();
-            const blob = new Blob([buffer], {
-                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    const G = 'FFB48554',
+                        GL = 'FFCFA776',
+                        DB = 'FF0B0E17',
+                        HB = 'FF1A2035',
+                        SB = 'FF243050';
+                    const AR = 'FFF5F0E8',
+                        W = 'FFFFFFFF',
+                        DT = 'FF1A1A1A',
+                        PB = 'FFD4EDDA',
+                        NB = 'FFF8D7DA';
+                    const PT = 'FF155724',
+                        NT = 'FF721C24',
+                        GB = 'FFFFF3CD';
+
+                    function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11,
+                                color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid',
+                                fgColor: { argb: bg } }, alignment: { horizontal: 'center',
+                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                    style: 'thin', color: { argb: G } }, bottom: { style: 'thin',
+                                    color: { argb: G } }, left: { style: 'thin', color: { argb: G } },
+                                right: { style: 'thin', color: { argb: G } } } }; }
+
+                    function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial',
+                                bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern',
+                                pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h,
+                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                    style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair',
+                                    color: { argb: 'FFCCCCCC' } }, left: { style: 'hair',
+                                    color: { argb: 'FFCCCCCC' } }, right: { style: 'hair',
+                                    color: { argb: 'FFCCCCCC' } } } }; }
+
+                    function ap(c, s) { if (s.font) c.font = s.font; if (s.fill) c.fill = s.fill; if (s
+                            .alignment) c.alignment = s.alignment; if (s.border) c.border = s.border; if (s
+                            .numFmt) c.numFmt = s.numFmt; }
+
+                    function mh(ws, fc, tc, r, text, bg = HB, tc2 = GL, fs = 12) { ws.mergeCells(r, fc, r,
+                        tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true,
+                            size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid',
+                            fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle',
+                            wrapText: true, readingOrder: 'rtl' }; c.border = { top: { style: 'medium',
+                                color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } },
+                            left: { style: 'medium', color: { argb: G } }, right: { style: 'medium',
+                                color: { argb: G } } }; }
+
+                    // 1. غلاف التقرير
+                    const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true,
+                            showGridLines: false }] });
+                    [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
+                    for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
+                    cv.getRow(2).height = 80;
+                    cv.getRow(4).height = 60;
+                    cv.mergeCells(2, 1, 2, 4);
+                    const bc = cv.getCell(2, 1);
+                    bc.value = 'مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+                    bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
+                    bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
+                    bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
+                    readingOrder: 'rtl' };
+                    bc.border = { bottom: { style: 'thick', color: { argb: G } } };
+                    mh(cv, 1, 4, 4, `تقرير تقييم مطعم\n${name}`, DB, GL, 18);
+                    const inf = [
+                        ['📋 اسم المطعم', name],
+                        ['📅 التاريخ', new Date().toLocaleDateString('ar-EG')],
+                        ['💰 العملة', currency],
+                        ['📊 القيمة العادلة', `${currency}${D.fairValue.toFixed(0)}`],
+                        ['📈 EBITDA', `${currency}${D.EBITDA.toFixed(0)}`],
+                        ['🔢 المضاعف المستخدم', `${D.multiplier.toFixed(2)}x`]
+                    ];
+                    let ir = 6;
+                    inf.forEach(([l, v], idx) => {
+                        cv.mergeCells(ir, 1, ir, 2);
+                        cv.mergeCells(ir, 3, ir, 4);
+                        const lc = cv.getCell(ir, 1),
+                            vc = cv.getCell(ir, 3);
+                        lc.value = l;
+                        vc.value = v;
+                        const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
+                        ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } },
+                            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
+                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' },
+                            border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
+                                right: { style: 'hair' } } });
+                        ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } },
+                            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
+                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' },
+                            border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
+                                right: { style: 'hair' } } });
+                        cv.getRow(ir).height = 28;
+                        ir++;
+                    });
+
+                    // 2. المدخلات
+                    const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true,
+                            showGridLines: false }] });
+                    inputsSheet.getColumn(1).width = 5;
+                    inputsSheet.getColumn(2).width = 38;
+                    inputsSheet.getColumn(3).width = 22;
+                    inputsSheet.getColumn(4).width = 22;
+                    inputsSheet.getColumn(5).width = 5;
+                    mh(inputsSheet, 1, 5, 1, '📋 جدول المدخلات والافتراضات الأساسية', DB, GL, 14);
+                    inputsSheet.getRow(1).height = 40;
+                    mh(inputsSheet, 2, 4, 2, 'البيانات المالية السنوية', SB, W, 11);
+                    inputsSheet.getRow(2).height = 28;
+
+                    let iRow = 3;
+                    const addInputRow = (label, val, note = '') => {
+                        inputsSheet.getRow(iRow).height = 24;
+                        const bg = iRow % 2 === 0 ? 'FFFEFCF6' : 'FFFFFFFF';
+                        const lc = inputsSheet.getCell(iRow, 2),
+                            vc = inputsSheet.getCell(iRow, 3),
+                            nc = inputsSheet.getCell(iRow, 4);
+                        lc.value = label;
+                        vc.value = val;
+                        nc.value = note;
+                        ap(lc, cs(bg, DT, true, 'right'));
+                        ap(vc, { ...cs(bg, '0000FF', false, 'center'), numFmt: typeof val === 'number' ?
+                            '#,##0.00' : null });
+                        ap(nc, cs(bg, '00695C', false, 'center'));
+                        iRow++;
+                    };
+
+                    addInputRow('إجمالي الإيرادات', D.rev);
+                    addInputRow('تكلفة البضاعة المباعة (COGS)', D.cogs);
+                    addInputRow('المصاريف التشغيلية (OPEX)', D.opex);
+                    addInputRow('الإهلاك والاستهلاك', D.depr);
+                    addInputRow('الفوائد المدفوعة', D.interest);
+                    addInputRow('الضرائب المدفوعة', D.taxes);
+                    addInputRow('إجمالي الديون القائمة', D.totalDebt);
+                    addInputRow('القيمة السوقية للأصول', D.assetValue);
+                    addInputRow('مضاعف السوق', D.originalMultiplier);
+                    addInputRow('نسبة الملكية', D.ownership, '%');
+                    addInputRow('سنة التأسيس', D.estYear);
+                    addInputRow('سنة انتهاء عقد الإيجار', D.leaseExpiry);
+                    if (D.injectionImpact) {
+                        addInputRow('ضخ رأس مال (قيمة)', document.getElementById('injectionAmount').value || 0);
+                        addInputRow('ضخ رأس مال (عائد %)', document.getElementById('injectionROI').value || 0);
+                    }
+
+                    // 3. مؤشرات الأداء
+                    const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true,
+                            showGridLines: false }] });
+                    [5, 32, 22, 22, 22, 5].forEach((w, i) => kpiSheet.getColumn(i + 1).width = w);
+                    mh(kpiSheet, 1, 6, 1, '📊 لوحة المؤشرات الرئيسية', DB, GL, 15);
+                    kpiSheet.getRow(1).height = 45;
+                    mh(kpiSheet, 2, 5, 2, `${name} | ${new Date().toLocaleDateString('ar-EG')}`, HB, W, 10);
+                    kpiSheet.getRow(2).height = 26;
+
+                    const kpis = [
+                        { label: 'EBITDA', value: `${currency}${D.EBITDA.toFixed(0)}`, good: D.EBITDA > 0 },
+                        { label: 'القيمة العادلة', value: `${currency}${D.fairValue.toFixed(0)}`, good: D
+                                .fairValue > 0 },
+                        { label: 'سعر الحصة', value: `${currency}${D.sharePrice.toFixed(0)}`, good: D
+                                .sharePrice > 0 },
+                        { label: 'فترة الاسترداد', value: isFinite(D.paybackYears) ? D.paybackYears.toFixed(
+                                2) + ' سنة' : 'لا نهائي', good: isFinite(D.paybackYears) && D
+                                .paybackYears < 10 },
+                        { label: 'مؤشر الكفاءة', value: D.efficiencyIndex.toFixed(2), good: D
+                                .efficiencyIndex >= 1 },
+                        { label: 'المضاعف المستخدم', value: D.multiplier.toFixed(2) + 'x', good: D
+                                .multiplier >= 2 }
+                    ];
+                    let kRow = 3;
+                    kpis.forEach((k, idx) => {
+                        kpiSheet.getRow(kRow).height = 40;
+                        kpiSheet.mergeCells(kRow, 2, kRow, 2);
+                        kpiSheet.mergeCells(kRow, 3, kRow, 3);
+                        kpiSheet.mergeCells(kRow, 4, kRow, 4);
+                        kpiSheet.mergeCells(kRow, 5, kRow, 5);
+                        const ic = kpiSheet.getCell(kRow, 2);
+                        ic.value = `🔹 ${idx+1}`;
+                        const lc2 = kpiSheet.getCell(kRow, 3);
+                        lc2.value = k.label;
+                        const vc3 = kpiSheet.getCell(kRow, 4);
+                        vc3.value = k.value;
+                        const nc2 = kpiSheet.getCell(kRow, 5);
+                        nc2.value = '';
+                        const bg = k.good ? PB : NB,
+                            tc = k.good ? PT : NT;
+                        [ic, lc2, vc3, nc2].forEach(c => { c.fill = { type: 'pattern', pattern: 'solid',
+                                fgColor: { argb: bg } };
+                            c.border = { top: { style: 'thin', color: { argb: G } }, bottom: { style: 'thin',
+                                    color: { argb: G } }, left: { style: 'thin', color: { argb: G } },
+                                right: { style: 'thin', color: { argb: G } } }; });
+                        ic.font = { name: 'Arial', bold: true, size: 14, color: { argb: '555555' } };
+                        ic.alignment = { horizontal: 'center', vertical: 'middle' };
+                        lc2.font = { name: 'Arial', bold: true, size: 11, color: { argb: DT } };
+                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        vc3.font = { name: 'Arial', bold: true, size: 13, color: { argb: tc } };
+                        vc3.alignment = { horizontal: 'center', vertical: 'middle' };
+                        nc2.font = { name: 'Arial', size: 9, color: { argb: '444444' } };
+                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        kRow++;
+                    });
+                    kRow++;
+                    kpiSheet.mergeCells(kRow, 2, kRow, 5);
+                    const kFinal = kpiSheet.getCell(kRow, 2);
+                    kFinal.value = D.fairValue > 0 ? '✅ التقييم إيجابي' : '⚠️ التقييم سلبي أو صفري';
+                    kFinal.font = { name: 'Arial', bold: true, size: 13, color: { argb: D.fairValue > 0 ?
+                            PT : '856404' } };
+                    kFinal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: D.fairValue > 0 ?
+                            PB : GB } };
+                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+                    kFinal.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
+                            color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
+                        right: { style: 'medium', color: { argb: G } } };
+                    kpiSheet.getRow(kRow).height = 40;
+
+                    // 4. تحليل الحساسية
+                    const sensSheet = workbook.addWorksheet('تحليل الحساسية', { views: [{ rightToLeft: true,
+                            showGridLines: false }] });
+                    sensSheet.getColumn(1).width = 5;
+                    sensSheet.getColumn(2).width = 20;
+                    sensSheet.getColumn(3).width = 22;
+                    sensSheet.getColumn(4).width = 22;
+                    sensSheet.getColumn(5).width = 22;
+                    sensSheet.getColumn(6).width = 5;
+                    mh(sensSheet, 1, 6, 1, '📈 تحليل الحساسية (تأثير المضاعف)', DB, GL, 14);
+                    sensSheet.getRow(1).height = 40;
+                    sensSheet.addRow(['المضاعف', 'قيمة الكيان', 'القيمة العادلة', 'سعر حصتك']);
+                    const mults = [2, 2.5, 3, 3.5, 4];
+                    mults.forEach(m => {
+                        const ev = D.EBITDA * m;
+                        const eq = ev - D.totalDebt;
+                        const fair = eq > 0 ? eq : 0;
+                        sensSheet.addRow([m, ev, fair, (fair * D.ownership) / 100]);
+                    });
+                    const sensHeader = sensSheet.getRow(2);
+                    sensHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                    sensHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+
+                    // 5. التوصيات
+                    const recSheet = workbook.addWorksheet('التوصيات', { views: [{ rightToLeft: true,
+                            showGridLines: false }] });
+                    recSheet.getColumn(1).width = 5;
+                    recSheet.getColumn(2).width = 50;
+                    recSheet.getColumn(3).width = 5;
+                    mh(recSheet, 1, 3, 1, '💡 التوصيات', DB, GL, 14);
+                    recSheet.getRow(1).height = 40;
+                    let recContent = '';
+                    if (D.fairValue > 0) {
+                        recContent =
+                            `✅ التقييم إيجابي: القيمة العادلة ${currency}${D.fairValue.toFixed(0)}\n`;
+                        recContent += `سعر الحصة (${D.ownership}%): ${currency}${D.sharePrice.toFixed(0)}\n`;
+                        if (D.leaseWarning) recContent += `⚠️ ${D.leaseWarning}\n`;
+                        if (D.injectionImpact) {
+                            recContent += `💉 بعد ضخ رأس المال: القيمة العادلة المتوقعة ${currency}${D.injectionImpact.newFairValue.toFixed(0)}\n`;
+                        }
+                        recContent += `\nيوصى بالتفاوض بناءً على هذا النطاق، مع مراعاة تحسين المؤشرات الضعيفة.`;
+                    } else {
+                        recContent =
+                            `🔴 التقييم سلبي أو صفري. تحتاج إلى مراجعة هيكل التكاليف، زيادة الإيرادات، أو تخفيض الديون.`;
+                    }
+                    recSheet.getCell(3, 2).value = recContent;
+                    recSheet.getCell(3, 2).font = { name: 'Arial', size: 11 };
+                    recSheet.getCell(3, 2).alignment = { wrapText: true, readingOrder: 'rtl' };
+
+                    const buffer = await workbook.xlsx.writeBuffer();
+                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    const now = new Date();
+                    const fileName =
+                        `تقييم_مطعم_${name}_${now.toISOString().slice(0,10)}.xlsx`;
+                    saveAs(blob, fileName);
+                } catch (err) {
+                    console.error(err);
+                    alert('خطأ أثناء إنشاء ملف Excel: ' + err.message);
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ========== تصدير Word ==========
+            async function exportToWord() {
+                if (!window.lastValuation) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+                showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات');
+                try {
+                    const D = window.lastValuation;
+                    const currency = document.getElementById('currencySelect').value;
+                    const name = document.getElementById('restaurantName').value || 'المطعم';
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('ar-EG');
+
+                    let injectionHtml = '';
+                    if (D.injectionImpact) {
+                        injectionHtml = `
+                            <h3 style="color:#b8860b;">💉 تأثير ضخ رأس المال</h3>
+                            <p>القيمة العادلة بعد الضخ: ${currency}${D.injectionImpact.newFairValue.toFixed(0)}</p>
+                            <p>فترة الاسترداد الجديدة: ${isFinite(D.injectionImpact.newPayback) ? D.injectionImpact.newPayback.toFixed(2)+' سنة' : 'غير محسوبة'}</p>
+                        `;
+                    }
+
+                    const fullHtml = `<!DOCTYPE html>
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+                    <head><meta charset='utf-8'><title>تقرير تقييم مطعم - FAROUK GRUP</title>
+                    <style>
+                        body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;}
+                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                        .cover h1{font-size:32px;color:#b8860b;margin:0;}
+                        .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                        table{width:100%;border-collapse:collapse;margin:20px 0;direction:rtl;}
+                        th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                        th{background:#fefcf6;color:#b8860b;font-weight:bold;}
+                        .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;font-size:10pt;}
+                        .rec{background:#f9f9f9;padding:15px;border-right:4px solid #b8860b;margin:20px 0;}
+                    </style></head>
+                    <body>
+                        <div class="cover">
+                            <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+                            <h2>تقرير تقييم مطعم</h2>
+                            <p>اسم المطعم: ${name} | التاريخ: ${dateStr}</p>
+                            <p>العملة: ${currency}</p>
+                        </div>
+                        <h2 style="color:#b8860b;">📊 المؤشرات الرئيسية</h2>
+                        <table>
+                            <thead><tr><th>المؤشر</th><th>القيمة</th></tr></thead>
+                            <tbody>
+                                <tr><td>EBITDA</td><td>${currency}${D.EBITDA.toFixed(0)}</td></tr>
+                                <tr><td>القيمة العادلة</td><td>${currency}${D.fairValue.toFixed(0)}</td></tr>
+                                <tr><td>سعر حصة ${D.ownership}%</td><td>${currency}${D.sharePrice.toFixed(0)}</td></tr>
+                                <tr><td>فترة الاسترداد</td><td>${isFinite(D.paybackYears) ? D.paybackYears.toFixed(2)+' سنة' : 'لا نهائي'}</td></tr>
+                                <tr><td>مؤشر الكفاءة</td><td>${D.efficiencyIndex.toFixed(2)}</td></tr>
+                                <tr><td>المضاعف المستخدم</td><td>${D.multiplier.toFixed(2)}x</td></tr>
+                            </tbody>
+                        </table>
+                        ${D.leaseWarning ? `<div style="background:#f8d7da;padding:10px;border-radius:8px;border-right:4px solid #dc3545;margin:20px 0;">${D.leaseWarning}</div>` : ''}
+                        ${injectionHtml}
+                        <div class="rec">
+                            <h3 style="color:#b8860b;">📌 التوصية</h3>
+                            <p>${D.fairValue > 0 ? '✅ التقييم إيجابي، يوصى بالمضي قدماً في المفاوضات بناءً على النطاق المعروض.' : '🔴 التقييم سلبي أو صفري، يجب مراجعة هيكل التكاليف أو زيادة الإيرادات.'}</p>
+                        </div>
+                        <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+                    </body></html>`;
+
+                    const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `تقييم_مطعم_${name}_${now.toISOString().slice(0,10)}.doc`;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                } catch (err) {
+                    console.error(err);
+                    alert('خطأ في إنشاء تقرير Word');
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ===== ربط أزرار التصدير =====
+            document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+            document.getElementById('exportFullExcelBtn').addEventListener('click', exportToFullExcel);
+
+            // ===== تشغيل تلقائي =====
+            window.addEventListener('load', function() {
+                // تشغيل الحساب تلقائياً لعرض النتائج الافتراضية
+                setTimeout(function() {
+                    const res = computeValuation();
+                    displayResults(res);
+                }, 400);
             });
-            saveAs(blob, `تقييم_${name}.xlsx`);
-        });
+
+        })();
     </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>تقييم المعارف والمهارات | FAROUK GRUP</title>
     <!-- حماية الصفحة -->
     <script src="auth-check.js"></script>
@@ -10,433 +10,481 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- AOS Library -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <!-- html2canvas & ExcelJS & FileSaver -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
+        /* ===== RESET & BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg-dark: #0b0e17;
-            --bg-panel: rgba(18, 24, 36, 0.85);
-            --bg-card: rgba(22, 30, 46, 0.8);
-            --border-light: rgba(180, 133, 84, 0.25);
-            --accent-glow: #b48554;
-            --accent-soft: #cfa776;
-            --text-light: #f0f4fa;
-            --text-muted: #aab7d4;
-            --text-dark: #0b0e17;
-            --shadow-soft: 0 15px 35px -10px rgba(0,0,0,0.6), 0 0 0 1px rgba(180,133,84,0.15);
-            --shadow-glow: 0 15px 35px -10px rgba(0,0,0,0.8), 0 0 20px rgba(180,133,84,0.3);
-            --radius-md: 20px;
-            --radius-lg: 30px;
-            --transition: all 0.3s ease;
-            --gold: #b8860b;
-            --gold-light: #d4b15a;
-            --gold-soft: rgba(184,134,11,0.1);
-            --dark: #0f0f0f;
-            --dark-light: #1a1a1a;
-            --white: #ffffff;
-            --offwhite: #f9f9f9;
-            --text: #333;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
-            --color-red: #e63946;
-            --color-orange: #f77f00;
-            --color-green: #2a9d8f;
-            --color-blue: #4a6fa5;
-        }
-        body {
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
             font-family: 'Tajawal', sans-serif;
-            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
-            color: var(--text-light);
-            line-height: 1.6;
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 100px !important;
         }
-        .glow-bg { position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 0; }
-        .glow-bg span { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%); border-radius: 50%; filter: blur(80px); animation: glowMove 20s infinite alternate ease-in-out; }
-        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(180,133,84,0.12) 0%, transparent 70%); }
-        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
-        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.1) 0%, transparent 70%); animation-delay: -5s; }
-        @keyframes glowMove { 0% { transform: translate(0, 0) scale(1); opacity: 0.5; } 100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; } }
 
-        .hero-mini {
-            background: linear-gradient(135deg, var(--dark) 0%, #1a1a2e 100%);
-            color: white;
-            text-align: center;
-            padding: 2.5rem 1rem;
-            border-bottom: 4px solid var(--accent-glow);
-            position: relative;
-            overflow: hidden;
-            z-index: 2;
+        /* ===== إزالة كل ما يسبب الاهتزاز ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .chart-card, .scenario-card, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .personal-info,
+        .question-item, .domain-section, .progress-area,
+        .modal-overlay, .modal-container, .export-word-btn, .export-excel-full-btn {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
         }
-        .hero-mini::before {
-            content: '';
+
+        /* ===== خلفية ثابتة ===== */
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
             position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(180,133,84,0.2) 0%, transparent 60%);
-            animation: rotate 30s linear infinite;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.12) 0%, transparent 70%);
         }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.06) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.08) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
         .hero-mini h2 {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--gold-light);
-            margin-bottom: 0.5rem;
-            position: relative;
-            z-index: 2;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
         .hero-mini p {
-            font-size: 1.15rem;
-            max-width: 700px;
-            margin: 0 auto;
-            opacity: 0.95;
-            position: relative;
-            z-index: 2;
-            color: #e0d7c6;
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
         }
-        .calc-wrapper { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; position: relative; z-index: 2; }
-        .calc-box {
-            background: var(--bg-panel);
-            backdrop-filter: blur(15px);
-            border: 2px solid var(--border-light);
-            border-radius: var(--radius-lg);
-            padding: 1.8rem;
-            box-shadow: var(--shadow-soft);
-            position: relative;
-            overflow: hidden;
-        }
-        .calc-box:hover { box-shadow: var(--shadow-glow); border-color: rgba(180,133,84,0.4); }
 
+        /* ===== WRAPPER ===== */
+        .calc-wrapper {
+            max-width: 1050px;
+            margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+        }
+
+        /* ===== CARD ===== */
+        .calc-box {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .calc-box h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+        }
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== معلومات شخصية ===== */
         .personal-info {
-            background: var(--bg-card);
-            border-radius: var(--radius-md);
-            padding: 1.2rem 1.5rem;
-            margin-bottom: 1.8rem;
-            border: 1px solid var(--border-light);
+            background: rgba(22,30,46,0.6); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 20px; padding: 1rem; margin-bottom: 1.5rem;
         }
         .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 0.8rem 1.5rem;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.8rem;
         }
-        .info-field { display: flex; flex-direction: column; gap: 0.2rem; }
-        .info-field label { font-weight: 700; color: var(--accent-soft); font-size: 0.85rem; }
+        .info-field {
+            display: flex; flex-direction: column; gap: 0.2rem;
+        }
+        .info-field label {
+            font-weight: 700; color: #cfa776; font-size: 0.85rem;
+        }
         .info-field input, .info-field select {
-            background: rgba(10,14,23,0.7);
-            border: 2px solid var(--border-light);
-            border-radius: 30px;
-            padding: 0.6rem 1rem;
-            color: var(--text-light);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            transition: var(--transition);
-            width: 100%;
-            outline: none;
+            width: 100%; padding: 0.6rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
         }
         .info-field input:focus, .info-field select:focus {
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 0 3px rgba(180,133,84,0.2);
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
         }
+
+        /* ===== شريط التقدم ===== */
         .progress-area {
-            background: var(--bg-card);
-            border-radius: 60px;
-            padding: 0.6rem 1.5rem;
-            margin-bottom: 1.8rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            border: 1px solid var(--border-light);
+            background: rgba(22,30,46,0.6); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 60px; padding: 0.5rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 0.5rem;
         }
         .counter {
-            background: rgba(10,14,23,0.6);
-            padding: 0.2rem 1rem;
-            border-radius: 30px;
-            color: var(--gold-light);
-            font-weight: 700;
-            font-size: 1rem;
+            background: rgba(10,14,23,0.6); padding: 0.1rem 1rem;
+            border-radius: 30px; color: #d4b15a; font-weight: 700; font-size: 0.95rem;
         }
         .progress-bar-bg {
-            flex: 1;
-            height: 8px;
-            background: var(--bg-dark);
-            border-radius: 20px;
-            overflow: hidden;
-            min-width: 80px;
+            flex: 1; height: 8px; background: #0b0e17;
+            border-radius: 20px; overflow: hidden; min-width: 80px;
         }
         .progress-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--accent-glow), var(--gold-light));
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, #b48554, #d4b15a);
             border-radius: 20px;
-            transition: width 0.25s ease;
         }
+
+        /* ===== الأسئلة ===== */
         .questions-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-            max-height: 65vh;
-            overflow-y: auto;
+            display: flex; flex-direction: column; gap: 1rem;
+            margin-bottom: 1.5rem;
+            max-height: 60vh; overflow-y: auto;
             padding-left: 5px;
         }
-        .questions-grid::-webkit-scrollbar { width: 6px; }
-        .questions-grid::-webkit-scrollbar-track { background: var(--bg-dark); border-radius: 10px; }
-        .questions-grid::-webkit-scrollbar-thumb { background: var(--accent-glow); border-radius: 10px; }
+        .questions-grid::-webkit-scrollbar { width: 4px; }
+        .questions-grid::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); border-radius: 10px; }
+        .questions-grid::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
 
         .domain-section {
-            background: var(--bg-card);
-            border-radius: var(--radius-md);
-            padding: 1.2rem 1.5rem;
-            border: 1px solid var(--border-light);
-            transition: var(--transition);
+            background: rgba(22,30,46,0.6); border: 1px solid rgba(180,133,84,0.12);
+            border-radius: 20px; padding: 0.8rem 1rem;
         }
         .domain-title {
-            color: var(--accent-soft);
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--border-light);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            color: #cfa776; font-size: 1.1rem; font-weight: 700;
+            margin-bottom: 0.6rem; padding-bottom: 0.3rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            display: flex; align-items: center; gap: 0.5rem;
         }
-        .domain-title i { color: var(--accent-glow); font-size: 1.5rem; }
+        .domain-title i { color: #b48554; font-size: 1.2rem; }
+
         .question-item {
-            background: rgba(10,14,23,0.4);
-            border-radius: var(--radius-md);
-            padding: 1rem 1.2rem;
-            margin-bottom: 0.8rem;
+            background: rgba(10,14,23,0.4); border: 1px solid rgba(180,133,84,0.08);
+            border-radius: 16px; padding: 0.6rem 1rem;
+            margin-bottom: 0.6rem;
             border-right: 4px solid transparent;
-            transition: var(--transition);
         }
         .question-item:last-child { margin-bottom: 0; }
-        .question-item:hover { border-color: var(--accent-glow); background: rgba(20,28,44,0.6); }
         .question-item.critical {
-            border-right: 5px solid var(--color-red) !important;
-            background: rgba(230, 57, 70, 0.08);
+            border-right-color: #dc3545 !important;
+            background: rgba(220,53,69,0.08);
         }
         .question-item.warning-item {
-            border-right: 5px solid var(--color-orange) !important;
-            background: rgba(247, 127, 0, 0.08);
+            border-right-color: #ffc107 !important;
+            background: rgba(255,193,7,0.08);
         }
         .question-text {
-            color: var(--text-light);
-            font-size: 0.95rem;
-            font-weight: 600;
-            margin-bottom: 0.6rem;
-            display: flex;
-            align-items: baseline;
-            gap: 0.5rem;
+            color: #f0f4fa; font-size: 0.95rem; font-weight: 600;
+            margin-bottom: 0.4rem; display: flex; align-items: baseline; gap: 0.5rem;
         }
         .q-num {
-            background: var(--accent-glow);
-            color: #0b0e17;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 800;
-            margin-left: 0.5rem;
+            background: #b48554; color: #0b0e17; width: 24px; height: 24px;
+            border-radius: 50%; display: inline-flex; align-items: center;
+            justify-content: center; font-size: 0.7rem; font-weight: 800;
             flex-shrink: 0;
         }
         .options-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem 0.6rem;
+            display: flex; flex-wrap: wrap; gap: 0.3rem 0.6rem;
             justify-content: flex-start;
         }
         .radio-option {
-            background: rgba(10,14,23,0.6);
-            border-radius: 50px;
-            padding: 0.3rem 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            cursor: pointer;
-            transition: var(--transition);
-            border: 1px solid var(--border-light);
-            font-size: 0.8rem;
+            background: rgba(10,14,23,0.5); border-radius: 50px;
+            padding: 0.2rem 0.7rem;
+            display: flex; align-items: center; gap: 0.3rem;
+            cursor: pointer; border: 1px solid rgba(180,133,84,0.15);
+            font-size: 0.75rem;
         }
         .radio-option.selected {
-            background: rgba(180,133,84,0.25);
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 0 2px rgba(180,133,84,0.3);
+            background: rgba(180,133,84,0.2);
+            border-color: #b48554;
         }
         .radio-option input {
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            border: 2px solid var(--text-muted);
-            background: transparent;
-            margin: 0;
-            cursor: pointer;
-            position: relative;
+            appearance: none; width: 14px; height: 14px;
+            border-radius: 50%; border: 2px solid #aab7d4;
+            background: transparent; margin: 0; cursor: pointer;
             flex-shrink: 0;
         }
         .radio-option input:checked {
-            border-color: var(--gold-light);
-            background: var(--gold-light);
-            box-shadow: inset 0 0 0 4px rgba(10,14,23,0.8);
+            border-color: #d4b15a; background: #d4b15a;
+            box-shadow: inset 0 0 0 3px rgba(10,14,23,0.8);
         }
-        .radio-option label { color: var(--text-light); font-size: 0.8rem; font-weight: 500; cursor: pointer; }
+        .radio-option label {
+            color: #f0f4fa; font-size: 0.75rem; font-weight: 500;
+            cursor: pointer;
+        }
 
-        .action-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
-        .result-btn, .export-btn {
+        /* ===== أزرار الإجراء ===== */
+        .action-row {
+            display: flex; gap: 0.8rem; flex-wrap: wrap;
+        }
+        .result-btn {
             flex: 1; min-width: 150px;
-            background: rgba(180,133,84,0.2);
-            border: 1px solid var(--border-light);
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
             border-radius: 50px;
-            padding: 0.9rem 1.5rem;
+            padding: 0.8rem 1.5rem;
             font-weight: 700; font-size: 1rem;
             cursor: pointer;
-            transition: var(--transition);
-            color: var(--accent-soft);
+            color: #cfa776;
             font-family: 'Tajawal', sans-serif;
             display: flex; align-items: center; justify-content: center; gap: 0.5rem;
         }
-        .result-btn:hover, .export-btn:hover {
-            background: rgba(180,133,84,0.4);
-            color: #fff;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 15px rgba(180,133,84,0.3);
-            transform: translateY(-2px);
-        }
-        .export-btn {
-            background: rgba(42,122,90,0.2);
-            border-color: rgba(42,122,90,0.3);
-            color: #7fc9a5;
-        }
-        .export-btn:hover { background: rgba(42,122,90,0.4); border-color: #2a7a5a; color: #fff; }
+        .result-btn:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
 
+        /* ===== أزرار التصدير ===== */
+        .export-container {
+            display: flex; justify-content: center; gap: 0.8rem;
+            flex-wrap: wrap; margin: 0;
+        }
+        .export-word-btn, .export-excel-full-btn {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+            padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.9rem; font-family: 'Tajawal', sans-serif;
+            flex: 1 1 auto; justify-content: center; max-width: 220px;
+        }
+        .export-word-btn:hover, .export-excel-full-btn:hover { background: rgba(180,133,84,0.25); }
+
+        /* ===== شاشة تحميل ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== فوتر ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== مودال النتيجة ===== */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
             display: flex; align-items: center; justify-content: center;
-            z-index: 2000; visibility: hidden; opacity: 0; transition: all 0.3s ease;
+            z-index: 2000; visibility: hidden; opacity: 0;
             padding: 20px;
         }
-        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-overlay.active {
+            visibility: visible; opacity: 1;
+        }
         .modal-container {
-            background: var(--bg-panel);
-            border-radius: var(--radius-lg);
-            max-width: 650px; width: 100%; max-height: 90vh;
-            border: 2px solid var(--border-light);
-            padding: 1.5rem; text-align: center;
-            box-shadow: var(--shadow-glow);
-            transform: scale(0.9); transition: transform 0.2s;
+            background: rgba(18,24,36,0.95); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; max-width: 650px; width: 100%;
+            max-height: 90vh; padding: 1.5rem;
+            text-align: center; box-shadow: 0 15px 35px -10px rgba(0,0,0,0.8);
             overflow-y: auto; display: flex; flex-direction: column;
         }
-        .modal-overlay.active .modal-container { transform: scale(1); }
+        .modal-container::-webkit-scrollbar { width: 4px; }
+        .modal-container::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); border-radius: 10px; }
+        .modal-container::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
         .modal-icon { font-size: 3rem; margin-bottom: 0.5rem; }
-        .modal-title { color: var(--accent-soft); font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem; }
+        .modal-title {
+            color: #cfa776; font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem;
+        }
         .total-score {
-            background: var(--bg-card); border-radius: 60px; padding: 0.8rem; margin: 0.8rem 0;
-            font-size: 2rem; font-weight: 900; color: var(--gold-light); border: 1px solid var(--border-light);
+            background: rgba(22,30,46,0.8); border-radius: 60px;
+            padding: 0.8rem; margin: 0.8rem 0;
+            font-size: 2rem; font-weight: 900; color: #d4b15a;
+            border: 1px solid rgba(180,133,84,0.2);
         }
         .interpretation {
-            font-size: 1.1rem; font-weight: 600; padding: 0.8rem; border-radius: 40px;
-            background: rgba(10,14,23,0.5); color: var(--text-light); margin-bottom: 1rem;
+            font-size: 1.1rem; font-weight: 600; padding: 0.8rem;
+            border-radius: 40px; background: rgba(10,14,23,0.5);
+            color: #f0f4fa; margin-bottom: 1rem; line-height: 1.6;
         }
         .recommendations-box {
-            text-align: right; background: rgba(10,14,23,0.5); border-radius: var(--radius-md);
-            padding: 0.8rem 1.2rem; margin-bottom: 1rem; border-right: 4px solid var(--accent-glow);
+            text-align: right; background: rgba(10,14,23,0.5);
+            border-radius: 20px; padding: 0.8rem 1.2rem;
+            margin-bottom: 1rem; border-right: 4px solid #b48554;
         }
-        .recommendations-box h3 { color: var(--accent-soft); font-size: 1.1rem; margin-bottom: 0.5rem; }
-        .recommendations-box ul { list-style: none; padding: 0; }
+        .recommendations-box h3 {
+            color: #cfa776; font-size: 1.1rem; margin-bottom: 0.5rem;
+        }
+        .recommendations-box ul {
+            list-style: none; padding: 0;
+        }
         .recommendations-box li {
-            color: var(--text-light); font-size: 0.95rem; padding: 0.4rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 0.5rem; align-items: flex-start;
+            color: #f0f4fa; font-size: 0.9rem; padding: 0.3rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; gap: 0.5rem; align-items: flex-start;
         }
-        .rec-dot { color: var(--gold-light); font-weight: bold; }
+        .recommendations-box li:last-child { border-bottom: none; }
+        .rec-dot { color: #d4b15a; font-weight: bold; }
         .modal-btn {
-            background: rgba(180,133,84,0.2); border: 1px solid var(--border-light);
-            border-radius: 50px; padding: 0.7rem 1.5rem; font-size: 1rem; font-weight: 700;
-            font-family: 'Tajawal', sans-serif; color: var(--accent-soft); cursor: pointer;
-            transition: var(--transition); margin-top: 0.5rem; width: 80%; align-self: center;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            border-radius: 50px;
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem; font-weight: 700;
+            font-family: 'Tajawal', sans-serif;
+            color: #cfa776;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            width: 80%; align-self: center;
         }
-        .modal-btn:hover { background: rgba(180,133,84,0.4); color: #fff; border-color: var(--accent-glow); }
+        .modal-btn:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
 
+        /* ===== تنبيه ===== */
         .warning-toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: rgba(220,53,69,0.9); backdrop-filter: blur(8px); color: white;
-            padding: 0.8rem 1.8rem; border-radius: 60px; font-weight: 700;
-            z-index: 1100; font-size: 0.95rem; display: none; transition: 0.2s; pointer-events: none;
+            background: rgba(220,53,69,0.9); backdrop-filter: blur(8px);
+            color: white; padding: 0.8rem 1.8rem; border-radius: 60px;
+            font-weight: 700; z-index: 1100; font-size: 0.95rem;
+            display: none; pointer-events: none;
         }
-        .footer-simple {
-            text-align: center; padding: 1.5rem; margin-top: 2rem;
-            background: rgba(10,14,23,0.5); backdrop-filter: blur(5px);
-            border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.85rem;
-        }
-        .footer-simple span { color: var(--accent-soft); font-weight: 700; }
 
-        /* زر الرئيسية العائم */
-        .home-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(180,133,84,0.9);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-family: 'Tajawal', sans-serif;
-            font-weight: bold;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.3s;
+        /* ===== زر الرئيسية العائم ===== */
+        .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            right: 20px !important; left: auto !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+            background: #b48554 !important; color: #fff !important;
+            text-decoration: none !important;
         }
-        .home-btn:hover { background: #b48554; transform: scale(1.05); }
+        .home-floating-btn:hover { opacity: 0.9 !important; }
+        .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
 
+        /* ===================================================
+           تحسينات للشاشات المتوسطة والكبيرة (كمبيوتر)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .info-grid { grid-template-columns: repeat(4, 1fr); }
+            .questions-grid { max-height: 65vh; }
+            .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .export-word-btn, .export-excel-full-btn { font-size: 1rem; padding: 0.8rem 2rem; }
+            .domain-title { font-size: 1.3rem; }
+            .question-text { font-size: 1rem; }
+        }
+
+        /* ===================================================
+           تحسينات للجوال (شاشات ≤ 768px)
+           =================================================== */
         @media (max-width: 768px) {
-            .hero-mini h2 { font-size: 2rem; }
-            .calc-box { padding: 1rem; }
-            .info-grid { grid-template-columns: 1fr; }
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .info-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .info-field label { font-size: 0.75rem; }
+            .info-field input, .info-field select { font-size: 0.8rem; padding: 0.4rem 0.7rem; }
+            .progress-area { padding: 0.4rem 1rem; }
+            .counter { font-size: 0.8rem; }
+            .questions-grid { max-height: 50vh; }
+            .question-text { font-size: 0.85rem; }
+            .radio-option label { font-size: 0.7rem; }
+            .result-btn { font-size: 0.9rem; padding: 0.6rem 1rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 0.75rem; padding: 0.4rem 1rem; max-width: 160px; }
+            .home-floating-btn { bottom: 14px !important; right: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .modal-container { padding: 1rem; }
+            .modal-title { font-size: 1.4rem; }
+            .total-score { font-size: 1.5rem; }
+            .interpretation { font-size: 1rem; }
             .action-row { flex-direction: column; }
-            .questions-grid { max-height: 55vh; }
-            .home-btn { bottom: 15px; right: 15px; padding: 10px 16px; font-size: 0.9rem; }
+            .action-row .result-btn, .action-row .export-word-btn, .action-row .export-excel-full-btn { width: 100%; max-width: none; }
+            .export-container { flex-direction: column; align-items: stretch; }
+            .export-container .export-word-btn, .export-container .export-excel-full-btn { max-width: none; width: 100%; }
+            .domain-title { font-size: 1rem; }
         }
-        .section-title-sm, .panel-header, .collapsible span, .result-card h4, .hero-mini h2 {
-            -webkit-text-fill-color: initial !important;
-            color: var(--accent-soft) !important;
-            background: none !important;
-            background-image: none !important;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+
+        /* ===== تحسينات للشاشات الصغيرة جداً (≤ 400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .info-grid { grid-template-columns: 1fr; }
+            .home-floating-btn { bottom: 10px !important; right: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+            .questions-grid { max-height: 40vh; }
+            .radio-option { padding: 0.1rem 0.5rem; }
+            .radio-option label { font-size: 0.65rem; }
         }
+
+        /* ===== تحسينات التمرير ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
     </style>
 </head>
 <body>
+    <!-- خلفية ثابتة -->
     <div class="glow-bg"><span></span><span></span><span></span></div>
 
+    <!-- شاشة تحميل التصدير -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">جاري إنشاء التقرير...</h3>
+            <p id="loadingMsg">يرجى الانتظار</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
     <section class="hero-mini">
-        <h2>تقييم المعارف والمهارات الشخصية</h2>
-        <p>حدد مستواك الحقيقي في المعرفة، القدرات، التوجيهات والسلوكيات – واكشف الجوانب الحرجة باللون الأحمر والبرتقالي</p>
+        <h2>📋 تقييم المعارف والمهارات الشخصية</h2>
+        <p>حدد مستواك الحقيقي في المعرفة، القدرات، التوجيهات والسلوكيات – مع تلوين الجوانب الحرجة</p>
     </section>
 
+    <!-- WRAPPER -->
     <section class="calc-wrapper">
-        <div class="calc-box" data-aos="fade-up">
-            <div style="text-align:center; margin-bottom:1.5rem;">
-                <span style="background:var(--accent-glow); color:#0b0e17; padding:0.4rem 1.5rem; border-radius:40px; font-weight:800;">0 = غير مدرك | 5 = خبير</span>
-            </div>
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-user-graduate"></i><span>تقييم</span></div>
+            <h2><i class="fas fa-user-graduate" style="color:#cfa776;margin-left:0.5rem;"></i>تقييم المهارات الشخصية</h2>
+
+            <!-- معلومات شخصية -->
             <div class="personal-info">
                 <div class="info-grid">
                     <div class="info-field"><label><i class="fas fa-user"></i> الاسم الكامل</label><input type="text" id="empName" placeholder="أدخل اسمك"></div>
@@ -446,27 +494,36 @@
                 </div>
             </div>
 
+            <!-- شريط التقدم -->
             <div class="progress-area">
                 <div class="counter" id="answeredCounter">0 / 16</div>
                 <div class="progress-bar-bg"><div class="progress-fill" id="progressFill"></div></div>
                 <div class="counter">🎯 التطوير الذاتي</div>
             </div>
 
+            <!-- الأسئلة -->
             <div id="questionsContainer" class="questions-grid"></div>
 
+            <!-- أزرار الإجراء -->
             <div class="action-row">
                 <button id="showResultBtn" class="result-btn"><i class="fas fa-chart-pie"></i> عرض النتيجة والتوصيات</button>
-                <button id="exportWordBtn" class="export-btn"><i class="fas fa-file-word"></i> تقرير Word</button>
-                <button id="exportExcelBtn" class="export-btn"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                <button id="exportWordBtn" class="export-word-btn"><i class="fas fa-file-word"></i> تقرير Word</button>
+                <button id="exportExcelBtn" class="export-excel-full-btn"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+            </div>
+            <div style="text-align:center;color:#aab7d4;font-size:0.8rem;margin-top:1rem;">
+                <i class="fas fa-clipboard-list" style="color:#cfa776;"></i> 16 معياراً في 4 مجالات | 0 = غير مدرك | 5 = خبير
             </div>
         </div>
     </section>
 
-    <footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
+    <footer class="footer-simple">
+        جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
+    </footer>
 
-    <!-- زر الرئيسية فقط -->
-    <a href="index.html" class="home-btn"><i class="fas fa-home"></i> الرئيسية</a>
+    <!-- زر الرئيسية العائم -->
+    <a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> الرئيسية</a>
 
+    <!-- ====== مودال عرض النتيجة ====== -->
     <div id="resultModal" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-icon">📋</div>
@@ -480,15 +537,28 @@
             <button class="modal-btn" id="closeModalBtn">حسناً، سأعمل على تطويرها ✓</button>
         </div>
     </div>
-    <div id="warningToast" class="warning-toast">⚠️ الرجاء الإجابة على جميع المعايير أولاً.</div>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- ====== تنبيه ====== -->
+    <div id="warningToast" class="warning-toast">⚠️ الرجاء الإجابة على جميع المعايير قبل عرض النتيجة.</div>
+
+    <!-- ====== السكربت ====== -->
     <script>
-        AOS.init({ duration: 800, once: true, offset: 100 });
+        (function() {
+            'use strict';
 
-        // ========== تعريف المجالات والمعايير (16 معياراً) ==========
-        const domains = [
-            {
+            // ===== دوال التحميل =====
+            function showLoading(title, msg) {
+                document.getElementById('loadingTitle').textContent = title;
+                document.getElementById('loadingMsg').textContent = msg;
+                document.getElementById('exportLoading').classList.add('show');
+            }
+
+            function hideLoading() {
+                document.getElementById('exportLoading').classList.remove('show');
+            }
+
+            // ========== تعريف المجالات والمعايير (16 معياراً) ==========
+            const domains = [{
                 name: "المعرفة",
                 icon: "fa-brain",
                 criteria: [
@@ -497,8 +567,7 @@
                     "معرفة كافية بنظام المحاسبة الإدارية والقدرة على شرحه وتعديله",
                     "فهم سياسات وإجراءات الموارد البشرية لدعم الفريق في الرواتب والحياة المهنية"
                 ]
-            },
-            {
+            }, {
                 name: "القدرات",
                 icon: "fa-chart-line",
                 criteria: [
@@ -507,8 +576,7 @@
                     "استخدام عملية تقييم المخاطر وتقديم تقديرات مالية متفائلة ومحتملة ومتشائمة",
                     "تقديم حالة عمل مقنعة لترويج مشروع وتعديل مؤشرات الأداء الرئيسية"
                 ]
-            },
-            {
+            }, {
                 name: "التوجيهات",
                 icon: "fa-compass",
                 criteria: [
@@ -517,8 +585,7 @@
                     "الالتزام بتحقيق الأهداف مع إدراك أن الجهل بالأمور المالية والإدارية يقلل الأداء",
                     "تقوية العلاقة المعرفية بالماليات واعتبار الإدارة المالية مصدراً لدعم الأهداف"
                 ]
-            },
-            {
+            }, {
                 name: "السلوكيات",
                 icon: "fa-user-check",
                 criteria: [
@@ -527,393 +594,602 @@
                     "مراجعة خطة التطوير الشخصي باستمرار والتخطيط للترقية التالية",
                     "إظهار الحماس للفريق والإصرار على تحقيق جميع مؤشرات الأداء الرئيسية"
                 ]
-            }
-        ];
+            }];
 
-        let allCriteria = [];
-        domains.forEach(domain => {
-            domain.criteria.forEach((text, idx) => {
-                allCriteria.push({ domain: domain.name, text: text, domainIndex: domains.indexOf(domain), localIndex: idx });
+            let allCriteria = [];
+            domains.forEach(domain => {
+                domain.criteria.forEach((text) => {
+                    allCriteria.push({ domain: domain.name, text: text });
+                });
             });
-        });
-        const totalQuestions = allCriteria.length; // 16
-        let answers = new Array(totalQuestions).fill(null);
-        const container = document.getElementById("questionsContainer");
+            const totalQuestions = allCriteria.length; // 16
+            let answers = new Array(totalQuestions).fill(null);
+            const container = document.getElementById("questionsContainer");
 
-        // تسميات الدرجات من 0 إلى 5
-        const scoreLabels = {
-            0: "غير مدرك",
-            1: "معرفة ضئيلة",
-            2: "اطلاع معقول",
-            3: "مستوى جيد",
-            4: "أعلى من العادي",
-            5: "خبير"
-        };
+            const scoreLabels = {
+                0: "غير مدرك",
+                1: "معرفة ضئيلة",
+                2: "اطلاع معقول",
+                3: "مستوى جيد",
+                4: "أعلى من العادي",
+                5: "خبير"
+            };
 
-        // ========== بناء الواجهة ==========
-        function renderQuestions() {
-            container.innerHTML = "";
-            let currentDomain = "";
-            let domainDiv = null;
+            // ========== بناء الواجهة ==========
+            function renderQuestions() {
+                container.innerHTML = "";
+                let currentDomain = "";
+                let domainDiv = null;
 
-            allCriteria.forEach((item, idx) => {
-                if (item.domain !== currentDomain) {
-                    currentDomain = item.domain;
-                    domainDiv = document.createElement("div");
-                    domainDiv.className = "domain-section";
-                    const domainObj = domains.find(d => d.name === currentDomain);
-                    const title = document.createElement("div");
-                    title.className = "domain-title";
-                    title.innerHTML = `<i class="fas ${domainObj?.icon || 'fa-circle'}"></i> ${currentDomain}`;
-                    domainDiv.appendChild(title);
-                    container.appendChild(domainDiv);
-                }
-
-                const qDiv = document.createElement("div");
-                qDiv.className = "question-item";
-                qDiv.setAttribute("data-qidx", idx);
-
-                const qHeader = document.createElement("div");
-                qHeader.className = "question-text";
-                qHeader.innerHTML = `<span class="q-num">${idx+1}</span> ${item.text}`;
-
-                const optionsDiv = document.createElement("div");
-                optionsDiv.className = "options-row";
-
-                for (let val = 0; val <= 5; val++) {
-                    const radioWrap = document.createElement("div");
-                    radioWrap.className = "radio-option";
-                    const radioInput = document.createElement("input");
-                    radioInput.type = "radio";
-                    radioInput.name = `q_${idx}`;
-                    radioInput.value = val;
-                    radioInput.id = `q_${idx}_val_${val}`;
-                    const label = document.createElement("label");
-                    label.htmlFor = `q_${idx}_val_${val}`;
-                    label.innerText = `${val} - ${scoreLabels[val]}`;
-
-                    radioInput.addEventListener("change", (function(index, selectedVal) {
-                        return function(e) {
-                            if (e.target.checked) {
-                                answers[index] = selectedVal;
-                                updateProgressAndBar();
-                                applyColorCoding(index, selectedVal);
-                                highlightSelectedOption(radioWrap.parentElement, selectedVal);
-                            }
-                        };
-                    })(idx, val));
-
-                    radioWrap.appendChild(radioInput);
-                    radioWrap.appendChild(label);
-                    optionsDiv.appendChild(radioWrap);
-                }
-
-                qDiv.appendChild(qHeader);
-                qDiv.appendChild(optionsDiv);
-                domainDiv.appendChild(qDiv);
-
-                // استعادة القيم السابقة
-                if (answers[idx] !== null) {
-                    const selectedRadio = document.querySelector(`input[name="q_${idx}"][value="${answers[idx]}"]`);
-                    if (selectedRadio) {
-                        selectedRadio.checked = true;
-                        const parentOpt = selectedRadio.closest(".radio-option");
-                        if (parentOpt) highlightSelectedOption(parentOpt.parentElement, answers[idx]);
-                        applyColorCoding(idx, answers[idx]);
+                allCriteria.forEach((item, idx) => {
+                    if (item.domain !== currentDomain) {
+                        currentDomain = item.domain;
+                        domainDiv = document.createElement("div");
+                        domainDiv.className = "domain-section";
+                        const title = document.createElement("div");
+                        title.className = "domain-title";
+                        const domainObj = domains.find(d => d.name === currentDomain);
+                        title.innerHTML = `<i class="fas ${domainObj?.icon || 'fa-circle'}"></i> ${currentDomain}`;
+                        domainDiv.appendChild(title);
+                        container.appendChild(domainDiv);
                     }
-                }
-            });
-        }
 
-        function highlightSelectedOption(optionsContainer, selectedVal) {
-            if (!optionsContainer) return;
-            const allRadios = optionsContainer.querySelectorAll(".radio-option");
-            allRadios.forEach(opt => {
-                const input = opt.querySelector("input");
-                if (input && parseInt(input.value) === selectedVal) {
-                    opt.classList.add("selected");
+                    const qDiv = document.createElement("div");
+                    qDiv.className = "question-item";
+                    qDiv.setAttribute("data-qidx", idx);
+
+                    const qHeader = document.createElement("div");
+                    qHeader.className = "question-text";
+                    qHeader.innerHTML = `<span class="q-num">${idx+1}</span> ${item.text}`;
+
+                    const optionsDiv = document.createElement("div");
+                    optionsDiv.className = "options-row";
+
+                    for (let val = 0; val <= 5; val++) {
+                        const radioWrap = document.createElement("div");
+                        radioWrap.className = "radio-option";
+                        const radioInput = document.createElement("input");
+                        radioInput.type = "radio";
+                        radioInput.name = `q_${idx}`;
+                        radioInput.value = val;
+                        radioInput.id = `q_${idx}_val_${val}`;
+                        const label = document.createElement("label");
+                        label.htmlFor = `q_${idx}_val_${val}`;
+                        label.innerText = `${val} - ${scoreLabels[val]}`;
+
+                        radioInput.addEventListener("change", (function(index, selectedVal) {
+                            return function(e) {
+                                if (e.target.checked) {
+                                    answers[index] = selectedVal;
+                                    updateProgressAndBar();
+                                    applyColorCoding(index, selectedVal);
+                                    highlightSelectedOption(radioWrap.parentElement,
+                                    selectedVal);
+                                }
+                            };
+                        })(idx, val));
+
+                        radioWrap.appendChild(radioInput);
+                        radioWrap.appendChild(label);
+                        optionsDiv.appendChild(radioWrap);
+                    }
+
+                    qDiv.appendChild(qHeader);
+                    qDiv.appendChild(optionsDiv);
+                    domainDiv.appendChild(qDiv);
+
+                    if (answers[idx] !== null) {
+                        const selectedRadio = document.querySelector(`input[name="q_${idx}"][value="${answers[idx]}"]`);
+                        if (selectedRadio) {
+                            selectedRadio.checked = true;
+                            const parentOpt = selectedRadio.closest(".radio-option");
+                            if (parentOpt) highlightSelectedOption(parentOpt.parentElement, answers[idx]);
+                            applyColorCoding(idx, answers[idx]);
+                        }
+                    }
+                });
+            }
+
+            function highlightSelectedOption(optionsContainer, selectedVal) {
+                if (!optionsContainer) return;
+                const allRadios = optionsContainer.querySelectorAll(".radio-option");
+                allRadios.forEach(opt => {
+                    const input = opt.querySelector("input");
+                    if (input && parseInt(input.value) === selectedVal) {
+                        opt.classList.add("selected");
+                    } else {
+                        opt.classList.remove("selected");
+                    }
+                });
+            }
+
+            function applyColorCoding(index, value) {
+                const questionDiv = document.querySelector(`.question-item[data-qidx="${index}"]`);
+                if (!questionDiv) return;
+                questionDiv.classList.remove("critical", "warning-item");
+                if (value === 0 || value === 1) {
+                    questionDiv.classList.add("critical");
+                } else if (value === 2) {
+                    questionDiv.classList.add("warning-item");
+                }
+            }
+
+            function updateProgressAndBar() {
+                const answeredCount = answers.filter(a => a !== null).length;
+                document.getElementById("answeredCounter").innerText = `${answeredCount} / ${totalQuestions}`;
+                const percent = (answeredCount / totalQuestions) * 100;
+                document.getElementById("progressFill").style.width = `${percent}%`;
+            }
+
+            // ========== الحسابات والتوصيات ==========
+            function calculateTotalScore() {
+                let sum = 0;
+                for (let i = 0; i < totalQuestions; i++) {
+                    if (answers[i] === null) return null;
+                    sum += answers[i];
+                }
+                return sum;
+            }
+
+            function getCriticalAndWarningItems() {
+                const critical = [];
+                const warning = [];
+                allCriteria.forEach((item, idx) => {
+                    if (answers[idx] === null) return;
+                    if (answers[idx] === 0 || answers[idx] === 1) {
+                        critical.push({ ...item, index: idx, score: answers[idx] });
+                    } else if (answers[idx] === 2) {
+                        warning.push({ ...item, index: idx, score: answers[idx] });
+                    }
+                });
+                return { critical, warning };
+            }
+
+            function getInterpretation(score) {
+                const maxScore = totalQuestions * 5; // 80
+                const percent = (score / maxScore) * 100;
+                if (percent >= 85) return { level: "خبير متمرس", message: "معارف ومهارات استثنائية، أنت قدوة في مؤسستك.",
+                    color: "#4ade80" };
+                else if (percent >= 70) return { level: "متقدم", message: "مستوى جيد جداً مع فرص للتحسين في بعض الجوانب.",
+                    color: "#facc15" };
+                else if (percent >= 50) return { level: "مؤهل", message: "أساس متين، لكن هناك فجوات تحتاج إلى خطة تطويرية.",
+                    color: "#fb923c" };
+                else if (percent >= 30) return { level: "مبتدئ", message: "معارف أساسية فقط، ينبغي تكثيف التعلم والتطبيق العملي.",
+                    color: "#f87171" };
+                else return { level: "وعي محدود", message: "أنت في بداية الطريق، تحتاج إلى بناء قاعدة معرفية قوية فوراً.",
+                    color: "#ef4444" };
+            }
+
+            function generateRecommendations() {
+                const totalScore = calculateTotalScore();
+                if (totalScore === null) return [];
+                const { critical, warning } = getCriticalAndWarningItems();
+                let recommendations = [];
+
+                if (critical.length > 0) {
+                    recommendations.push("🔴 <strong>جوانب حرجة (تحتاج علاجاً فورياً):</strong>");
+                    critical.forEach(item => {
+                        recommendations.push(`• ${item.text} (الدرجة: ${item.score} - ${scoreLabels[item.score]})`);
+                    });
+                    recommendations.push("⚠️ هذه الجوانب جوهرية للنجاح ويجب العمل عليها بأولوية قصوى.");
+                }
+                if (warning.length > 0) {
+                    recommendations.push("🟠 <strong>جوانب مقلقة (تحتاج تطوير ومراقبة):</strong>");
+                    warning.forEach(item => {
+                        recommendations.push(`• ${item.text} (الدرجة: 2 - ${scoreLabels[2]})`);
+                    });
+                }
+                if (critical.length === 0 && warning.length === 0 && totalScore > 0) {
+                    recommendations.push("✅ لا توجد جوانب حرجة أو مقلقة جداً. حافظ على التميز وراقب تقدمك.");
+                }
+
+                const maxScore = totalQuestions * 5;
+                const percent = (totalScore / maxScore) * 100;
+                if (percent < 50) {
+                    recommendations.push(
+                        "📌 نصيحة: ركز على بناء المعرفة المالية والإدارية عبر دورات متخصصة واطلب توجيهاً من خبراء.");
+                } else if (percent < 75) {
+                    recommendations.push(
+                        "📌 نصيحة: عمّق فهمك في المجالات البرتقالية، ومارس تطبيق المهارات في مشاريع حقيقية.");
                 } else {
-                    opt.classList.remove("selected");
+                    recommendations.push("📌 نصيحة: أنت في وضع قوي، شارك معرفتك مع زملائك وتولى مهاماً قيادية.");
                 }
-            });
-        }
 
-        function applyColorCoding(index, value) {
-            const questionDiv = document.querySelector(`.question-item[data-qidx="${index}"]`);
-            if (!questionDiv) return;
-            questionDiv.classList.remove("critical", "warning-item");
-            if (value === 0 || value === 1) {
-                questionDiv.classList.add("critical");
-            } else if (value === 2) {
-                questionDiv.classList.add("warning-item");
-            }
-        }
-
-        function updateProgressAndBar() {
-            const answeredCount = answers.filter(a => a !== null).length;
-            document.getElementById("answeredCounter").innerText = `${answeredCount} / ${totalQuestions}`;
-            const percent = (answeredCount / totalQuestions) * 100;
-            document.getElementById("progressFill").style.width = `${percent}%`;
-        }
-
-        // ========== الحسابات والتوصيات ==========
-        function calculateTotalScore() {
-            let sum = 0;
-            for (let i = 0; i < totalQuestions; i++) {
-                if (answers[i] === null) return null;
-                sum += answers[i];
-            }
-            return sum;
-        }
-
-        function getCriticalAndWarningItems() {
-            const critical = [];
-            const warning = [];
-            allCriteria.forEach((item, idx) => {
-                if (answers[idx] === null) return;
-                if (answers[idx] === 0 || answers[idx] === 1) {
-                    critical.push({ ...item, index: idx, score: answers[idx] });
-                } else if (answers[idx] === 2) {
-                    warning.push({ ...item, index: idx, score: answers[idx] });
-                }
-            });
-            return { critical, warning };
-        }
-
-        function getInterpretation(score) {
-            const maxScore = totalQuestions * 5; // 80
-            const percent = (score / maxScore) * 100;
-            if (percent >= 85) return { level: "خبير متمرس", message: "معارف ومهارات استثنائية، أنت قدوة في مؤسستك.", color: "#4ade80" };
-            else if (percent >= 70) return { level: "متقدم", message: "مستوى جيد جداً مع فرص للتحسين في بعض الجوانب.", color: "#facc15" };
-            else if (percent >= 50) return { level: "مؤهل", message: "أساس متين، لكن هناك فجوات تحتاج إلى خطة تطويرية.", color: "#fb923c" };
-            else if (percent >= 30) return { level: "مبتدئ", message: "معارف أساسية فقط، ينبغي تكثيف التعلم والتطبيق العملي.", color: "#f87171" };
-            else return { level: "وعي محدود", message: "أنت في بداية الطريق، تحتاج إلى بناء قاعدة معرفية قوية فوراً.", color: "#ef4444" };
-        }
-
-        function generateRecommendations() {
-            const totalScore = calculateTotalScore();
-            if (totalScore === null) return [];
-            const { critical, warning } = getCriticalAndWarningItems();
-            let recommendations = [];
-
-            if (critical.length > 0) {
-                recommendations.push("🔴 <strong>جوانب حرجة (تحتاج علاجاً فورياً):</strong>");
-                critical.forEach(item => {
-                    recommendations.push(`• ${item.text} (الدرجة: ${item.score} - ${scoreLabels[item.score]})`);
-                });
-                recommendations.push("⚠️ هذه الجوانب جوهرية للنجاح ويجب العمل عليها بأولوية قصوى.");
-            }
-            if (warning.length > 0) {
-                recommendations.push("🟠 <strong>جوانب مقلقة (تحتاج تطوير ومراقبة):</strong>");
-                warning.forEach(item => {
-                    recommendations.push(`• ${item.text} (الدرجة: 2 - ${scoreLabels[2]})`);
-                });
-            }
-            if (critical.length === 0 && warning.length === 0 && totalScore > 0) {
-                recommendations.push("✅ لا توجد جوانب حرجة أو مقلقة جداً. حافظ على التميز وراقب تقدمك.");
+                return recommendations;
             }
 
-            const maxScore = totalQuestions * 5;
-            const percent = (totalScore / maxScore) * 100;
-            if (percent < 50) {
-                recommendations.push("📌 نصيحة: ركز على بناء المعرفة المالية والإدارية عبر دورات متخصصة واطلب توجيهاً من خبراء.");
-            } else if (percent < 75) {
-                recommendations.push("📌 نصيحة: عمّق فهمك في المجالات البرتقالية، ومارس تطبيق المهارات في مشاريع حقيقية.");
-            } else {
-                recommendations.push("📌 نصيحة: أنت في وضع قوي، شارك معرفتك مع زملائك وتولى مهاماً قيادية.");
-            }
-
-            return recommendations;
-        }
-
-        // ========== عرض المودال ==========
-        function showResultModal() {
-            for (let i = 0; i < totalQuestions; i++) {
-                if (answers[i] === null) {
-                    const toast = document.getElementById("warningToast");
-                    toast.style.display = "block";
-                    setTimeout(() => {
-                        toast.style.opacity = "0";
-                        setTimeout(() => { toast.style.display = "none"; toast.style.opacity = "1"; }, 400);
-                    }, 2000);
-                    const firstUnanswered = document.querySelector(`.question-item[data-qidx="${i}"]`);
-                    if (firstUnanswered) {
-                        firstUnanswered.scrollIntoView({ behavior: "smooth", block: "center" });
-                        firstUnanswered.style.border = "2px solid #dc3545";
-                        setTimeout(() => { firstUnanswered.style.border = ""; }, 1500);
+            // ========== عرض المودال ==========
+            function showResultModal() {
+                for (let i = 0; i < totalQuestions; i++) {
+                    if (answers[i] === null) {
+                        const toast = document.getElementById("warningToast");
+                        toast.style.display = "block";
+                        setTimeout(() => {
+                            toast.style.opacity = "0";
+                            setTimeout(() => { toast.style.display = "none";
+                                toast.style.opacity = "1"; }, 400);
+                        }, 2000);
+                        const firstUnanswered = document.querySelector(`.question-item[data-qidx="${i}"]`);
+                        if (firstUnanswered) {
+                            firstUnanswered.scrollIntoView({ behavior: "smooth", block: "center" });
+                            firstUnanswered.style.border = "2px solid #dc3545";
+                            setTimeout(() => { firstUnanswered.style.border = ""; }, 1500);
+                        }
+                        return;
                     }
-                    return;
                 }
-            }
-            const totalScore = calculateTotalScore();
-            if (totalScore === null) return;
-            const interpretation = getInterpretation(totalScore);
-            const recommendations = generateRecommendations();
+                const totalScore = calculateTotalScore();
+                if (totalScore === null) return;
+                const interpretation = getInterpretation(totalScore);
+                const recommendations = generateRecommendations();
 
-            document.getElementById("modalScore").innerText = `${totalScore} نقطة (من 80)`;
-            document.getElementById("modalInterpretation").innerHTML = `
-                <strong style="color: ${interpretation.color}; font-size:1.3rem;">${interpretation.level}</strong><br>
-                ${interpretation.message}
-            `;
-            const recList = document.getElementById("recList");
-            recList.innerHTML = "";
-            recommendations.forEach(rec => {
-                const li = document.createElement("li");
-                li.innerHTML = `<span class="rec-dot">•</span> ${rec}`;
-                recList.appendChild(li);
+                document.getElementById("modalScore").innerText = `${totalScore} نقطة (من 80)`;
+                document.getElementById("modalInterpretation").innerHTML = `
+                    <strong style="color: ${interpretation.color}; font-size:1.3rem;">${interpretation.level}</strong><br>
+                    ${interpretation.message}
+                `;
+                const recList = document.getElementById("recList");
+                recList.innerHTML = "";
+                recommendations.forEach(rec => {
+                    const li = document.createElement("li");
+                    li.innerHTML = `<span class="rec-dot">•</span> ${rec}`;
+                    recList.appendChild(li);
+                });
+                document.getElementById("resultModal").classList.add("active");
+            }
+
+            document.getElementById("showResultBtn").addEventListener("click", showResultModal);
+            document.getElementById("closeModalBtn").addEventListener("click", function() {
+                document.getElementById("resultModal").classList.remove("active");
             });
-            document.getElementById("resultModal").classList.add("active");
-        }
-
-        document.getElementById("showResultBtn").addEventListener("click", showResultModal);
-        document.getElementById("closeModalBtn").addEventListener("click", () => {
-            document.getElementById("resultModal").classList.remove("active");
-        });
-        document.getElementById("resultModal").addEventListener("click", function(e) {
-            if (e.target === this) document.getElementById("resultModal").classList.remove("active");
-        });
-
-        // ========== تصدير Word ==========
-        function generateWordHTML() {
-            const empName = document.getElementById("empName").value || "غير محدد";
-            const jobTitle = document.getElementById("jobTitle").value || "غير محدد";
-            const department = document.getElementById("department").value || "غير محدد";
-            const evalDate = document.getElementById("evalDate").value || new Date().toISOString().slice(0,10);
-
-            let totalScore = 0;
-            let allAnswered = true;
-            for (let i = 0; i < totalQuestions; i++) {
-                if (answers[i] === null) { allAnswered = false; break; }
-                totalScore += answers[i];
-            }
-            const interpretation = allAnswered ? getInterpretation(totalScore) : { level: "غير مكتمل", message: "لم يتم الإجابة على جميع المعايير." };
-            const recommendations = allAnswered ? generateRecommendations() : ["أكمل الإجابة على جميع المعايير."];
-
-            let rows = "";
-            allCriteria.forEach((item, idx) => {
-                const ans = answers[idx] !== null ? answers[idx] : "-";
-                const label = ans !== "-" ? scoreLabels[ans] : "-";
-                rows += `<tr>
-                    <td style="border:1px solid #aaa;padding:6px;">${idx+1}</td>
-                    <td style="border:1px solid #aaa;padding:6px;">${item.domain}</td>
-                    <td style="border:1px solid #aaa;padding:6px;">${item.text}</td>
-                    <td style="border:1px solid #aaa;padding:6px;text-align:center;">${label}</td>
-                    <td style="border:1px solid #aaa;padding:6px;text-align:center;">${ans}</td>
-                </tr>`;
+            document.getElementById("resultModal").addEventListener("click", function(e) {
+                if (e.target === this) document.getElementById("resultModal").classList.remove("active");
             });
 
-            return `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><style>
-                body { font-family:'Tajawal',sans-serif; padding:30px; direction:rtl; }
-                h1 { color:#0a1a2a; border-bottom:3px solid #b48554; }
-                .info-table { width:100%; border-collapse:collapse; margin-bottom:20px; }
-                .info-table td { padding:8px; border:1px solid #ccc; }
-                .summary { background:#f5f0e8; padding:15px; border-radius:12px; margin:20px 0; }
-                .rec-box { border-right:5px solid #b48554; padding:15px; background:#faf8f5; }
-                table { width:100%; border-collapse:collapse; }
-                th { background:#1a1a2e; color:white; padding:8px; }
-                td { border:1px solid #ddd; padding:6px; }
-            </style></head><body>
-            <h1>تقرير تقييم المعارف والمهارات</h1>
-            <table class="info-table">
-                <tr><td><strong>الاسم</strong></td><td>${empName}</td><td><strong>المسمى الوظيفي</strong></td><td>${jobTitle}</td></tr>
-                <tr><td><strong>القسم</strong></td><td>${department}</td><td><strong>تاريخ التقييم</strong></td><td>${evalDate}</td></tr>
-            </table>
-            <div class="summary">
-                <strong>النتيجة:</strong> ${allAnswered ? totalScore+'/80' : 'غير مكتملة'} |
-                <strong>التقدير:</strong> ${interpretation.level}<br>
-                <small>${interpretation.message}</small>
-            </div>
-            <div class="rec-box"><h3>📌 التوصيات</h3><ul>${recommendations.map(r=>`<li>${r}</li>`).join('')}</ul></div>
-            <h2>تفاصيل المعايير</h2>
-            <table><thead><tr><th>#</th><th>المجال</th><th>المعيار</th><th>التقدير</th><th>الدرجة</th></tr></thead><tbody>${rows}</tbody></table>
-            <p style="text-align:center;color:#888;">FAROUK GRUP © ${new Date().getFullYear()}</p>
-            </body></html>`;
-        }
+            // ========== تصدير Word ==========
+            function generateWordHTML() {
+                const empName = document.getElementById("empName").value || "غير محدد";
+                const jobTitle = document.getElementById("jobTitle").value || "غير محدد";
+                const department = document.getElementById("department").value || "غير محدد";
+                const evalDate = document.getElementById("evalDate").value || new Date().toISOString().slice(0, 10);
 
-        document.getElementById("exportWordBtn").addEventListener("click", () => {
-            for (let i = 0; i < totalQuestions; i++) {
-                if (answers[i] === null) {
-                    document.getElementById("warningToast").style.display = "block";
-                    setTimeout(() => {
-                        document.getElementById("warningToast").style.opacity = "0";
+                let totalScore = 0;
+                let allAnswered = true;
+                for (let i = 0; i < totalQuestions; i++) {
+                    if (answers[i] === null) { allAnswered = false; break; }
+                    totalScore += answers[i];
+                }
+                const interpretation = allAnswered ? getInterpretation(totalScore) : { level: "غير مكتمل",
+                    message: "لم يتم الإجابة على جميع المعايير." };
+                const recommendations = allAnswered ? generateRecommendations() : ["أكمل الإجابة على جميع المعايير."];
+
+                let rows = "";
+                allCriteria.forEach((item, idx) => {
+                    const ans = answers[idx] !== null ? answers[idx] : "-";
+                    const label = ans !== "-" ? scoreLabels[ans] : "-";
+                    rows += `<tr>
+                        <td style="border:1px solid #aaa;padding:6px;">${idx+1}</td>
+                        <td style="border:1px solid #aaa;padding:6px;">${item.domain}</td>
+                        <td style="border:1px solid #aaa;padding:6px;">${item.text}</td>
+                        <td style="border:1px solid #aaa;padding:6px;text-align:center;">${label}</td>
+                        <td style="border:1px solid #aaa;padding:6px;text-align:center;">${ans}</td>
+                    </tr>`;
+                });
+
+                let recHtml = recommendations.map(r => `<li>${r}</li>`).join('');
+
+                return `<!DOCTYPE html>
+                <html dir="rtl">
+                <head><meta charset="UTF-8">
+                    <style>
+                        body { font-family: 'Arial', 'Tajawal', sans-serif; padding: 30px; direction: rtl; }
+                        h1 { color: #0a1a2a; border-bottom: 3px solid #b48554; padding-bottom: 10px; }
+                        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        .info-table td { padding: 8px; border: 1px solid #ccc; }
+                        .info-table td:first-child { font-weight: bold; background: #f0f0f0; width: 25%; }
+                        .summary { background: #f5f0e8; padding: 15px; border-radius: 12px; margin: 20px 0; }
+                        .summary strong { color: #b48554; }
+                        .rec-box { border-right: 5px solid #b48554; padding: 15px; background: #faf8f5; border-radius: 10px; margin: 20px 0; }
+                        .rec-box h3 { margin-top: 0; color: #0a1a2a; }
+                        .rec-box ul { padding-right: 20px; }
+                        .rec-box li { margin-bottom: 8px; }
+                        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+                        th { background: #1a1a2e; color: white; padding: 8px; border: 1px solid #999; }
+                        td { border: 1px solid #ddd; padding: 6px; }
+                        .footer { margin-top: 30px; font-size: 0.8rem; color: #555; text-align: center; }
+                    </style>
+                </head>
+                <body>
+                    <h1>تقرير تقييم المعارف والمهارات</h1>
+                    <table class="info-table">
+                        <tr><td><strong>الاسم</strong></td><td>${empName}</td><td><strong>المسمى الوظيفي</strong></td><td>${jobTitle}</td></tr>
+                        <tr><td><strong>القسم</strong></td><td>${department}</td><td><strong>تاريخ التقييم</strong></td><td>${evalDate}</td></tr>
+                    </table>
+                    <div class="summary">
+                        <strong>النتيجة:</strong> ${allAnswered ? totalScore+'/80' : 'غير مكتملة'} &nbsp;|&nbsp;
+                        <strong>التقدير:</strong> <span style="color:${interpretation.color};">${interpretation.level}</span><br>
+                        <small>${interpretation.message}</small>
+                    </div>
+                    <div class="rec-box">
+                        <h3>📌 التوصيات</h3>
+                        <ul>${recHtml}</ul>
+                    </div>
+                    <h2>تفاصيل المعايير</h2>
+                    <table><thead><tr><th>#</th><th>المجال</th><th>المعيار</th><th>التقدير</th><th>الدرجة</th></tr></thead><tbody>${rows}</tbody></table>
+                    <div class="footer">تم إنشاء هذا التقرير بواسطة مجموعة فاروق للإستشارات والأعمال | ${new Date().toLocaleDateString('ar-EG')}</div>
+                </body></html>`;
+            }
+
+            function exportToWord() {
+                for (let i = 0; i < totalQuestions; i++) {
+                    if (answers[i] === null) {
+                        const toast = document.getElementById("warningToast");
+                        toast.style.display = "block";
                         setTimeout(() => {
-                            document.getElementById("warningToast").style.display = "none";
-                            document.getElementById("warningToast").style.opacity = "1";
-                        }, 400);
-                    }, 2000);
-                    return;
+                            toast.style.opacity = "0";
+                            setTimeout(() => { toast.style.display = "none";
+                                toast.style.opacity = "1"; }, 400);
+                        }, 2000);
+                        return;
+                    }
                 }
+                const content = generateWordHTML();
+                const blob = new Blob(['\uFEFF' + content], { type: 'application/msword' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `تقييم_المهارات_${document.getElementById('empName').value || 'شخصي'}.doc`;
+                link.click();
+                URL.revokeObjectURL(link.href);
             }
-            const blob = new Blob([generateWordHTML()], { type: 'application/msword' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `تقييم_المهارات_${document.getElementById('empName').value || 'شخصي'}.doc`;
-            a.click();
-        });
+            document.getElementById("exportWordBtn").addEventListener("click", exportToWord);
 
-        // ========== تصدير Excel ==========
-        async function exportToExcel() {
-            for (let i = 0; i < totalQuestions; i++) {
-                if (answers[i] === null) {
-                    document.getElementById("warningToast").style.display = "block";
-                    setTimeout(() => {
-                        document.getElementById("warningToast").style.opacity = "0";
+            // ========== تصدير Excel ==========
+            async function exportToExcel() {
+                for (let i = 0; i < totalQuestions; i++) {
+                    if (answers[i] === null) {
+                        const toast = document.getElementById("warningToast");
+                        toast.style.display = "block";
                         setTimeout(() => {
-                            document.getElementById("warningToast").style.display = "none";
-                            document.getElementById("warningToast").style.opacity = "1";
-                        }, 400);
-                    }, 2000);
-                    return;
+                            toast.style.opacity = "0";
+                            setTimeout(() => { toast.style.display = "none";
+                                toast.style.opacity = "1"; }, 400);
+                        }, 2000);
+                        return;
+                    }
+                }
+
+                showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والجداول');
+                try {
+                    const empName = document.getElementById("empName").value || "غير محدد";
+                    const jobTitle = document.getElementById("jobTitle").value || "غير محدد";
+                    const department = document.getElementById("department").value || "غير محدد";
+                    const evalDate = document.getElementById("evalDate").value || new Date().toISOString().slice(0, 10);
+
+                    const totalScore = calculateTotalScore();
+                    const interpretation = getInterpretation(totalScore);
+                    const recommendations = generateRecommendations();
+
+                    const workbook = new ExcelJS.Workbook();
+                    workbook.creator = 'FAROUK GRUP';
+                    workbook.created = new Date();
+
+                    const G = 'FFB48554',
+                        GL = 'FFCFA776',
+                        DB = 'FF0B0E17',
+                        HB = 'FF1A2035',
+                        SB = 'FF243050';
+                    const AR = 'FFF5F0E8',
+                        W = 'FFFFFFFF',
+                        DT = 'FF1A1A1A';
+                    const RED = 'FFE6B8B7',
+                        ORANGE = 'FFFDE4C8';
+
+                    function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11,
+                                color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid',
+                                fgColor: { argb: bg } }, alignment: { horizontal: 'center',
+                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                    style: 'thin', color: { argb: G } }, bottom: { style: 'thin',
+                                    color: { argb: G } }, left: { style: 'thin', color: { argb: G } },
+                                right: { style: 'thin', color: { argb: G } } } }; }
+
+                    function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial',
+                                bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern',
+                                pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h,
+                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                    style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair',
+                                    color: { argb: 'FFCCCCCC' } }, left: { style: 'hair',
+                                    color: { argb: 'FFCCCCCC' } }, right: { style: 'hair',
+                                    color: { argb: 'FFCCCCCC' } } } }; }
+
+                    function ap(c, s) { if (s.font) c.font = s.font; if (s.fill) c.fill = s.fill; if (s
+                            .alignment) c.alignment = s.alignment; if (s.border) c.border = s.border; if (s
+                            .numFmt) c.numFmt = s.numFmt; }
+
+                    function mh(ws, fc, tc, r, text, bg = HB, tc2 = GL, fs = 12) { ws.mergeCells(r, fc, r,
+                        tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true,
+                            size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid',
+                            fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle',
+                            wrapText: true, readingOrder: 'rtl' }; c.border = { top: { style: 'medium',
+                                color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } },
+                            left: { style: 'medium', color: { argb: G } }, right: { style: 'medium',
+                                color: { argb: G } } }; }
+
+                    // 1. غلاف التقرير
+                    const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true,
+                            showGridLines: false }] });
+                    [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
+                    for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
+                    cv.getRow(2).height = 80;
+                    cv.getRow(4).height = 60;
+                    cv.mergeCells(2, 1, 2, 4);
+                    const bc = cv.getCell(2, 1);
+                    bc.value = 'مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+                    bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
+                    bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
+                    bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
+                    readingOrder: 'rtl' };
+                    bc.border = { bottom: { style: 'thick', color: { argb: G } } };
+                    mh(cv, 1, 4, 4, `تقرير تقييم المعارف والمهارات\n${empName}`, DB, GL, 18);
+                    const inf = [
+                        ['📋 اسم الموظف', empName],
+                        ['📅 التاريخ', evalDate],
+                        ['💼 المسمى الوظيفي', jobTitle],
+                        ['🏢 القسم', department],
+                        ['📊 النتيجة الإجمالية', `${totalScore}/80`],
+                        ['🏅 التقدير', interpretation.level]
+                    ];
+                    let ir = 6;
+                    inf.forEach(([l, v], idx) => {
+                        cv.mergeCells(ir, 1, ir, 2);
+                        cv.mergeCells(ir, 3, ir, 4);
+                        const lc = cv.getCell(ir, 1),
+                            vc = cv.getCell(ir, 3);
+                        lc.value = l;
+                        vc.value = v;
+                        const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
+                        ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } },
+                            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
+                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' },
+                            border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
+                                right: { style: 'hair' } } });
+                        ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } },
+                            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
+                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' },
+                            border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
+                                right: { style: 'hair' } } });
+                        cv.getRow(ir).height = 28;
+                        ir++;
+                    });
+
+                    // 2. النتيجة والتوصيات
+                    const recSheet = workbook.addWorksheet('النتيجة والتوصيات', { views: [{ rightToLeft: true,
+                            showGridLines: false }] });
+                    recSheet.getColumn(1).width = 5;
+                    recSheet.getColumn(2).width = 50;
+                    recSheet.getColumn(3).width = 5;
+                    mh(recSheet, 1, 3, 1, '📊 النتيجة الإجمالية والتوصيات', DB, GL, 14);
+                    recSheet.getRow(1).height = 40;
+
+                    recSheet.mergeCells(2, 2, 2, 2);
+                    const sc = recSheet.getCell(2, 2);
+                    sc.value = `النتيجة: ${totalScore}/80  |  التقدير: ${interpretation.level}`;
+                    sc.font = { name: 'Arial', bold: true, size: 14, color: { argb: interpretation.color } };
+                    sc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AR } };
+                    sc.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+                    sc.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
+                            color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
+                        right: { style: 'medium', color: { argb: G } } };
+                    recSheet.getRow(2).height = 35;
+
+                    recSheet.mergeCells(3, 2, 3, 2);
+                    const ic = recSheet.getCell(3, 2);
+                    ic.value = interpretation.message;
+                    ic.font = { name: 'Arial', size: 11, color: { argb: DT } };
+                    ic.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEFCF6' } };
+                    ic.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
+                    readingOrder: 'rtl' };
+                    ic.border = { top: { style: 'hair' }, bottom: { style: 'hair', color: { argb: G } },
+                        left: { style: 'hair' }, right: { style: 'hair' } };
+                    recSheet.getRow(3).height = 40;
+
+                    let recRow = 5;
+                    recSheet.mergeCells(recRow, 2, recRow, 2);
+                    const rt = recSheet.getCell(recRow, 2);
+                    rt.value = '📌 التوصيات وأولويات التطوير';
+                    rt.font = { name: 'Arial', bold: true, size: 12, color: { argb: GL } };
+                    rt.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HB } };
+                    rt.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                    rt.border = { bottom: { style: 'medium', color: { argb: G } } };
+                    recSheet.getRow(recRow).height = 30;
+                    recRow++;
+
+                    recommendations.forEach((rec, idx) => {
+                        recSheet.mergeCells(recRow, 2, recRow, 2);
+                        const rc = recSheet.getCell(recRow, 2);
+                        rc.value = `${idx+1}. ${rec}`;
+                        const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
+                        rc.font = { name: 'Arial', size: 10, color: { argb: DT } };
+                        rc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+                        rc.alignment = { horizontal: 'right', vertical: 'top', wrapText: true,
+                            readingOrder: 'rtl' };
+                        rc.border = { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
+                            right: { style: 'hair' } };
+                        recSheet.getRow(recRow).height = 22;
+                        recRow++;
+                    });
+
+                    // 3. تفاصيل المعايير
+                    const detailSheet = workbook.addWorksheet('تفاصيل التقييم', { views: [{ rightToLeft: true,
+                            showGridLines: false }] });
+                    detailSheet.getColumn(1).width = 5;
+                    detailSheet.getColumn(2).width = 10;
+                    detailSheet.getColumn(3).width = 30;
+                    detailSheet.getColumn(4).width = 45;
+                    detailSheet.getColumn(5).width = 20;
+                    detailSheet.getColumn(6).width = 15;
+                    detailSheet.getColumn(7).width = 5;
+                    mh(detailSheet, 1, 7, 1, '📋 تفاصيل التقييم حسب المعايير', DB, GL, 14);
+                    detailSheet.getRow(1).height = 40;
+                    detailSheet.addRow(['#', 'المجال', 'المعيار', 'التقدير', 'الدرجة']);
+                    const detailHeader = detailSheet.getRow(2);
+                    detailHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                    detailHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+                    detailSheet.getRow(2).height = 28;
+
+                    allCriteria.forEach((item, idx) => {
+                        const ans = answers[idx] !== null ? answers[idx] : '-';
+                        const label = ans !== '-' ? scoreLabels[ans] : '-';
+                        const row = detailSheet.addRow([idx + 1, item.domain, item.text, label, ans]);
+                        row.height = 22;
+                        const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
+                        const bgColor = (ans === 0 || ans === 1) ? RED : (ans === 2 ? ORANGE : bg);
+                        row.eachCell((cell) => {
+                            if (cell.col === 5) {
+                                cell.font = { name: 'Arial', bold: true, size: 10, color: { argb: ans >=
+                                        4 ? 'FF28A745' : ans >= 3 ? 'FFED6C02' :
+                                        'FFDC3545' } };
+                            }
+                            Object.assign(cell, cs(bgColor, DT, false, cell.col === 2 || cell.col ===
+                                5 ? 'center' : 'right'));
+                        });
+                    });
+
+                    const buffer = await workbook.xlsx.writeBuffer();
+                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    const now = new Date();
+                    const fileName =
+                        `تقييم_مهارات_${empName}_${now.toISOString().slice(0,10)}.xlsx`;
+                    saveAs(blob, fileName);
+                } catch (err) {
+                    console.error(err);
+                    alert('خطأ أثناء إنشاء ملف Excel: ' + err.message);
+                } finally {
+                    hideLoading();
                 }
             }
-            const empName = document.getElementById("empName").value || "غير محدد";
-            const totalScore = calculateTotalScore();
-            const recommendations = generateRecommendations();
-            const workbook = new ExcelJS.Workbook();
-            const ws = workbook.addWorksheet('تقييم المهارات', { views: [{ rightToLeft: true }] });
-            ws.getColumn(1).width = 5; ws.getColumn(2).width = 25; ws.getColumn(3).width = 45; ws.getColumn(4).width = 20; ws.getColumn(5).width = 10;
+            document.getElementById("exportExcelBtn").addEventListener("click", exportToExcel);
 
-            ws.mergeCells('A1:E1');
-            const titleCell = ws.getCell('A1');
-            titleCell.value = 'تقييم المعارف والمهارات - FAROUK GRUP';
-            titleCell.font = { bold: true, size: 16, color: { argb: 'FFCFA776' } };
-            titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0B0E17' } };
-            titleCell.alignment = { horizontal: 'center' };
-
-            let row = 3;
-            ws.getCell(`A${row}`).value = 'الاسم:'; ws.getCell(`B${row}`).value = empName;
-            ws.getCell(`C${row}`).value = 'النتيجة:'; ws.getCell(`D${row}`).value = `${totalScore}/80`;
-            row += 2;
-
-            ws.addRow(['#', 'المجال', 'المعيار', 'التقدير', 'الدرجة']);
-            allCriteria.forEach((item, idx) => {
-                const ans = answers[idx];
-                const label = scoreLabels[ans];
-                const newRow = ws.addRow([idx+1, item.domain, item.text, label, ans]);
-                if (ans === 0 || ans === 1) {
-                    newRow.eachCell(cell => { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6B8B7' } }; });
-                } else if (ans === 2) {
-                    newRow.eachCell(cell => { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDE4C8' } }; });
+            // ============================================================
+            // التهيئة
+            // ============================================================
+            function init() {
+                renderQuestions();
+                updateProgressAndBar();
+                for (let i = 0; i < totalQuestions; i++) {
+                    const selectedInput = document.querySelector(`input[name="q_${i}"]:checked`);
+                    if (selectedInput) {
+                        const val = parseInt(selectedInput.value);
+                        answers[i] = val;
+                        const optionsRow = selectedInput.closest('.options-row');
+                        if (optionsRow) highlightSelectedOption(optionsRow, val);
+                        applyColorCoding(i, val);
+                    }
                 }
-            });
-            row = ws.rowCount + 2;
-            ws.mergeCells(`A${row}:E${row}`);
-            ws.getCell(`A${row}`).value = '📌 التوصيات:';
-            recommendations.forEach((rec, i) => {
-                row++;
-                ws.mergeCells(`A${row}:E${row}`);
-                ws.getCell(`A${row}`).value = rec;
-            });
+                updateProgressAndBar();
+            }
+            init();
 
-            const buffer = await workbook.xlsx.writeBuffer();
-            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            saveAs(blob, `تقييم_مهارات_${empName}_${new Date().toISOString().slice(0,10)}.xlsx`);
-        }
-        document.getElementById("exportExcelBtn").addEventListener("click", exportToExcel);
-
-        // تهيئة
-        renderQuestions();
-        updateProgressAndBar();
+        })();
     </script>
 </body>
 </html>

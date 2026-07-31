@@ -2,198 +2,461 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
-    <title>نظام تدقيق HACCP المتقدم - تحليل المخاطر والتوصيات | FAROUK GRUP</title>
-    <!-- حماية الصفحة -->
-    <script src="auth-check.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>نظام تدقيق HACCP المتقدم | FAROUK GRUP</title>
+<!-- حماية الصفحة -->
+<script src="auth-check.js"></script>
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <!-- AOS Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-    <!-- html2canvas لتصدير Word -->
+    <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- مكتبات Excel احترافية -->
+    <!-- ExcelJS & FileSaver -->
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
     <style>
-        /* ========== جميع الأنماط الأصلية كاملة ========== */
+        /* ===== RESET & BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg-dark: #0b0e17;
-            --bg-panel: rgba(18, 24, 36, 0.85);
-            --bg-card: rgba(22, 30, 46, 0.8);
-            --border-light: rgba(180, 133, 84, 0.25);
-            --accent-glow: #b48554;
-            --accent-soft: #cfa776;
-            --text-light: #f0f4fa;
-            --text-muted: #aab7d4;
-            --text-dark: #0b0e17;
-            --shadow-soft: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 133, 84, 0.15);
-            --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
-            --radius-md: 20px;
-            --radius-lg: 30px;
-            --transition: all 0.3s ease;
-            --gold: #b8860b;
-            --gold-light: #d4b15a;
-            --gold-soft: rgba(184,134,11,0.1);
-            --dark: #0f0f0f;
-            --dark-light: #1a1a1a;
-            --white: #ffffff;
-            --offwhite: #f9f9f9;
-            --text: #333;
-            --risk-high: #dc3545;
-            --risk-medium: #ffc107;
-            --risk-low: #28a745;
-        }
-
-        body {
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
             font-family: 'Tajawal', sans-serif;
-            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
-            color: var(--text-light);
-            line-height: 1.6;
-            min-height: 100vh;
-            position: relative;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
         }
 
-        .glow-bg { position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 0; }
-        .glow-bg span { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%); border-radius: 50%; filter: blur(80px); animation: glowMove 20s infinite alternate ease-in-out; }
-        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(180,133,84,0.12) 0%, transparent 70%); }
-        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
-        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.1) 0%, transparent 70%); animation-delay: -5s; }
-        @keyframes glowMove { 0% { transform: translate(0, 0) scale(1); opacity: 0.5; } 100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; } }
+        /* ===== إزالة كل ما يسبب الاهتزاز ===== */
+        .checklist-card, .result-card, .container, .checklist-section,
+        .checklist-item, .item-row, .btn-primary, .btn-secondary,
+        .btn-export, .currency-row, .calc-floating-btn, .home-floating-btn,
+        .featured-badge, .glow-bg, .floating-shape, .result-area,
+        .info-item input, .signature-item input, .notes-field textarea {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
 
-        .floating-shape { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(184,134,11,0.1) 0%, transparent 70%); z-index: 0; pointer-events: none; }
-        .shape-1 { top: -100px; left: -100px; animation: float 20s infinite ease-in-out; }
-        .shape-2 { bottom: -50px; right: -50px; width: 200px; height: 200px; animation: float 15s infinite ease-in-out reverse; }
-        @keyframes float { 0% { transform: translate(0,0) rotate(0deg); } 33% { transform: translate(30px,-30px) rotate(5deg); } 66% { transform: translate(-20px,20px) rotate(-5deg); } 100% { transform: translate(0,0) rotate(0deg); } }
+        /* ===== خلفية ثابتة ===== */
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.20;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.10) 0%, transparent 70%);
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.05) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.06) 0%, transparent 70%); }
+        .floating-shape { display: none; }
 
-        .hero-mini { background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%); color: white; text-align: center; padding: 3rem 1rem; border-bottom: 4px solid var(--gold); position: relative; overflow: hidden; z-index: 2; }
-        .hero-mini::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(184,134,11,0.2) 0%, transparent 60%); animation: rotate 40s linear infinite; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .hero-mini h2 { font-size: 2.5rem; font-weight: 900; color: var(--gold-light); margin-bottom: 0.5rem; position: relative; z-index: 2; }
-        .hero-mini p { font-size: 1.2rem; max-width: 700px; margin: 0 auto; opacity: 0.95; position: relative; z-index: 2; }
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
+        }
 
-        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; position: relative; z-index: 2; }
-        .checklist-card { background: var(--bg-panel); backdrop-filter: blur(15px); border: 2px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-soft); position: relative; overflow: hidden; }
-        .checklist-card:hover { box-shadow: var(--shadow-glow); border-color: rgba(180,133,84,0.4); }
-        .checklist-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, transparent 0%, rgba(184,134,11,0.05) 100%); z-index: -1; }
-        .checklist-card h2 { font-size: 1.8rem; font-weight: 900; background: linear-gradient(135deg, #f0e6d2, #cfa776); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1.5rem; text-align: center; border-bottom: 2px solid var(--border-light); padding-bottom: 0.5rem; }
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1050px; margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+        }
 
-        .info-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
-        .info-item { flex: 1 1 250px; }
-        .info-item label { display: block; margin-bottom: 0.5rem; font-weight: 700; color: var(--accent-soft); }
-        .info-item input { width: 100%; padding: 1rem; border: 2px solid var(--border-light); border-radius: 30px; background: rgba(10,14,23,0.7); color: var(--text-light); font-family: 'Inter', sans-serif; }
-        .info-item input:focus { outline: none; border-color: var(--accent-glow); box-shadow: 0 0 0 3px rgba(180,133,84,0.2); }
+        /* ===== CARD ===== */
+        .checklist-card {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .checklist-card h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.5rem;
+        }
+        .checklist-card h2 i { color: #cfa776; margin-left: 0.4rem; }
 
-        .signature-row { display: flex; gap: 1.5rem; margin-bottom: 2rem; background: rgba(180,133,84,0.15); border: 1px solid var(--border-light); padding: 1.5rem; border-radius: 30px; }
-        .signature-item { flex: 1; }
-        .signature-item label { font-weight: 700; color: var(--accent-soft); }
-        .signature-item input { width: 100%; padding: 0.8rem; border: 2px solid var(--border-light); border-radius: 30px; background: rgba(10,14,23,0.7); color: var(--text-light); }
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
 
-        .checklist-section { margin-bottom: 2rem; border: 2px solid var(--border-light); border-radius: 30px; padding: 1.5rem; }
-        .section-title { color: var(--accent-soft); font-weight: 900; font-size: 1.5rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .checklist-item { margin-bottom: 1.5rem; border-bottom: 1px solid rgba(180,133,84,0.2); padding-bottom: 1rem; }
-        .item-row { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
-        .item-row input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--accent-glow); cursor: pointer; }
-        .item-row label { font-weight: 700; color: var(--text-light); cursor: pointer; flex: 1; }
-        .risk-badge { display: inline-block; padding: 0.2rem 0.8rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; }
-        .risk-high { background: var(--risk-high); color: white; }
-        .risk-medium { background: var(--risk-medium); color: #111; }
-        .risk-low { background: var(--risk-low); color: white; }
+        /* ===== صف المعلومات ===== */
+        .info-row {
+            display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1rem;
+        }
+        .info-item { flex: 1 1 200px; }
+        .info-item label {
+            display: block; font-weight: 700; color: #cfa776; font-size: 0.85rem; margin-bottom: 0.3rem;
+        }
+        .info-item input {
+            width: 100%; padding: 0.6rem 0.8rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            background: rgba(10,14,23,0.6); color: #f0f4fa; font-size: 0.9rem;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .info-item input:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
 
-        .notes-field { margin-top: 0.5rem; margin-right: 2.2rem; width: calc(100% - 2.2rem); }
-        .notes-field textarea { width: 100%; padding: 0.5rem; border: 1px solid var(--border-light); border-radius: 15px; background: rgba(10,14,23,0.7); color: var(--text-light); font-family: 'Tajawal', sans-serif; resize: vertical; min-height: 60px; }
+        /* ===== صف التوقيع ===== */
+        .signature-row {
+            display: flex; gap: 0.8rem; flex-wrap: wrap;
+            background: rgba(180,133,84,0.08); border: 1px solid rgba(180,133,84,0.12);
+            padding: 0.8rem 1rem; border-radius: 24px; margin-bottom: 1.2rem;
+        }
+        .signature-item { flex: 1 1 200px; }
+        .signature-item label {
+            display: block; font-weight: 700; color: #cfa776; font-size: 0.85rem; margin-bottom: 0.3rem;
+        }
+        .signature-item input {
+            width: 100%; padding: 0.5rem 0.8rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            background: rgba(10,14,23,0.6); color: #f0f4fa; font-size: 0.9rem;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .signature-item input:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
 
-        .recommendation-box { margin-top: 0.5rem; margin-right: 2.2rem; padding: 0.8rem; border-radius: 15px; background: rgba(255,193,7,0.15); border: 1px solid var(--warning); color: #fbbf24; font-size: 0.9rem; }
-        .recommendation-box strong { display: block; margin-bottom: 0.3rem; }
+        /* ===== أقسام التدقيق ===== */
+        .checklist-section {
+            background: rgba(22,30,46,0.5); border: 1px solid rgba(180,133,84,0.1);
+            border-radius: 20px; padding: 1rem; margin-bottom: 1.2rem;
+        }
+        .section-title {
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;
+            border-bottom: 1px dashed rgba(180,133,84,0.1); padding-bottom: 0.4rem;
+        }
+        .section-title i { color: #cfa776; }
 
-        .result-area { margin: 2rem 0; padding: 1.5rem; background: rgba(180,133,84,0.15); border: 1px solid var(--border-light); border-radius: 30px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-        .score { font-size: 2rem; font-weight: 900; color: var(--accent-soft); }
-        .evaluation { font-size: 1.2rem; font-weight: 700; color: var(--text-muted); }
-        .overall-risk { font-size: 1.5rem; font-weight: 900; padding: 0.5rem 1.5rem; border-radius: 50px; }
-        .risk-level-high { background: var(--risk-high); color: white; }
-        .risk-level-medium { background: var(--risk-medium); color: #111; }
-        .risk-level-low { background: var(--risk-low); color: white; }
+        .checklist-item {
+            margin-bottom: 0.8rem; border-bottom: 1px solid rgba(180,133,84,0.06);
+            padding-bottom: 0.6rem;
+        }
+        .checklist-item:last-child { border-bottom: none; margin-bottom: 0; }
 
-        .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
-        .btn-primary { background: rgba(180,133,84,0.2); border: 1px solid var(--border-light); color: var(--accent-soft); border-radius: 50px; padding: 1rem 2.5rem; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.8rem; backdrop-filter: blur(10px); }
-        .btn-primary:hover { background: rgba(180,133,84,0.4); color: #fff; border-color: var(--accent-glow); box-shadow: 0 0 25px rgba(180,133,84,0.3); transform: translateY(-3px); }
-        .btn-secondary { background: rgba(30,74,122,0.2); border: 1px solid #1e4a7a; color: #8ab8ff; border-radius: 50px; padding: 1rem 2.5rem; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.8rem; }
-        .btn-secondary:hover { background: rgba(30,74,122,0.4); color: #fff; border-color: #1e4a7a; transform: translateY(-3px); }
+        .item-row {
+            display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+        }
+        .item-row input[type="checkbox"] {
+            width: 20px; height: 20px; accent-color: #b48554; cursor: pointer;
+            flex-shrink: 0;
+        }
+        .item-row label {
+            font-weight: 700; color: #f0f4fa; cursor: pointer; flex: 1;
+            font-size: 0.9rem;
+        }
+        .risk-badge {
+            display: inline-block; padding: 0.15rem 0.6rem; border-radius: 50px;
+            font-size: 0.7rem; font-weight: 700; white-space: nowrap;
+        }
+        .risk-high { background: #dc3545; color: white; }
+        .risk-medium { background: #ffc107; color: #111; }
+        .risk-low { background: #28a745; color: white; }
 
-        /* شاشة تحميل التصدير */
-        .export-loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(6px); }
+        .notes-field { margin-top: 0.3rem; margin-right: 2.2rem; width: calc(100% - 2.2rem); }
+        .notes-field textarea {
+            width: 100%; padding: 0.4rem 0.6rem; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 14px; background: rgba(10,14,23,0.4); color: #f0f4fa;
+            font-family: 'Tajawal', sans-serif; resize: vertical; min-height: 40px;
+            font-size: 0.8rem;
+        }
+        .notes-field textarea:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 2px rgba(180,133,84,0.1);
+        }
+
+        .recommendation-box {
+            margin-top: 0.3rem; margin-right: 2.2rem; padding: 0.5rem 0.8rem;
+            border-radius: 14px; background: rgba(255,193,7,0.10);
+            border: 1px solid rgba(255,193,7,0.2); color: #fbbf24;
+            font-size: 0.8rem; display: none;
+        }
+        .recommendation-box strong { display: block; margin-bottom: 0.2rem; }
+
+        /* ===== منطقة النتائج ===== */
+        .result-area {
+            margin: 1.5rem 0; padding: 1.2rem;
+            background: rgba(180,133,84,0.10); border: 1px solid rgba(180,133,84,0.2);
+            border-radius: 24px; display: none;
+            flex-wrap: wrap; align-items: center; justify-content: space-between;
+            gap: 1rem;
+        }
+        .score { font-size: 2rem; font-weight: 900; color: #cfa776; }
+        .evaluation { font-size: 1.1rem; font-weight: 700; color: #aab7d4; }
+        .overall-risk { font-size: 1.2rem; font-weight: 900; padding: 0.4rem 1.2rem; border-radius: 50px; }
+        .risk-level-low { background: #28a745; color: white; }
+        .risk-level-medium { background: #ffc107; color: #111; }
+        .risk-level-high { background: #dc3545; color: white; }
+
+        /* ===== أزرار ===== */
+        .btn-group {
+            display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1rem;
+        }
+        .btn-primary, .btn-secondary {
+            background: rgba(180,133,84,0.15); border: 1px solid rgba(180,133,84,0.2);
+            color: #cfa776; border-radius: 50px; padding: 0.8rem 1.8rem;
+            font-weight: 700; font-size: 1rem; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.6rem;
+            font-family: 'Tajawal', sans-serif;
+            flex: 1 1 auto; justify-content: center;
+        }
+        .btn-primary:hover, .btn-secondary:hover {
+            background: rgba(180,133,84,0.3); color: #fff;
+            border-color: #b48554;
+        }
+        .btn-secondary {
+            background: rgba(30,74,122,0.15); border-color: #1e4a7a;
+            color: #8ab8ff;
+        }
+        .btn-secondary:hover {
+            background: rgba(30,74,122,0.3);
+        }
+
+        /* ===== أزرار التصدير ===== */
+        .export-container {
+            display: flex; justify-content: center; gap: 0.8rem;
+            flex-wrap: wrap; margin: 1.5rem 0;
+        }
+        .export-btn, .export-word-btn {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+            padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.9rem; font-family: 'Tajawal', sans-serif;
+            flex: 1 1 auto; justify-content: center; max-width: 220px;
+        }
+        .export-btn:hover, .export-word-btn:hover { background: rgba(180,133,84,0.25); }
+        .export-btn.excel { background: rgba(40,167,69,0.12); border-color: #28a745; color: #6fbf6f; }
+        .export-btn.excel:hover { background: rgba(40,167,69,0.25); }
+
+        /* ===== شاشة تحميل ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
         .export-loading.show { display: flex; }
-        .export-loading-box { background: var(--bg-panel); border: 2px solid var(--border-light); border-radius: 24px; padding: 2rem 3rem; text-align: center; box-shadow: var(--shadow-glow); }
-        .export-loading-box i { font-size: 3rem; color: var(--accent-soft); animation: spin 1s linear infinite; display: block; margin-bottom: 1rem; }
-        .export-loading-box h3 { color: var(--accent-soft); margin-bottom: 0.5rem; font-size: 1.2rem; }
-        .export-loading-box p { color: var(--text-muted); font-size: 0.9rem; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* فوتر */
-        .footer-simple { text-align: center; padding: 1.5rem; margin-top: 2rem; background: rgba(10,14,23,0.5); backdrop-filter: blur(5px); border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.85rem; }
-        .footer-simple span { color: var(--accent-soft); font-weight: 700; }
+        /* ===== فوتر ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
 
-        /* الآلة الحاسبة */
-        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(4px); }
-        .modal-content { background: var(--bg-panel); margin: 5% auto; padding: 0; border: 2px solid var(--border-light); border-radius: 30px; width: 90%; max-width: 300px; box-shadow: var(--shadow-glow); }
-        .modal-header { background: rgba(180,133,84,0.15); border-bottom: 2px solid var(--border-light); padding: 10px 15px; border-radius: 28px 28px 0 0; display: flex; align-items: center; justify-content: space-between; }
-        .modal-header h2 { margin: 0; color: var(--accent-soft); font-size: 1rem; font-weight: 900; }
-        .close { color: var(--text-muted); float: left; font-size: 24px; font-weight: bold; cursor: pointer; }
-        .close:hover { color: var(--accent-glow); }
-        .modal-body { padding: 15px; }
-        .calc-display { width: 100%; height: 45px; font-size: 1.4rem; text-align: left; padding: 0 10px; border: 2px solid var(--border-light); border-radius: 20px; margin-bottom: 15px; background: rgba(10,14,23,0.8); color: var(--accent-soft); font-family: 'Inter', monospace; direction: ltr; }
-        .calc-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-        .calc-btn { background: rgba(180,133,84,0.1); border: 1px solid var(--border-light); border-radius: 15px; padding: 10px 0; font-size: 1rem; font-weight: 700; color: var(--text-light); cursor: pointer; }
-        .calc-btn:hover { background: rgba(180,133,84,0.3); border-color: var(--accent-glow); }
-        .calc-btn.operator { color: var(--accent-soft); }
-        .calc-btn.equals { background: rgba(180,133,84,0.3); color: white; grid-column: span 2; }
-        .calc-btn.equals:hover { background: rgba(180,133,84,0.5); }
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
+        .calc-display {
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: left;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
 
-        .calc-floating-btn { position: fixed; bottom: 20px; left: 20px; background: rgba(180,133,84,0.2); border: 1px solid var(--border-light); border-radius: 50px; padding: 0.8rem 1.2rem; color: var(--accent-soft); font-size: 1rem; font-weight: 700; z-index: 100; backdrop-filter: blur(10px); cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 0.5rem; }
-        .calc-floating-btn:hover { background: rgba(180,133,84,0.4); color: #fff; border-color: var(--accent-glow); box-shadow: 0 0 15px rgba(180,133,84,0.3); }
+        /* ===== الأزرار العائمة ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
 
+        /* ===================================================
+           تحسينات للشاشات المتوسطة والكبيرة (كمبيوتر)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .checklist-card { padding: 2rem 2.5rem; }
+            .checklist-card h2 { font-size: 2rem; }
+            .section-title { font-size: 1.4rem; }
+            .item-row label { font-size: 1rem; }
+            .btn-primary, .btn-secondary { font-size: 1.1rem; padding: 1rem 2.5rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .score { font-size: 2.5rem; }
+        }
+
+        /* ===================================================
+           تحسينات للجوال (شاشات ≤ 768px)
+           =================================================== */
         @media (max-width: 768px) {
-            .hero-mini h2 { font-size: 2rem; }
-            .checklist-card { padding: 1.5rem; }
-            .signature-row { flex-direction: column; }
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .container { margin: 1rem auto; padding: 0 0.6rem; }
+            .checklist-card { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .checklist-card h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .info-row { flex-direction: column; gap: 0.5rem; }
+            .signature-row { flex-direction: column; gap: 0.5rem; padding: 0.6rem 0.8rem; }
+            .checklist-section { padding: 0.8rem; }
+            .section-title { font-size: 1rem; }
             .item-row { flex-direction: column; align-items: flex-start; }
+            .item-row label { font-size: 0.8rem; }
             .notes-field, .recommendation-box { margin-right: 0; width: 100%; }
             .btn-group { flex-direction: column; }
             .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
             .result-area { flex-direction: column; align-items: flex-start; }
+            .export-container { flex-direction: column; align-items: stretch; }
+            .export-btn, .export-word-btn { width: 100%; max-width: 100%; justify-content: center; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .score { font-size: 1.6rem; }
+            .overall-risk { font-size: 1rem; }
+        }
+
+        /* ===== تحسينات للشاشات الصغيرة جداً (≤ 400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .checklist-card h2 { font-size: 1.1rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+        }
+
+        /* ===== منع التحديد العرضي ===== */
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        /* ===== تحسين التمرير ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+
+        /* إصلاح ظهور العناوين */
+        .section-title, .result-card .label, .hero-mini h2 {
+            -webkit-text-fill-color: initial !important;
+            color: #cfa776 !important;
+            background: none !important;
+            background-image: none !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .note {
+            background: rgba(180,133,84,0.08); padding: 0.6rem 1rem;
+            border-radius: 16px; font-size: 0.85rem; color: #aab7d4;
+            margin-top: 0.5rem; border-right: 3px solid #b48554;
         }
     </style>
 </head>
 <body>
-<body style="overflow-x: hidden;">
 <div class="glow-bg"><span></span><span></span><span></span></div>
-<div class="floating-shape shape-1"></div>
-<div class="floating-shape shape-2"></div>
+
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">جاري إنشاء التقرير...</h3>
+        <p id="loadingMsg">يرجى الانتظار</p>
+    </div>
+</div>
 
 <section class="hero-mini">
     <h2>📋 نظام تدقيق HACCP المتقدم</h2>
     <p>تحليل المخاطر - توصيات تصحيحية فورية - تقارير احترافية</p>
 </section>
 
-<!-- شاشة تحميل التصدير -->
-<div class="export-loading" id="exportLoading">
-    <div class="export-loading-box">
-        <i class="fas fa-spinner"></i>
-        <h3 id="loadingTitle">جاري إنشاء التقرير الاحترافي...</h3>
-        <p id="loadingMsg">يرجى الانتظار — قد يستغرق ذلك لحظات</p>
-    </div>
-</div>
-
 <div class="container">
     <div class="checklist-card" data-aos="fade-up">
-        <h2><i class="fas fa-clipboard-check"></i> نموذج التدقيق اليومي مع تحليل المخاطر</h2>
+        <div class="featured-badge"><i class="fas fa-clipboard-check"></i><span>HACCP</span></div>
+        <h2><i class="fas fa-clipboard-check" style="color:#cfa776;margin-left:0.5rem;"></i>نموذج التدقيق اليومي مع تحليل المخاطر</h2>
 
+        <!-- معلومات التدقيق -->
         <div class="info-row">
             <div class="info-item">
                 <label><i class="fas fa-calendar-alt"></i> التاريخ</label>
@@ -205,6 +468,7 @@
             </div>
         </div>
 
+        <!-- التوقيع -->
         <div class="signature-row">
             <div class="signature-item">
                 <label><i class="fas fa-pen"></i> اسم المسؤول (للتوقيع)</label>
@@ -212,73 +476,59 @@
             </div>
             <div class="signature-item">
                 <label><i class="fas fa-signature"></i> التوقيع</label>
-                <input type="text" id="signature" placeholder="التوقيع الإلكتروني أو اليدوي">
+                <input type="text" id="signature" placeholder="التوقيع الإلكتروني">
             </div>
         </div>
 
+        <!-- قائمة التدقيق -->
         <div id="checklistContainer">
             <!-- 1. الاستلام -->
             <div class="checklist-section">
                 <div class="section-title"><i class="fas fa-truck"></i> 1. مرحلة الاستلام</div>
-                
                 <div class="checklist-item" id="item-rec1">
                     <div class="item-row">
                         <input type="checkbox" id="rec1" class="haccp-item" data-risk="high" data-id="rec1">
-                        <label for="rec1">فحص درجة حرارة المواد المبردة (يجب أن تكون ≤ 4°C) والمجمدة (≤ -18°C)</label>
+                        <label for="rec1">فحص درجة حرارة المواد المبردة (≤ 4°C) والمجمدة (≤ -18°C)</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-rec1" placeholder="ملاحظات (مثال: ثلاجة الشاحنة كانت 6 درجات)"></textarea>
-                    </div>
-                    <div id="recommendation-rec1" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-rec1" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-rec1" class="recommendation-box"></div>
                 </div>
-
                 <div class="checklist-item" id="item-rec2">
                     <div class="item-row">
                         <input type="checkbox" id="rec2" class="haccp-item" data-risk="medium" data-id="rec2">
                         <label for="rec2">التحقق من سلامة العبوات (لا تمزق، لا تسريب، لا صدأ)</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-rec2" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-rec2" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-rec2" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-rec2" class="recommendation-box"></div>
                 </div>
-
                 <div class="checklist-item" id="item-rec3">
                     <div class="item-row">
                         <input type="checkbox" id="rec3" class="haccp-item" data-risk="high" data-id="rec3">
                         <label for="rec3">التأكد من تواريخ الصلاحية (غير منتهية)</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-rec3" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-rec3" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-rec3" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-rec3" class="recommendation-box"></div>
                 </div>
-
                 <div class="checklist-item" id="item-rec4">
                     <div class="item-row">
                         <input type="checkbox" id="rec4" class="haccp-item" data-risk="medium" data-id="rec4">
-                        <label for="rec4">وجود شهادات صحية للمواد عالية الخطورة (إن وجدت)</label>
+                        <label for="rec4">وجود شهادات صحية للمواد عالية الخطورة</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-rec4" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-rec4" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-rec4" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-rec4" class="recommendation-box"></div>
                 </div>
-
                 <div class="checklist-item" id="item-rec5">
                     <div class="item-row">
                         <input type="checkbox" id="rec5" class="haccp-item" data-risk="medium" data-id="rec5">
                         <label for="rec5">فصل المواد النيئة عن الجاهزة أثناء النقل</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-rec5" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-rec5" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-rec5" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-rec5" class="recommendation-box"></div>
                 </div>
             </div>
 
@@ -291,10 +541,8 @@
                         <label for="sto1">درجة حرارة الثلاجات ≤ 4°C (مسجلة)</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-sto1" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-sto1" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-sto1" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-sto1" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-sto2">
                     <div class="item-row">
@@ -302,10 +550,8 @@
                         <label for="sto2">درجة حرارة المجمدات ≤ -18°C (مسجلة)</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-sto2" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-sto2" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-sto2" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-sto2" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-sto3">
                     <div class="item-row">
@@ -313,10 +559,8 @@
                         <label for="sto3">تخزين المواد النيئة في الرفوف السفلية (أسفل المطبوخة)</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-sto3" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-sto3" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-sto3" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-sto3" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-sto4">
                     <div class="item-row">
@@ -324,10 +568,8 @@
                         <label for="sto4">فصل المواد الكيميائية عن المواد الغذائية</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-sto4" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-sto4" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-sto4" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-sto4" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-sto5">
                     <div class="item-row">
@@ -335,10 +577,8 @@
                         <label for="sto5">تنظيف الثلاجات والمجمدات وعدم وجود تراكمات ثلج</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-sto5" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-sto5" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-sto5" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-sto5" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-sto6">
                     <div class="item-row">
@@ -346,10 +586,8 @@
                         <label for="sto6">ترتيب المواد حسب تاريخ الصلاحية (FIFO)</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-sto6" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-sto6" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-sto6" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-sto6" class="recommendation-box"></div>
                 </div>
             </div>
 
@@ -362,10 +600,8 @@
                         <label for="prep1">غسل اليدين قبل البدء وبعد التعامل مع المواد النيئة</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-prep1" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-prep1" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-prep1" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-prep1" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-prep2">
                     <div class="item-row">
@@ -373,10 +609,8 @@
                         <label for="prep2">استخدام ألواح تقطيع منفصلة للحوم النيئة والدواجن والخضار</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-prep2" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-prep2" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-prep2" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-prep2" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-prep3">
                     <div class="item-row">
@@ -384,10 +618,8 @@
                         <label for="prep3">تعقيم الأدوات والأسطح بعد تحضير المواد النيئة</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-prep3" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-prep3" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-prep3" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-prep3" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-prep4">
                     <div class="item-row">
@@ -395,37 +627,31 @@
                         <label for="prep4">عدم ترك المواد القابلة للتلف خارج التبريد لأكثر من ساعتين</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-prep4" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-prep4" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-prep4" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-prep4" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-prep5">
                     <div class="item-row">
                         <input type="checkbox" id="prep5" class="haccp-item" data-risk="high" data-id="prep5">
-                        <label for="prep5">إذابة الأغذية المجمدة في الثلاجة أو الميكروويف (وليس في درجة حرارة الغرفة)</label>
+                        <label for="prep5">إذابة الأغذية المجمدة في الثلاجة أو الميكروويف</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-prep5" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-prep5" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-prep5" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-prep5" class="recommendation-box"></div>
                 </div>
             </div>
 
-            <!-- 4. الطهي وإعادة التسخين -->
+            <!-- 4. الطهي -->
             <div class="checklist-section">
                 <div class="section-title"><i class="fas fa-fire"></i> 4. الطهي وإعادة التسخين</div>
                 <div class="checklist-item" id="item-cook1">
                     <div class="item-row">
                         <input type="checkbox" id="cook1" class="haccp-item" data-risk="high" data-id="cook1">
-                        <label for="cook1">وصول درجة حرارة قلب الدواجن إلى 74°C على الأقل</label>
+                        <label for="cook1">وصول درجة حرارة قلب الدواجن إلى 74°C</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-cook1" placeholder="ملاحظات (مثال: سجلنا 72 درجة فقط)"></textarea>
-                    </div>
-                    <div id="recommendation-cook1" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-cook1" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-cook1" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-cook2">
                     <div class="item-row">
@@ -433,10 +659,8 @@
                         <label for="cook2">وصول درجة حرارة اللحوم المفرومة إلى 71°C</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-cook2" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-cook2" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-cook2" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-cook2" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-cook3">
                     <div class="item-row">
@@ -444,10 +668,8 @@
                         <label for="cook3">وصول درجة حرارة الأسماك إلى 63°C</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-cook3" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-cook3" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-cook3" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-cook3" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-cook4">
                     <div class="item-row">
@@ -455,10 +677,8 @@
                         <label for="cook4">إعادة تسخين الأطعمة المحفوظة إلى 74°C خلال ساعتين</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-cook4" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-cook4" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-cook4" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-cook4" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-cook5">
                     <div class="item-row">
@@ -466,10 +686,8 @@
                         <label for="cook5">تسجيل درجات حرارة الطهي في السجل</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-cook5" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-cook5" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-cook5" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-cook5" class="recommendation-box"></div>
                 </div>
             </div>
 
@@ -482,10 +700,8 @@
                         <label for="cool1">تبريد الأطعمة الساخنة من 60°C إلى 20°C خلال ساعتين</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-cool1" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-cool1" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-cool1" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-cool1" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-cool2">
                     <div class="item-row">
@@ -493,10 +709,8 @@
                         <label for="cool2">ثم من 20°C إلى 4°C خلال 4 ساعات إضافية</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-cool2" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-cool2" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-cool2" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-cool2" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-cool3">
                     <div class="item-row">
@@ -504,10 +718,8 @@
                         <label for="cool3">استخدام أوعية ضحلة للتبريد السريع</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-cool3" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-cool3" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-cool3" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-cool3" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-cool4">
                     <div class="item-row">
@@ -515,10 +727,8 @@
                         <label for="cool4">تغطية الأطعمة بعد التبريد الكامل</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-cool4" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-cool4" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-cool4" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-cool4" class="recommendation-box"></div>
                 </div>
             </div>
 
@@ -531,10 +741,8 @@
                         <label for="per1">ارتداء زي العمل النظيف (شيفون، مئزر)</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-per1" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-per1" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-per1" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-per1" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-per2">
                     <div class="item-row">
@@ -542,10 +750,8 @@
                         <label for="per2">تغطية الشعر (شبكة أو قبعة)</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-per2" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-per2" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-per2" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-per2" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-per3">
                     <div class="item-row">
@@ -553,10 +759,8 @@
                         <label for="per3">عدم ارتداء المجوهرات أو الساعات</label>
                         <span class="risk-badge risk-low">خطر منخفض</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-per3" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-per3" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-per3" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-per3" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-per4">
                     <div class="item-row">
@@ -564,10 +768,8 @@
                         <label for="per4">تقليم الأظافر وعدم وضع طلاء أظافر</label>
                         <span class="risk-badge risk-low">خطر منخفض</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-per4" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-per4" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-per4" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-per4" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-per5">
                     <div class="item-row">
@@ -575,10 +777,8 @@
                         <label for="per5">عدم العمل أثناء المرض (إسهال، قيء، التهابات جلدية)</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-per5" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-per5" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-per5" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-per5" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-per6">
                     <div class="item-row">
@@ -586,10 +786,8 @@
                         <label for="per6">غسل اليدين بعد استخدام الحمام، التدخين، الأكل، لمس النفايات</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-per6" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-per6" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-per6" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-per6" class="recommendation-box"></div>
                 </div>
             </div>
 
@@ -602,10 +800,8 @@
                         <label for="clean1">تنظيف وتعقيم جميع أسطح العمل بعد كل استخدام</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-clean1" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-clean1" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-clean1" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-clean1" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-clean2">
                     <div class="item-row">
@@ -613,10 +809,8 @@
                         <label for="clean2">غسل وتعقيم الأحواض وأماكن غسل اليدين</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-clean2" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-clean2" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-clean2" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-clean2" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-clean3">
                     <div class="item-row">
@@ -624,10 +818,8 @@
                         <label for="clean3">تنظيف الأرضيات والجدران من بقايا الطعام</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-clean3" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-clean3" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-clean3" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-clean3" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-clean4">
                     <div class="item-row">
@@ -635,10 +827,8 @@
                         <label for="clean4">استخدام مواد معقمة معتمدة وبالتركيز الصحيح</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-clean4" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-clean4" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-clean4" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-clean4" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-clean5">
                     <div class="item-row">
@@ -646,10 +836,8 @@
                         <label for="clean5">جدول تنظيف معلّق ويتم التوقيع عليه</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-clean5" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-clean5" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-clean5" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-clean5" class="recommendation-box"></div>
                 </div>
             </div>
 
@@ -662,10 +850,8 @@
                         <label for="pest1">عدم وجود حشرات أو قوارض في المنشأة</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-pest1" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-pest1" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-pest1" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-pest1" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-pest2">
                     <div class="item-row">
@@ -673,10 +859,8 @@
                         <label for="pest2">سد جميع الفتحات والشقوق في الجدران والأبواب</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-pest2" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-pest2" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-pest2" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-pest2" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-pest3">
                     <div class="item-row">
@@ -684,10 +868,8 @@
                         <label for="pest3">تركيب مصائد ضوئية أو لاصقة (حسب الحاجة)</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-pest3" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-pest3" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-pest3" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-pest3" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-pest4">
                     <div class="item-row">
@@ -695,14 +877,12 @@
                         <label for="pest4">وجود عقد مع شركة مكافحة آفات معتمدة</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-pest4" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-pest4" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-pest4" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-pest4" class="recommendation-box"></div>
                 </div>
             </div>
 
-            <!-- 9. التوثيق والسجلات -->
+            <!-- 9. التوثيق -->
             <div class="checklist-section">
                 <div class="section-title"><i class="fas fa-file-alt"></i> 9. التوثيق</div>
                 <div class="checklist-item" id="item-doc1">
@@ -711,10 +891,8 @@
                         <label for="doc1">تسجيل درجات حرارة الثلاجات والمجمدات يومياً</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-doc1" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-doc1" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-doc1" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-doc1" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-doc2">
                     <div class="item-row">
@@ -722,10 +900,8 @@
                         <label for="doc2">تسجيل درجات حرارة الطهي والتبريد</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-doc2" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-doc2" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-doc2" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-doc2" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-doc3">
                     <div class="item-row">
@@ -733,10 +909,8 @@
                         <label for="doc3">الاحتفاظ بسجلات الاستلام لمدة لا تقل عن 6 أشهر</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-doc3" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-doc3" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-doc3" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-doc3" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-doc4">
                     <div class="item-row">
@@ -744,14 +918,12 @@
                         <label for="doc4">توقيع المسؤول على جميع السجلات يومياً</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-doc4" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-doc4" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-doc4" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-doc4" class="recommendation-box"></div>
                 </div>
             </div>
 
-            <!-- 10. التوعية والتدريب -->
+            <!-- 10. التدريب -->
             <div class="checklist-section">
                 <div class="section-title"><i class="fas fa-chalkboard-teacher"></i> 10. التدريب</div>
                 <div class="checklist-item" id="item-tr1">
@@ -760,10 +932,8 @@
                         <label for="tr1">جميع العاملين حاصلون على تدريب في سلامة الغذاء</label>
                         <span class="risk-badge risk-high">خطر مرتفع</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-tr1" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-tr1" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-tr1" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-tr1" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-tr2">
                     <div class="item-row">
@@ -771,10 +941,8 @@
                         <label for="tr2">وجود تعليمات واضحة معلقة (غسل اليدين، درجات الحرارة)</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-tr2" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-tr2" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-tr2" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-tr2" class="recommendation-box"></div>
                 </div>
                 <div class="checklist-item" id="item-tr3">
                     <div class="item-row">
@@ -782,16 +950,14 @@
                         <label for="tr3">تذكير العاملين بإجراءات السلامة بشكل دوري</label>
                         <span class="risk-badge risk-medium">خطر متوسط</span>
                     </div>
-                    <div class="notes-field">
-                        <textarea id="note-tr3" placeholder="ملاحظات"></textarea>
-                    </div>
-                    <div id="recommendation-tr3" class="recommendation-box" style="display: none;"></div>
+                    <div class="notes-field"><textarea id="note-tr3" placeholder="ملاحظات"></textarea></div>
+                    <div id="recommendation-tr3" class="recommendation-box"></div>
                 </div>
             </div>
         </div>
 
         <!-- نتيجة التقييم -->
-        <div class="result-area" id="resultArea" style="display: none;">
+        <div class="result-area" id="resultArea">
             <div>
                 <span class="score" id="scoreDisplay">0%</span>
                 <span class="evaluation" id="evaluationText"></span>
@@ -802,65 +968,118 @@
         <!-- الأزرار -->
         <div class="btn-group">
             <button class="btn-primary" id="calculateBtn"><i class="fas fa-calculator"></i> احسب النتيجة والتوصيات</button>
-            <button class="btn-primary" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel احترافي</button>
-            <button class="btn-secondary" id="exportWordBtn"><i class="fas fa-file-word"></i> تقرير Word كامل</button>
+        </div>
+
+        <!-- أزرار التصدير -->
+        <div class="export-container">
+            <button class="export-btn excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel شامل</button>
+            <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير Word</button>
+        </div>
+
+        <div id="initialMessage" style="margin-top:0.5rem;color:var(--text-muted);text-align:center;font-size:0.9rem;">
+            <i class="fas fa-robot" style="color:var(--accent-soft);"></i> اضغط "احسب النتيجة" ثم استخدم أزرار التصدير
         </div>
     </div>
 </div>
 
-<!-- فوتر مبسط -->
-<footer class="footer-simple">
-    جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
-</footer>
+<footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
 
-<!-- زر الآلة الحاسبة العائم -->
-<div class="calc-floating-btn" id="calculatorBtn">
-    <i class="fas fa-calculator"></i> آلة حاسبة
-</div>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> حاسبة</button>
+<a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> الرئيسية</a>
 
-<!-- نافذة الآلة الحاسبة المنبثقة -->
+<!-- نافذة الآلة الحاسبة -->
 <div id="calculatorModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span class="close">&times;</span>
-            <h2><i class="fas fa-calculator" style="color: var(--accent-soft);"></i> آلة حاسبة</h2>
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> آلة حاسبة</h2>
         </div>
         <div class="modal-body">
             <input type="text" id="calcDisplay" class="calc-display" readonly>
             <div class="calc-buttons">
-                <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('8')">8</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('7')">7</button>
-                <button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('5')">5</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('4')">4</button>
-                <button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('2')">2</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('1')">1</button>
-                <button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
-                <button class="calc-btn" onclick="clearCalculator()">C</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('0')">0</button>
-                <button class="calc-btn" onclick="handleCalculatorInput('.')">.</button>
-                <button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
-                <button class="calc-btn" onclick="backspaceCalculator()">⌫</button>
-                <button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- زر العودة للرئيسية -->
-<a href="index.html" style="position:fixed;bottom:20px;right:20px;background:rgba(180,133,84,0.9);color:white;padding:12px 20px;border-radius:50px;text-decoration:none;font-family:'Tajawal',sans-serif;font-weight:bold;backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,0.2);box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:9999;display:flex;align-items:center;gap:8px;transition:0.3s;" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';"><i class="fas fa-home"></i> الرئيسية</a>
-
-<!-- AOS -->
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
     AOS.init({ duration: 800, once: true, offset: 100 });
-    document.getElementById('checkDate').value = new Date().toISOString().split('T')[0];
 
-    // قاعدة بيانات التوصيات التصحيحية الكاملة
+    // ===== آلة حاسبة =====
+    const calcDisplay = document.getElementById('calcDisplay');
+    let currentCalcInput = '';
+    function handleCalc(v) {
+        if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+        if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+        if (v === '=') {
+            try {
+                let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/'));
+                calcDisplay.value = r;
+                currentCalcInput = r.toString();
+            } catch(e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
+            return;
+        }
+        currentCalcInput += v;
+        calcDisplay.value = currentCalcInput;
+    }
+    document.querySelectorAll('.calc-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const v = this.dataset.val;
+            if (v !== undefined) handleCalc(v);
+        });
+    });
+    const modalEl = document.getElementById('calculatorModal');
+    document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        modalEl.classList.add('active');
+        calcDisplay.value = currentCalcInput;
+    });
+    document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+    modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+    document.addEventListener('keydown', function(e) {
+        if (!modalEl.classList.contains('active')) return;
+        e.preventDefault();
+        const k = e.key;
+        if (k >= '0' && k <= '9') handleCalc(k);
+        else if (k === '.') handleCalc('.');
+        else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+        else if (k === 'Enter' || k === '=') handleCalc('=');
+        else if (k === 'Backspace') handleCalc('⌫');
+        else if (k === 'Escape') modalEl.classList.remove('active');
+        else if (k.toLowerCase() === 'c') handleCalc('C');
+    });
+
+    // ===== شاشة تحميل =====
+    function showLoading(title, msg) {
+        document.getElementById('loadingTitle').textContent = title;
+        document.getElementById('loadingMsg').textContent = msg;
+        document.getElementById('exportLoading').classList.add('show');
+    }
+    function hideLoading() {
+        document.getElementById('exportLoading').classList.remove('show');
+    }
+
+    // ===== بيانات التوصيات =====
     const correctiveActions = {
         rec1: { risk: "مرتفع", action: "يجب رفض المواد إذا كانت درجة حرارتها أعلى من 4°C للمبردة أو -18°C للمجمدة.", recommendation: "استخدم مقياس حرارة معاير وسجل درجة الحرارة. إذا كانت مرتفعة، أعِد الشحنة فوراً." },
         rec2: { risk: "متوسط", action: "العبوات التالفة قد تسبب تلوثاً. يجب عزل المواد ذات العبوات التالفة.", recommendation: "افحص العبوات عند الاستلام. إذا وجدت تالفة، أعدها أو استخدمها فوراً بعد التأكد." },
@@ -929,7 +1148,7 @@
         });
     }
 
-    // دالة جمع بيانات التدقيق
+    // ===== جمع بيانات التدقيق =====
     function collectAuditData() {
         const date = document.getElementById('checkDate').value;
         const inspector = document.getElementById('inspectorName').value || 'غير محدد';
@@ -963,6 +1182,7 @@
         return { date, inspector, signatureName, signature, details, checked, total, percent, evaluation, overallRiskLevel };
     }
 
+    // ===== حساب النتيجة =====
     document.getElementById('calculateBtn').addEventListener('click', function() {
         const data = collectAuditData();
         document.getElementById('resultArea').style.display = 'flex';
@@ -971,50 +1191,50 @@
         const riskEl = document.getElementById('overallRiskDisplay');
         riskEl.textContent = `مستوى الخطر العام: ${data.overallRiskLevel}`;
         riskEl.className = 'overall-risk ' + (data.overallRiskLevel.includes('منخفض') ? 'risk-level-low' : (data.overallRiskLevel.includes('متوسط') ? 'risk-level-medium' : 'risk-level-high'));
+        // تخزين النتائج للتصدير
+        window.lastAuditData = data;
     });
 
-    // دوال التحميل
-    function showLoading(title, msg) {
-        document.getElementById('loadingTitle').textContent = title;
-        document.getElementById('loadingMsg').textContent = msg;
-        document.getElementById('exportLoading').classList.add('show');
-    }
-    function hideLoading() { document.getElementById('exportLoading').classList.remove('show'); }
-
-    // تصدير Excel احترافي
-    async function exportToFullExcel() {
-        const data = collectAuditData();
-        showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'يرجى الانتظار');
+    // ================================================================
+    // ========== تصدير Excel احترافي ==========
+    // ================================================================
+    document.getElementById('exportExcelBtn').addEventListener('click', async function() {
+        if (!window.lastAuditData) { alert('الرجاء إجراء التحليل أولاً (اضغط على "احسب النتيجة").'); return; }
+        showLoading('جاري إنشاء تقرير Excel...', 'إنشاء الأوراق والرسوم');
         try {
+            const data = window.lastAuditData;
             const workbook = new ExcelJS.Workbook();
             workbook.creator = 'FAROUK GRUP';
-            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035';
-            const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
-            const PT = 'FF155724', NT = 'FF721C24';
+            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+            const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
+            const PT = 'FF155724', NT = 'FF721C24', GB = 'FFFFF3CD';
 
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
             function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
 
-            // غلاف
-            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true }] });
+            // 1. غلاف التقرير
+            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
             [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
             cv.getRow(2).height=80; cv.getRow(4).height=60;
             cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
             bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
-            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'}; bc.border={bottom:{style:'thick',color:{argb:G}}};
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
             mh(cv,1,4,4,`تقرير تدقيق HACCP\n${data.inspector}`,DB,GL,18);
-            const inf=[['📋 التاريخ',data.date],['👤 المسؤول',data.inspector],['📊 النسبة',`${data.percent}%`],['⚠️ مستوى الخطر',data.overallRiskLevel]];
+            const inf=[['📋 التاريخ',data.date],['👤 المسؤول',data.inspector],['📊 نسبة الامتثال',`${data.percent}%`],['⚠️ مستوى الخطر',data.overallRiskLevel]];
             let ir=6;
             inf.forEach(([l,v],idx)=>{
                 cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
                 const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
                 const bg=idx%2===0?AR:'FFFEFCF6';
-                lc.font={name:'Arial',bold:true,size:11,color:{argb:'00695C'}}; lc.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; lc.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
-                vc.font={name:'Arial',size:11,color:{argb:DT}}; vc.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; vc.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
                 cv.getRow(ir).height=28; ir++;
             });
 
-            // تفاصيل التدقيق
-            const detailSheet = workbook.addWorksheet('تفاصيل التدقيق', { views: [{ rightToLeft: true }] });
+            // 2. تفاصيل التدقيق
+            const detailSheet = workbook.addWorksheet('تفاصيل التدقيق', { views: [{ rightToLeft: true, showGridLines: false }] });
             detailSheet.getColumn(1).width = 5; detailSheet.getColumn(2).width = 50; detailSheet.getColumn(3).width = 15; detailSheet.getColumn(4).width = 20; detailSheet.getColumn(5).width = 30; detailSheet.getColumn(6).width = 5;
             mh(detailSheet,1,6,1,'📋 قائمة تدقيق HACCP',DB,GL,14);
             detailSheet.getRow(1).height=40;
@@ -1026,111 +1246,119 @@
                 detailSheet.addRow([item.label, item.status ? '✅ مطابق' : '❌ غير مطابق', item.risk, item.note, item.status ? '' : item.recommendation]);
             });
 
-            // ملخص النتائج
-            const summarySheet = workbook.addWorksheet('ملخص النتائج', { views: [{ rightToLeft: true }] });
+            // 3. ملخص النتائج
+            const summarySheet = workbook.addWorksheet('ملخص النتائج', { views: [{ rightToLeft: true, showGridLines: false }] });
             summarySheet.getColumn(1).width = 30; summarySheet.getColumn(2).width = 40;
-            summarySheet.getCell('A1').value = 'النسبة المئوية للامتثال'; summarySheet.getCell('B1').value = `${data.percent}%`;
-            summarySheet.getCell('A2').value = 'التقييم'; summarySheet.getCell('B2').value = data.evaluation;
-            summarySheet.getCell('A3').value = 'مستوى الخطر العام'; summarySheet.getCell('B3').value = data.overallRiskLevel;
-            summarySheet.getCell('A4').value = 'توقيع المسؤول'; summarySheet.getCell('B4').value = `${data.signatureName} - ${data.signature}`;
+            mh(summarySheet,1,2,1,'📊 ملخص التدقيق',DB,GL,14);
+            summarySheet.getRow(1).height=40;
+            const summaryData = [
+                ['نسبة الامتثال', `${data.percent}%`],
+                ['التقييم', data.evaluation],
+                ['مستوى الخطر العام', data.overallRiskLevel],
+                ['عدد البنود المطابقة', data.checked],
+                ['إجمالي البنود', data.total],
+                ['توقيع المسؤول', `${data.signatureName} - ${data.signature || '__________'}`]
+            ];
+            summaryData.forEach((row,idx) => {
+                const r = idx + 3;
+                const lc = summarySheet.getCell(r,1); lc.value = row[0]; ap(lc, cs(idx%2===0?'FFFEFCF6':'FFFFFFFF',DT,true,'right'));
+                const vc = summarySheet.getCell(r,2); vc.value = row[1]; ap(vc, cs(idx%2===0?'FFFEFCF6':'FFFFFFFF',DT,false,'center'));
+            });
 
             const buffer = await workbook.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            saveAs(blob, `تقرير_HACCP_${data.date}.xlsx`);
-        } catch(err) { alert('خطأ Excel: '+err.message); }
-        finally { hideLoading(); }
-    }
+            const now = new Date();
+            const fileName = `تقرير_HACCP_${data.date}_${now.toISOString().slice(0,10)}.xlsx`;
+            saveAs(blob, fileName);
+        } catch(err) { alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
+    });
 
-    // تصدير Word احترافي
-    async function exportToWord() {
-        const data = collectAuditData();
-        showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات');
+    // ================================================================
+    // ========== تصدير Word احترافي ==========
+    // ================================================================
+    document.getElementById('exportWordBtn').addEventListener('click', async function() {
+        if (!window.lastAuditData) { alert('الرجاء إجراء التحليل أولاً (اضغط على "احسب النتيجة").'); return; }
+        showLoading('جاري إنشاء تقرير Word...', 'جمع البيانات');
         try {
+            const data = window.lastAuditData;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ar-EG');
+
+            // التقاط صورة منطقة النتائج
             const resultArea = document.getElementById('resultArea');
             let resultImg = '';
             if (resultArea) {
-                const canvas = await html2canvas(resultArea, { scale: 2, backgroundColor: '#ffffff' });
-                resultImg = canvas.toDataURL('image/png');
+                try {
+                    const origBg = resultArea.style.backgroundColor;
+                    resultArea.style.backgroundColor = '#ffffff';
+                    const canvas = await html2canvas(resultArea, { scale: 2, backgroundColor: '#ffffff' });
+                    resultArea.style.backgroundColor = origBg;
+                    resultImg = canvas.toDataURL('image/png');
+                } catch(e) {}
             }
 
             let itemsHTML = '';
             data.details.forEach(item => {
+                const statusColor = item.status ? '#155724' : '#721c24';
+                const statusText = item.status ? '✅ مطابق' : '❌ غير مطابق';
                 itemsHTML += `
                     <tr>
-                        <td>${item.label}</td>
-                        <td style="color:${item.status?'#155724':'#721c24'};">${item.status ? '✅ مطابق' : '❌ غير مطابق'}</td>
-                        <td>${item.risk}</td>
-                        <td>${item.note || '-'}</td>
-                        <td>${item.status ? '-' : item.recommendation}</td>
+                        <td style="border:1px solid #b8860b;padding:8px;text-align:right;">${item.label}</td>
+                        <td style="border:1px solid #b8860b;padding:8px;text-align:center;color:${statusColor};font-weight:bold;">${statusText}</td>
+                        <td style="border:1px solid #b8860b;padding:8px;text-align:center;">${item.risk}</td>
+                        <td style="border:1px solid #b8860b;padding:8px;text-align:center;">${item.note || '-'}</td>
+                        <td style="border:1px solid #b8860b;padding:8px;text-align:right;">${item.status ? '-' : item.recommendation}</td>
                     </tr>
                 `;
             });
 
             const fullHtml = `<!DOCTYPE html>
-            <html dir="rtl">
-            <head><meta charset="utf-8"><title>تقرير HACCP - FAROUK GRUP</title>
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+            <head><meta charset='utf-8'><title>تقرير HACCP - FAROUK GRUP</title>
             <style>
-                body{font-family:'Tajawal',sans-serif;margin:2rem;background:#fff;color:#333;}
-                h1{color:#b8860b;border-bottom:2px solid #b8860b;}
-                table{width:100%;border-collapse:collapse;margin:20px 0;}
-                th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                th{background:#fefcf6;color:#b8860b;}
-                .signature{margin-top:40px;display:flex;justify-content:space-between;}
+                body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;color:#333;}
+                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                .cover h1{font-size:32px;color:#b8860b;margin:0;}
+                .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                .cover p{color:#666;}
+                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                th{background:#fefcf6;color:#b8860b;font-weight:bold;}
+                .signature{margin-top:40px;display:flex;justify-content:space-between;flex-wrap:wrap;}
+                .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
             </style></head>
             <body>
-                <h1>📋 تقرير التدقيق اليومي لنظام HACCP</h1>
-                <p><strong>التاريخ:</strong> ${data.date} | <strong>المسؤول:</strong> ${data.inspector}</p>
-                ${resultImg ? `<div style="text-align:center;margin:20px 0;"><img src="${resultImg}" style="max-width:100%;border:1px solid #b8860b;"/></div>` : ''}
-                <h2>نتيجة التدقيق: ${data.percent}% - ${data.evaluation} (مستوى الخطر: ${data.overallRiskLevel})</h2>
+                <div class="cover">
+                    <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+                    <h2>📋 تقرير التدقيق اليومي لنظام HACCP</h2>
+                    <p>التاريخ: ${data.date} | المسؤول: ${data.inspector}</p>
+                    <p>تاريخ التقرير: ${dateStr}</p>
+                </div>
+                ${resultImg ? `<div style="text-align:center;margin:20px 0;"><img src="${resultImg}" style="max-width:100%;border:1px solid #b8860b;border-radius:10px;" /></div>` : ''}
+                <h2 style="color:#b8860b;">نتيجة التدقيق: ${data.percent}% - ${data.evaluation}</h2>
+                <h3 style="color:#b8860b;">مستوى الخطر العام: ${data.overallRiskLevel}</h3>
                 <table>
-                    <thead><tr><th>البند</th><th>الحالة</th><th>مستوى الخطر</th><th>ملاحظات</th><th>التوصية</th></tr></thead>
+                    <thead><tr><th style="background:#fefcf6;color:#b8860b;border:1px solid #b8860b;padding:8px;">البند</th><th style="background:#fefcf6;color:#b8860b;border:1px solid #b8860b;padding:8px;">الحالة</th><th style="background:#fefcf6;color:#b8860b;border:1px solid #b8860b;padding:8px;">مستوى الخطر</th><th style="background:#fefcf6;color:#b8860b;border:1px solid #b8860b;padding:8px;">ملاحظات</th><th style="background:#fefcf6;color:#b8860b;border:1px solid #b8860b;padding:8px;">التوصية</th></tr></thead>
                     <tbody>${itemsHTML}</tbody>
                 </table>
                 <div class="signature">
                     <div><strong>اسم المسؤول:</strong> ${data.signatureName}</div>
                     <div><strong>التوقيع:</strong> ${data.signature || '________________'}</div>
                 </div>
-                <p style="margin-top:40px;color:#777;">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${new Date().getFullYear()}</p>
+                <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()} | www.farouk-grup.com</div>
             </body></html>`;
 
             const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `تقرير_HACCP_${data.date}.doc`;
+            link.download = `تقرير_HACCP_${data.date}_${now.toISOString().slice(0,10)}.doc`;
             link.click();
             URL.revokeObjectURL(link.href);
-        } catch(err) { alert('خطأ Word: '+err.message); }
-        finally { hideLoading(); }
-    }
-
-    document.getElementById('exportExcelBtn').addEventListener('click', exportToFullExcel);
-    document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
-
-    // الآلة الحاسبة
-    const calcDisplay = document.getElementById('calcDisplay');
-    let currentCalcInput = '';
-    function safeEvaluate(expr) { try { if (!/^[0-9+\-*/().\s]+$/.test(expr)) throw new Error(); expr = expr.replace(/÷/g, '/').replace(/×/g, '*'); return new Function('return (' + expr + ')')(); } catch { return 'خطأ'; } }
-    window.handleCalculatorInput = (v) => { currentCalcInput += v; calcDisplay.value = currentCalcInput; };
-    window.clearCalculator = () => { currentCalcInput = ''; calcDisplay.value = ''; };
-    window.backspaceCalculator = () => { currentCalcInput = currentCalcInput.slice(0,-1); calcDisplay.value = currentCalcInput; };
-    window.calculateCalculatorResult = () => { if (!currentCalcInput) return; const r = safeEvaluate(currentCalcInput); calcDisplay.value = r; currentCalcInput = r.toString(); };
-    const modal = document.getElementById('calculatorModal');
-    document.getElementById('calculatorBtn').onclick = (e) => { e.preventDefault(); modal.style.display = 'block'; };
-    document.querySelector('.close').onclick = () => modal.style.display = 'none';
-    window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
-    document.addEventListener('keydown', (e) => {
-        if (modal.style.display !== 'block') return;
-        e.preventDefault();
-        const k = e.key;
-        if (k>='0'&&k<='9') handleCalculatorInput(k);
-        else if (k=='.') handleCalculatorInput('.');
-        else if (k=='+'||k=='-'||k=='*'||k=='/') handleCalculatorInput(k);
-        else if (k=='Enter'||k=='=') calculateCalculatorResult();
-        else if (k=='Backspace') backspaceCalculator();
-        else if (k=='Escape') modal.style.display = 'none';
-        else if (k.toLowerCase()=='c') clearCalculator();
+        } catch(err) { alert('خطأ Word: ' + err.message); } finally { hideLoading(); }
     });
 
+    // ===== تهيئة أولية =====
+    document.getElementById('checkDate').value = new Date().toISOString().split('T')[0];
     setupRecommendations();
 </script>
 </body>

@@ -2,937 +2,1090 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>الحاسبة المالية والاستشارية | FAROUK GRUP</title>
-    <!-- حماية الصفحة -->
-    <script src="auth-check.js"></script>
+<!-- حماية الصفحة -->
+<script src="auth-check.js"></script>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- html2canvas لتصدير Word -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- ExcelJS & FileSaver -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
-        /* ========== أنماط البوابة العامة ========== */
+        /* ===== RESET & BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg-dark: #0b0e17;
-            --bg-panel: rgba(18, 24, 36, 0.85);
-            --bg-card: rgba(22, 30, 46, 0.8);
-            --border-light: rgba(180, 133, 84, 0.25);
-            --accent-glow: #b48554;
-            --accent-soft: #cfa776;
-            --text-light: #f0f4fa;
-            --text-muted: #aab7d4;
-            --shadow-soft: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 133, 84, 0.15);
-            --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
-            --radius-md: 20px;
-            --radius-lg: 30px;
-            --transition: all 0.3s ease;
-            --gold: #b8860b;
-            --gold-light: #d4b15a;
-            --danger: #dc3545;
-        }
-        body {
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
             font-family: 'Tajawal', sans-serif;
-            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
-            color: var(--text-light);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
         }
 
-        /* خلفية متوهجة */
+        /* ===== إزالة كل ما يسبب الاهتزاز ===== */
+        .calculator, .history-panel, .header-bar, .result-card,
+        .btn, .btn-export, .btn-calc, .calc-container, .screen-container,
+        .buttons-grid, .table-container, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .btn-export-excel,
+        .btn-export-word, .export-loading {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== خلفية ثابتة ===== */
         .glow-bg {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 0;
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
         }
         .glow-bg span {
             position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%);
             border-radius: 50%;
             filter: blur(80px);
-            animation: glowMove 20s infinite alternate ease-in-out;
+            opacity: 0.20;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.10) 0%, transparent 70%);
         }
-        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(180,133,84,0.12) 0%, transparent 70%); }
-        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.1) 0%, transparent 70%); }
-        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.1) 0%, transparent 70%); animation-delay: -5s; }
-        @keyframes glowMove {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-            100% { transform: translate(40px, -30px) scale(1.2); opacity: 0.8; }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.05) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.06) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 2.5rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.2rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.1rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
         }
 
-        /* الهيدر (بدون اسم المستخدم وزر الخروج) */
+        /* ===== الهيدر ===== */
         .header-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--bg-panel);
-            backdrop-filter: blur(18px);
-            border: 1px solid var(--border-light);
-            border-radius: 80px;
-            padding: 0.8rem 2rem;
-            margin: 1rem 2rem;
+            background: rgba(18,24,36,0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 60px;
+            padding: 0.6rem 1.5rem;
+            margin: 1rem 1.5rem;
             flex-wrap: wrap;
-            gap: 1.5rem;
-            box-shadow: var(--shadow-soft);
+            gap: 1rem;
+            box-shadow: 0 10px 30px -8px rgba(0,0,0,0.4);
             z-index: 10;
             position: relative;
         }
         .datetime {
             display: flex;
-            gap: 2rem;
-            color: var(--text-muted);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-        }
-        .datetime i { color: var(--accent-soft); margin-left: 0.4rem; }
-        .header-title {
-            text-align: center;
-            font-weight: 800;
-            font-size: 1.3rem;
-            background: linear-gradient(135deg, #f0e6d2, #cfd9ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* المحتوى الرئيسي */
-        .main-content {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 1rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* ========== أنماط الآلة الحاسبة (الأصلية) ========== */
-        .calc-container {
-            width: 950px;
-            max-width: 98vw;
-            display: flex;
             gap: 1.5rem;
-            justify-content: center;
-            align-items: stretch;
+            color: #aab7d4;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+        }
+        .datetime i { color: #cfa776; margin-left: 0.4rem; }
+        .header-title {
+            font-weight: 800; font-size: 1.1rem;
+            color: #cfa776;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        }
+        .header-title i { color: #cfa776; margin-left: 0.4rem; }
+
+        /* ===== المحتوى الرئيسي ===== */
+        .main-content {
+            flex: 1; display: flex; align-items: flex-start; justify-content: center;
+            padding: 1.5rem 1rem; position: relative; z-index: 2;
+        }
+        .calc-container {
+            width: 1050px; max-width: 98vw;
+            display: flex; gap: 1.5rem; justify-content: center; align-items: stretch;
             background: transparent;
         }
+
+        /* ===== الآلة الحاسبة ===== */
         .calculator {
             flex: 0 0 340px;
-            background: var(--bg-panel);
+            background: rgba(18,24,36,0.92);
             backdrop-filter: blur(10px);
-            border: 2px solid var(--border-light);
-            border-radius: var(--radius-md);
-            padding: 1.2rem;
-            box-shadow: var(--shadow-soft);
-            display: flex;
-            flex-direction: column;
+            border: 2px solid rgba(180,133,84,0.15);
+            border-radius: 20px;
+            padding: 1rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
         }
         .calculator-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 0.8rem;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 0.6rem;
         }
         .calculator-header h2 {
-            color: var(--accent-soft);
-            font-size: 1.1rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            color: #cfa776; font-size: 1rem; font-weight: 800;
+            display: flex; align-items: center; gap: 0.4rem;
         }
-        .calculator-header h2 i { color: var(--accent-glow); }
+        .calculator-header h2 i { color: #b48554; }
         .screen-container {
             background: rgba(10,14,23,0.8);
-            border: 2px solid var(--border-light);
-            border-radius: var(--radius-sm);
-            padding: 0.8rem 1rem;
-            margin-bottom: 1rem;
-            text-align: left;
-            direction: ltr;
+            border: 2px solid rgba(180,133,84,0.15);
+            border-radius: 14px;
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 0.8rem;
+            text-align: left; direction: ltr;
         }
         .history-display {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            font-family: 'Inter', monospace;
-            min-height: 1.2rem;
-            margin-bottom: 0.2rem;
-            white-space: nowrap;
-            overflow-x: auto;
+            color: #aab7d4; font-size: 0.75rem; font-family: 'Inter', monospace;
+            min-height: 1rem; margin-bottom: 0.1rem;
+            white-space: nowrap; overflow-x: auto;
         }
         .main-display {
-            color: var(--accent-soft);
-            font-size: 1.8rem;
-            font-weight: 700;
-            font-family: 'Inter', monospace;
-            white-space: nowrap;
-            overflow-x: auto;
+            color: #cfa776; font-size: 1.8rem; font-weight: 700;
+            font-family: 'Inter', monospace; white-space: nowrap; overflow-x: auto;
             letter-spacing: -0.5px;
         }
         .error-message {
-            background-color: rgba(220,53,69,0.2);
-            color: #f9acac;
-            border: 1px solid var(--danger);
-            padding: 0.4rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.8rem;
-            text-align: center;
-            margin-bottom: 0.8rem;
-            font-weight: 600;
-            display: none;
+            background: rgba(220,53,69,0.15); color: #f9acac;
+            border: 1px solid #dc3545; padding: 0.3rem; border-radius: 12px;
+            font-size: 0.75rem; text-align: center; margin-bottom: 0.6rem;
+            font-weight: 600; display: none;
         }
         .buttons-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0.4rem;
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.35rem;
             flex: 1;
         }
         .btn {
-            background: rgba(180,133,84,0.1);
-            border: 1px solid var(--border-light);
-            border-radius: 6px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-light);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
+            background: rgba(180,133,84,0.08); border: 1px solid rgba(180,133,84,0.12);
+            border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.85rem;
+            font-weight: 600; color: #f0f4fa; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            user-select: none; padding: 0.4rem 0;
         }
-        .btn:hover {
-            background: rgba(180,133,84,0.3);
-            border-color: var(--accent-glow);
-            color: #fff;
-        }
-        .btn:active { transform: scale(0.96); }
-        .btn-number { font-weight: 700; font-size: 1.1rem; color: var(--text-light); }
+        .btn:hover { background: rgba(180,133,84,0.2); border-color: #b48554; color: #fff; }
+        .btn:active { transform: scale(0.95); }
+        .btn-number { font-weight: 700; font-size: 1rem; color: #f0f4fa; }
         .btn-operator {
-            background: rgba(180,133,84,0.15);
-            color: var(--accent-soft);
-            border-color: rgba(180,133,84,0.3);
-            font-weight: 800;
-            font-size: 1.1rem;
+            background: rgba(180,133,84,0.12); color: #cfa776;
+            border-color: rgba(180,133,84,0.2); font-weight: 800; font-size: 1rem;
         }
-        .btn-operator:hover { background: rgba(180,133,84,0.4); }
-        .btn-memory { font-size: 0.8rem; color: var(--text-muted); }
-        .btn-action { color: var(--danger); }
+        .btn-operator:hover { background: rgba(180,133,84,0.3); }
+        .btn-memory { font-size: 0.7rem; color: #aab7d4; }
+        .btn-action { color: #f87171; }
         .btn-equals {
-            background: var(--accent-glow);
-            color: #111;
-            grid-column: span 2;
-            border: none;
+            background: #b48554; color: #111; grid-column: span 2;
+            border: none; font-size: 1.2rem; font-weight: 900;
         }
-        .btn-equals:hover { background: var(--gold-light); color: #111; }
+        .btn-equals:hover { background: #d4b15a; color: #111; }
         .btn-finance {
-            font-family: 'Tajawal', sans-serif;
-            font-size: 0.8rem;
-            background: rgba(30,74,122,0.3);
-            border-color: #1e4a7a;
+            font-family: 'Tajawal', sans-serif; font-size: 0.7rem;
+            background: rgba(30,74,122,0.2); border-color: #1e4a7a;
             color: #8ab8ff;
         }
-        .btn-finance:hover { background: rgba(30,74,122,0.5); color: #fff; }
+        .btn-finance:hover { background: rgba(30,74,122,0.4); color: #fff; }
 
-        /* قسم السجل */
+        /* ===== لوحة السجل ===== */
         .history-panel {
-            flex: 1;
-            background: var(--bg-panel);
+            flex: 1; min-width: 0;
+            background: rgba(18,24,36,0.92);
             backdrop-filter: blur(10px);
-            border: 2px solid var(--border-light);
-            border-radius: var(--radius-md);
-            padding: 1.2rem;
-            box-shadow: var(--shadow-soft);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            border: 2px solid rgba(180,133,84,0.15);
+            border-radius: 20px;
+            padding: 1rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; overflow: hidden;
         }
         .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.8rem;
-            border-bottom: 1px solid var(--border-light);
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 0.8rem; padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(180,133,84,0.12);
+            flex-wrap: wrap; gap: 0.5rem;
         }
         .history-header h3 {
-            color: var(--accent-soft);
-            font-size: 1.1rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            color: #cfa776; font-size: 1rem; font-weight: 800;
+            display: flex; align-items: center; gap: 0.4rem;
         }
         .history-controls {
-            display: flex;
-            gap: 0.5rem;
+            display: flex; gap: 0.4rem; flex-wrap: wrap;
         }
         .filter-select {
-            padding: 0.4rem 0.8rem;
-            border-radius: var(--radius-sm);
-            border: 2px solid var(--border-light);
-            font-family: 'Tajawal', sans-serif;
-            font-size: 0.85rem;
-            outline: none;
-            background: rgba(10,14,23,0.7);
-            color: var(--text-light);
+            padding: 0.3rem 0.6rem; border-radius: 20px;
+            border: 2px solid rgba(180,133,84,0.15);
+            font-family: 'Tajawal', sans-serif; font-size: 0.75rem;
+            outline: none; background: rgba(10,14,23,0.6); color: #f0f4fa;
         }
-        .filter-select option { background: #0b0e17; color: var(--text-light); }
+        .filter-select option { background: #0b0e17; color: #f0f4fa; }
         .btn-export {
-            background: rgba(180,133,84,0.15);
-            border: 1px solid var(--border-light);
-            border-radius: 40px;
-            padding: 0.4rem 1rem;
-            color: var(--accent-soft);
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-size: 0.85rem;
+            background: rgba(180,133,84,0.10); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 30px; padding: 0.3rem 0.8rem;
+            color: #cfa776; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            font-size: 0.7rem; font-family: 'Tajawal', sans-serif;
         }
-        .btn-export:hover {
-            background: rgba(180,133,84,0.3);
-            color: #fff;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 15px rgba(180,133,84,0.3);
-        }
+        .btn-export:hover { background: rgba(180,133,84,0.2); color: #fff; border-color: #b48554; }
         .table-container {
-            flex: 1;
-            overflow-y: auto;
-            border: 2px solid var(--border-light);
-            border-radius: var(--radius-sm);
-            background: rgba(10,14,23,0.5);
+            flex: 1; overflow-y: auto;
+            border: 2px solid rgba(180,133,84,0.08); border-radius: 14px;
+            background: rgba(10,14,23,0.4);
+            min-height: 200px;
         }
         .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: right;
+            width: 100%; border-collapse: collapse; text-align: right; font-size: 0.8rem;
         }
         .history-table th {
-            background: rgba(180,133,84,0.2);
-            color: var(--accent-soft);
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding: 0.6rem 0.8rem;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            border-bottom: 2px solid var(--border-light);
+            background: rgba(180,133,84,0.12); color: #cfa776;
+            font-size: 0.75rem; font-weight: 700; padding: 0.4rem 0.6rem;
+            position: sticky; top: 0; z-index: 10;
+            border-bottom: 2px solid rgba(180,133,84,0.1);
         }
         .history-table td {
-            padding: 0.6rem 0.8rem;
-            border-bottom: 1px solid var(--border-light);
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            vertical-align: middle;
+            padding: 0.4rem 0.6rem; border-bottom: 1px solid rgba(180,133,84,0.06);
+            font-size: 0.8rem; color: #aab7d4; vertical-align: middle;
         }
-        .history-table tr:hover { background: rgba(180,133,84,0.1); }
+        .history-table tr:hover { background: rgba(180,133,84,0.05); }
         .badge {
-            display: inline-block;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            font-family: 'Inter', sans-serif;
+            display: inline-block; padding: 0.15rem 0.4rem; border-radius: 4px;
+            font-size: 0.65rem; font-weight: 700; font-family: 'Inter', sans-serif;
         }
         .badge-math { background: rgba(0,100,200,0.2); color: #8ab8ff; }
         .badge-finance { background: rgba(255,193,7,0.2); color: #ffd966; }
-        .td-operation {
-            font-family: 'Inter', monospace;
-            color: var(--text-light);
-            direction: ltr;
-            text-align: left;
-        }
-        .td-result {
-            font-family: 'Inter', monospace;
-            font-weight: 700;
-            color: var(--accent-soft);
-            direction: ltr;
-            text-align: left;
-        }
-        .action-btns {
-            display: flex;
-            gap: 0.4rem;
-            justify-content: flex-end;
-        }
+        .td-operation { font-family: 'Inter', monospace; color: #f0f4fa; direction: ltr; text-align: left; font-size: 0.75rem; }
+        .td-result { font-family: 'Inter', monospace; font-weight: 700; color: #cfa776; direction: ltr; text-align: left; }
+        .action-btns { display: flex; gap: 0.3rem; justify-content: flex-end; }
         .icon-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 0.3rem;
-            border-radius: 4px;
-            transition: 0.2s;
+            background: transparent; border: none; color: #aab7d4;
+            cursor: pointer; padding: 0.2rem; border-radius: 4px;
         }
-        .icon-btn.restore:hover { color: var(--accent-glow); background: rgba(180,133,84,0.2); }
-        .icon-btn.delete:hover { color: var(--danger); background: rgba(220,53,69,0.2); }
+        .icon-btn.restore:hover { color: #b48554; background: rgba(180,133,84,0.15); }
+        .icon-btn.delete:hover { color: #f87171; background: rgba(220,53,69,0.15); }
         .btn-clear-all {
-            width: 100%;
-            margin-top: 1rem;
-            padding: 0.6rem;
-            background: rgba(220,53,69,0.1);
-            border: 1px solid var(--danger);
-            color: #f9acac;
-            font-weight: 700;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: 0.2s;
-            font-family: 'Tajawal', sans-serif;
+            width: 100%; margin-top: 0.6rem; padding: 0.4rem;
+            background: rgba(220,53,69,0.08); border: 1px solid rgba(220,53,69,0.2);
+            color: #f9acac; font-weight: 700; border-radius: 14px;
+            cursor: pointer; font-family: 'Tajawal', sans-serif; font-size: 0.8rem;
         }
-        .btn-clear-all:hover {
-            background: rgba(220,53,69,0.2);
-            border-color: #f87171;
-        }
+        .btn-clear-all:hover { background: rgba(220,53,69,0.15); border-color: #f87171; }
 
-        /* الفوتر */
+        /* ===== أزرار التصدير ===== */
+        .export-bar {
+            display: flex; gap: 0.6rem; flex-wrap: wrap;
+            margin-top: 0.8rem; padding-top: 0.6rem;
+            border-top: 1px solid rgba(180,133,84,0.08);
+        }
+        .btn-export-excel, .btn-export-word {
+            background: rgba(180,133,84,0.08); border: 1px solid rgba(180,133,84,0.12);
+            border-radius: 30px; padding: 0.3rem 1rem;
+            color: #cfa776; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.7rem; font-family: 'Tajawal', sans-serif;
+            flex: 1; justify-content: center;
+        }
+        .btn-export-excel:hover, .btn-export-word:hover {
+            background: rgba(180,133,84,0.2); color: #fff; border-color: #b48554;
+        }
+        .btn-export-excel { background: rgba(40,167,69,0.10); border-color: #28a745; color: #6fbf6f; }
+        .btn-export-excel:hover { background: rgba(40,167,69,0.2); }
+        .btn-export-word { background: rgba(30,74,122,0.10); border-color: #1e4a7a; color: #8ab8ff; }
+        .btn-export-word:hover { background: rgba(30,74,122,0.2); }
+
+        /* ===== شاشة تحميل ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== فوتر ===== */
         .footer-simple {
-            text-align: center;
-            padding: 1rem;
-            margin-top: 2rem;
-            background: rgba(10,14,23,0.5);
-            backdrop-filter: blur(5px);
-            border-top: 1px solid var(--border-light);
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            position: relative;
-            z-index: 2;
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
         }
-        .footer-simple span { color: var(--accent-soft); font-weight: 700; }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
 
-        @media (max-width: 850px) {
-            .calc-container { flex-direction: column; align-items: center; }
-            .calculator { flex: none; width: 100%; max-width: 400px; margin: 0 auto; }
-            .history-panel { flex: none; width: 100%; height: 400px; margin-top: 1rem; }
+        /* ===== الأزرار العائمة ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
         }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===================================================
+           تحسينات للشاشات المتوسطة والكبيرة (كمبيوتر)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .btn { font-size: 0.95rem; padding: 0.5rem 0; }
+            .main-display { font-size: 2.2rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+        }
+
+        /* ===================================================
+           تحسينات للجوال (شاشات ≤ 768px)
+           =================================================== */
         @media (max-width: 768px) {
-            .header-bar { margin: 0.5rem; padding: 0.5rem 1rem; flex-direction: column; text-align: center; }
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .main-content { padding: 0.5rem 0.3rem; }
+            .calc-container { flex-direction: column; align-items: center; gap: 0.8rem; }
+            .calculator { flex: none; width: 100%; max-width: 400px; padding: 0.8rem; }
+            .history-panel { flex: none; width: 100%; min-height: 300px; padding: 0.8rem; }
+            .calculator-header h2 { font-size: 0.9rem; }
+            .main-display { font-size: 1.5rem; }
+            .buttons-grid { gap: 0.3rem; }
+            .btn { font-size: 0.75rem; padding: 0.35rem 0; }
+            .btn-number { font-size: 0.9rem; }
+            .btn-operator { font-size: 0.9rem; }
+            .btn-equals { font-size: 1rem; }
+            .btn-finance { font-size: 0.6rem; }
+            .header-bar { margin: 0.5rem; padding: 0.5rem 1rem; flex-direction: column; text-align: center; gap: 0.3rem; }
+            .datetime { font-size: 0.7rem; gap: 0.8rem; }
+            .header-title { font-size: 0.9rem; }
+            .history-header h3 { font-size: 0.85rem; }
+            .filter-select { font-size: 0.65rem; padding: 0.2rem 0.4rem; }
+            .btn-export { font-size: 0.65rem; padding: 0.2rem 0.6rem; }
+            .history-table { font-size: 0.7rem; }
+            .history-table th { font-size: 0.65rem; padding: 0.3rem 0.4rem; }
+            .history-table td { font-size: 0.7rem; padding: 0.3rem 0.4rem; }
+            .td-operation { font-size: 0.65rem; }
+            .btn-export-excel, .btn-export-word { font-size: 0.65rem; padding: 0.25rem 0.6rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
         }
+
+        /* ===== تحسينات للشاشات الصغيرة جداً (≤ 400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calculator { padding: 0.5rem; }
+            .buttons-grid { gap: 0.2rem; }
+            .btn { font-size: 0.65rem; padding: 0.25rem 0; }
+            .main-display { font-size: 1.2rem; }
+            .history-panel { min-height: 200px; padding: 0.5rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+        }
+
+        /* ===== منع التحديد العرضي ===== */
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        /* ===== تحسين التمرير ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
     </style>
 </head>
 <body>
-<body style="overflow-x: hidden;">
-    <div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- خلفية ثابتة -->
+<div class="glow-bg"><span></span><span></span><span></span></div>
 
-    <!-- الهيدر (بدون اسم المستخدم وزر الخروج) -->
-    <div class="header-bar">
-        <div class="datetime">
-            <div><i class="fas fa-calendar-alt"></i> <span id="currentDate"></span></div>
-            <div><i class="fas fa-clock"></i> <span id="currentTime"></span></div>
-        </div>
-        <div class="header-title">مجموعة فاروق للاستشارات والأعمال</div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">جاري إنشاء التقرير...</h3>
+        <p id="loadingMsg">يرجى الانتظار</p>
     </div>
+</div>
 
-    <div class="main-content">
-        <div class="calc-container">
-            <div class="calculator">
-                <div class="calculator-header">
-                    <h2><i class="fas fa-calculator"></i> الحاسبة الاستشارية</h2>
-                </div>
-                <div class="error-message" id="errorMessage"></div>
-                <div class="screen-container">
-                    <div class="history-display" id="historyDisplay"></div>
-                    <div class="main-display" id="display">0</div>
-                </div>
-                <div class="buttons-grid">
-                    <button class="btn btn-memory" onclick="handleMemory('MC')">MC</button>
-                    <button class="btn btn-memory" onclick="handleMemory('MR')">MR</button>
-                    <button class="btn btn-memory" onclick="handleMemory('M+')">M+</button>
-                    <button class="btn btn-memory" onclick="handleMemory('M-')">M-</button>
-                    <button class="btn btn-action" onclick="clearEntry()">CE</button>
+<!-- HERO -->
+<section class="hero-mini">
+    <h2>🧮 الحاسبة المالية والاستشارية</h2>
+    <p>عمليات حسابية متقدمة، دوال مالية، وسجل شامل لكل العمليات</p>
+</section>
 
-                    <button class="btn btn-number" onclick="appendToDisplay('9')">9</button>
-                    <button class="btn btn-number" onclick="appendToDisplay('8')">8</button>
-                    <button class="btn btn-number" onclick="appendToDisplay('7')">7</button>
-                    <button class="btn btn-operator" onclick="setOperator('/')">÷</button>
-                    <button class="btn btn-action" onclick="clearDisplay()">C</button>
+<!-- الهيدر -->
+<div class="header-bar">
+    <div class="datetime">
+        <div><i class="fas fa-calendar-alt"></i> <span id="currentDate"></span></div>
+        <div><i class="fas fa-clock"></i> <span id="currentTime"></span></div>
+    </div>
+    <div class="header-title"><i class="fas fa-calculator"></i> مجموعة فاروق للاستشارات والأعمال</div>
+</div>
 
-                    <button class="btn btn-number" onclick="appendToDisplay('6')">6</button>
-                    <button class="btn btn-number" onclick="appendToDisplay('5')">5</button>
-                    <button class="btn btn-number" onclick="appendToDisplay('4')">4</button>
-                    <button class="btn btn-operator" onclick="setOperator('*')">×</button>
-                    <button class="btn" onclick="backspace()"><i class="fas fa-backspace"></i></button>
-
-                    <button class="btn btn-number" onclick="appendToDisplay('3')">3</button>
-                    <button class="btn btn-number" onclick="appendToDisplay('2')">2</button>
-                    <button class="btn btn-number" onclick="appendToDisplay('1')">1</button>
-                    <button class="btn btn-operator" onclick="setOperator('-')">-</button>
-                    <button class="btn" onclick="calculateSquareRoot()">√</button>
-
-                    <button class="btn" onclick="toggleSign()">±</button>
-                    <button class="btn btn-number" onclick="appendToDisplay('.')">.</button>
-                    <button class="btn btn-number" onclick="appendToDisplay('0')">0</button>
-                    <button class="btn btn-operator" onclick="setOperator('+')">+</button>
-                    <button class="btn" onclick="calculatePercent()">%</button>
-
-                    <button class="btn btn-finance" onclick="applyTax()">ضريبة</button>
-                    <button class="btn btn-finance" onclick="applyDiscount()">خصم</button>
-                    <button class="btn btn-finance" onclick="calculateROI()">ROI</button>
-                    <button class="btn btn-finance" onclick="calculateSimpleInterest()">فائدة</button>
-                    <button class="btn" onclick="power()">xʸ</button>
-
-                    <button class="btn btn-equals" onclick="calculateResult()">=</button>
-                    <button class="btn" onclick="calculateReciprocal()">1/x</button>
-                    <button class="btn" onclick="log10()">log</button>
-                    <button class="btn" onclick="factorial()">n!</button>
-                </div>
+<!-- المحتوى الرئيسي -->
+<div class="main-content">
+    <div class="calc-container">
+        <!-- الآلة الحاسبة -->
+        <div class="calculator">
+            <div class="calculator-header">
+                <h2><i class="fas fa-calculator"></i> الحاسبة الاستشارية</h2>
             </div>
+            <div class="error-message" id="errorMessage"></div>
+            <div class="screen-container">
+                <div class="history-display" id="historyDisplay"></div>
+                <div class="main-display" id="display">0</div>
+            </div>
+            <div class="buttons-grid">
+                <button class="btn btn-memory" onclick="handleMemory('MC')">MC</button>
+                <button class="btn btn-memory" onclick="handleMemory('MR')">MR</button>
+                <button class="btn btn-memory" onclick="handleMemory('M+')">M+</button>
+                <button class="btn btn-memory" onclick="handleMemory('M-')">M-</button>
+                <button class="btn btn-action" onclick="clearEntry()">CE</button>
 
-            <div class="history-panel">
-                <div class="history-header">
-                    <h3><i class="fas fa-table"></i> سجل العمليات</h3>
-                    <div class="history-controls">
-                        <select id="filterSelect" class="filter-select" onchange="filterHistory()">
-                            <option value="all">كل العمليات</option>
-                            <option value="+">جمع (+)</option>
-                            <option value="-">طرح (-)</option>
-                            <option value="*">ضرب (×)</option>
-                            <option value="/">قسمة (÷)</option>
-                            <option value="مالية">عمليات مالية / متقدمة</option>
-                        </select>
-                        <button class="btn-export" onclick="exportHistory()"><i class="fas fa-download"></i> تصدير CSV</button>
-                    </div>
-                </div>
-                <div class="table-container">
-                    <table class="history-table">
-                        <thead>
-                            <tr><th style="width: 15%;">النوع</th><th style="width: 45%;">العملية المنجزة</th><th style="width: 25%;">النتيجة</th><th style="width: 15%; text-align: center;">إجراء</th> </>
-                        </thead>
-                        <tbody id="historyTableBody"></tbody>
-                     </table>
-                </div>
-                <button class="btn-clear-all" onclick="clearHistory()"><i class="fas fa-trash-alt"></i> مسح كامل السجل</button>
+                <button class="btn btn-number" onclick="appendToDisplay('9')">9</button>
+                <button class="btn btn-number" onclick="appendToDisplay('8')">8</button>
+                <button class="btn btn-number" onclick="appendToDisplay('7')">7</button>
+                <button class="btn btn-operator" onclick="setOperator('/')">÷</button>
+                <button class="btn btn-action" onclick="clearDisplay()">C</button>
+
+                <button class="btn btn-number" onclick="appendToDisplay('6')">6</button>
+                <button class="btn btn-number" onclick="appendToDisplay('5')">5</button>
+                <button class="btn btn-number" onclick="appendToDisplay('4')">4</button>
+                <button class="btn btn-operator" onclick="setOperator('*')">×</button>
+                <button class="btn" onclick="backspace()"><i class="fas fa-backspace"></i></button>
+
+                <button class="btn btn-number" onclick="appendToDisplay('3')">3</button>
+                <button class="btn btn-number" onclick="appendToDisplay('2')">2</button>
+                <button class="btn btn-number" onclick="appendToDisplay('1')">1</button>
+                <button class="btn btn-operator" onclick="setOperator('-')">-</button>
+                <button class="btn" onclick="calculateSquareRoot()">√</button>
+
+                <button class="btn" onclick="toggleSign()">±</button>
+                <button class="btn btn-number" onclick="appendToDisplay('.')">.</button>
+                <button class="btn btn-number" onclick="appendToDisplay('0')">0</button>
+                <button class="btn btn-operator" onclick="setOperator('+')">+</button>
+                <button class="btn" onclick="calculatePercent()">%</button>
+
+                <button class="btn btn-finance" onclick="applyTax()">ضريبة</button>
+                <button class="btn btn-finance" onclick="applyDiscount()">خصم</button>
+                <button class="btn btn-finance" onclick="calculateROI()">ROI</button>
+                <button class="btn btn-finance" onclick="calculateSimpleInterest()">فائدة</button>
+                <button class="btn" onclick="power()">xʸ</button>
+
+                <button class="btn btn-equals" onclick="calculateResult()">=</button>
+                <button class="btn" onclick="calculateReciprocal()">1/x</button>
+                <button class="btn" onclick="log10()">log</button>
+                <button class="btn" onclick="factorial()">n!</button>
             </div>
         </div>
+
+        <!-- لوحة السجل -->
+        <div class="history-panel">
+            <div class="history-header">
+                <h3><i class="fas fa-table"></i> سجل العمليات</h3>
+                <div class="history-controls">
+                    <select id="filterSelect" class="filter-select" onchange="filterHistory()">
+                        <option value="all">كل العمليات</option>
+                        <option value="+">جمع (+)</option>
+                        <option value="-">طرح (-)</option>
+                        <option value="*">ضرب (×)</option>
+                        <option value="/">قسمة (÷)</option>
+                        <option value="مالية">عمليات مالية / متقدمة</option>
+                    </select>
+                    <button class="btn-export" onclick="exportHistory()"><i class="fas fa-download"></i> CSV</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="history-table">
+                    <thead>
+                        <tr><th style="width:12%;">النوع</th><th style="width:43%;">العملية</th><th style="width:25%;">النتيجة</th><th style="width:20%;text-align:center;">إجراء</th></tr>
+                    </thead>
+                    <tbody id="historyTableBody"></tbody>
+                </table>
+            </div>
+            <button class="btn-clear-all" onclick="clearHistory()"><i class="fas fa-trash-alt"></i> مسح كامل السجل</button>
+            <div class="export-bar">
+                <button class="btn-export-excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Excel شامل</button>
+                <button class="btn-export-word" id="exportWordBtn"><i class="fas fa-file-word"></i> Word</button>
+            </div>
+        </div>
     </div>
+</div>
 
-    <footer class="footer-simple">
-        جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
-    </footer>
+<!-- فوتر -->
+<footer class="footer-simple">
+    جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
+</footer>
 
-    <!-- زر العودة إلى الرئيسية (عائم) -->
-    <a href="index.html" style="position: fixed; bottom: 20px; right: 20px; background: rgba(180,133,84,0.9); color: white; padding: 12px 20px; border-radius: 50px; text-decoration: none; font-family: 'Tajawal', sans-serif; font-weight: bold; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 9999; display: flex; align-items: center; gap: 8px; transition: 0.3s;" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';">
-        <i class="fas fa-home"></i> الرئيسية
-    </a>
+<!-- أزرار عائمة -->
+<a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> الرئيسية</a>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({ duration: 800, once: true });
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: true });
 
-        // ========== دوال الوقت والتاريخ فقط ==========
-        function updateDateTime() {
-            const now = new Date();
-            document.getElementById('currentDate').innerText = now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('currentTime').innerText = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    // ===== الوقت والتاريخ =====
+    function updateDateTime() {
+        const now = new Date();
+        document.getElementById('currentDate').innerText = now.toLocaleDateString('ar-EG', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+        document.getElementById('currentTime').innerText = now.toLocaleTimeString('ar-EG', {
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    // ===== شاشة تحميل =====
+    function showLoading(title, msg) {
+        document.getElementById('loadingTitle').textContent = title;
+        document.getElementById('loadingMsg').textContent = msg;
+        document.getElementById('exportLoading').classList.add('show');
+    }
+    function hideLoading() {
+        document.getElementById('exportLoading').classList.remove('show');
+    }
+
+    // ===== كود الآلة الحاسبة كاملاً =====
+    let display = document.getElementById('display');
+    let historyDisplayElem = document.getElementById('historyDisplay');
+    let errorMsgElem = document.getElementById('errorMessage');
+    let historyTableBody = document.getElementById('historyTableBody');
+
+    let currentInput = '0';
+    let previousInput = '';
+    let operator = null;
+    let memory = 0;
+    let history = [];
+
+    function showError(text) {
+        errorMsgElem.style.display = 'block';
+        errorMsgElem.innerText = text;
+        setTimeout(() => { errorMsgElem.style.display = 'none'; }, 3000);
+    }
+
+    function updateDisplay() {
+        if (currentInput.length > 15 && !currentInput.includes('e')) {
+            let num = parseFloat(currentInput);
+            display.innerText = Number.isInteger(num) ? num : num.toPrecision(12).replace(/\.?0+$/, '');
+        } else {
+            display.innerText = currentInput;
         }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
+    }
 
-        // ========== كود الآلة الحاسبة كامل (من الملف الأصلي) ==========
-        let display = document.getElementById('display');
-        let historyDisplayElem = document.getElementById('historyDisplay');
-        let errorMsgElem = document.getElementById('errorMessage');
-        let historyTableBody = document.getElementById('historyTableBody');
-
-        let currentInput = '0';
-        let previousInput = '';
-        let operator = null;
-        let memory = 0;
-        let history = [];
-
-        function showError(text) {
-            errorMsgElem.style.display = 'block';
-            errorMsgElem.innerText = text;
-            setTimeout(() => { errorMsgElem.style.display = 'none'; }, 3000);
+    function appendToDisplay(value) {
+        if (currentInput === '0' && value !== '.') {
+            currentInput = value;
+        } else {
+            if (value === '.' && currentInput.includes('.')) return;
+            currentInput += value;
         }
+        updateDisplay();
+    }
 
-        function updateDisplay() {
-            if(currentInput.length > 15 && !currentInput.includes('e')) {
-                let num = parseFloat(currentInput);
-                display.innerText = Number.isInteger(num) ? num : num.toPrecision(12).replace(/\.?0+$/, '');
-            } else {
-                display.innerText = currentInput;
-            }
-        }
+    function clearDisplay() {
+        currentInput = '0';
+        previousInput = '';
+        operator = null;
+        updateDisplay();
+        historyDisplayElem.innerText = '';
+    }
 
-        function appendToDisplay(value) {
-            if (currentInput === '0' && value !== '.') {
-                currentInput = value;
-            } else {
-                if (value === '.' && currentInput.includes('.')) return;
-                currentInput += value;
-            }
-            updateDisplay();
-        }
+    function clearEntry() {
+        currentInput = '0';
+        updateDisplay();
+    }
 
-        function clearDisplay() {
+    function backspace() {
+        if (currentInput.length > 1) {
+            currentInput = currentInput.slice(0, -1);
+        } else {
             currentInput = '0';
-            previousInput = '';
-            operator = null;
+        }
+        if (currentInput === '-') currentInput = '0';
+        updateDisplay();
+    }
+
+    function setOperator(op) {
+        if (operator !== null && previousInput !== '') {
+            calculateResult(false);
+        }
+        previousInput = currentInput;
+        currentInput = '0';
+        operator = op;
+        historyDisplayElem.innerText = previousInput + ' ' + operator;
+    }
+
+    function calculateResult(saveToHistory = true) {
+        if (operator === null || previousInput === '') return;
+
+        let prev = parseFloat(previousInput);
+        let curr = parseFloat(currentInput);
+        let result;
+        let type = operator;
+
+        switch (operator) {
+            case '+': result = prev + curr; break;
+            case '-': result = prev - curr; break;
+            case '*': result = prev * curr; break;
+            case '/':
+                if (curr === 0) { showError('خطأ رياضي: القسمة على صفر'); return; }
+                result = prev / curr;
+                break;
+            default: return;
+        }
+
+        result = Math.round(result * 1000000000) / 1000000000;
+
+        let operationStr = `${previousInput} ${operator} ${currentInput} = ${result}`;
+
+        if (saveToHistory) {
+            history.unshift({ text: operationStr, type: type });
+            if (history.length > 50) history.pop();
+            filterHistory();
+        }
+
+        currentInput = result.toString();
+        previousInput = '';
+        operator = null;
+        historyDisplayElem.innerText = operationStr;
+        updateDisplay();
+    }
+
+    function toggleSign() {
+        if (currentInput !== '0') {
+            currentInput = (parseFloat(currentInput) * -1).toString();
             updateDisplay();
-            historyDisplayElem.innerText = '';
         }
+    }
 
-        function clearEntry() {
-            currentInput = '0';
-            updateDisplay();
-        }
+    function calculatePercent() {
+        let curr = parseFloat(currentInput);
+        let result;
 
-        function backspace() {
-            if (currentInput.length > 1) {
-                currentInput = currentInput.slice(0, -1);
-            } else {
-                currentInput = '0';
-            }
-            if(currentInput === '-') currentInput = '0';
-            updateDisplay();
-        }
-
-        function setOperator(op) {
-            if (operator !== null && previousInput !== '') {
-                calculateResult(false);
-            }
-            previousInput = currentInput;
-            currentInput = '0';
-            operator = op;
-            historyDisplayElem.innerText = previousInput + ' ' + operator;
-        }
-
-        function calculateResult(saveToHistory = true) {
-            if (operator === null || previousInput === '') return;
-
+        if (previousInput !== '' && operator !== null) {
             let prev = parseFloat(previousInput);
-            let curr = parseFloat(currentInput);
-            let result;
-            let type = operator;
-
-            switch (operator) {
-                case '+': result = prev + curr; break;
-                case '-': result = prev - curr; break;
-                case '*': result = prev * curr; break;
-                case '/': 
-                    if (curr === 0) {
-                        showError('خطأ رياضي: القسمة على صفر');
-                        return;
-                    }
-                    result = prev / curr; 
-                    break;
-                default: return;
-            }
+            if (operator === '+') result = prev + (prev * curr / 100);
+            else if (operator === '-') result = prev - (prev * curr / 100);
+            else if (operator === '*') result = prev * (curr / 100);
+            else if (operator === '/') result = prev / (curr / 100);
+            else result = curr / 100;
 
             result = Math.round(result * 1000000000) / 1000000000;
-
-            let operationStr = `${previousInput} ${operator} ${currentInput} = ${result}`;
-            
-            if(saveToHistory) {
-                history.unshift({ text: operationStr, type: type });
-                if (history.length > 50) history.pop();
-                filterHistory();
-            }
-
+            let operationStr = `${prev} ${operator} ${curr}% = ${result}`;
+            history.unshift({ text: operationStr, type: operator });
+            filterHistory();
+            historyDisplayElem.innerText = operationStr;
             currentInput = result.toString();
             previousInput = '';
             operator = null;
-            historyDisplayElem.innerText = operationStr;
-            updateDisplay();
-        }
-
-        function toggleSign() {
-            if (currentInput !== '0') {
-                currentInput = (parseFloat(currentInput) * -1).toString();
-                updateDisplay();
-            }
-        }
-
-        function calculatePercent() {
-            let curr = parseFloat(currentInput);
-            let result;
-
-            if (previousInput !== '' && operator !== null) {
-                let prev = parseFloat(previousInput);
-                if (operator === '+') result = prev + (prev * curr / 100);
-                else if (operator === '-') result = prev - (prev * curr / 100);
-                else if (operator === '*') result = prev * (curr / 100);
-                else if (operator === '/') result = prev / (curr / 100);
-                else result = curr / 100;
-                
-                result = Math.round(result * 1000000000) / 1000000000;
-                let operationStr = `${prev} ${operator} ${curr}% = ${result}`;
-                history.unshift({ text: operationStr, type: operator });
-                filterHistory();
-                historyDisplayElem.innerText = operationStr;
-                currentInput = result.toString();
-                previousInput = '';
-                operator = null;
-            } else {
-                result = curr / 100;
-                currentInput = result.toString();
-            }
-            updateDisplay();
-        }
-
-        function calculateSquareRoot() {
-            let value = parseFloat(currentInput);
-            if (value < 0) {
-                showError('لا يمكن حساب الجذر لعدد سالب');
-                return;
-            }
-            let res = Math.sqrt(value);
-            res = Math.round(res * 1000000000) / 1000000000;
-            currentInput = res.toString();
-            history.unshift({ text: `√(${value}) = ${currentInput}`, type: 'مالية' });
-            filterHistory();
-            updateDisplay();
-        }
-
-        function calculateReciprocal() {
-            let value = parseFloat(currentInput);
-            if (value === 0) {
-                showError('لا يمكن القسمة على الصفر');
-                return;
-            }
-            let res = 1 / value;
-            res = Math.round(res * 1000000000) / 1000000000;
-            currentInput = res.toString();
-            history.unshift({ text: `1/(${value}) = ${currentInput}`, type: 'مالية' });
-            filterHistory();
-            updateDisplay();
-        }
-
-        function power() {
-            let base = parseFloat(currentInput);
-            let exponent = prompt('أدخل قيمة الأس (القوة):', '2');
-            if (exponent === null || exponent.trim() === '') return;
-            let exp = parseFloat(exponent);
-            if (isNaN(exp)) { showError('قيمة غير صالحة'); return; }
-            
-            let res = Math.pow(base, exp);
-            res = Math.round(res * 1000000000) / 1000000000;
-            currentInput = res.toString();
-            history.unshift({ text: `${base}^${exp} = ${currentInput}`, type: 'مالية' });
-            filterHistory();
-            updateDisplay();
-        }
-
-        function log10() {
-            let val = parseFloat(currentInput);
-            if (val <= 0) { showError('اللوغاريتم للأعداد الموجبة فقط'); return; }
-            let res = Math.log10(val);
-            res = Math.round(res * 1000000000) / 1000000000;
-            currentInput = res.toString();
-            history.unshift({ text: `log10(${val}) = ${currentInput}`, type: 'مالية' });
-            filterHistory();
-            updateDisplay();
-        }
-
-        function factorial() {
-            let n = parseInt(currentInput);
-            if (isNaN(n) || n < 0 || n > 170) { 
-                showError('يجب إدخال عدد صحيح موجب (أقل من 170)'); 
-                return; 
-            }
-            let fact = 1;
-            for (let i = 2; i <= n; i++) fact *= i;
-            currentInput = fact.toString();
-            history.unshift({ text: `${n}! = ${currentInput}`, type: 'مالية' });
-            filterHistory();
-            updateDisplay();
-        }
-
-        function applyTax() {
-            let rate = prompt('أدخل نسبة الضريبة المضافة (%) (مثال: 15):', '15');
-            if (rate === null || rate.trim() === '') return;
-            let r = parseFloat(rate);
-            if (isNaN(r)) return;
-            
-            let amount = parseFloat(currentInput);
-            let taxValue = amount * (r / 100);
-            let result = amount + taxValue;
-            result = Math.round(result * 100) / 100;
-            
-            history.unshift({ text: `${amount} + ضريبة ${r}% = ${result}`, type: 'مالية' });
+        } else {
+            result = curr / 100;
             currentInput = result.toString();
-            updateDisplay();
-            filterHistory();
         }
+        updateDisplay();
+    }
 
-        function applyDiscount() {
-            let rate = prompt('أدخل نسبة الخصم (%) (مثال: 10):', '10');
-            if (rate === null || rate.trim() === '') return;
-            let r = parseFloat(rate);
-            if (isNaN(r)) return;
-            
-            let amount = parseFloat(currentInput);
-            let discountValue = amount * (r / 100);
-            let result = amount - discountValue;
-            result = Math.round(result * 100) / 100;
-            
-            history.unshift({ text: `${amount} - خصم ${r}% = ${result}`, type: 'مالية' });
-            currentInput = result.toString();
-            updateDisplay();
-            filterHistory();
-        }
-
-        function calculateROI() {
-            let cost = parseFloat(currentInput);
-            if(cost === 0) { showError('يجب أن تكون التكلفة أكبر من صفر'); return; }
-            
-            let revenue = prompt('أدخل العائد الإجمالي المتوقع:', cost * 1.2);
-            if (revenue === null || revenue.trim() === '') return;
-            let rev = parseFloat(revenue);
-            if (isNaN(rev)) return;
-            
-            let roi = ((rev - cost) / cost) * 100;
-            roi = Math.round(roi * 100) / 100;
-            
-            history.unshift({ text: `ROI (تكلفة:${cost}, عائد:${rev}) = %${roi}`, type: 'مالية' });
-            currentInput = roi.toString();
-            updateDisplay();
-            filterHistory();
-        }
-
-        function calculateSimpleInterest() {
-            let principal = parseFloat(currentInput);
-            
-            let rate = prompt('معدل الفائدة السنوي المتوقع (%)', '5');
-            if (rate === null || rate.trim() === '') return;
-            let r = parseFloat(rate) / 100;
-            
-            let time = prompt('المدة الزمنية (بالسنوات)', '1');
-            if (time === null || time.trim() === '') return;
-            let t = parseFloat(time);
-            
-            if (isNaN(r) || isNaN(t)) return;
-            
-            let interest = principal * r * t;
-            interest = Math.round(interest * 100) / 100;
-            
-            history.unshift({ text: `فائدة (${principal}×${r*100}%×${t}سنة) = ${interest}`, type: 'مالية' });
-            currentInput = interest.toString();
-            updateDisplay();
-            filterHistory();
-        }
-
-        function handleMemory(cmd) {
-            let value = parseFloat(currentInput);
-            switch (cmd) {
-                case 'MC': memory = 0; historyDisplayElem.innerText = "Memory Cleared"; setTimeout(()=>historyDisplayElem.innerText="",1000); break;
-                case 'MR': currentInput = memory.toString(); updateDisplay(); break;
-                case 'M+': memory += value; historyDisplayElem.innerText = "M+ " + value; setTimeout(()=>historyDisplayElem.innerText="",1000); break;
-                case 'M-': memory -= value; historyDisplayElem.innerText = "M- " + value; setTimeout(()=>historyDisplayElem.innerText="",1000); break;
-            }
-        }
-
-        function renderHistory(filteredList) {
-            historyTableBody.innerHTML = '';
-            if(filteredList.length === 0) {
-                historyTableBody.innerHTML = ` ones<td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem 0;">لا توجد عمليات مسجلة حالياً</td> </tr>`;
-                return;
-            }
-
-            filteredList.forEach((item, index) => {
-                let parts = item.text.split('=');
-                let operationStr = parts[0] ? parts[0].trim() : '';
-                let resultStr = parts[1] ? parts[1].trim() : item.text;
-                let badgeClass = item.type === 'مالية' ? 'badge-finance' : 'badge-math';
-
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><span class="badge ${badgeClass}">${item.type}</span></td>
-                    <td class="td-operation">${operationStr}</td>
-                    <td class="td-result">${resultStr}</td>
-                    <td>
-                        <div class="action-btns">
-                            <button class="icon-btn restore" title="استخدام النتيجة" onclick="restoreResult('${resultStr}')"><i class="fas fa-reply"></i></button>
-                            <button class="icon-btn delete" title="حذف القيد" onclick="deleteHistoryItem(${index})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                `;
-                historyTableBody.appendChild(tr);
-            });
-        }
-
-        function restoreResult(val) {
-            val = val.replace('%', '').trim();
-            currentInput = val;
-            updateDisplay();
-        }
-
-        function filterHistory() {
-            let filter = document.getElementById('filterSelect').value;
-            let filtered = history;
-            if (filter !== 'all') {
-                filtered = history.filter(item => item.type === filter);
-            }
-            renderHistory(filtered);
-        }
-
-        function deleteHistoryItem(index) {
-            let filter = document.getElementById('filterSelect').value;
-            let displayed = (filter === 'all') ? history : history.filter(i => i.type === filter);
-            let realItem = displayed[index];
-            let actualIndex = history.findIndex(i => i === realItem);
-            if (actualIndex !== -1) history.splice(actualIndex, 1);
-            filterHistory();
-        }
-
-        function clearHistory() {
-            if(confirm("هل أنت متأكد من مسح كافة سجلات الحسابات؟")) {
-                history = [];
-                filterHistory();
-            }
-        }
-
-        function exportHistory() {
-            if(history.length === 0) {
-                showError("السجل فارغ، لا يوجد ما يمكن تصديره");
-                return;
-            }
-            let csv = 'النوع,العملية المنجزة,النتيجة\n';
-            history.forEach(item => {
-                let parts = item.text.split('=');
-                let op = parts[0].trim().replace(/"/g, '""');
-                let res = parts[1] ? parts[1].trim().replace(/"/g, '""') : '';
-                csv += `"${item.type}","${op}","${res}"\n`;
-            });
-            let blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            let link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `سجل_حسابات_مجموعة_فاروق_${new Date().toISOString().slice(0,10)}.csv`;
-            link.click();
-        }
-
-        // دعم لوحة المفاتيح
-        document.addEventListener('keydown', function(e) {
-            if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
-            const key = e.key;
-            if (['+', '-', '*', '/', '=', 'Enter', 'Escape', 'Backspace', 'Delete', '%'].includes(key) || 
-                (key >= '0' && key <= '9') || key === '.') {
-                e.preventDefault();
-            }
-            if (key >= '0' && key <= '9') appendToDisplay(key);
-            else if (key === '.') appendToDisplay('.');
-            else if (key === '+') setOperator('+');
-            else if (key === '-') setOperator('-');
-            else if (key === '*') setOperator('*');
-            else if (key === '/') setOperator('/');
-            else if (key === '=' || key === 'Enter') calculateResult();
-            else if (key === 'Escape') clearDisplay();
-            else if (key === 'Delete') clearEntry();
-            else if (key === 'Backspace') backspace();
-        });
-
-        // تهيئة الجدول
+    function calculateSquareRoot() {
+        let value = parseFloat(currentInput);
+        if (value < 0) { showError('لا يمكن حساب الجذر لعدد سالب'); return; }
+        let res = Math.sqrt(value);
+        res = Math.round(res * 1000000000) / 1000000000;
+        currentInput = res.toString();
+        history.unshift({ text: `√(${value}) = ${currentInput}`, type: 'مالية' });
         filterHistory();
-    </script>
+        updateDisplay();
+    }
+
+    function calculateReciprocal() {
+        let value = parseFloat(currentInput);
+        if (value === 0) { showError('لا يمكن القسمة على الصفر'); return; }
+        let res = 1 / value;
+        res = Math.round(res * 1000000000) / 1000000000;
+        currentInput = res.toString();
+        history.unshift({ text: `1/(${value}) = ${currentInput}`, type: 'مالية' });
+        filterHistory();
+        updateDisplay();
+    }
+
+    function power() {
+        let base = parseFloat(currentInput);
+        let exponent = prompt('أدخل قيمة الأس (القوة):', '2');
+        if (exponent === null || exponent.trim() === '') return;
+        let exp = parseFloat(exponent);
+        if (isNaN(exp)) { showError('قيمة غير صالحة'); return; }
+        let res = Math.pow(base, exp);
+        res = Math.round(res * 1000000000) / 1000000000;
+        currentInput = res.toString();
+        history.unshift({ text: `${base}^${exp} = ${currentInput}`, type: 'مالية' });
+        filterHistory();
+        updateDisplay();
+    }
+
+    function log10() {
+        let val = parseFloat(currentInput);
+        if (val <= 0) { showError('اللوغاريتم للأعداد الموجبة فقط'); return; }
+        let res = Math.log10(val);
+        res = Math.round(res * 1000000000) / 1000000000;
+        currentInput = res.toString();
+        history.unshift({ text: `log10(${val}) = ${currentInput}`, type: 'مالية' });
+        filterHistory();
+        updateDisplay();
+    }
+
+    function factorial() {
+        let n = parseInt(currentInput);
+        if (isNaN(n) || n < 0 || n > 170) {
+            showError('يجب إدخال عدد صحيح موجب (أقل من 170)');
+            return;
+        }
+        let fact = 1;
+        for (let i = 2; i <= n; i++) fact *= i;
+        currentInput = fact.toString();
+        history.unshift({ text: `${n}! = ${currentInput}`, type: 'مالية' });
+        filterHistory();
+        updateDisplay();
+    }
+
+    function applyTax() {
+        let rate = prompt('أدخل نسبة الضريبة المضافة (%) (مثال: 15):', '15');
+        if (rate === null || rate.trim() === '') return;
+        let r = parseFloat(rate);
+        if (isNaN(r)) return;
+        let amount = parseFloat(currentInput);
+        let taxValue = amount * (r / 100);
+        let result = amount + taxValue;
+        result = Math.round(result * 100) / 100;
+        history.unshift({ text: `${amount} + ضريبة ${r}% = ${result}`, type: 'مالية' });
+        currentInput = result.toString();
+        updateDisplay();
+        filterHistory();
+    }
+
+    function applyDiscount() {
+        let rate = prompt('أدخل نسبة الخصم (%) (مثال: 10):', '10');
+        if (rate === null || rate.trim() === '') return;
+        let r = parseFloat(rate);
+        if (isNaN(r)) return;
+        let amount = parseFloat(currentInput);
+        let discountValue = amount * (r / 100);
+        let result = amount - discountValue;
+        result = Math.round(result * 100) / 100;
+        history.unshift({ text: `${amount} - خصم ${r}% = ${result}`, type: 'مالية' });
+        currentInput = result.toString();
+        updateDisplay();
+        filterHistory();
+    }
+
+    function calculateROI() {
+        let cost = parseFloat(currentInput);
+        if (cost === 0) { showError('يجب أن تكون التكلفة أكبر من صفر'); return; }
+        let revenue = prompt('أدخل العائد الإجمالي المتوقع:', cost * 1.2);
+        if (revenue === null || revenue.trim() === '') return;
+        let rev = parseFloat(revenue);
+        if (isNaN(rev)) return;
+        let roi = ((rev - cost) / cost) * 100;
+        roi = Math.round(roi * 100) / 100;
+        history.unshift({ text: `ROI (تكلفة:${cost}, عائد:${rev}) = %${roi}`, type: 'مالية' });
+        currentInput = roi.toString();
+        updateDisplay();
+        filterHistory();
+    }
+
+    function calculateSimpleInterest() {
+        let principal = parseFloat(currentInput);
+        let rate = prompt('معدل الفائدة السنوي المتوقع (%)', '5');
+        if (rate === null || rate.trim() === '') return;
+        let r = parseFloat(rate) / 100;
+        let time = prompt('المدة الزمنية (بالسنوات)', '1');
+        if (time === null || time.trim() === '') return;
+        let t = parseFloat(time);
+        if (isNaN(r) || isNaN(t)) return;
+        let interest = principal * r * t;
+        interest = Math.round(interest * 100) / 100;
+        history.unshift({ text: `فائدة (${principal}×${r*100}%×${t}سنة) = ${interest}`, type: 'مالية' });
+        currentInput = interest.toString();
+        updateDisplay();
+        filterHistory();
+    }
+
+    function handleMemory(cmd) {
+        let value = parseFloat(currentInput);
+        switch (cmd) {
+            case 'MC': memory = 0; historyDisplayElem.innerText = "Memory Cleared";
+                setTimeout(() => historyDisplayElem.innerText = "", 1000); break;
+            case 'MR': currentInput = memory.toString(); updateDisplay(); break;
+            case 'M+': memory += value; historyDisplayElem.innerText = "M+ " + value;
+                setTimeout(() => historyDisplayElem.innerText = "", 1000); break;
+            case 'M-': memory -= value; historyDisplayElem.innerText = "M- " + value;
+                setTimeout(() => historyDisplayElem.innerText = "", 1000); break;
+        }
+    }
+
+    function renderHistory(filteredList) {
+        historyTableBody.innerHTML = '';
+        if (filteredList.length === 0) {
+            historyTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#aab7d4;padding:1.5rem 0;">لا توجد عمليات مسجلة</td></tr>`;
+            return;
+        }
+        filteredList.forEach((item, index) => {
+            let parts = item.text.split('=');
+            let operationStr = parts[0] ? parts[0].trim() : '';
+            let resultStr = parts[1] ? parts[1].trim() : item.text;
+            let badgeClass = item.type === 'مالية' ? 'badge-finance' : 'badge-math';
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span class="badge ${badgeClass}">${item.type}</span></td>
+                <td class="td-operation">${operationStr}</td>
+                <td class="td-result">${resultStr}</td>
+                <td>
+                    <div class="action-btns">
+                        <button class="icon-btn restore" title="استخدام النتيجة" onclick="restoreResult('${resultStr}')"><i class="fas fa-reply"></i></button>
+                        <button class="icon-btn delete" title="حذف القيد" onclick="deleteHistoryItem(${index})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            `;
+            historyTableBody.appendChild(tr);
+        });
+    }
+
+    function restoreResult(val) {
+        val = val.replace('%', '').trim();
+        currentInput = val;
+        updateDisplay();
+    }
+
+    function filterHistory() {
+        let filter = document.getElementById('filterSelect').value;
+        let filtered = history;
+        if (filter !== 'all') {
+            filtered = history.filter(item => item.type === filter);
+        }
+        renderHistory(filtered);
+    }
+
+    function deleteHistoryItem(index) {
+        let filter = document.getElementById('filterSelect').value;
+        let displayed = (filter === 'all') ? history : history.filter(i => i.type === filter);
+        let realItem = displayed[index];
+        let actualIndex = history.findIndex(i => i === realItem);
+        if (actualIndex !== -1) history.splice(actualIndex, 1);
+        filterHistory();
+    }
+
+    function clearHistory() {
+        if (confirm("هل أنت متأكد من مسح كافة سجلات الحسابات؟")) {
+            history = [];
+            filterHistory();
+        }
+    }
+
+    function exportHistory() {
+        if (history.length === 0) { showError("السجل فارغ"); return; }
+        let csv = 'النوع,العملية المنجزة,النتيجة\n';
+        history.forEach(item => {
+            let parts = item.text.split('=');
+            let op = parts[0].trim().replace(/"/g, '""');
+            let res = parts[1] ? parts[1].trim().replace(/"/g, '""') : '';
+            csv += `"${item.type}","${op}","${res}"\n`;
+        });
+        let blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        let link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `سجل_حسابات_مجموعة_فاروق_${new Date().toISOString().slice(0,10)}.csv`;
+        link.click();
+    }
+
+    // ================================================================
+    // ========== تصدير Excel احترافي ==========
+    // ================================================================
+    document.getElementById('exportExcelBtn').addEventListener('click', async function() {
+        if (history.length === 0) { alert('الرجاء إجراء بعض العمليات الحسابية أولاً.'); return; }
+        showLoading('جاري إنشاء تقرير Excel...', 'إنشاء الأوراق');
+        try {
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'FAROUK GRUP';
+            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+            const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
+            const PT = 'FF155724', NT = 'FF721C24';
+
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+
+            // 1. غلاف التقرير
+            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+            [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+            cv.getRow(2).height=80; cv.getRow(4).height=60;
+            cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+            bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
+            mh(cv,1,4,4,`تقرير العمليات الحسابية\n${new Date().toLocaleDateString('ar-EG')}`,DB,GL,18);
+            const inf=[['📋 عدد العمليات',history.length],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['⏰ الوقت',new Date().toLocaleTimeString('ar-EG')]];
+            let ir=6;
+            inf.forEach(([l,v],idx)=>{
+                cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+                const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+                const bg=idx%2===0?AR:'FFFEFCF6';
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                cv.getRow(ir).height=28; ir++;
+            });
+
+            // 2. سجل العمليات
+            const logSheet = workbook.addWorksheet('سجل العمليات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            logSheet.getColumn(1).width = 5; logSheet.getColumn(2).width = 20; logSheet.getColumn(3).width = 50; logSheet.getColumn(4).width = 30; logSheet.getColumn(5).width = 5;
+            mh(logSheet,1,5,1,'📋 سجل العمليات الحسابية',DB,GL,14);
+            logSheet.getRow(1).height=40;
+            logSheet.addRow(['#', 'النوع', 'العملية المنجزة', 'النتيجة']);
+            const headerRow = logSheet.getRow(2);
+            headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+            history.forEach((item, idx) => {
+                let parts = item.text.split('=');
+                let op = parts[0] ? parts[0].trim() : '';
+                let res = parts[1] ? parts[1].trim() : item.text;
+                logSheet.addRow([idx+1, item.type, op, res]);
+            });
+
+            // 3. ملخص إحصائي
+            const sumSheet = workbook.addWorksheet('ملخص إحصائي', { views: [{ rightToLeft: true, showGridLines: false }] });
+            sumSheet.getColumn(1).width = 5; sumSheet.getColumn(2).width = 35; sumSheet.getColumn(3).width = 30; sumSheet.getColumn(4).width = 5;
+            mh(sumSheet,1,4,1,'📊 ملخص إحصائي',DB,GL,14);
+            sumSheet.getRow(1).height=40;
+            const mathCount = history.filter(i => i.type !== 'مالية').length;
+            const finCount = history.filter(i => i.type === 'مالية').length;
+            const sumData = [
+                ['إجمالي العمليات', history.length],
+                ['عمليات رياضية أساسية', mathCount],
+                ['عمليات مالية متقدمة', finCount],
+                ['تاريخ التقرير', new Date().toLocaleDateString('ar-EG')]
+            ];
+            sumSheet.addRow(['المؤشر', 'القيمة']);
+            sumData.forEach(row => sumSheet.addRow(row));
+            sumSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            sumSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const now = new Date();
+            const fileName = `سجل_حسابات_${now.toISOString().slice(0,10)}.xlsx`;
+            saveAs(blob, fileName);
+        } catch(err) { alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
+    });
+
+    // ================================================================
+    // ========== تصدير Word احترافي ==========
+    // ================================================================
+    document.getElementById('exportWordBtn').addEventListener('click', async function() {
+        if (history.length === 0) { alert('الرجاء إجراء بعض العمليات الحسابية أولاً.'); return; }
+        showLoading('جاري إنشاء تقرير Word...', 'جمع البيانات');
+        try {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ar-EG');
+
+            let tableRows = '';
+            history.forEach((item, idx) => {
+                let parts = item.text.split('=');
+                let op = parts[0] ? parts[0].trim() : '';
+                let res = parts[1] ? parts[1].trim() : item.text;
+                const badgeColor = item.type === 'مالية' ? '#ffc107' : '#007bff';
+                const textColor = item.type === 'مالية' ? '#111' : '#fff';
+                tableRows += `
+                    <tr>
+                        <td style="border:1px solid #b8860b;padding:8px;text-align:center;">${idx+1}</td>
+                        <td style="border:1px solid #b8860b;padding:8px;text-align:center;"><span style="background:${badgeColor};color:${textColor};padding:0.2rem 0.6rem;border-radius:4px;font-weight:700;">${item.type}</span></td>
+                        <td style="border:1px solid #b8860b;padding:8px;text-align:center;direction:ltr;">${op}</td>
+                        <td style="border:1px solid #b8860b;padding:8px;text-align:center;direction:ltr;font-weight:700;color:#b8860b;">${res}</td>
+                    </tr>
+                `;
+            });
+
+            const mathCount = history.filter(i => i.type !== 'مالية').length;
+            const finCount = history.filter(i => i.type === 'مالية').length;
+
+            const fullHtml = `<!DOCTYPE html>
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+            <head><meta charset='utf-8'><title>تقرير الحاسبة المالية - FAROUK GRUP</title>
+            <style>
+                body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;color:#333;}
+                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                .cover h1{font-size:32px;color:#b8860b;margin:0;}
+                .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                .cover p{color:#666;}
+                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                th{background:#fefcf6;color:#b8860b;font-weight:bold;}
+                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
+                .summary{background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;margin:20px 0;}
+            </style></head>
+            <body>
+                <div class="cover">
+                    <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+                    <h2>📋 تقرير العمليات الحسابية والمالية</h2>
+                    <p>التاريخ: ${dateStr} | الوقت: ${now.toLocaleTimeString('ar-EG')}</p>
+                </div>
+                <div class="summary">
+                    <h3 style="color:#b8860b;">📊 ملخص العمليات</h3>
+                    <p>إجمالي العمليات: <strong>${history.length}</strong></p>
+                    <p>عمليات رياضية أساسية: <strong>${mathCount}</strong></p>
+                    <p>عمليات مالية متقدمة: <strong>${finCount}</strong></p>
+                </div>
+                <h2 style="color:#b8860b;">📋 سجل العمليات الكامل</h2>
+                <table>
+                    <thead><tr><th>#</th><th>النوع</th><th>العملية المنجزة</th><th>النتيجة</th></tr></thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+                <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+            </body></html>`;
+
+            const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `تقرير_حسابات_${now.toISOString().slice(0,10)}.doc`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        } catch(err) { alert('خطأ Word: ' + err.message); } finally { hideLoading(); }
+    });
+
+    // ===== دعم لوحة المفاتيح =====
+    document.addEventListener('keydown', function(e) {
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+        const key = e.key;
+        if (['+', '-', '*', '/', '=', 'Enter', 'Escape', 'Backspace', 'Delete', '%'].includes(key) ||
+            (key >= '0' && key <= '9') || key === '.') {
+            e.preventDefault();
+        }
+        if (key >= '0' && key <= '9') appendToDisplay(key);
+        else if (key === '.') appendToDisplay('.');
+        else if (key === '+') setOperator('+');
+        else if (key === '-') setOperator('-');
+        else if (key === '*') setOperator('*');
+        else if (key === '/') setOperator('/');
+        else if (key === '=' || key === 'Enter') calculateResult();
+        else if (key === 'Escape') clearDisplay();
+        else if (key === 'Delete') clearEntry();
+        else if (key === 'Backspace') backspace();
+    });
+
+    // تهيئة الجدول
+    filterHistory();
+</script>
 </body>
 </html>

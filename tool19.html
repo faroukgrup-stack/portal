@@ -2,1633 +2,1131 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>التنبؤ المالي المتقدم | FAROUK GRUP</title>
-    <script src="auth-check.js">
-    </script>
+<!-- حماية الصفحة -->
+<script src="auth-check.js"></script>
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
-    </script>
-    <!-- مكتبات التصدير الاحترافية (ExcelJS + FileSaver) -->
-    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        :root {
-            --bg-dark: #0b0e17;
-            --bg-panel: rgba(18, 24, 36, 0.85);
-            --bg-card: rgba(22, 30, 46, 0.8);
-            --border-light: rgba(180, 133, 84, 0.25);
-            --accent-glow: #b48554;
-            --accent-soft: #cfa776;
-            --text-light: #f0f4fa;
-            --text-muted: #aab7d4;
-            --text-dark: #0b0e17;
-            --shadow-soft: 0 15px 35px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 133, 84, 0.15);
-            --shadow-glow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(180, 133, 84, 0.3);
-            --radius-md: 20px;
-            --radius-lg: 30px;
-            --transition: all 0.3s ease;
-            --gold: #b8860b;
-            --gold-light: #d4b15a;
-            --gold-soft: rgba(184, 134, 11, 0.1);
-            --dark: #0f0f0f;
-            --dark-light: #1a1a1a;
-            --white: #ffffff;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
-        }
-        body {
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
             font-family: 'Tajawal', sans-serif;
-            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
-            color: var(--text-light);
-            line-height: 1.6;
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
         }
+
+        /* ===== إزالة كل ما يسبب الاهتزاز ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .btn-export, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .form-group input,
+        .form-group select, .grid-2, .results-grid, .chart-grid,
+        .action-bar, .export-loading, .export-loading-box, .modal, .modal-content {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== خلفية ثابتة ===== */
         .glow-bg {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 0;
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
         }
         .glow-bg span {
             position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(180, 133, 84, 0.15) 0%, transparent 70%);
             border-radius: 50%;
             filter: blur(80px);
-            animation: glowMove 20s infinite alternate ease-in-out;
+            opacity: 0.20;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.10) 0%, transparent 70%);
         }
-        .glow-bg span:nth-child(1) {
-            top: -100px;
-            right: -100px;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(180, 133, 84, 0.12) 0%, transparent 70%);
-        }
-        .glow-bg span:nth-child(2) {
-            bottom: -150px;
-            left: -150px;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(100, 150, 200, 0.1) 0%, transparent 70%);
-        }
-        .glow-bg span:nth-child(3) {
-            top: 30%;
-            left: 30%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(180, 133, 84, 0.1) 0%, transparent 70%);
-            animation-delay: -5s;
-        }
-        @keyframes glowMove {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 0.5;
-            }
-            100% {
-                transform: translate(40px, -30px) scale(1.2);
-                opacity: 0.8;
-            }
-        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.05) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.06) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
         .hero-mini {
-            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
-            color: white;
-            text-align: center;
-            padding: 3rem 1rem;
-            border-bottom: 4px solid var(--gold);
-            position: relative;
-            overflow: hidden;
-            z-index: 2;
-        }
-        .hero-mini::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(184, 134, 11, 0.2) 0%, transparent 60%);
-            animation: rotate 40s linear infinite;
-        }
-        @keyframes rotate {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
         }
         .hero-mini h2 {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--gold-light);
-            margin-bottom: 0.5rem;
-            position: relative;
-            z-index: 2;
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
         .hero-mini p {
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto;
-            opacity: 0.95;
-            position: relative;
-            z-index: 2;
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
         }
+
+        /* ===== WRAPPER ===== */
         .calc-wrapper {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            position: relative;
-            z-index: 2;
+            max-width: 1050px; margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
         }
+
+        /* ===== CARD ===== */
         .calc-box {
-            background: var(--bg-panel);
-            backdrop-filter: blur(15px);
-            border: 2px solid var(--border-light);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-soft);
-            position: relative;
-            overflow: hidden;
-        }
-        .calc-box:hover {
-            box-shadow: var(--shadow-glow);
-            border-color: rgba(180, 133, 84, 0.4);
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
         }
         .calc-box h2 {
-            font-size: 1.8rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #f0e6d2, #cfa776);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1.5rem;
-            text-align: center;
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
         }
         .featured-badge {
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            background: linear-gradient(135deg, var(--accent-glow), var(--gold-light));
-            color: #111;
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            font-weight: 900;
-            border: 3px solid white;
-            z-index: 10;
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
         }
-        .featured-badge i {
-            font-size: 1.8rem;
-            margin-bottom: 0.2rem;
-            color: #0b0e17;
-        }
-        .featured-badge span {
-            font-size: 0.8rem;
-            text-align: center;
-            color: #0b0e17;
-        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== صف العملة ===== */
         .currency-row {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            background: rgba(180, 133, 84, 0.15);
-            border: 1px solid var(--border-light);
-            padding: 0.8rem 1rem;
-            border-radius: 50px;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.8rem; background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.2);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
         }
-        .currency-row label {
-            font-weight: 700;
-            color: var(--accent-soft);
-            margin: 0;
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
+        .currency-row select, .currency-row input {
+            flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
         }
-        .currency-row select,
-        .currency-row input {
-            width: 150px;
-            padding: 0.5rem 1rem;
-            border: 2px solid var(--border-light);
-            border-radius: 30px;
-            background: rgba(10, 14, 23, 0.7);
-            color: var(--text-light);
-            font-weight: 700;
-            font-family: 'Inter', sans-serif;
-        }
-        .currency-row input {
-            width: 250px;
-        }
+        .currency-row input { flex: 2 1 200px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* ===== عناوين الأقسام ===== */
         .section-title-sm {
-            font-size: 1.3rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #f0e6d2, #cfd9ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
             margin: 1.2rem 0 0.8rem 0;
-            border-bottom: 2px solid var(--border-light);
-            padding-bottom: 0.3rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
         }
-        .form-group {
-            margin-bottom: 1rem;
-            position: relative;
-        }
-        label {
-            display: block;
-            margin-bottom: 0.3rem;
-            font-weight: 700;
-            color: var(--accent-soft);
-            font-size: 0.9rem;
-        }
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 2px solid var(--border-light);
-            border-radius: 30px;
-            background: rgba(10, 14, 23, 0.7);
-            color: var(--text-light);
-            font-family: 'Tajawal', sans-serif;
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-        input:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 0 3px rgba(180, 133, 84, 0.2);
-            background: rgba(15, 20, 30, 0.9);
-        }
-        .tooltip {
-            position: relative;
-            cursor: help;
-        }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 260px;
-            background-color: var(--dark);
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px;
-            position: absolute;
-            z-index: 100;
-            bottom: 130%;
-            left: 50%;
-            margin-left: -130px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.85rem;
-            border: 1px solid var(--gold);
-            pointer-events: none;
-        }
-        .tooltip .tooltiptext::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: var(--dark) transparent transparent transparent;
-        }
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== شبكة ===== */
         .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+            gap: 0.8rem; margin-bottom: 0.5rem;
         }
+
+        /* ===== صفوف النماذج ===== */
+        .form-group {
+            flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
+        }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-left: 0.3rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+
+        /* ===== زر الحساب ===== */
         .btn-calculate {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            width: 100%;
-            padding: 1.2rem;
-            border-radius: 50px;
-            background: rgba(180, 133, 84, 0.2);
-            border: 1px solid var(--border-light);
-            color: var(--accent-soft);
-            font-weight: 900;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: var(--transition);
-            backdrop-filter: blur(10px);
-            margin: 1.5rem 0;
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer; margin: 1.5rem 0; font-family: 'Tajawal', sans-serif;
         }
-        .btn-calculate:hover {
-            background: rgba(180, 133, 84, 0.4);
-            color: #fff;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 25px rgba(180, 133, 84, 0.3);
-            transform: translateY(-3px);
-        }
-        .results-section {
-            margin-top: 2rem;
-        }
+        .btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-calculate:active { transform: scale(0.97); }
+
+        /* ===== النتائج ===== */
+        .results-section { margin-top: 1.5rem; }
         .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+            gap: 0.8rem; margin-bottom: 1rem;
         }
         .result-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            padding: 1.2rem;
-            text-align: center;
-            box-shadow: var(--shadow-soft);
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.12);
+            border-radius: 16px; padding: 0.8rem; text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         }
-        .result-card .label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 0.3rem;
-        }
-        .result-card .value {
-            font-size: 1.3rem;
-            font-weight: 900;
-            color: var(--accent-soft);
-        }
+        .result-card .label { font-size: 0.75rem; color: #aab7d4; margin-bottom: 0.2rem; font-weight: 700; }
+        .result-card .value { font-size: 1.2rem; font-weight: 900; color: #cfa776; }
         .result-card .status {
-            font-size: 0.75rem;
-            margin-top: 0.3rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 20px;
-            display: inline-block;
+            font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 20px;
+            display: inline-block; margin-top: 0.2rem;
         }
-        .status-good {
-            background: var(--success);
-            color: white;
-        }
-        .status-bad {
-            background: var(--danger);
-            color: white;
-        }
-        .status-warning {
-            background: var(--warning);
-            color: #111;
-        }
+        .status-good { background: #28a745; color: white; }
+        .status-bad { background: #dc3545; color: white; }
+        .status-warning { background: #ffc107; color: #111; }
+
+        /* ===== جداول ===== */
         .table-container {
-            overflow-x: auto;
-            margin-top: 1rem;
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            background: var(--bg-card);
-            padding: 0.8rem;
+            overflow-x: auto; margin-top: 1rem;
+            border: 1px solid rgba(180,133,84,0.1); border-radius: 20px;
+            background: rgba(22,30,46,0.6); padding: 0.5rem;
+            -webkit-overflow-scrolling: touch;
         }
         table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
+            width: 100%; border-collapse: collapse; font-size: 0.85rem;
+            min-width: 500px;
         }
         th {
-            background: rgba(180, 133, 84, 0.2);
-            color: var(--accent-soft);
-            font-weight: 900;
-            padding: 0.5rem;
-            border-bottom: 2px solid var(--border-light);
-            text-align: center;
+            background: rgba(180,133,84,0.15); color: #cfa776;
+            font-weight: 900; padding: 0.5rem 0.6rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15); white-space: nowrap;
         }
         td {
-            padding: 0.5rem;
-            border-bottom: 1px solid rgba(180, 133, 84, 0.2);
-            text-align: center;
-            color: var(--text-light);
+            padding: 0.5rem 0.6rem;
+            border-bottom: 1px solid rgba(180,133,84,0.06);
+            text-align: center; color: #f0f4fa;
         }
+        tr:last-child td { border-bottom: none; }
+
+        /* ===== رسوم بيانية ===== */
         .chart-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 1rem; margin: 1rem 0;
         }
         .chart-container {
-            background: var(--bg-card);
-            border-radius: 20px;
-            padding: 1rem;
-            border: 1px solid var(--border-light);
-            height: 280px;
+            background: rgba(22,30,46,0.6); border-radius: 16px;
+            padding: 0.6rem; border: 1px solid rgba(180,133,84,0.08);
+            height: 220px;
+            position: relative;
         }
-        canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
+        .chart-container canvas { width: 100% !important; height: 100% !important; }
+
+        /* ===== أزرار التصدير ===== */
         .action-bar {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-            margin: 1rem 0;
-            flex-wrap: wrap;
+            display: flex; gap: 0.8rem; margin: 1rem 0;
+            flex-wrap: wrap; justify-content: flex-end;
         }
         .btn-export {
-            background: rgba(180, 133, 84, 0.15);
-            border: 1px solid var(--border-light);
-            color: var(--accent-soft);
-            border-radius: 50px;
-            padding: 0.8rem 1.5rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+            background: rgba(180,133,84,0.10); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 40px; padding: 0.6rem 1.2rem;
+            color: #cfa776; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.85rem; font-family: 'Tajawal', sans-serif;
         }
-        .btn-export:hover {
-            background: rgba(180, 133, 84, 0.3);
-            color: #fff;
-            border-color: var(--accent-glow);
-        }
-        .btn-export.word {
-            background: rgba(30, 74, 122, 0.2);
-            border-color: #1e4a7a;
-            color: #8ab8ff;
-        }
-        .footer-simple {
-            text-align: center;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            background: rgba(10, 14, 23, 0.5);
-            backdrop-filter: blur(5px);
-            border-top: 1px solid var(--border-light);
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-        .footer-simple span {
-            color: var(--accent-soft);
-            font-weight: 700;
-        }
-        .calc-floating-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(180, 133, 84, 0.2);
-            border: 1px solid var(--border-light);
-            border-radius: 50px;
-            padding: 0.8rem 1.2rem;
-            color: var(--accent-soft);
-            font-size: 1rem;
-            font-weight: 700;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .calc-floating-btn:hover {
-            background: rgba(180, 133, 84, 0.4);
-            color: #fff;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 15px rgba(180, 133, 84, 0.3);
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            background: var(--bg-panel);
-            margin: 5% auto;
-            padding: 0;
-            border: 2px solid var(--border-light);
-            border-radius: 30px;
-            width: 90%;
-            max-width: 300px;
-            box-shadow: var(--shadow-glow);
-        }
-        .modal-header {
-            background: rgba(180, 133, 84, 0.15);
-            border-bottom: 2px solid var(--border-light);
-            padding: 10px 15px;
-            border-radius: 28px 28px 0 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .modal-header h2 {
-            margin: 0;
-            color: var(--accent-soft);
-            font-size: 1rem;
-            font-weight: 900;
-        }
-        .close {
-            color: var(--text-muted);
-            float: left;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close:hover {
-            color: var(--accent-glow);
-        }
-        .modal-body {
-            padding: 15px;
-        }
-        .calc-display {
-            width: 100%;
-            height: 45px;
-            font-size: 1.4rem;
-            text-align: left;
-            padding: 0 10px;
-            border: 2px solid var(--border-light);
-            border-radius: 20px;
-            margin-bottom: 15px;
-            background: rgba(10, 14, 23, 0.8);
-            color: var(--accent-soft);
-            font-family: 'Inter', monospace;
-            direction: ltr;
-        }
-        .calc-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-        }
-        .calc-btn {
-            background: rgba(180, 133, 84, 0.1);
-            border: 1px solid var(--border-light);
-            border-radius: 15px;
-            padding: 10px 0;
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-light);
-            cursor: pointer;
-        }
-        .calc-btn:hover {
-            background: rgba(180, 133, 84, 0.3);
-            border-color: var(--accent-glow);
-        }
-        .calc-btn.operator {
-            color: var(--accent-soft);
-        }
-        .calc-btn.equals {
-            background: rgba(180, 133, 84, 0.3);
-            color: white;
-            grid-column: span 2;
-        }
-        .calc-btn.equals:hover {
-            background: rgba(180, 133, 84, 0.5);
-        }
+        .btn-export:hover { background: rgba(180,133,84,0.25); }
+        .btn-export.word { background: rgba(30,74,122,0.15); border-color: #1e4a7a; color: #8ab8ff; }
+        .btn-export.word:hover { background: rgba(30,74,122,0.3); }
+        .btn-export.excel { background: rgba(40,167,69,0.12); border-color: #28a745; color: #6fbf6f; }
+        .btn-export.excel:hover { background: rgba(40,167,69,0.25); }
 
-        /* شاشة تحميل التصدير */
+        /* ===== شاشة تحميل ===== */
         .export-loading {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            backdrop-filter: blur(6px);
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
         }
-        .export-loading.show {
-            display: flex;
-        }
+        .export-loading.show { display: flex; }
         .export-loading-box {
-            background: var(--bg-panel);
-            border: 2px solid var(--border-light);
-            border-radius: 24px;
-            padding: 2rem 3rem;
-            text-align: center;
-            box-shadow: var(--shadow-glow);
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
         }
         .export-loading-box i {
-            font-size: 3rem;
-            color: var(--accent-soft);
-            animation: spin 1s linear infinite;
-            display: block;
-            margin-bottom: 1rem;
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
         }
-        .export-loading-box h3 {
-            color: var(--accent-soft);
-            margin-bottom: 0.5rem;
-            font-size: 1.2rem;
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== فوتر ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
         }
-        .export-loading-box p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
         }
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
+        .calc-display {
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: left;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
+
+        /* ===== الأزرار العائمة ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== رسائل ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+        .tooltip .tooltiptext { display: none; }
+
+        /* ===================================================
+           تحسينات للشاشات المتوسطة والكبيرة (كمبيوتر)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .section-title-sm { font-size: 1.4rem; }
+            .form-group { flex: 1 1 220px; }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value { font-size: 1.4rem; }
+            .result-card .label { font-size: 0.85rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .chart-container { height: 260px; }
+            .grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px,1fr)); }
         }
 
-        @media (max-width:768px) {
-            .hero-mini h2 {
-                font-size: 2rem;
-            }
-            .featured-badge {
-                width: 70px;
-                height: 70px;
-            }
-            .featured-badge i {
-                font-size: 1.4rem;
-            }
-            .featured-badge span {
-                font-size: 0.6rem;
-            }
-            .grid-2 {
-                grid-template-columns: 1fr;
-            }
-            .currency-row select,
-            .currency-row input {
-                width: 100%;
-            }
+        /* ===================================================
+           تحسينات للجوال (شاشات ≤ 768px)
+           =================================================== */
+        @media (max-width: 768px) {
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; }
+            .currency-row label { font-size: 0.8rem; }
+            .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; }
+            .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+            .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-grid { grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 0.5rem; }
+            .result-card { padding: 0.6rem 0.4rem; }
+            .result-card .value { font-size: 1rem; }
+            .result-card .label { font-size: 0.65rem; }
+            .chart-grid { grid-template-columns: 1fr; gap: 0.8rem; }
+            .chart-container { height: 180px; padding: 0.5rem; }
+            table { font-size: 0.7rem; min-width: 360px; }
+            th, td { padding: 0.3rem 0.4rem; }
+            .action-bar { justify-content: center; flex-direction: column; }
+            .btn-export { width: 100%; justify-content: center; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .grid-2 { grid-template-columns: 1fr; gap: 0.5rem; }
         }
 
-        /* إصلاح ظهور العناوين التي تختفي */
-        .section-title-sm,
-        .panel-header,
-        .collapsible span,
-        .result-card h4,
-        .hero-mini h2 {
+        /* ===== تحسينات للشاشات الصغيرة جداً (≤ 400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+            .results-grid { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+            .chart-container { height: 150px; }
+        }
+
+        /* ===== منع التحديد العرضي ===== */
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        /* ===== تحسين التمرير ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+
+        /* إصلاح ظهور العناوين */
+        .section-title-sm, .result-card .label, .hero-mini h2 {
             -webkit-text-fill-color: initial !important;
-            color: var(--accent-soft) !important;
+            color: #cfa776 !important;
             background: none !important;
             background-image: none !important;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
     </style>
 </head>
-<body style="overflow-x: hidden;">
-    <div class="glow-bg"><span></span><span></span><span></span></div>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
 
-    <!-- شاشة تحميل التصدير -->
-    <div class="export-loading" id="exportLoading">
-        <div class="export-loading-box">
-            <i class="fas fa-spinner"></i>
-            <h3 id="loadingTitle">جاري إنشاء التقرير الاحترافي...</h3>
-            <p id="loadingMsg">يرجى الانتظار — قد يستغرق ذلك لحظات</p>
-        </div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">جاري إنشاء التقرير...</h3>
+        <p id="loadingMsg">يرجى الانتظار</p>
     </div>
+</div>
 
-    <section class="hero-mini">
-        <h2>📈 التنبؤ المالي المتقدم</h2>
-        <p>توقعات القوائم المالية، التدفقات النقدية، وتحليل الاستثمار</p>
-    </section>
+<section class="hero-mini">
+    <h2>📈 التنبؤ المالي المتقدم</h2>
+    <p>توقعات القوائم المالية، التدفقات النقدية، وتحليل الاستثمار</p>
+</section>
 
-    <div class="calc-wrapper">
-        <div class="calc-box" data-aos="fade-up">
-            <div class="featured-badge">
-                <i class="fas fa-chart-line"></i>
-                <span>تنبؤ</span>
-            </div>
-            <h2><i class="fas fa-chart-line"></i> بيانات الأساس والافتراضات</h2>
-            <div class="currency-row">
-                <div class="tooltip"><label><i class="fas fa-coins"></i> العملة:</label><select id="currencySelect"><option value="$" selected>دولار ($)</option><option value="€">يورو (€)</option><option value="₺">ليرة تركية (₺)</option><option value="ج.م">جنيه مصري (ج.م)</option><option value="د.ك">دينار كويتي (د.ك)</option><option value="ر.س">ريال سعودي (ر.س)</option></select><span class="tooltiptext">العملة المستخدمة في البيانات.</span></div>
-                <div class="tooltip"><label><i class="fas fa-building"></i> اسم الجهة:</label><input type="text" id="companyName" placeholder="اسم الشركة"><span class="tooltiptext">اسم الجهة المالية.</span></div>
-            </div>
+<div class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-chart-line"></i><span>تنبؤ</span></div>
+        <h2><i class="fas fa-chart-line" style="color:#cfa776;margin-left:0.5rem;"></i>بيانات الأساس والافتراضات</h2>
 
-            <div class="grid-2">
-                <div>
-                    <div class="section-title-sm">📊 البيانات التاريخية</div>
-                    <div class="form-group tooltip"><label>الإيرادات (سنة الأساس)</label><input type="number" id="baseRevenue" placeholder="مثال: 2000000"><span class="tooltiptext">الإيرادات في آخر سنة متاحة.</span></div>
-                    <div class="form-group tooltip"><label>تكلفة المبيعات (% من الإيرادات)</label><input type="number" id="cogsPercent" value="60"><span class="tooltiptext">نسبة تكلفة المبيعات من الإيرادات.</span></div>
-                    <div class="form-group tooltip"><label>المصاريف التشغيلية (% من الإيرادات)</label><input type="number" id="opexPercent" value="25"><span class="tooltiptext">نسبة المصاريف التشغيلية من الإيرادات.</span></div>
-                    <div class="form-group tooltip"><label>معدل الضريبة (%)</label><input type="number" id="taxRate" value="25"><span class="tooltiptext">نسبة ضريبة الدخل.</span></div>
-                    <div class="form-group tooltip"><label>الإهلاك السنوي</label><input type="number" id="depreciation" placeholder="مثال: 50000"><span class="tooltiptext">قيمة الإهلاك السنوي الثابت.</span></div>
-                    <div class="form-group tooltip"><label>النفقات الرأسمالية (CAPEX) السنوي</label><input type="number" id="capex" placeholder="مثال: 80000"><span class="tooltiptext">الاستثمارات السنوية في الأصول الثابتة.</span></div>
-                    <div class="form-group tooltip"><label>أيام تحصيل المدينين (DSO)</label><input type="number" id="dso" value="45"><span class="tooltiptext">متوسط فترة تحصيل المبيعات الآجلة.</span></div>
-                    <div class="form-group tooltip"><label>أيام المخزون (DIO)</label><input type="number" id="dio" value="60"><span class="tooltiptext">متوسط فترة بقاء المخزون.</span></div>
-                    <div class="form-group tooltip"><label>أيام سداد الدائنين (DPO)</label><input type="number" id="dpo" value="30"><span class="tooltiptext">متوسط فترة سداد الموردين.</span></div>
-                </div>
-                <div>
-                    <div class="section-title-sm">📈 افتراضات النمو والتقييم</div>
-                    <div class="form-group tooltip"><label>معدل نمو الإيرادات السنوي (%)</label><input type="number" id="growthRate" value="10"><span class="tooltiptext">نسبة النمو السنوي للإيرادات.</span></div>
-                    <div class="form-group tooltip"><label>عدد سنوات التوقع</label><input type="number" id="forecastYears" value="5"><span class="tooltiptext">عدد السنوات المراد توقعها.</span></div>
-                    <div class="form-group tooltip"><label>معدل الخصم (WACC) (%)</label><input type="number" id="discountRate" value="10"><span class="tooltiptext">معدل الخصم لحساب صافي القيمة الحالية.</span></div>
-                    <div class="form-group tooltip"><label>رأس المال العامل الأولي</label><input type="number" id="initialWC" placeholder="مثال: 200000"><span class="tooltiptext">رأس المال العامل في سنة الأساس.</span></div>
-                    <div class="form-group tooltip"><label>الاستثمار الأولي (CAPEX سنة 0)</label><input type="number" id="initialInvestment" placeholder="مثال: 500000"><span class="tooltiptext">الاستثمار الأولي خارج التدفقات التشغيلية.</span></div>
-                    <div class="form-group tooltip"><label>القيمة النهائية (Terminal Value) كنسبة من آخر سنة FCF</label><input type="number" id="terminalGrowth" value="3"><span class="tooltiptext">معدل النمو الدائم بعد فترة التوقع (%)</span></div>
-                </div>
-            </div>
-
-            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> تنفيذ التنبؤ المالي</button>
-
-            <div class="results-section" id="resultsSection" style="display: none;">
-                <div class="action-bar">
-                    <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> تقرير Word كامل + رسوم بيانية</button>
-                    <button class="btn-export" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel احترافي</button>
-                </div>
-                <div class="results-grid" id="kpiCards"></div>
-                <div class="section-title-sm">📋 قائمة الدخل المتوقعة</div>
-                <div class="table-container" id="incomeTable"></div>
-                <div class="section-title-sm">💵 التدفقات النقدية الحرة (FCF)</div>
-                <div class="table-container" id="cashFlowTable"></div>
-                <div class="chart-grid">
-                    <div class="chart-container"><canvas id="revenueChart"></canvas></div>
-                    <div class="chart-container"><canvas id="fcfChart"></canvas></div>
-                </div>
-                <div id="valuationCard" class="result-card"></div>
-            </div>
-            <div id="initialMessage" style="margin-top:1rem; color:var(--text-muted); text-align:center;"><i class="fas fa-robot" style="color: var(--accent-soft);"></i> سيتم عرض التنبؤات بعد الضغط على زر الحساب</div>
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> العملة:</label>
+            <select id="currencySelect">
+                <option value="$" selected>دولار ($)</option>
+                <option value="€">يورو (€)</option>
+                <option value="₺">ليرة تركية (₺)</option>
+                <option value="ج.م">جنيه مصري (ج.م)</option>
+                <option value="د.ك">دينار كويتي (د.ك)</option>
+                <option value="ر.س">ريال سعودي (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> اسم الجهة:</label>
+            <input type="text" id="companyName" value="اسم الجهة المستفيدة من التقرير" placeholder="الجهة المستفيدة">
         </div>
-    </div>
 
-    <footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
-
-    <div class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> آلة حاسبة</div>
-    <div id="calculatorModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><span class="close">&times;</span><h2><i class="fas fa-calculator" style="color: var(--accent-soft);"></i> آلة حاسبة</h2></div>
-            <div class="modal-body">
-                <input type="text" id="calcDisplay" class="calc-display" readonly>
-                <div class="calc-buttons">
-                    <button class="calc-btn" onclick="handleCalculatorInput('9')">9</button><button class="calc-btn" onclick="handleCalculatorInput('8')">8</button><button class="calc-btn" onclick="handleCalculatorInput('7')">7</button><button class="calc-btn operator" onclick="handleCalculatorInput('/')">÷</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('6')">6</button><button class="calc-btn" onclick="handleCalculatorInput('5')">5</button><button class="calc-btn" onclick="handleCalculatorInput('4')">4</button><button class="calc-btn operator" onclick="handleCalculatorInput('*')">×</button>
-                    <button class="calc-btn" onclick="handleCalculatorInput('3')">3</button><button class="calc-btn" onclick="handleCalculatorInput('2')">2</button><button class="calc-btn" onclick="handleCalculatorInput('1')">1</button><button class="calc-btn operator" onclick="handleCalculatorInput('-')">-</button>
-                    <button class="calc-btn" onclick="clearCalculator()">C</button><button class="calc-btn" onclick="handleCalculatorInput('.')">.</button><button class="calc-btn" onclick="handleCalculatorInput('0')">0</button><button class="calc-btn operator" onclick="handleCalculatorInput('+')">+</button>
-                    <button class="calc-btn" onclick="backspaceCalculator()">⌫</button><button class="calc-btn equals" onclick="calculateCalculatorResult()" style="grid-column: span 3;">=</button>
-                </div>
+        <div class="grid-2">
+            <div>
+                <div class="section-title-sm">📊 البيانات التاريخية</div>
+                <div class="form-group tooltip"><label>الإيرادات (سنة الأساس)</label><input type="number" id="baseRevenue" placeholder="مثال: 2000000"><span class="tooltiptext">الإيرادات في آخر سنة متاحة.</span></div>
+                <div class="form-group tooltip"><label>تكلفة المبيعات (% من الإيرادات)</label><input type="number" id="cogsPercent" value="60"><span class="tooltiptext">نسبة تكلفة المبيعات من الإيرادات.</span></div>
+                <div class="form-group tooltip"><label>المصاريف التشغيلية (% من الإيرادات)</label><input type="number" id="opexPercent" value="25"><span class="tooltiptext">نسبة المصاريف التشغيلية من الإيرادات.</span></div>
+                <div class="form-group tooltip"><label>معدل الضريبة (%)</label><input type="number" id="taxRate" value="25"><span class="tooltiptext">نسبة ضريبة الدخل.</span></div>
+                <div class="form-group tooltip"><label>الإهلاك السنوي</label><input type="number" id="depreciation" placeholder="مثال: 50000"><span class="tooltiptext">قيمة الإهلاك السنوي الثابت.</span></div>
+                <div class="form-group tooltip"><label>النفقات الرأسمالية (CAPEX) السنوي</label><input type="number" id="capex" placeholder="مثال: 80000"><span class="tooltiptext">الاستثمارات السنوية في الأصول الثابتة.</span></div>
+                <div class="form-group tooltip"><label>أيام تحصيل المدينين (DSO)</label><input type="number" id="dso" value="45"><span class="tooltiptext">متوسط فترة تحصيل المبيعات الآجلة.</span></div>
+                <div class="form-group tooltip"><label>أيام المخزون (DIO)</label><input type="number" id="dio" value="60"><span class="tooltiptext">متوسط فترة بقاء المخزون.</span></div>
+                <div class="form-group tooltip"><label>أيام سداد الدائنين (DPO)</label><input type="number" id="dpo" value="30"><span class="tooltiptext">متوسط فترة سداد الموردين.</span></div>
+            </div>
+            <div>
+                <div class="section-title-sm">📈 افتراضات النمو والتقييم</div>
+                <div class="form-group tooltip"><label>معدل نمو الإيرادات السنوي (%)</label><input type="number" id="growthRate" value="10"><span class="tooltiptext">نسبة النمو السنوي للإيرادات.</span></div>
+                <div class="form-group tooltip"><label>عدد سنوات التوقع</label><input type="number" id="forecastYears" value="5"><span class="tooltiptext">عدد السنوات المراد توقعها.</span></div>
+                <div class="form-group tooltip"><label>معدل الخصم (WACC) (%)</label><input type="number" id="discountRate" value="10"><span class="tooltiptext">معدل الخصم لحساب صافي القيمة الحالية.</span></div>
+                <div class="form-group tooltip"><label>رأس المال العامل الأولي</label><input type="number" id="initialWC" placeholder="مثال: 200000"><span class="tooltiptext">رأس المال العامل في سنة الأساس.</span></div>
+                <div class="form-group tooltip"><label>الاستثمار الأولي (CAPEX سنة 0)</label><input type="number" id="initialInvestment" placeholder="مثال: 500000"><span class="tooltiptext">الاستثمار الأولي خارج التدفقات التشغيلية.</span></div>
+                <div class="form-group tooltip"><label>معدل النمو الدائم (%)</label><input type="number" id="terminalGrowth" value="3"><span class="tooltiptext">معدل النمو الدائم بعد فترة التوقع.</span></div>
             </div>
         </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> تنفيذ التنبؤ المالي</button>
+
+        <div class="results-section" id="resultsSection" style="display:none;">
+            <div class="action-bar">
+                <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> Word</button>
+                <button class="btn-export excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Excel شامل</button>
+            </div>
+            <div class="results-grid" id="kpiCards"></div>
+            <div class="section-title-sm">📋 قائمة الدخل المتوقعة</div>
+            <div class="table-container" id="incomeTable"></div>
+            <div class="section-title-sm">💵 التدفقات النقدية الحرة (FCF)</div>
+            <div class="table-container" id="cashFlowTable"></div>
+            <div class="chart-grid">
+                <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+                <div class="chart-container"><canvas id="fcfChart"></canvas></div>
+            </div>
+            <div id="valuationCard" class="result-card"></div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center;">
+            <i class="fas fa-robot" style="color:var(--accent-soft);"></i> سيتم عرض التنبؤات بعد الضغط على زر الحساب
+        </div>
     </div>
+</div>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js">
-    </script>
-    <script>
-        AOS.init({ duration: 800, once: true });
+<footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
 
-        // متغير عام لتخزين النتائج للتصدير
-        let globalForecastData = null;
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> حاسبة</button>
+<a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> الرئيسية</a>
 
-        // ------------------ دوال مساعدة للتصدير ------------------
-        function showLoading(title, msg) {
-            document.getElementById('loadingTitle').textContent = title;
-            document.getElementById('loadingMsg').textContent = msg;
-            document.getElementById('exportLoading').classList.add('show');
-        }
+<!-- نافذة الآلة الحاسبة -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> آلة حاسبة</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        function hideLoading() {
-            document.getElementById('exportLoading').classList.remove('show');
-        }
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: true, offset: 100 });
 
-        // ------------------ دوال الحساب ------------------
-        function getInputs() {
-            return {
-                currency: document.getElementById('currencySelect').value,
-                companyName: document.getElementById('companyName').value || 'الجهة',
-                baseRevenue: parseFloat(document.getElementById('baseRevenue').value) || 0,
-                cogsPercent: parseFloat(document.getElementById('cogsPercent').value) / 100 || 0,
-                opexPercent: parseFloat(document.getElementById('opexPercent').value) / 100 || 0,
-                taxRate: parseFloat(document.getElementById('taxRate').value) / 100 || 0,
-                depreciation: parseFloat(document.getElementById('depreciation').value) || 0,
-                capex: parseFloat(document.getElementById('capex').value) || 0,
-                dso: parseFloat(document.getElementById('dso').value) || 0,
-                dio: parseFloat(document.getElementById('dio').value) || 0,
-                dpo: parseFloat(document.getElementById('dpo').value) || 0,
-                growthRate: parseFloat(document.getElementById('growthRate').value) / 100 || 0,
-                forecastYears: parseInt(document.getElementById('forecastYears').value) || 5,
-                discountRate: parseFloat(document.getElementById('discountRate').value) / 100 || 0.1,
-                initialWC: parseFloat(document.getElementById('initialWC').value) || 0,
-                initialInvestment: parseFloat(document.getElementById('initialInvestment').value) || 0,
-                terminalGrowth: parseFloat(document.getElementById('terminalGrowth').value) / 100 || 0.03
-            };
-        }
-
-        function calculateForecast(inputs) {
-            const years = inputs.forecastYears;
-            let revenue = [];
-            let cogs = [];
-            let opex = [];
-            let ebit = [];
-            let tax = [];
-            let netIncome = [];
-            let fcf = [];
-
-            for (let i = 0; i < years; i++) {
-                let rev = inputs.baseRevenue * Math.pow(1 + inputs.growthRate, i + 1);
-                revenue.push(rev);
-                let c = rev * inputs.cogsPercent;
-                cogs.push(c);
-                let op = rev * inputs.opexPercent;
-                opex.push(op);
-                let ebit_i = rev - c - op - inputs.depreciation;
-                ebit.push(ebit_i);
-                let tax_i = ebit_i > 0 ? ebit_i * inputs.taxRate : 0;
-                tax.push(tax_i);
-                let net = ebit_i - tax_i;
-                netIncome.push(net);
-            }
-
-            let wc = [];
-            for (let i = 0; i < years; i++) {
-                let receivables = (inputs.dso / 365) * revenue[i];
-                let inventory = (inputs.dio / 365) * inputs.cogsPercent * revenue[i];
-                let payables = (inputs.dpo / 365) * inputs.cogsPercent * revenue[i];
-                let wc_i = receivables + inventory - payables;
-                wc.push(wc_i);
-            }
-
-            for (let i = 0; i < years; i++) {
-                let changeWC = (i === 0) ? wc[i] - inputs.initialWC : wc[i] - wc[i - 1];
-                let fcf_i = netIncome[i] + inputs.depreciation - inputs.capex - changeWC;
-                fcf.push(fcf_i);
-            }
-
-            let npv = -inputs.initialInvestment;
-            let cumFcf = 0;
-            let paybackYear = null;
-            let paybackFraction = 0;
-            for (let i = 0; i < years; i++) {
-                let pv = fcf[i] / Math.pow(1 + inputs.discountRate, i + 1);
-                npv += pv;
-                cumFcf += fcf[i];
-                if (cumFcf >= inputs.initialInvestment && paybackYear === null) {
-                    paybackYear = i + 1;
-                    let prevCum = cumFcf - fcf[i];
-                    paybackFraction = (inputs.initialInvestment - prevCum) / fcf[i];
-                }
-            }
-            let paybackPeriod = paybackYear ? paybackYear - 1 + paybackFraction : null;
-
-            let terminalFcf = fcf[years - 1] * (1 + inputs.terminalGrowth);
-            let terminalValue = terminalFcf / (inputs.discountRate - inputs.terminalGrowth);
-            let pvTerminal = terminalValue / Math.pow(1 + inputs.discountRate, years);
-            let totalNpv = npv + pvTerminal;
-
-            let irr = null;
-            if (totalNpv > 0) {
-                let cashFlows = [-inputs.initialInvestment, ...fcf];
-                cashFlows[cashFlows.length - 1] += terminalValue;
-                irr = calculateIRR(cashFlows);
-            }
-
-            return { revenue, cogs, opex, ebit, tax, netIncome, fcf, wc, npv, totalNpv, irr, paybackPeriod,
-                terminalValue };
-        }
-
-        function calculateIRR(cashFlows, guess = 0.1) {
-            let hasPos = cashFlows.some(cf => cf > 0);
-            let hasNeg = cashFlows.some(cf => cf < 0);
-            if (!hasPos || !hasNeg) return NaN;
-            let low = -0.99,
-                high = 1e6,
-                fLow = 0,
-                fHigh = 0;
-            for (let i = 0; i < cashFlows.length; i++) {
-                fLow += cashFlows[i] / Math.pow(1 + low, i);
-                fHigh += cashFlows[i] / Math.pow(1 + high, i);
-            }
-            if (fLow * fHigh > 0) return NaN;
-            for (let iter = 0; iter < 1000; iter++) {
-                let mid = (low + high) / 2;
-                let fMid = 0;
-                for (let i = 0; i < cashFlows.length; i++) fMid += cashFlows[i] / Math.pow(1 + mid, i);
-                if (Math.abs(fMid) < 1e-8) return mid;
-                if (fMid > 0) low = mid;
-                else high = mid;
-            }
-            return (low + high) / 2;
-        }
-
-        // ------------------ عرض النتائج ------------------
-        let revenueChart, fcfChart;
-
-        function displayForecast() {
-            const inputs = getInputs();
-            const forecast = calculateForecast(inputs);
-            const currency = inputs.currency;
-            const years = inputs.forecastYears;
-
-            // تخزين البيانات للتصدير
-            globalForecastData = {
-                inputs: inputs,
-                forecast: forecast,
-                years: years,
-                currency: currency
-            };
-
-            document.getElementById('resultsSection').style.display = 'block';
-            document.getElementById('initialMessage').style.display = 'none';
-
-            document.getElementById('kpiCards').innerHTML = `
-                <div class="result-card"><div class="label">صافي القيمة الحالية (NPV)</div><div class="value">${currency}${forecast.totalNpv.toFixed(0)}</div><div class="status ${forecast.totalNpv>0?'status-good':'status-bad'}">${forecast.totalNpv>0?'مربح':'خاسر'}</div></div>
-                <div class="result-card"><div class="label">معدل العائد الداخلي (IRR)</div><div class="value">${forecast.irr ? (forecast.irr*100).toFixed(2)+'%' : 'غير محدد'}</div><div class="status ${forecast.irr && forecast.irr>inputs.discountRate?'status-good':'status-warning'}">${forecast.irr && forecast.irr>inputs.discountRate ? '> معدل الخصم' : '≤ معدل الخصم'}</div></div>
-                <div class="result-card"><div class="label">فترة الاسترداد</div><div class="value">${forecast.paybackPeriod ? forecast.paybackPeriod.toFixed(1) : '∞'}</div><div class="unit">سنة</div></div>
-                <div class="result-card"><div class="label">القيمة النهائية (Terminal Value)</div><div class="value">${currency}${forecast.terminalValue.toFixed(0)}</div></div>
-            `;
-
-            let incomeHtml = `<thead><tr><th>السنة</th><th>الإيرادات</th><th>تكلفة المبيعات</th><th>المصاريف التشغيلية</th><th>الإهلاك</th><th>EBIT</th><th>الضريبة</th><th>صافي الربح</th></tr></thead><tbody>`;
-            for (let i = 0; i < years; i++) {
-                incomeHtml += `<tr><td>سنة ${i+1}</td><td>${currency}${forecast.revenue[i].toFixed(0)}</td><td>${currency}${forecast.cogs[i].toFixed(0)}</td><td>${currency}${forecast.opex[i].toFixed(0)}</td><td>${currency}${inputs.depreciation.toFixed(0)}</td><td class="${forecast.ebit[i]>=0?'positive':'negative'}">${currency}${forecast.ebit[i].toFixed(0)}</td><td>${currency}${forecast.tax[i].toFixed(0)}</td><td class="${forecast.netIncome[i]>=0?'positive':'negative'}">${currency}${forecast.netIncome[i].toFixed(0)}</td></tr>`;
-            }
-            incomeHtml += `</tbody>`;
-            document.getElementById('incomeTable').innerHTML = `<table>${incomeHtml}</table>`;
-
-            let cashHtml = `<thead><tr><th>السنة</th><th>صافي الربح</th><th>الإهلاك</th><th>CAPEX</th><th>تغير رأس المال العامل</th><th>التدفق النقدي الحر (FCF)</th></tr></thead><tbody>`;
-            for (let i = 0; i < years; i++) {
-                let changeWC = (i === 0) ? forecast.wc[i] - inputs.initialWC : forecast.wc[i] - forecast.wc[i -
-                    1];
-                cashHtml += `<tr><td>سنة ${i+1}</td><td>${currency}${forecast.netIncome[i].toFixed(0)}</td><td>${currency}${inputs.depreciation.toFixed(0)}</td><td>${currency}${inputs.capex.toFixed(0)}</td><td>${currency}${changeWC.toFixed(0)}</td><td class="${forecast.fcf[i]>=0?'positive':'negative'}">${currency}${forecast.fcf[i].toFixed(0)}</td></tr>`;
-            }
-            cashHtml += `</tbody>`;
-            document.getElementById('cashFlowTable').innerHTML = `<table>${cashHtml}</table>`;
-
-            if (revenueChart) revenueChart.destroy();
-            const ctxRev = document.getElementById('revenueChart').getContext('2d');
-            revenueChart = new Chart(ctxRev, {
-                type: 'line',
-                data: {
-                    labels: Array.from({ length: years }, (_, i) => `سنة ${i+1}`),
-                    datasets: [
-                        { label: 'الإيرادات', data: forecast.revenue, borderColor: '#28a745',
-                        fill: false },
-                        { label: 'صافي الربح', data: forecast.netIncome, borderColor: '#b8860b',
-                        fill: false }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            if (fcfChart) fcfChart.destroy();
-            const ctxFcf = document.getElementById('fcfChart').getContext('2d');
-            fcfChart = new Chart(ctxFcf, {
-                type: 'bar',
-                data: {
-                    labels: Array.from({ length: years }, (_, i) => `سنة ${i+1}`),
-                    datasets: [{ label: 'التدفق النقدي الحر', data: forecast.fcf,
-                    backgroundColor: '#b8860b' }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            document.getElementById('valuationCard').innerHTML = `
-                <div class="label">تقييم المشروع</div>
-                <div>NPV (بما في ذلك القيمة النهائية): ${currency}${forecast.totalNpv.toFixed(0)}</div>
-                <div>IRR: ${forecast.irr ? (forecast.irr*100).toFixed(2)+'%' : 'غير محدد'}</div>
-                <div>فترة الاسترداد: ${forecast.paybackPeriod ? forecast.paybackPeriod.toFixed(1)+' سنة' : 'غير محققة'}</div>
-                <div class="unit">* تم حساب القيمة النهائية بمعدل نمو دائم ${inputs.terminalGrowth*100}%</div>
-            `;
-        }
-
-        // ------------------ تصدير Excel احترافي (ExcelJS) ------------------
-        async function exportToExcel() {
-            if (!globalForecastData) {
-                alert('الرجاء إجراء التحليل أولاً.');
-                return;
-            }
-            showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'يرجى الانتظار');
+    // ===== آلة حاسبة =====
+    const calcDisplay = document.getElementById('calcDisplay');
+    let currentCalcInput = '';
+    function handleCalc(v) {
+        if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+        if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+        if (v === '=') {
             try {
-                await new Promise(r => setTimeout(r, 100));
-                const F = globalForecastData.forecast;
-                const I = globalForecastData.inputs;
-                const currency = I.currency;
-                const companyName = I.companyName;
-                const years = globalForecastData.years;
-                const workbook = new ExcelJS.Workbook();
-                workbook.creator = 'FAROUK GRUP';
-                workbook.created = new Date();
+                let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/'));
+                calcDisplay.value = r;
+                currentCalcInput = r.toString();
+            } catch(e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
+            return;
+        }
+        currentCalcInput += v;
+        calcDisplay.value = currentCalcInput;
+    }
+    document.querySelectorAll('.calc-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const v = this.dataset.val;
+            if (v !== undefined) handleCalc(v);
+        });
+    });
+    const modalEl = document.getElementById('calculatorModal');
+    document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        modalEl.classList.add('active');
+        calcDisplay.value = currentCalcInput;
+    });
+    document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+    modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+    document.addEventListener('keydown', function(e) {
+        if (!modalEl.classList.contains('active')) return;
+        e.preventDefault();
+        const k = e.key;
+        if (k >= '0' && k <= '9') handleCalc(k);
+        else if (k === '.') handleCalc('.');
+        else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+        else if (k === 'Enter' || k === '=') handleCalc('=');
+        else if (k === 'Backspace') handleCalc('⌫');
+        else if (k === 'Escape') modalEl.classList.remove('active');
+        else if (k.toLowerCase() === 'c') handleCalc('C');
+    });
 
-                const G = 'FFB48554',
-                    GL = 'FFCFA776',
-                    DB = 'FF0B0E17',
-                    HB = 'FF1A2035',
-                    SB = 'FF243050';
-                const AR = 'FFF5F0E8',
-                    W = 'FFFFFFFF',
-                    DT = 'FF1A1A1A',
-                    PB = 'FFD4EDDA',
-                    NB = 'FFF8D7DA';
-                const PT = 'FF155724',
-                    NT = 'FF721C24',
-                    GB = 'FFFFF3CD';
-                const nc = '#,##0;(#,##0);"-"';
+    // ===== شاشة تحميل =====
+    function showLoading(title, msg) {
+        document.getElementById('loadingTitle').textContent = title;
+        document.getElementById('loadingMsg').textContent = msg;
+        document.getElementById('exportLoading').classList.add('show');
+    }
+    function hideLoading() {
+        document.getElementById('exportLoading').classList.remove('show');
+    }
 
-                function hs(bg = HB, tc = GL) {
-                    return {
-                        font: { name: 'Arial', bold: true, size: 11, color: { argb: tc } },
-                        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                        alignment: { horizontal: 'center', vertical: 'middle', wrapText: true,
-                            readingOrder: 'rtl' },
-                        border: { top: { style: 'thin', color: { argb: G } }, bottom: { style: 'thin',
-                                color: { argb: G } }, left: { style: 'thin', color: { argb: G } },
-                            right: { style: 'thin', color: { argb: G } } }
-                    };
-                }
+    // ===== متغير عام =====
+    let globalForecastData = null;
 
-                function cs(bg = W, tc = DT, b = false, h = 'center') {
-                    return {
-                        font: { name: 'Arial', bold: b, size: 10, color: { argb: tc } },
-                        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                        alignment: { horizontal: h, vertical: 'middle', wrapText: true, readingOrder: 'rtl' },
-                        border: { top: { style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair',
-                                color: { argb: 'FFCCCCCC' } }, left: { style: 'hair',
-                            color: { argb: 'FFCCCCCC' } }, right: { style: 'hair',
-                            color: { argb: 'FFCCCCCC' } } }
-                    };
-                }
+    // ===== دوال الحساب =====
+    function getInputs() {
+        return {
+            currency: document.getElementById('currencySelect').value,
+            companyName: document.getElementById('companyName').value || 'الجهة',
+            baseRevenue: parseFloat(document.getElementById('baseRevenue').value) || 0,
+            cogsPercent: parseFloat(document.getElementById('cogsPercent').value) / 100 || 0,
+            opexPercent: parseFloat(document.getElementById('opexPercent').value) / 100 || 0,
+            taxRate: parseFloat(document.getElementById('taxRate').value) / 100 || 0,
+            depreciation: parseFloat(document.getElementById('depreciation').value) || 0,
+            capex: parseFloat(document.getElementById('capex').value) || 0,
+            dso: parseFloat(document.getElementById('dso').value) || 0,
+            dio: parseFloat(document.getElementById('dio').value) || 0,
+            dpo: parseFloat(document.getElementById('dpo').value) || 0,
+            growthRate: parseFloat(document.getElementById('growthRate').value) / 100 || 0,
+            forecastYears: parseInt(document.getElementById('forecastYears').value) || 5,
+            discountRate: parseFloat(document.getElementById('discountRate').value) / 100 || 0.1,
+            initialWC: parseFloat(document.getElementById('initialWC').value) || 0,
+            initialInvestment: parseFloat(document.getElementById('initialInvestment').value) || 0,
+            terminalGrowth: parseFloat(document.getElementById('terminalGrowth').value) / 100 || 0.03
+        };
+    }
 
-                function ap(c, s) { if (s.font) c.font = s.font; if (s.fill) c.fill = s.fill; if (s.alignment) c
-                        .alignment = s.alignment; if (s.border) c.border = s.border; if (s.numFmt) c.numFmt = s
-                        .numFmt; }
+    function calculateForecast(inputs) {
+        const years = inputs.forecastYears;
+        let revenue = [], cogs = [], opex = [], ebit = [], tax = [], netIncome = [], fcf = [];
 
-                function mh(ws, fc, tc, r, text, bg = HB, tc2 = GL, fs = 12) {
-                    ws.mergeCells(r, fc, r, tc);
-                    const c = ws.getCell(r, fc);
-                    c.value = text;
-                    c.font = { name: 'Arial', bold: true, size: fs, color: { argb: tc2 } };
-                    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
-                    c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'rtl' };
-                    c.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
-                            color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
-                        right: { style: 'medium', color: { argb: G } } };
-                }
+        for (let i = 0; i < years; i++) {
+            let rev = inputs.baseRevenue * Math.pow(1 + inputs.growthRate, i + 1);
+            revenue.push(rev);
+            let c = rev * inputs.cogsPercent;
+            cogs.push(c);
+            let op = rev * inputs.opexPercent;
+            opex.push(op);
+            let ebit_i = rev - c - op - inputs.depreciation;
+            ebit.push(ebit_i);
+            let tax_i = ebit_i > 0 ? ebit_i * inputs.taxRate : 0;
+            tax.push(tax_i);
+            let net = ebit_i - tax_i;
+            netIncome.push(net);
+        }
 
-                // 1. غلاف التقرير
-                const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true,
-                        showGridLines: false }] });
-                [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
-                for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
-                cv.getRow(2).height = 80;
-                cv.getRow(4).height = 60;
-                cv.mergeCells(2, 1, 2, 4);
-                const bc = cv.getCell(2, 1);
-                bc.value = 'مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
-                bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
-                bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
-                bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'rtl' };
-                bc.border = { bottom: { style: 'thick', color: { argb: G } } };
-                mh(cv, 1, 4, 4, `تقرير التنبؤ المالي المتقدم\n${companyName}`, DB, GL, 18);
-                const inf = [
-                    ['📋 الجهة', companyName],
-                    ['📅 التاريخ', new Date().toLocaleDateString('ar-EG')],
-                    ['💰 العملة', currency],
-                    ['📈 عدد سنوات التوقع', years + ' سنوات'],
-                    ['💵 صافي القيمة الحالية (NPV)',
-                        `${currency} ${F.totalNpv.toFixed(0)}`
-                    ],
-                    ['📊 معدل العائد الداخلي (IRR)', F.irr ? (F.irr * 100).toFixed(2) + '%' : 'غير محدد']
-                ];
-                let ir = 6;
-                inf.forEach(([l, v], idx) => {
-                    cv.mergeCells(ir, 1, ir, 2);
-                    cv.mergeCells(ir, 3, ir, 4);
-                    const lc = cv.getCell(ir, 1),
-                        vc = cv.getCell(ir, 3);
-                    lc.value = l;
-                    vc.value = v;
-                    const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
-                    ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } },
-                        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                        alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' },
-                        border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
-                            right: { style: 'hair' } } });
-                    ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } }, fill: { type: 'pattern',
-                            pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: 'center',
-                            vertical: 'middle', readingOrder: 'rtl' }, border: { top: { style: 'hair' },
-                            bottom: { style: 'hair' }, left: { style: 'hair' },
-                        right: { style: 'hair' } } });
-                    cv.getRow(ir).height = 28;
-                    ir++;
-                });
-                const vr = ir + 1,
-                    isg = F.totalNpv > 0;
-                cv.mergeCells(vr, 1, vr, 4);
-                const vc2 = cv.getCell(vr, 1);
-                vc2.value = isg ? '✅ المشروع مربح — NPV موجب' : '⚠️ المشروع خاسر — NPV سالب';
-                vc2.font = { name: 'Arial', bold: true, size: 14, color: { argb: isg ? PT : 'FF856404' } };
-                vc2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: isg ? PB : GB } };
-                vc2.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
-                vc2.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
-                        color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
-                    right: { style: 'medium', color: { argb: G } } };
-                cv.getRow(vr).height = 40;
+        let wc = [];
+        for (let i = 0; i < years; i++) {
+            let receivables = (inputs.dso / 365) * revenue[i];
+            let inventory = (inputs.dio / 365) * inputs.cogsPercent * revenue[i];
+            let payables = (inputs.dpo / 365) * inputs.cogsPercent * revenue[i];
+            let wc_i = receivables + inventory - payables;
+            wc.push(wc_i);
+        }
 
-                // 2. المدخلات والافتراضات
-                const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true,
-                        showGridLines: false }] });
-                inputsSheet.getColumn(1).width = 5;
-                inputsSheet.getColumn(2).width = 38;
-                inputsSheet.getColumn(3).width = 22;
-                inputsSheet.getColumn(4).width = 22;
-                inputsSheet.getColumn(5).width = 5;
-                mh(inputsSheet, 1, 5, 1, '📋 جدول المدخلات والافتراضات الأساسية', DB, GL, 14);
-                inputsSheet.getRow(1).height = 40;
-                mh(inputsSheet, 2, 4, 2, 'البيانات الأساسية للمشروع', SB, W, 11);
-                inputsSheet.getRow(2).height = 28;
-                const inputsData = [
-                    ['الإيرادات (سنة الأساس)', I.baseRevenue,
-                        `${currency} ${I.baseRevenue.toFixed(0)}`],
-                    ['تكلفة المبيعات (%)', (I.cogsPercent * 100),
-                        `${(I.cogsPercent*100).toFixed(0)}%`],
-                    ['المصاريف التشغيلية (%)', (I.opexPercent * 100),
-                        `${(I.opexPercent*100).toFixed(0)}%`],
-                    ['معدل الضريبة (%)', (I.taxRate * 100), `${(I.taxRate*100).toFixed(0)}%`],
-                    ['الإهلاك السنوي', I.depreciation,
-                    `${currency} ${I.depreciation.toFixed(0)}`],
-                    ['النفقات الرأسمالية السنوية (CAPEX)', I.capex,
-                        `${currency} ${I.capex.toFixed(0)}`],
-                    ['أيام تحصيل المدينين (DSO)', I.dso, `${I.dso} يوم`],
-                    ['أيام المخزون (DIO)', I.dio, `${I.dio} يوم`],
-                    ['أيام سداد الدائنين (DPO)', I.dpo, `${I.dpo} يوم`],
-                    ['معدل نمو الإيرادات السنوي (%)', (I.growthRate * 100),
-                        `${(I.growthRate*100).toFixed(1)}%`],
-                    ['عدد سنوات التوقع', years, `${years} سنوات`],
-                    ['معدل الخصم (WACC) (%)', (I.discountRate * 100),
-                        `${(I.discountRate*100).toFixed(1)}%`],
-                    ['رأس المال العامل الأولي', I.initialWC,
-                        `${currency} ${I.initialWC.toFixed(0)}`],
-                    ['الاستثمار الأولي', I.initialInvestment,
-                        `${currency} ${I.initialInvestment.toFixed(0)}`],
-                    ['معدل النمو الدائم (%)', (I.terminalGrowth * 100),
-                        `${(I.terminalGrowth*100).toFixed(1)}%`],
-                    ['العملة المستخدمة', I.currency, ''],
-                    ['اسم الجهة / المشروع', I.companyName, '']
-                ];
-                let iRow = 3;
-                inputsData.forEach(([label, val, note], idx) => {
-                    inputsSheet.getRow(iRow).height = 24;
-                    const bg = idx % 2 === 0 ? 'FFFEFCF6' : 'FFFFFFFF';
-                    const lc = inputsSheet.getCell(iRow, 2),
-                        vc = inputsSheet.getCell(iRow, 3),
-                        nc = inputsSheet.getCell(iRow, 4);
-                    lc.value = label;
-                    vc.value = val;
-                    nc.value = note;
-                    ap(lc, cs(bg, DT, true, 'right'));
-                    ap(vc, { ...cs(bg, '0000FF', false, 'center'), numFmt: typeof val === 'number' ? nc :
-                            null });
-                    ap(nc, cs(bg, '00695C', false, 'center'));
-                    iRow++;
-                });
+        for (let i = 0; i < years; i++) {
+            let changeWC = (i === 0) ? wc[i] - inputs.initialWC : wc[i] - wc[i - 1];
+            let fcf_i = netIncome[i] + inputs.depreciation - inputs.capex - changeWC;
+            fcf.push(fcf_i);
+        }
 
-                // 3. مؤشرات الأداء الرئيسية
-                const kpiSheet = workbook.addWorksheet('مؤشرات الأداء الرئيسية', { views: [{ rightToLeft: true,
-                        showGridLines: false }] });
-                [5, 32, 22, 22, 22, 5].forEach((w, i) => kpiSheet.getColumn(i + 1).width = w);
-                mh(kpiSheet, 1, 6, 1, '📊 لوحة مؤشرات الأداء الرئيسية (KPI Dashboard)', DB, GL, 15);
-                kpiSheet.getRow(1).height = 45;
-                mh(kpiSheet, 2, 5, 2, `${companyName} | ${new Date().toLocaleDateString('ar-EG')}`, HB, W, 10);
-                kpiSheet.getRow(2).height = 26;
-                const kpis = [
-                    { label: 'صافي القيمة الحالية (NPV)', value: `${currency} ${F.totalNpv.toFixed(0)}`,
-                        good: F.totalNpv > 0, interpretation: 'القيمة الحالية للتدفقات النقدية' },
-                    { label: 'معدل العائد الداخلي (IRR)', value: F.irr ? (F.irr * 100).toFixed(2) + '%' :
-                            'غير محدد', good: F.irr && F.irr > I.discountRate,
-                        interpretation: 'مقارنة بمعدل الخصم' },
-                    { label: 'فترة الاسترداد', value: F.paybackPeriod ? F.paybackPeriod.toFixed(1) + ' سنة' :
-                            'غير محققة', good: F.paybackPeriod && F.paybackPeriod <= years,
-                        interpretation: 'فترة استرداد الاستثمار' },
-                    { label: 'القيمة النهائية (Terminal Value)', value: `${currency} ${F.terminalValue.toFixed(0)}`,
-                        good: F.terminalValue > 0, interpretation: 'قيمة المشروع بعد فترة التوقع' },
-                    { label: 'إجمالي الإيرادات (آخر سنة)', value: `${currency} ${F.revenue[years-1].toFixed(0)}`,
-                        good: true, interpretation: `إيرادات السنة ${years}` }
-                ];
-                let kRow = 3;
-                kpis.forEach((k, idx) => {
-                    kpiSheet.getRow(kRow).height = 40;
-                    kpiSheet.mergeCells(kRow, 2, kRow, 2);
-                    kpiSheet.mergeCells(kRow, 3, kRow, 3);
-                    kpiSheet.mergeCells(kRow, 4, kRow, 4);
-                    kpiSheet.mergeCells(kRow, 5, kRow, 5);
-                    const ic = kpiSheet.getCell(kRow, 2);
-                    ic.value = `🔹 ${idx+1}`;
-                    const lc2 = kpiSheet.getCell(kRow, 3);
-                    lc2.value = k.label;
-                    const vc3 = kpiSheet.getCell(kRow, 4);
-                    vc3.value = k.value;
-                    const nc2 = kpiSheet.getCell(kRow, 5);
-                    nc2.value = k.interpretation;
-                    const bg = k.good ? PB : NB,
-                        tc = k.good ? PT : NT;
-                    [ic, lc2, vc3, nc2].forEach(c => { c.fill = { type: 'pattern', pattern: 'solid',
-                            fgColor: { argb: bg } };
-                        c.border = { top: { style: 'thin', color: { argb: G } }, bottom: { style: 'thin',
-                                color: { argb: G } }, left: { style: 'thin', color: { argb: G } },
-                            right: { style: 'thin', color: { argb: G } } }; });
-                    ic.font = { name: 'Arial', bold: true, size: 14, color: { argb: '555555' } };
-                    ic.alignment = { horizontal: 'center', vertical: 'middle' };
-                    lc2.font = { name: 'Arial', bold: true, size: 11, color: { argb: DT } };
-                    lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
-                    vc3.font = { name: 'Arial', bold: true, size: 13, color: { argb: tc } };
-                    vc3.alignment = { horizontal: 'center', vertical: 'middle' };
-                    nc2.font = { name: 'Arial', size: 9, color: { argb: '444444' } };
-                    nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
-                    kRow++;
-                });
+        let npv = -inputs.initialInvestment;
+        let cumFcf = 0;
+        let paybackYear = null, paybackFraction = 0;
+        for (let i = 0; i < years; i++) {
+            let pv = fcf[i] / Math.pow(1 + inputs.discountRate, i + 1);
+            npv += pv;
+            cumFcf += fcf[i];
+            if (cumFcf >= inputs.initialInvestment && paybackYear === null) {
+                paybackYear = i + 1;
+                let prevCum = cumFcf - fcf[i];
+                paybackFraction = (inputs.initialInvestment - prevCum) / fcf[i];
+            }
+        }
+        let paybackPeriod = paybackYear ? paybackYear - 1 + paybackFraction : null;
+
+        let terminalFcf = fcf[years - 1] * (1 + inputs.terminalGrowth);
+        let terminalValue = terminalFcf / (inputs.discountRate - inputs.terminalGrowth);
+        let pvTerminal = terminalValue / Math.pow(1 + inputs.discountRate, years);
+        let totalNpv = npv + pvTerminal;
+
+        let irr = null;
+        let cashFlows = [-inputs.initialInvestment, ...fcf];
+        cashFlows[cashFlows.length - 1] += terminalValue;
+        irr = calculateIRR(cashFlows);
+
+        return { revenue, cogs, opex, ebit, tax, netIncome, fcf, wc, npv, totalNpv, irr, paybackPeriod, terminalValue };
+    }
+
+    function calculateIRR(cashFlows) {
+        let hasPos = cashFlows.some(cf => cf > 0);
+        let hasNeg = cashFlows.some(cf => cf < 0);
+        if (!hasPos || !hasNeg) return NaN;
+        let low = -0.99, high = 1e6, fLow = 0, fHigh = 0;
+        for (let i = 0; i < cashFlows.length; i++) {
+            fLow += cashFlows[i] / Math.pow(1 + low, i);
+            fHigh += cashFlows[i] / Math.pow(1 + high, i);
+        }
+        if (fLow * fHigh > 0) return NaN;
+        for (let iter = 0; iter < 1000; iter++) {
+            let mid = (low + high) / 2;
+            let fMid = 0;
+            for (let i = 0; i < cashFlows.length; i++) fMid += cashFlows[i] / Math.pow(1 + mid, i);
+            if (Math.abs(fMid) < 1e-8) return mid;
+            if (fMid > 0) low = mid;
+            else high = mid;
+        }
+        return (low + high) / 2;
+    }
+
+    // ===== عرض النتائج =====
+    let revenueChart, fcfChart;
+
+    function displayForecast() {
+        const inputs = getInputs();
+        const forecast = calculateForecast(inputs);
+        const currency = inputs.currency;
+        const years = inputs.forecastYears;
+
+        globalForecastData = { inputs, forecast, years, currency };
+
+        document.getElementById('resultsSection').style.display = 'block';
+        document.getElementById('initialMessage').style.display = 'none';
+
+        document.getElementById('kpiCards').innerHTML = `
+            <div class="result-card"><div class="label">صافي القيمة الحالية (NPV)</div><div class="value">${currency}${forecast.totalNpv.toFixed(0)}</div><div class="status ${forecast.totalNpv>0?'status-good':'status-bad'}">${forecast.totalNpv>0?'مربح':'خاسر'}</div></div>
+            <div class="result-card"><div class="label">معدل العائد الداخلي (IRR)</div><div class="value">${forecast.irr ? (forecast.irr*100).toFixed(2)+'%' : 'غير محدد'}</div><div class="status ${forecast.irr && forecast.irr>inputs.discountRate?'status-good':'status-warning'}">${forecast.irr && forecast.irr>inputs.discountRate ? '> معدل الخصم' : '≤ معدل الخصم'}</div></div>
+            <div class="result-card"><div class="label">فترة الاسترداد</div><div class="value">${forecast.paybackPeriod ? forecast.paybackPeriod.toFixed(1) : '∞'}</div><div class="unit">سنة</div></div>
+            <div class="result-card"><div class="label">القيمة النهائية (Terminal Value)</div><div class="value">${currency}${forecast.terminalValue.toFixed(0)}</div></div>
+        `;
+
+        let incomeHtml = `<thead><tr><th>السنة</th><th>الإيرادات</th><th>تكلفة المبيعات</th><th>المصاريف التشغيلية</th><th>الإهلاك</th><th>EBIT</th><th>الضريبة</th><th>صافي الربح</th></tr></thead><tbody>`;
+        for (let i = 0; i < years; i++) {
+            incomeHtml += `<tr><td>سنة ${i+1}</td><td>${currency}${forecast.revenue[i].toFixed(0)}</td><td>${currency}${forecast.cogs[i].toFixed(0)}</td><td>${currency}${forecast.opex[i].toFixed(0)}</td><td>${currency}${inputs.depreciation.toFixed(0)}</td><td class="${forecast.ebit[i]>=0?'positive':'negative'}">${currency}${forecast.ebit[i].toFixed(0)}</td><td>${currency}${forecast.tax[i].toFixed(0)}</td><td class="${forecast.netIncome[i]>=0?'positive':'negative'}">${currency}${forecast.netIncome[i].toFixed(0)}</td></tr>`;
+        }
+        incomeHtml += `</tbody>`;
+        document.getElementById('incomeTable').innerHTML = `<table>${incomeHtml}</table>`;
+
+        let cashHtml = `<thead><tr><th>السنة</th><th>صافي الربح</th><th>الإهلاك</th><th>CAPEX</th><th>تغير رأس المال العامل</th><th>التدفق النقدي الحر (FCF)</th></tr></thead><tbody>`;
+        for (let i = 0; i < years; i++) {
+            let changeWC = (i === 0) ? forecast.wc[i] - inputs.initialWC : forecast.wc[i] - forecast.wc[i - 1];
+            cashHtml += `<tr><td>سنة ${i+1}</td><td>${currency}${forecast.netIncome[i].toFixed(0)}</td><td>${currency}${inputs.depreciation.toFixed(0)}</td><td>${currency}${inputs.capex.toFixed(0)}</td><td>${currency}${changeWC.toFixed(0)}</td><td class="${forecast.fcf[i]>=0?'positive':'negative'}">${currency}${forecast.fcf[i].toFixed(0)}</td></tr>`;
+        }
+        cashHtml += `</tbody>`;
+        document.getElementById('cashFlowTable').innerHTML = `<table>${cashHtml}</table>`;
+
+        if (revenueChart) revenueChart.destroy();
+        const ctxRev = document.getElementById('revenueChart').getContext('2d');
+        revenueChart = new Chart(ctxRev, {
+            type: 'line',
+            data: {
+                labels: Array.from({ length: years }, (_, i) => `سنة ${i+1}`),
+                datasets: [
+                    { label: 'الإيرادات', data: forecast.revenue, borderColor: '#28a745', fill: false },
+                    { label: 'صافي الربح', data: forecast.netIncome, borderColor: '#b8860b', fill: false }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        if (fcfChart) fcfChart.destroy();
+        const ctxFcf = document.getElementById('fcfChart').getContext('2d');
+        fcfChart = new Chart(ctxFcf, {
+            type: 'bar',
+            data: {
+                labels: Array.from({ length: years }, (_, i) => `سنة ${i+1}`),
+                datasets: [{ label: 'التدفق النقدي الحر', data: forecast.fcf, backgroundColor: '#b8860b' }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        document.getElementById('valuationCard').innerHTML = `
+            <div class="label">تقييم المشروع</div>
+            <div>NPV (بما في ذلك القيمة النهائية): ${currency}${forecast.totalNpv.toFixed(0)}</div>
+            <div>IRR: ${forecast.irr ? (forecast.irr*100).toFixed(2)+'%' : 'غير محدد'}</div>
+            <div>فترة الاسترداد: ${forecast.paybackPeriod ? forecast.paybackPeriod.toFixed(1)+' سنة' : 'غير محققة'}</div>
+            <div class="unit">* تم حساب القيمة النهائية بمعدل نمو دائم ${(inputs.terminalGrowth*100).toFixed(1)}%</div>
+        `;
+    }
+
+    document.getElementById('calculateBtn').addEventListener('click', displayForecast);
+
+    // ================================================================
+    // ========== تصدير Excel احترافي (مطابق للأدوات السابقة) ==========
+    // ================================================================
+    document.getElementById('exportExcelBtn').addEventListener('click', async function() {
+        if (!globalForecastData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+        showLoading('جاري إنشاء تقرير Excel...', 'إنشاء الأوراق والرسوم');
+        try {
+            const F = globalForecastData.forecast;
+            const I = globalForecastData.inputs;
+            const currency = I.currency;
+            const companyName = I.companyName;
+            const years = globalForecastData.years;
+
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'FAROUK GRUP';
+            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+            const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA', GB = 'FFFFF3CD';
+            const PT = 'FF155724', NT = 'FF721C24';
+            const nc = '#,##0;(#,##0);"-"';
+
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+
+            // 1. غلاف التقرير
+            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+            [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+            cv.getRow(2).height=80; cv.getRow(4).height=60;
+            cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+            bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
+            mh(cv,1,4,4,`تقرير التنبؤ المالي المتقدم\n${companyName}`,DB,GL,18);
+            const inf=[['📋 الجهة',companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',currency],['📈 عدد سنوات التوقع',`${years} سنوات`],['💵 NPV',`${currency} ${F.totalNpv.toFixed(0)}`],['📊 IRR',F.irr?(F.irr*100).toFixed(2)+'%':'غير محدد']];
+            let ir=6;
+            inf.forEach(([l,v],idx)=>{
+                cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+                const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+                const bg=idx%2===0?AR:'FFFEFCF6';
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                cv.getRow(ir).height=28; ir++;
+            });
+
+            // 2. المدخلات
+            const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            inputsSheet.getColumn(1).width=5; inputsSheet.getColumn(2).width=38; inputsSheet.getColumn(3).width=22; inputsSheet.getColumn(4).width=22; inputsSheet.getColumn(5).width=5;
+            mh(inputsSheet,1,5,1,'📋 جدول المدخلات والافتراضات الأساسية',DB,GL,14);
+            inputsSheet.getRow(1).height=40;
+            mh(inputsSheet,2,4,2,'البيانات الأساسية للمشروع',SB,'FFFFFFFF',11);
+            inputsSheet.getRow(2).height=28;
+            const inputFields = [
+                ['الإيرادات (سنة الأساس)', I.baseRevenue, `${currency} ${I.baseRevenue.toFixed(0)}`],
+                ['تكلفة المبيعات (%)', (I.cogsPercent*100), `${(I.cogsPercent*100).toFixed(0)}%`],
+                ['المصاريف التشغيلية (%)', (I.opexPercent*100), `${(I.opexPercent*100).toFixed(0)}%`],
+                ['معدل الضريبة (%)', (I.taxRate*100), `${(I.taxRate*100).toFixed(0)}%`],
+                ['الإهلاك السنوي', I.depreciation, `${currency} ${I.depreciation.toFixed(0)}`],
+                ['النفقات الرأسمالية (CAPEX)', I.capex, `${currency} ${I.capex.toFixed(0)}`],
+                ['أيام تحصيل المدينين (DSO)', I.dso, `${I.dso} يوم`],
+                ['أيام المخزون (DIO)', I.dio, `${I.dio} يوم`],
+                ['أيام سداد الدائنين (DPO)', I.dpo, `${I.dpo} يوم`],
+                ['معدل نمو الإيرادات (%)', (I.growthRate*100), `${(I.growthRate*100).toFixed(1)}%`],
+                ['عدد سنوات التوقع', years, 'سنة'],
+                ['معدل الخصم (WACC) (%)', (I.discountRate*100), `${(I.discountRate*100).toFixed(1)}%`],
+                ['رأس المال العامل الأولي', I.initialWC, `${currency} ${I.initialWC.toFixed(0)}`],
+                ['الاستثمار الأولي', I.initialInvestment, `${currency} ${I.initialInvestment.toFixed(0)}`],
+                ['معدل النمو الدائم (%)', (I.terminalGrowth*100), `${(I.terminalGrowth*100).toFixed(1)}%`]
+            ];
+            let iRow=3;
+            inputFields.forEach(([label,val,note],idx)=>{
+                inputsSheet.getRow(iRow).height=24;
+                const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+                const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
+                lc.value=label; vc.value=val; nc.value=note;
+                ap(lc,cs(bg,DT,true,'right'));
+                ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?nc:null});
+                ap(nc,cs(bg,'00695C',false,'center'));
+                iRow++;
+            });
+
+            // 3. مؤشرات الأداء
+            const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true, showGridLines: false }] });
+            [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
+            mh(kpiSheet,1,6,1,'📊 لوحة مؤشرات الأداء الرئيسية',DB,GL,15);
+            kpiSheet.getRow(1).height=45;
+            mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('ar-EG')}`,HB,'FFFFFFFF',10);
+            kpiSheet.getRow(2).height=26;
+            const kpis = [
+                { label: 'NPV', value: `${currency} ${F.totalNpv.toFixed(0)}`, good: F.totalNpv>0 },
+                { label: 'IRR', value: F.irr?(F.irr*100).toFixed(2)+'%':'غير محدد', good: F.irr && F.irr>I.discountRate },
+                { label: 'فترة الاسترداد', value: F.paybackPeriod?F.paybackPeriod.toFixed(1)+' سنة':'غير محققة', good: F.paybackPeriod && F.paybackPeriod<=years },
+                { label: 'القيمة النهائية', value: `${currency} ${F.terminalValue.toFixed(0)}`, good: F.terminalValue>0 },
+                { label: 'إيرادات آخر سنة', value: `${currency} ${F.revenue[years-1].toFixed(0)}`, good: true }
+            ];
+            let kRow=3;
+            kpis.forEach((k,idx)=>{
+                kpiSheet.getRow(kRow).height=40;
+                kpiSheet.mergeCells(kRow,2,kRow,2); kpiSheet.mergeCells(kRow,3,kRow,3); kpiSheet.mergeCells(kRow,4,kRow,4); kpiSheet.mergeCells(kRow,5,kRow,5);
+                const ic=kpiSheet.getCell(kRow,2); ic.value=`🔹 ${idx+1}`;
+                const lc2=kpiSheet.getCell(kRow,3); lc2.value=k.label;
+                const vc3=kpiSheet.getCell(kRow,4); vc3.value=k.value;
+                const nc2=kpiSheet.getCell(kRow,5); nc2.value='';
+                const bg=k.good?PB:NB, tc=k.good?PT:NT;
+                [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
+                ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
+                lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
                 kRow++;
-                kpiSheet.mergeCells(kRow, 2, kRow, 5);
-                const kFinal = kpiSheet.getCell(kRow, 2);
-                kFinal.value = F.totalNpv > 0 ? '✅ الحكم النهائي: المشروع مربح — يوصى بالاستثمار' :
-                    '⚠️ الحكم النهائي: المشروع خاسر — يحتاج مراجعة الافتراضات';
-                kFinal.font = { name: 'Arial', bold: true, size: 13, color: { argb: F.totalNpv > 0 ? PT :
-                        '856404' } };
-                kFinal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: F.totalNpv > 0 ? PB : GB } };
-                kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
-                kFinal.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
-                        color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
-                    right: { style: 'medium', color: { argb: G } } };
-                kpiSheet.getRow(kRow).height = 40;
+            });
+            kRow++;
+            kpiSheet.mergeCells(kRow,2,kRow,5);
+            const kFinal=kpiSheet.getCell(kRow,2);
+            kFinal.value=F.totalNpv>0?'✅ المشروع مربح — يوصى بالاستثمار':'⚠️ المشروع خاسر — يحتاج مراجعة';
+            kFinal.font={name:'Arial',bold:true,size:13,color:{argb:F.totalNpv>0?PT:'856404'}};
+            kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:F.totalNpv>0?PB:GB}};
+            kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
+            kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
+            kpiSheet.getRow(kRow).height=40;
 
-                // 4. قائمة الدخل المتوقعة
-                const incomeSheet = workbook.addWorksheet('قائمة الدخل المتوقعة', { views: [{ rightToLeft: true,
-                        showGridLines: false }] });
-                incomeSheet.getColumn(1).width = 5;
-                incomeSheet.getColumn(2).width = 14;
-                incomeSheet.getColumn(3).width = 16;
-                incomeSheet.getColumn(4).width = 16;
-                incomeSheet.getColumn(5).width = 16;
-                incomeSheet.getColumn(6).width = 14;
-                incomeSheet.getColumn(7).width = 16;
-                incomeSheet.getColumn(8).width = 14;
-                incomeSheet.getColumn(9).width = 16;
-                incomeSheet.getColumn(10).width = 5;
-                mh(incomeSheet, 1, 10, 1, '📋 قائمة الدخل المتوقعة', DB, GL, 14);
-                incomeSheet.getRow(1).height = 40;
-                const incHeaders = ['السنة', 'الإيرادات', 'تكلفة المبيعات', 'المصاريف التشغيلية', 'الإهلاك', 'EBIT',
-                    'الضريبة', 'صافي الربح'
-                ];
-                const incRow = incomeSheet.getRow(2);
-                incHeaders.forEach((h, i) => {
-                    const c = incomeSheet.getCell(2, i + 2);
-                    c.value = h;
-                    c.font = { name: 'Arial', bold: true, size: 10, color: { argb: W } };
-                    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
-                    c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                        readingOrder: 'rtl' };
-                    c.border = { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' },
-                        right: { style: 'thin' } };
-                });
-                incomeSheet.getRow(2).height = 28;
-                for (let i = 0; i < years; i++) {
-                    const r = i + 3;
-                    const rowData = [`سنة ${i+1}`, F.revenue[i], F.cogs[i], F.opex[i], I.depreciation, F.ebit[
-                        i], F.tax[i], F.netIncome[i]];
-                    rowData.forEach((val, j) => {
-                        const c = incomeSheet.getCell(r, j + 2);
-                        c.value = val;
-                        c.font = { name: 'Arial', size: 10, color: { argb: DT } };
-                        c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: i % 2 === 0 ?
-                                'FFFEFCF6' : W } };
-                        c.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
-                        c.border = { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
-                            right: { style: 'hair' } };
-                        if (typeof val === 'number') c.numFmt = nc;
-                    });
-                    incomeSheet.getRow(r).height = 22;
-                }
-
-                // 5. التدفقات النقدية الحرة
-                const fcfSheet = workbook.addWorksheet('التدفقات النقدية الحرة', { views: [{ rightToLeft: true,
-                        showGridLines: false }] });
-                fcfSheet.getColumn(1).width = 5;
-                fcfSheet.getColumn(2).width = 14;
-                fcfSheet.getColumn(3).width = 16;
-                fcfSheet.getColumn(4).width = 14;
-                fcfSheet.getColumn(5).width = 14;
-                fcfSheet.getColumn(6).width = 22;
-                fcfSheet.getColumn(7).width = 22;
-                fcfSheet.getColumn(8).width = 5;
-                mh(fcfSheet, 1, 8, 1, '💵 التدفقات النقدية الحرة (FCF)', DB, GL, 14);
-                fcfSheet.getRow(1).height = 40;
-                const fcfHeaders = ['السنة', 'صافي الربح', 'الإهلاك', 'CAPEX', 'تغير رأس المال العامل',
-                    'التدفق النقدي الحر (FCF)'
-                ];
-                const fcfHRow = fcfSheet.getRow(2);
-                fcfHeaders.forEach((h, i) => {
-                    const c = fcfSheet.getCell(2, i + 2);
-                    c.value = h;
-                    c.font = { name: 'Arial', bold: true, size: 10, color: { argb: W } };
-                    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
-                    c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                        readingOrder: 'rtl' };
-                    c.border = { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' },
-                        right: { style: 'thin' } };
-                });
-                fcfSheet.getRow(2).height = 28;
-                for (let i = 0; i < years; i++) {
-                    const r = i + 3;
-                    const changeWC = (i === 0) ? F.wc[i] - I.initialWC : F.wc[i] - F.wc[i - 1];
-                    const rowData = [`سنة ${i+1}`, F.netIncome[i], I.depreciation, I.capex, changeWC, F.fcf[i]];
-                    rowData.forEach((val, j) => {
-                        const c = fcfSheet.getCell(r, j + 2);
-                        c.value = val;
-                        c.font = { name: 'Arial', size: 10, color: { argb: DT } };
-                        c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: i % 2 === 0 ?
-                                'FFFEFCF6' : W } };
-                        c.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
-                        c.border = { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
-                            right: { style: 'hair' } };
-                        if (typeof val === 'number') c.numFmt = nc;
-                    });
-                    fcfSheet.getRow(r).height = 22;
-                }
-
-                // 6. الرسوم البيانية
-                const chartsSheet = workbook.addWorksheet('الرسوم البيانية', { views: [{ rightToLeft: true,
-                        showGridLines: false }] });
-                chartsSheet.getColumn(1).width = 5;
-                chartsSheet.getColumn(2).width = 50;
-                chartsSheet.getColumn(3).width = 5;
-                mh(chartsSheet, 1, 3, 1, '📈 الرسوم البيانية للتوقعات', DB, GL, 14);
-                chartsSheet.getRow(1).height = 40;
-                // التقاط رسم الإيرادات
-                const revCanvas = document.getElementById('revenueChart');
-                if (revCanvas) {
-                    try {
-                        const origBg = revCanvas.parentElement.style.backgroundColor;
-                        revCanvas.parentElement.style.backgroundColor = '#ffffff';
-                        const revImg = await html2canvas(revCanvas, { scale: 2, backgroundColor: '#ffffff' });
-                        revCanvas.parentElement.style.backgroundColor = origBg;
-                        const revImgData = revImg.toDataURL('image/png');
-                        const revImageId = workbook.addImage({ base64: revImgData, extension: 'png' });
-                        chartsSheet.addImage(revImageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 14 },
-                            editAs: 'oneCell' });
-                    } catch (err) { chartsSheet.getCell(2, 2).value =
-                        'تعذر التقاط رسم الإيرادات.'; }
-                }
-                // التقاط رسم FCF
-                const fcfCanvas = document.getElementById('fcfChart');
-                if (fcfCanvas) {
-                    try {
-                        const origBg2 = fcfCanvas.parentElement.style.backgroundColor;
-                        fcfCanvas.parentElement.style.backgroundColor = '#ffffff';
-                        const fcfImg = await html2canvas(fcfCanvas, { scale: 2, backgroundColor: '#ffffff' });
-                        fcfCanvas.parentElement.style.backgroundColor = origBg2;
-                        const fcfImgData = fcfImg.toDataURL('image/png');
-                        const fcfImageId = workbook.addImage({ base64: fcfImgData, extension: 'png' });
-                        chartsSheet.addImage(fcfImageId, { tl: { col: 1, row: 16 }, br: { col: 2, row: 28 },
-                            editAs: 'oneCell' });
-                    } catch (err) { chartsSheet.getCell(16, 2).value = 'تعذر التقاط رسم FCF.'; }
-                }
-
-                // 7. التفسير والتوصيات
-                const intSheet = workbook.addWorksheet('التفسير والتوصيات', { views: [{ rightToLeft: true,
-                        showGridLines: false }] });
-                intSheet.getColumn(1).width = 5;
-                intSheet.getColumn(2).width = 50;
-                intSheet.getColumn(3).width = 5;
-                mh(intSheet, 1, 3, 1, '📝 التفسير والتوصيات', DB, GL, 14);
-                intSheet.getRow(1).height = 45;
-                const sections = [
-                    { title: '1. ملخص المشروع',
-                        content: `الجهة: ${companyName}\nالعملة: ${currency}\nعدد سنوات التوقع: ${years}\nمعدل نمو الإيرادات: ${(I.growthRate*100).toFixed(1)}%\nمعدل الخصم: ${(I.discountRate*100).toFixed(1)}%\nتاريخ التحليل: ${new Date().toLocaleDateString('ar-EG')}` },
-                    { title: '2. نتائج التحليل',
-                        content: `صافي القيمة الحالية (NPV): ${currency} ${F.totalNpv.toFixed(0)}\nمعدل العائد الداخلي (IRR): ${F.irr ? (F.irr*100).toFixed(2)+'%' : 'غير محدد'}\nفترة الاسترداد: ${F.paybackPeriod ? F.paybackPeriod.toFixed(1)+' سنة' : 'غير محققة'}\nالقيمة النهائية: ${currency} ${F.terminalValue.toFixed(0)}\nإجمالي الإيرادات (آخر سنة): ${currency} ${F.revenue[years-1].toFixed(0)}` },
-                    { title: '3. التوصيات',
-                        content: F.totalNpv > 0 ? '✅ المشروع مربح — يوصى بالمضي قدماً في الاستثمار.\n• مراقبة التدفقات النقدية الفعلية مقابل المتوقعة.\n• متابعة مؤشرات الربحية بشكل دوري.\n• تحديث الافتراضات سنوياً.' :
-                            '⚠️ المشروع غير مربح حالياً — يُنصح بمراجعة الافتراضات.\n• خفض التكاليف التشغيلية.\n• إعادة تقييم معدل النمو المتوقع.\n• دراسة خيارات تمويل بديلة.' },
-                    { title: '4. تنويه وإخلاء المسؤولية',
-                        content: 'هذا التحليل مبني على افتراضات تقديرية. النتائج الفعلية قد تختلف بسبب ظروف السوق والتغيرات التشغيلية. يُنصح باستشارة خبير مالي قبل اتخاذ القرارات الاستثمارية.' }
-                ];
-                let itRow = 2;
-                sections.forEach((sec, idx) => {
-                    itRow++;
-                    intSheet.getRow(itRow).height = 30;
-                    intSheet.mergeCells(itRow, 2, itRow, 2);
-                    const tc3 = intSheet.getCell(itRow, 2);
-                    tc3.value = sec.title;
-                    tc3.font = { name: 'Arial', bold: true, size: 12, color: { argb: GL } };
-                    tc3.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: idx % 2 === 0 ? HB :
-                            SB } };
-                    tc3.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
-                    tc3.border = { bottom: { style: 'medium', color: { argb: G } } };
-                    itRow++;
-                    intSheet.getRow(itRow).height = Math.max(60, sec.content.split('\n').length * 18);
-                    intSheet.mergeCells(itRow, 2, itRow, 2);
-                    const cc = intSheet.getCell(itRow, 2);
-                    cc.value = sec.content;
-                    cc.font = { name: 'Arial', size: 10, color: { argb: DT } };
-                    cc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEFCF6' } };
-                    cc.alignment = { horizontal: 'right', vertical: 'top', wrapText: true,
-                    readingOrder: 'rtl' };
-                    cc.border = { top: { style: 'hair' }, bottom: { style: 'hair', color: { argb: G } },
-                        left: { style: 'hair' }, right: { style: 'hair' } };
-                });
-
-                const buffer = await workbook.xlsx.writeBuffer();
-                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                const now = new Date();
-                const fileName = `تقرير_تنبؤ_مالي_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
-                saveAs(blob, fileName);
-            } catch (err) { console.error(err);
-                alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
-        }
-
-        // ------------------ تصدير Word احترافي ------------------
-        async function exportToWord() {
-            if (!globalForecastData) {
-                alert('الرجاء إجراء التحليل أولاً.');
-                return;
+            // 4. قائمة الدخل
+            const incomeSheet = workbook.addWorksheet('قائمة الدخل المتوقعة', { views: [{ rightToLeft: true, showGridLines: false }] });
+            incomeSheet.getColumn(1).width=5; incomeSheet.getColumn(2).width=14; incomeSheet.getColumn(3).width=16; incomeSheet.getColumn(4).width=16; incomeSheet.getColumn(5).width=16; incomeSheet.getColumn(6).width=14; incomeSheet.getColumn(7).width=16; incomeSheet.getColumn(8).width=14; incomeSheet.getColumn(9).width=16; incomeSheet.getColumn(10).width=5;
+            mh(incomeSheet,1,10,1,'📋 قائمة الدخل المتوقعة',DB,GL,14);
+            incomeSheet.getRow(1).height=40;
+            const incHeaders = ['السنة','الإيرادات','تكلفة المبيعات','المصاريف التشغيلية','الإهلاك','EBIT','الضريبة','صافي الربح'];
+            const incRow = incomeSheet.getRow(2);
+            incHeaders.forEach((h,i)=>{const c=incomeSheet.getCell(2,i+2);c.value=h;c.font={name:'Arial',bold:true,size:10,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:G}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}};});
+            incomeSheet.getRow(2).height=28;
+            for (let i=0; i<years; i++) {
+                const r=i+3;
+                const rowData = [`سنة ${i+1}`, F.revenue[i], F.cogs[i], F.opex[i], I.depreciation, F.ebit[i], F.tax[i], F.netIncome[i]];
+                rowData.forEach((val,j)=>{const c=incomeSheet.getCell(r,j+2);c.value=val;c.font={name:'Arial',size:10,color:{argb:DT}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:i%2===0?'FFFEFCF6':'FFFFFFFF'}};c.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};c.border={top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}};if(typeof val==='number')c.numFmt=nc;});
+                incomeSheet.getRow(r).height=22;
             }
-            showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات والرسوم البيانية');
-            try {
-                const F = globalForecastData.forecast;
-                const I = globalForecastData.inputs;
-                const currency = I.currency;
-                const companyName = I.companyName;
-                const years = globalForecastData.years;
-                const now = new Date();
-                const dateStr = now.toLocaleDateString('ar-EG');
 
-                // التقاط الرسوم البيانية
-                const revCanvas = document.getElementById('revenueChart');
-                const fcfCanvas = document.getElementById('fcfChart');
-                let revImgBase64 = '',
-                    fcfImgBase64 = '';
-                if (revCanvas) {
+            // 5. التدفقات النقدية
+            const fcfSheet = workbook.addWorksheet('التدفقات النقدية الحرة', { views: [{ rightToLeft: true, showGridLines: false }] });
+            fcfSheet.getColumn(1).width=5; fcfSheet.getColumn(2).width=14; fcfSheet.getColumn(3).width=16; fcfSheet.getColumn(4).width=14; fcfSheet.getColumn(5).width=14; fcfSheet.getColumn(6).width=22; fcfSheet.getColumn(7).width=22; fcfSheet.getColumn(8).width=5;
+            mh(fcfSheet,1,8,1,'💵 التدفقات النقدية الحرة (FCF)',DB,GL,14);
+            fcfSheet.getRow(1).height=40;
+            const fcfHeaders = ['السنة','صافي الربح','الإهلاك','CAPEX','تغير رأس المال العامل','التدفق النقدي الحر'];
+            const fcfHRow = fcfSheet.getRow(2);
+            fcfHeaders.forEach((h,i)=>{const c=fcfSheet.getCell(2,i+2);c.value=h;c.font={name:'Arial',bold:true,size:10,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:G}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}};});
+            fcfSheet.getRow(2).height=28;
+            for (let i=0; i<years; i++) {
+                const r=i+3;
+                const changeWC = (i===0)?F.wc[i]-I.initialWC:F.wc[i]-F.wc[i-1];
+                const rowData = [`سنة ${i+1}`, F.netIncome[i], I.depreciation, I.capex, changeWC, F.fcf[i]];
+                rowData.forEach((val,j)=>{const c=fcfSheet.getCell(r,j+2);c.value=val;c.font={name:'Arial',size:10,color:{argb:DT}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:i%2===0?'FFFEFCF6':'FFFFFFFF'}};c.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};c.border={top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}};if(typeof val==='number')c.numFmt=nc;});
+                fcfSheet.getRow(r).height=22;
+            }
+
+            // 6. الرسوم البيانية
+            const chartsSheet = workbook.addWorksheet('الرسوم البيانية', { views: [{ rightToLeft: true, showGridLines: false }] });
+            chartsSheet.getColumn(1).width=5; chartsSheet.getColumn(2).width=50; chartsSheet.getColumn(3).width=5;
+            mh(chartsSheet,1,3,1,'📈 الرسوم البيانية للتوقعات',DB,GL,14);
+            chartsSheet.getRow(1).height=40;
+            const revCanvas = document.getElementById('revenueChart');
+            if (revCanvas) {
+                try {
                     const origBg = revCanvas.parentElement.style.backgroundColor;
                     revCanvas.parentElement.style.backgroundColor = '#ffffff';
-                    const img = await html2canvas(revCanvas, { scale: 2, backgroundColor: '#ffffff' });
+                    const revImg = await html2canvas(revCanvas, { scale: 2, backgroundColor: '#ffffff' });
                     revCanvas.parentElement.style.backgroundColor = origBg;
-                    revImgBase64 = img.toDataURL('image/png');
-                }
-                if (fcfCanvas) {
-                    const origBg = fcfCanvas.parentElement.style.backgroundColor;
+                    const revImageId = workbook.addImage({ base64: revImg.toDataURL('image/png'), extension: 'png' });
+                    chartsSheet.addImage(revImageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 14 }, editAs: 'oneCell' });
+                } catch(err) {}
+            }
+            const fcfCanvas = document.getElementById('fcfChart');
+            if (fcfCanvas) {
+                try {
+                    const origBg2 = fcfCanvas.parentElement.style.backgroundColor;
                     fcfCanvas.parentElement.style.backgroundColor = '#ffffff';
-                    const img = await html2canvas(fcfCanvas, { scale: 2, backgroundColor: '#ffffff' });
-                    fcfCanvas.parentElement.style.backgroundColor = origBg;
-                    fcfImgBase64 = img.toDataURL('image/png');
-                }
+                    const fcfImg = await html2canvas(fcfCanvas, { scale: 2, backgroundColor: '#ffffff' });
+                    fcfCanvas.parentElement.style.backgroundColor = origBg2;
+                    const fcfImageId = workbook.addImage({ base64: fcfImg.toDataURL('image/png'), extension: 'png' });
+                    chartsSheet.addImage(fcfImageId, { tl: { col: 1, row: 16 }, br: { col: 2, row: 28 }, editAs: 'oneCell' });
+                } catch(err) {}
+            }
 
-                // بناء KPI جدول
-                const kpiData = [
-                    { label: 'صافي القيمة الحالية (NPV)', value: `${currency} ${F.totalNpv.toFixed(0)}`,
-                        good: F.totalNpv > 0 },
-                    { label: 'معدل العائد الداخلي (IRR)', value: F.irr ? (F.irr * 100).toFixed(2) + '%' :
-                            'غير محدد', good: F.irr && F.irr > I.discountRate },
-                    { label: 'فترة الاسترداد', value: F.paybackPeriod ? F.paybackPeriod.toFixed(1) + ' سنة' :
-                            'غير محققة', good: F.paybackPeriod && F.paybackPeriod <= years },
-                    { label: 'القيمة النهائية (Terminal Value)', value: `${currency} ${F.terminalValue.toFixed(0)}`,
-                        good: F.terminalValue > 0 }
-                ];
-                let kpiRows = '';
-                kpiData.forEach(k => {
-                    kpiRows +=
-                        `<tr style="border:1px solid #b8860b;"><td style="padding:12px;background:${k.good?'#d4edda':'#f8d7da'};text-align:right;">${k.label}</td><td style="padding:12px;background:${k.good?'#d4edda':'#f8d7da'};text-align:center;"><strong style="font-size:1.2rem;color:${k.good?'#155724':'#721c24'}">${k.value}</strong></td><td style="padding:12px;background:${k.good?'#d4edda':'#f8d7da'};text-align:center;">${k.good?'✅ إيجابي':'⚠️ مراجعة'}</td></tr>`;
-                });
+            // 7. التوصيات
+            const recSheet = workbook.addWorksheet('التفسير والتوصيات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            recSheet.getColumn(1).width=5; recSheet.getColumn(2).width=50; recSheet.getColumn(3).width=5;
+            mh(recSheet,1,3,1,'📝 التفسير والتوصيات',DB,GL,14);
+            recSheet.getRow(1).height=45;
+            const sections = [
+                { title: '1. ملخص المشروع', content: `الجهة: ${companyName}\nالعملة: ${currency}\nعدد سنوات التوقع: ${years}\nمعدل نمو الإيرادات: ${(I.growthRate*100).toFixed(1)}%\nمعدل الخصم: ${(I.discountRate*100).toFixed(1)}%` },
+                { title: '2. نتائج التحليل', content: `NPV: ${currency} ${F.totalNpv.toFixed(0)}\nIRR: ${F.irr?(F.irr*100).toFixed(2)+'%':'غير محدد'}\nفترة الاسترداد: ${F.paybackPeriod?F.paybackPeriod.toFixed(1)+' سنة':'غير محققة'}\nالقيمة النهائية: ${currency} ${F.terminalValue.toFixed(0)}` },
+                { title: '3. التوصيات', content: F.totalNpv>0?'• المشروع مربح — يوصى بالمضي قدماً.\n• مراقبة التدفقات النقدية الفعلية.\n• تحديث الافتراضات سنوياً.':'• المشروع غير مربح حالياً.\n• خفض التكاليف التشغيلية.\n• إعادة تقييم معدل النمو المتوقع.' },
+                { title: '4. تنويه', content: 'هذا التحليل مبني على افتراضات تقديرية. النتائج الفعلية قد تختلف. يُنصح باستشارة خبير مالي.' }
+            ];
+            let itRow=2;
+            sections.forEach((sec,idx)=>{
+                itRow++;
+                recSheet.getRow(itRow).height=30;
+                recSheet.mergeCells(itRow,2,itRow,2);
+                const tc3=recSheet.getCell(itRow,2);
+                tc3.value=sec.title; tc3.font={name:'Arial',bold:true,size:12,color:{argb:GL}};
+                tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?HB:SB}};
+                tc3.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                tc3.border={bottom:{style:'medium',color:{argb:G}}};
+                itRow++;
+                recSheet.getRow(itRow).height=Math.max(60, sec.content.split('\n').length*18);
+                recSheet.mergeCells(itRow,2,itRow,2);
+                const cc=recSheet.getCell(itRow,2);
+                cc.value=sec.content;
+                cc.font={name:'Arial',size:10,color:{argb:DT}};
+                cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};
+                cc.alignment={horizontal:'right',vertical:'top',wrapText:true,readingOrder:'rtl'};
+                cc.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
+            });
 
-                // قائمة الدخل
-                let incomeHtml =
-                    '<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="border:1px solid #b8860b;padding:8px;">السنة</th><th style="border:1px solid #b8860b;padding:8px;">الإيرادات</th><th style="border:1px solid #b8860b;padding:8px;">تكلفة المبيعات</th><th style="border:1px solid #b8860b;padding:8px;">المصاريف التشغيلية</th><th style="border:1px solid #b8860b;padding:8px;">الإهلاك</th><th style="border:1px solid #b8860b;padding:8px;">EBIT</th><th style="border:1px solid #b8860b;padding:8px;">الضريبة</th><th style="border:1px solid #b8860b;padding:8px;">صافي الربح</th></tr></thead><tbody>';
-                for (let i = 0; i < years; i++) {
-                    incomeHtml +=
-                        `<tr style="border:1px solid #b8860b;"><td style="padding:8px;text-align:center;">سنة ${i+1}</td><td style="padding:8px;text-align:center;">${currency} ${F.revenue[i].toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${F.cogs[i].toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${F.opex[i].toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${I.depreciation.toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${F.ebit[i].toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${F.tax[i].toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${F.netIncome[i].toFixed(0)}</td></tr>`;
-                }
-                incomeHtml += '</tbody></table>';
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const now = new Date();
+            const fileName = `تقرير_تنبؤ_مالي_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+            saveAs(blob, fileName);
+        } catch(err) { alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
+    });
 
-                // التدفقات النقدية
-                let fcfHtml =
-                    '<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="border:1px solid #b8860b;padding:8px;">السنة</th><th style="border:1px solid #b8860b;padding:8px;">صافي الربح</th><th style="border:1px solid #b8860b;padding:8px;">الإهلاك</th><th style="border:1px solid #b8860b;padding:8px;">CAPEX</th><th style="border:1px solid #b8860b;padding:8px;">تغير رأس المال العامل</th><th style="border:1px solid #b8860b;padding:8px;">التدفق النقدي الحر (FCF)</th></tr></thead><tbody>';
-                for (let i = 0; i < years; i++) {
-                    const changeWC = (i === 0) ? F.wc[i] - I.initialWC : F.wc[i] - F.wc[i - 1];
-                    fcfHtml +=
-                        `<tr style="border:1px solid #b8860b;"><td style="padding:8px;text-align:center;">سنة ${i+1}</td><td style="padding:8px;text-align:center;">${currency} ${F.netIncome[i].toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${I.depreciation.toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${I.capex.toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${changeWC.toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${F.fcf[i].toFixed(0)}</td></tr>`;
-                }
-                fcfHtml += '</tbody></table>';
+    // ================================================================
+    // ========== تصدير Word احترافي ==========
+    // ================================================================
+    document.getElementById('exportWordBtn').addEventListener('click', async function() {
+        if (!globalForecastData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
+        showLoading('جاري إنشاء تقرير Word...', 'جمع البيانات والرسوم');
+        try {
+            const F = globalForecastData.forecast;
+            const I = globalForecastData.inputs;
+            const currency = I.currency;
+            const companyName = I.companyName;
+            const years = globalForecastData.years;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ar-EG');
 
-                const verdictHtml =
-                    `<div style="margin:20px 0;padding:15px;background:${F.totalNpv>0?'#d4edda':'#f8d7da'};border-radius:10px;text-align:center;"><strong>${F.totalNpv>0?'✅ المشروع مربح — يوصى بالاستثمار':'⚠️ المشروع خاسر — يحتاج مراجعة الافتراضات'}</strong></div>`;
+            const revCanvas = document.getElementById('revenueChart');
+            const fcfCanvas = document.getElementById('fcfChart');
+            let revImgBase64='', fcfImgBase64='';
+            if (revCanvas) {
+                const origBg = revCanvas.parentElement.style.backgroundColor;
+                revCanvas.parentElement.style.backgroundColor = '#ffffff';
+                const img = await html2canvas(revCanvas, { scale: 2, backgroundColor: '#ffffff' });
+                revCanvas.parentElement.style.backgroundColor = origBg;
+                revImgBase64 = img.toDataURL('image/png');
+            }
+            if (fcfCanvas) {
+                const origBg = fcfCanvas.parentElement.style.backgroundColor;
+                fcfCanvas.parentElement.style.backgroundColor = '#ffffff';
+                const img = await html2canvas(fcfCanvas, { scale: 2, backgroundColor: '#ffffff' });
+                fcfCanvas.parentElement.style.backgroundColor = origBg;
+                fcfImgBase64 = img.toDataURL('image/png');
+            }
 
-                const fullHtml = `<!DOCTYPE html>
-                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
-                <head><meta charset='utf-8'><title>تقرير التنبؤ المالي - FAROUK GRUP</title>
-                <style>
-                    body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;}
-                    .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                    .cover h1{font-size:32px;color:#b8860b;margin:0;}
-                    .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-                    .cover p{color:#666;}
-                    table{width:100%;border-collapse:collapse;margin:20px 0;direction:rtl;}
-                    th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                    th{background:#fefcf6;color:#b8860b;font-weight:bold;}
-                    .positive{color:#155724;background:#d4edda;}
-                    .negative{color:#721c24;background:#f8d7da;}
-                    .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
-                    .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;font-size:10pt;}
-                </style></head>
-                <body>
-                    <div class="cover">
-                        <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                        <h2>تقرير التنبؤ المالي المتقدم</h2>
-                        <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
-                        <p>العملة: ${currency} | عدد سنوات التوقع: ${years}</p>
-                    </div>
-                    <h2 style="color:#b8860b;">المدخلات الأساسية</h2>
-                    <table><tbody>
-                        <tr><th>الإيرادات (سنة الأساس)</th><td>${currency} ${I.baseRevenue.toFixed(0)}</td><th>معدل نمو الإيرادات</th><td>${(I.growthRate*100).toFixed(1)}%</td></tr>
-                        <tr><th>تكلفة المبيعات</th><td>${(I.cogsPercent*100).toFixed(0)}%</td><th>المصاريف التشغيلية</th><td>${(I.opexPercent*100).toFixed(0)}%</td></tr>
-                        <tr><th>معدل الضريبة</th><td>${(I.taxRate*100).toFixed(0)}%</td><th>معدل الخصم (WACC)</th><td>${(I.discountRate*100).toFixed(1)}%</td></tr>
-                        <tr><th>الإهلاك السنوي</th><td>${currency} ${I.depreciation.toFixed(0)}</td><th>CAPEX السنوي</th><td>${currency} ${I.capex.toFixed(0)}</td></tr>
-                        <tr><th>الاستثمار الأولي</th><td>${currency} ${I.initialInvestment.toFixed(0)}</td><th>معدل النمو الدائم</th><td>${(I.terminalGrowth*100).toFixed(1)}%</td></tr>
-                    </tbody></table>
-                    <h2 style="color:#b8860b;">📊 مؤشرات الأداء الرئيسية</h2>
-                    <table>${kpiRows}</table>
-                    ${verdictHtml}
-                    <h2 style="color:#b8860b;">📈 الرسم البياني — الإيرادات وصافي الربح</h2>
-                    <div style="text-align:center;">${revImgBase64 ? `<img src="${revImgBase64}" class="chart-img" />` : '<p>الرسم البياني غير متاح</p>'}</div>
-                    <h2 style="color:#b8860b;">📊 الرسم البياني — التدفق النقدي الحر</h2>
-                    <div style="text-align:center;">${fcfImgBase64 ? `<img src="${fcfImgBase64}" class="chart-img" />` : '<p>الرسم البياني غير متاح</p>'}</div>
-                    <h2 style="color:#b8860b;">📋 قائمة الدخل المتوقعة</h2>
-                    ${incomeHtml}
-                    <h2 style="color:#b8860b;">💵 التدفقات النقدية الحرة</h2>
-                    ${fcfHtml}
-                    <h2 style="color:#b8860b;">💰 تقييم المشروع</h2>
-                    <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">
-                        <p><strong>NPV (شامل القيمة النهائية):</strong> ${currency} ${F.totalNpv.toFixed(0)}</p>
-                        <p><strong>IRR:</strong> ${F.irr ? (F.irr*100).toFixed(2)+'%' : 'غير محدد'}</p>
-                        <p><strong>فترة الاسترداد:</strong> ${F.paybackPeriod ? F.paybackPeriod.toFixed(1)+' سنة' : 'غير محققة'}</p>
-                        <p><strong>القيمة النهائية:</strong> ${currency} ${F.terminalValue.toFixed(0)}</p>
-                    </div>
-                    <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()} | www.farouk-grup.com</div>
-                </body></html>`;
+            const kpiData = [
+                { label: 'NPV', value: `${currency} ${F.totalNpv.toFixed(0)}`, good: F.totalNpv>0 },
+                { label: 'IRR', value: F.irr?(F.irr*100).toFixed(2)+'%':'غير محدد', good: F.irr && F.irr>I.discountRate },
+                { label: 'فترة الاسترداد', value: F.paybackPeriod?F.paybackPeriod.toFixed(1)+' سنة':'غير محققة', good: F.paybackPeriod && F.paybackPeriod<=years },
+                { label: 'القيمة النهائية', value: `${currency} ${F.terminalValue.toFixed(0)}`, good: F.terminalValue>0 }
+            ];
+            let kpiRows='';
+            kpiData.forEach(k=>{
+                kpiRows += `<tr style="border:1px solid #b8860b;"><td style="padding:12px;background:${k.good?'#d4edda':'#f8d7da'};text-align:right;">${k.label}</td><td style="padding:12px;background:${k.good?'#d4edda':'#f8d7da'};text-align:center;"><strong style="font-size:1.2rem;color:${k.good?'#155724':'#721c24'}">${k.value}</strong></td><td style="padding:12px;background:${k.good?'#d4edda':'#f8d7da'};text-align:center;">${k.good?'✅ إيجابي':'⚠️ مراجعة'}</td></tr>`;
+            });
 
-                const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `تقرير_تنبؤ_مالي_${companyName}_${now.toISOString().slice(0,10)}.doc`;
-                link.click();
-                URL.revokeObjectURL(link.href);
-            } catch (err) { console.error(err);
-                alert('خطأ Word: ' + err.message); } finally { hideLoading(); }
-        }
+            let incomeHtml = '<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="border:1px solid #b8860b;padding:8px;">السنة</th><th style="border:1px solid #b8860b;padding:8px;">الإيرادات</th><th style="border:1px solid #b8860b;padding:8px;">تكلفة المبيعات</th><th style="border:1px solid #b8860b;padding:8px;">المصاريف التشغيلية</th><th style="border:1px solid #b8860b;padding:8px;">الإهلاك</th><th style="border:1px solid #b8860b;padding:8px;">EBIT</th><th style="border:1px solid #b8860b;padding:8px;">الضريبة</th><th style="border:1px solid #b8860b;padding:8px;">صافي الربح</th></tr></thead><tbody>';
+            for (let i=0; i<years; i++) {
+                incomeHtml += `<tr style="border:1px solid #b8860b;"><td style="padding:8px;text-align:center;">سنة ${i+1}</td><td style="padding:8px;text-align:center;">${currency} ${F.revenue[i].toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${F.cogs[i].toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${F.opex[i].toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${I.depreciation.toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${F.ebit[i].toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${F.tax[i].toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${F.netIncome[i].toFixed(0)}</td></tr>`;
+            }
+            incomeHtml += '</tbody></table>';
 
-        // ------------------ الآلة الحاسبة ------------------
-        let currentCalcInput = '';
-        const calcDisplay = document.getElementById('calcDisplay');
-        const modal = document.getElementById('calculatorModal');
-        const btnCalc = document.getElementById('calculatorBtn');
-        const spanClose = document.getElementsByClassName('close')[0];
-        window.handleCalculatorInput = (v) => { currentCalcInput += v;
-            calcDisplay.value = currentCalcInput; };
-        window.clearCalculator = () => { currentCalcInput = '';
-            calcDisplay.value = ''; };
-        window.backspaceCalculator = () => { currentCalcInput = currentCalcInput.slice(0, -1);
-            calcDisplay.value = currentCalcInput; };
-        window.calculateCalculatorResult = () => {
-            try { let expr = currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/');
-                let res = eval(expr);
-                calcDisplay.value = res;
-                currentCalcInput = res.toString(); } catch (e) { calcDisplay.value = 'خطأ';
-                currentCalcInput = ''; }
-        };
+            let fcfHtml = '<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="border:1px solid #b8860b;padding:8px;">السنة</th><th style="border:1px solid #b8860b;padding:8px;">صافي الربح</th><th style="border:1px solid #b8860b;padding:8px;">الإهلاك</th><th style="border:1px solid #b8860b;padding:8px;">CAPEX</th><th style="border:1px solid #b8860b;padding:8px;">تغير رأس المال العامل</th><th style="border:1px solid #b8860b;padding:8px;">التدفق النقدي الحر</th></tr></thead><tbody>';
+            for (let i=0; i<years; i++) {
+                const changeWC = (i===0)?F.wc[i]-I.initialWC:F.wc[i]-F.wc[i-1];
+                fcfHtml += `<tr style="border:1px solid #b8860b;"><td style="padding:8px;text-align:center;">سنة ${i+1}</td><td style="padding:8px;text-align:center;">${currency} ${F.netIncome[i].toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${I.depreciation.toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${I.capex.toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${changeWC.toFixed(0)}</td><td style="padding:8px;text-align:center;">${currency} ${F.fcf[i].toFixed(0)}</td></tr>`;
+            }
+            fcfHtml += '</tbody></table>';
 
-        function handleKeyboard(e) {
-            if (modal.style.display !== 'block') return;
-            const key = e.key;
-            e.preventDefault();
-            e.stopPropagation();
-            if (key >= '0' && key <= '9') handleCalculatorInput(key);
-            else if (key === '.') handleCalculatorInput('.');
-            else if (key === '+' || key === '-' || key === '*' || key === '/') handleCalculatorInput(key);
-            else if (key === 'Enter' || key === '=') calculateCalculatorResult();
-            else if (key === 'Backspace') backspaceCalculator();
-            else if (key === 'Escape') modal.style.display = 'none';
-            else if (key === 'c' || key === 'C') clearCalculator();
-        }
-        document.addEventListener('keydown', handleKeyboard);
-        btnCalc.onclick = () => { modal.style.display = 'block';
-            calcDisplay.value = currentCalcInput; };
-        spanClose.onclick = () => modal.style.display = 'none';
-        window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; };
+            const fullHtml = `<!DOCTYPE html>
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+            <head><meta charset='utf-8'><title>تقرير التنبؤ المالي - FAROUK GRUP</title>
+            <style>
+                body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;color:#333;}
+                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                .cover h1{font-size:32px;color:#b8860b;margin:0;}
+                .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                th{background:#fefcf6;color:#b8860b;}
+                .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
+            </style></head>
+            <body>
+                <div class="cover">
+                    <h1>مجموعة فاروق للاستشارات والأعمال</h1>
+                    <h2>تقرير التنبؤ المالي المتقدم</h2>
+                    <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
+                    <p>العملة: ${currency} | سنوات التوقع: ${years}</p>
+                </div>
+                <h2 style="color:#b8860b;">المدخلات الأساسية</h2>
+                <table><tbody>
+                    <tr><th>الإيرادات (سنة الأساس)</th><td>${currency} ${I.baseRevenue.toFixed(0)}</td><th>معدل نمو الإيرادات</th><td>${(I.growthRate*100).toFixed(1)}%</td></tr>
+                    <tr><th>تكلفة المبيعات</th><td>${(I.cogsPercent*100).toFixed(0)}%</td><th>المصاريف التشغيلية</th><td>${(I.opexPercent*100).toFixed(0)}%</td></tr>
+                    <tr><th>معدل الضريبة</th><td>${(I.taxRate*100).toFixed(0)}%</td><th>معدل الخصم</th><td>${(I.discountRate*100).toFixed(1)}%</td></tr>
+                    <tr><th>الإهلاك السنوي</th><td>${currency} ${I.depreciation.toFixed(0)}</td><th>CAPEX السنوي</th><td>${currency} ${I.capex.toFixed(0)}</td></tr>
+                    <tr><th>الاستثمار الأولي</th><td>${currency} ${I.initialInvestment.toFixed(0)}</td><th>معدل النمو الدائم</th><td>${(I.terminalGrowth*100).toFixed(1)}%</td></tr>
+                </tbody></table>
+                <h2 style="color:#b8860b;">📊 مؤشرات الأداء</h2>
+                <table>${kpiRows}</table>
+                <div style="margin:20px 0;padding:15px;background:${F.totalNpv>0?'#d4edda':'#f8d7da'};border-radius:10px;text-align:center;"><strong>${F.totalNpv>0?'✅ المشروع مربح — يوصى بالاستثمار':'⚠️ المشروع خاسر — يحتاج مراجعة'}</strong></div>
+                <h2 style="color:#b8860b;">📈 الرسوم البيانية</h2>
+                <div style="text-align:center;">${revImgBase64 ? `<img src="${revImgBase64}" class="chart-img" />` : '<p>الرسم البياني غير متاح</p>'}</div>
+                <div style="text-align:center;">${fcfImgBase64 ? `<img src="${fcfImgBase64}" class="chart-img" />` : '<p>الرسم البياني غير متاح</p>'}</div>
+                <h2 style="color:#b8860b;">📋 قائمة الدخل المتوقعة</h2>
+                ${incomeHtml}
+                <h2 style="color:#b8860b;">💵 التدفقات النقدية الحرة</h2>
+                ${fcfHtml}
+                <h2 style="color:#b8860b;">💰 تقييم المشروع</h2>
+                <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">
+                    <p><strong>NPV:</strong> ${currency} ${F.totalNpv.toFixed(0)}</p>
+                    <p><strong>IRR:</strong> ${F.irr?(F.irr*100).toFixed(2)+'%':'غير محدد'}</p>
+                    <p><strong>فترة الاسترداد:</strong> ${F.paybackPeriod?F.paybackPeriod.toFixed(1)+' سنة':'غير محققة'}</p>
+                    <p><strong>القيمة النهائية:</strong> ${currency} ${F.terminalValue.toFixed(0)}</p>
+                </div>
+                <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+            </body></html>`;
 
-        document.getElementById('calculateBtn').addEventListener('click', displayForecast);
-        document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
-        document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
-    </script>
-    <a href="index.html" style="position: fixed; bottom: 20px; right: 20px; background: rgba(180,133,84,0.9); color: white; padding: 12px 20px; border-radius: 50px; text-decoration: none; font-family: 'Tajawal', sans-serif; font-weight: bold; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 9999; display: flex; align-items: center; gap: 8px; transition: 0.3s;" onmouseover="this.style.backgroundColor='#b48554'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='rgba(180,133,84,0.9)'; this.style.transform='scale(1)';"><i class="fas fa-home"></i> الرئيسية</a>
+            const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `تقرير_تنبؤ_مالي_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        } catch(err) { alert('خطأ Word: ' + err.message); } finally { hideLoading(); }
+    });
+</script>
 </body>
 </html>
