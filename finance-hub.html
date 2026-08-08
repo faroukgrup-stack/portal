@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المنصة الشاملة | أدوات مالية وتشغيلية لرواد الأعمال والمدراء</title>
-    <meta name="description" content="المنصة الشاملة لرواد الأعمال والمدراء: أكثر من 20 أداة مالية متكاملة مع رسوم بيانية وتقارير وتوصيات لاتخاذ قرارات مالية صحيحة.">
-    <meta name="keywords" content="دراسة جدوى, حاسبة مالية, تعادل, تدفق نقدي, تحليل مخاطر, HACCP, تكاليف, استثمار, جدولة قروض, منصة مطاعم">
+    <title>المنصة الشاملة – مجموعة فاروق للاستشارات والأعمال</title>
+    <meta name="description" content="المنصة الشاملة لرواد الأعمال والمدراء: أكثر من 23 أداة مالية وتشغيلية متكاملة مع رسوم بيانية وتقارير وتوصيات لاتخاذ قرارات مالية صحيحة.">
+    <meta name="keywords" content="دراسة جدوى, حاسبة مالية, تعادل, تدفق نقدي, تحليل مخاطر, HACCP, تكاليف, استثمار, جدولة قروض, منصة مطاعم, مجموعة فاروق">
     <meta name="author" content="Farouk Azem">
 
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -18,11 +18,6 @@
             --navy-800: #0f1f3a;
             --navy-700: #15294d;
             --navy-600: #1b3360;
-            --blue-500: #2563eb;
-            --blue-400: #3b82f6;
-            --blue-300: #60a5fa;
-            --blue-100: #dbeafe;
-            --blue-50: #eff6ff;
             --gold: #ca8a04;
             --gold-light: #eab308;
             --gold-pale: #fef9c3;
@@ -46,10 +41,8 @@
             --radius-sm: 12px;
             --radius: 16px;
             --radius-lg: 24px;
-            --radius-xl: 32px;
             --radius-full: 50px;
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            /* ألوان نافذة الدفع من متجر نيولا */
             --nyala-primary: #2a1b3d;
             --nyala-gold: #e5b73b;
         }
@@ -65,15 +58,14 @@
         }
         .container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
 
-        /* ========== TYPOGRAPHY ========== */
         .section-label {
             display: inline-block;
             font-size: 0.85rem;
             font-weight: 700;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: var(--blue-500);
-            background: var(--blue-50);
+            color: #b48554;
+            background: rgba(180,133,84,0.12);
             padding: 6px 18px;
             border-radius: var(--radius-full);
             margin-bottom: 16px;
@@ -86,7 +78,7 @@
             margin-bottom: 18px;
             line-height: 1.35;
         }
-        .section-heading span { color: var(--blue-500); }
+        .section-heading span { color: #b48554; }
         .section-subtitle {
             font-size: 1.15rem;
             color: var(--gray-500);
@@ -95,7 +87,7 @@
         }
         .text-center { text-align: center; }
 
-        /* ========== HEADER ========== */
+        /* HEADER */
         .site-header {
             background: var(--navy-900);
             padding: 18px 0;
@@ -120,7 +112,7 @@
         .brand-icon {
             width: 42px;
             height: 42px;
-            background: linear-gradient(135deg, var(--blue-500), var(--teal-500));
+            background: linear-gradient(135deg, #b48554, #d4b15a);
             border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
@@ -136,7 +128,7 @@
         }
         .brand-text span { color: var(--gold-light); }
         .header-cta {
-            background: var(--blue-500);
+            background: #b48554;
             color: #fff;
             border: none;
             border-radius: var(--radius-full);
@@ -149,12 +141,12 @@
             white-space: nowrap;
         }
         .header-cta:hover {
-            background: var(--blue-400);
-            box-shadow: var(--shadow-btn);
+            background: #d4b15a;
+            box-shadow: 0 0 20px rgba(180,133,84,0.3);
             transform: translateY(-2px);
         }
 
-        /* ========== HERO ========== */
+        /* HERO */
         .hero {
             background: linear-gradient(170deg, var(--navy-900) 0%, var(--navy-700) 60%, #0f1f3a 100%);
             padding: 72px 0 80px;
@@ -169,7 +161,7 @@
             left: -120px;
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%);
             border-radius: 50%;
             pointer-events: none;
         }
@@ -193,7 +185,7 @@
             font-size: 0.9rem;
             font-weight: 600;
             margin-bottom: 24px;
-            color: var(--blue-300);
+            color: #d4b15a;
             backdrop-filter: blur(8px);
         }
         .hero-badge i { color: var(--gold-light); }
@@ -238,7 +230,7 @@
         }
         .hero-price {
             font-family: 'Cairo', sans-serif;
-            font-size: 2rem;
+            font-size: 2.4rem;
             font-weight: 900;
             color: #fff;
         }
@@ -248,12 +240,12 @@
             color: rgba(255,255,255,0.55);
         }
         .hero-price-old {
-            font-size: 1rem;
+            font-size: 1.1rem;
             text-decoration: line-through;
             color: rgba(255,255,255,0.4);
         }
         .hero-badge-sub {
-            background: var(--teal-500);
+            background: #14b8a6;
             color: #000;
             font-weight: 800;
             font-size: 0.8rem;
@@ -293,7 +285,7 @@
             border: 1px solid rgba(255,255,255,0.06);
         }
 
-        /* ========== BUTTONS ========== */
+        /* BUTTONS */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -308,23 +300,13 @@
             transition: var(--transition);
             text-decoration: none;
         }
-        .btn-primary {
-            background: var(--blue-500);
-            color: #fff;
-            box-shadow: var(--shadow-btn);
-        }
-        .btn-primary:hover {
-            background: var(--blue-400);
-            box-shadow: var(--shadow-btn-hover);
-            transform: translateY(-3px);
-        }
         .btn-gold {
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            background: linear-gradient(135deg, #b48554, #d4b15a);
             color: #1e1e1e;
-            box-shadow: 0 6px 22px rgba(202,138,4,0.4);
+            box-shadow: 0 6px 22px rgba(180,133,84,0.4);
         }
         .btn-gold:hover {
-            box-shadow: 0 10px 32px rgba(202,138,4,0.55);
+            box-shadow: 0 10px 32px rgba(180,133,84,0.55);
             transform: translateY(-3px);
         }
         .btn-outline-light {
@@ -337,7 +319,7 @@
             border-color: rgba(255,255,255,0.5);
         }
 
-        /* ========== PROBLEM SECTION ========== */
+        /* PROBLEM SECTION */
         .problem-section {
             padding: 80px 0;
             background: var(--light);
@@ -375,7 +357,7 @@
         .problem-card h4 { font-size: 1.15rem; color: var(--navy-900); margin-bottom: 10px; }
         .problem-card p { color: var(--gray-500); font-size: 0.95rem; }
 
-        /* ========== SOLUTION / VALUE SECTION ========== */
+        /* VALUE SECTION */
         .value-section {
             padding: 80px 0;
             background: var(--gray-50);
@@ -396,83 +378,86 @@
         }
         .value-card:hover {
             box-shadow: var(--shadow-card-hover);
-            border-color: var(--blue-300);
+            border-color: #b48554;
             transform: translateY(-6px);
         }
         .value-card .vc-icon {
             width: 64px;
             height: 64px;
             border-radius: 50%;
-            background: var(--blue-50);
+            background: rgba(180,133,84,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.8rem;
-            color: var(--blue-500);
+            color: #b48554;
             margin: 0 auto 20px;
         }
         .value-card h4 { font-size: 1.15rem; color: var(--navy-900); margin-bottom: 10px; }
         .value-card p { color: var(--gray-500); font-size: 0.95rem; }
 
-        /* ========== TOOLS GRID ========== */
+        /* TOOLS LIST - NEW STYLED */
         .tools-section {
             padding: 80px 0;
             background: var(--light);
         }
-        .tools-grid {
+        .tools-grid-categories {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 28px;
             margin-top: 32px;
         }
-        .tool-card {
+        .category-box {
             background: #fff;
             border: 1px solid var(--gray-200);
             border-radius: var(--radius);
-            padding: 18px 22px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow-card);
             transition: var(--transition);
         }
-        .tool-card:hover {
-            box-shadow: var(--shadow-card-hover);
-            border-color: var(--blue-300);
-            transform: translateY(-3px);
-        }
-        .tool-num {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-sm);
-            background: var(--blue-50);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .category-box:hover { box-shadow: var(--shadow-card-hover); }
+        .category-box h3 {
             font-family: 'Cairo', sans-serif;
-            font-weight: 900;
-            font-size: 1.1rem;
-            color: var(--blue-500);
-            flex-shrink: 0;
-        }
-        .tool-card:nth-child(2n) .tool-num {
-            background: var(--teal-100);
-            color: var(--teal-500);
-        }
-        .tool-card:nth-child(3n) .tool-num {
-            background: var(--gold-pale);
-            color: var(--gold);
-        }
-        .tool-card h5 { font-size: 1rem; color: var(--navy-900); margin-bottom: 4px; }
-        .tool-card .tool-tag {
-            font-size: 0.78rem;
-            color: var(--gray-500);
+            font-size: 1.25rem;
+            color: var(--navy-900);
+            border-bottom: 2px solid #b48554;
+            padding-bottom: 8px;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
-        .tool-card .tool-tag i { font-size: 0.7rem; color: var(--blue-500); }
+        .category-box h3 i { color: #b48554; }
+        .tool-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .tool-item:last-child { border-bottom: none; }
+        .tool-item i {
+            color: #b48554;
+            width: 20px;
+            text-align: center;
+        }
+        .tool-item .tool-name {
+            font-weight: 600;
+            color: var(--navy-800);
+            font-size: 0.95rem;
+        }
+        .tool-item .tool-desc {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-right: auto;
+            max-width: 180px;
+        }
+        @media (max-width: 600px) {
+            .tool-item { flex-wrap: wrap; }
+            .tool-item .tool-desc { max-width: 100%; margin-right: 0; }
+        }
 
-        /* ========== OUTPUTS SECTION ========== */
+        /* OUTPUTS SECTION */
         .outputs-section {
             padding: 80px 0;
             background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-700) 100%);
@@ -482,7 +467,7 @@
         .outputs-section .section-heading span { color: var(--gold-light); }
         .outputs-section .section-label {
             background: rgba(255,255,255,0.08);
-            color: var(--blue-300);
+            color: #d4b15a;
         }
         .outputs-section .section-subtitle { color: rgba(255,255,255,0.6); }
         .outputs-grid {
@@ -501,10 +486,7 @@
             transition: var(--transition);
         }
         .output-card:hover { background: rgba(255,255,255,0.08); }
-        .output-card .oc-icon {
-            font-size: 2.4rem;
-            margin-bottom: 18px;
-        }
+        .output-card .oc-icon { font-size: 2.4rem; margin-bottom: 18px; }
         .output-card h4 { font-size: 1.2rem; margin-bottom: 10px; }
         .output-card p { color: rgba(255,255,255,0.6); font-size: 0.95rem; }
         .output-gallery {
@@ -521,7 +503,7 @@
             box-shadow: 0 12px 40px rgba(0,0,0,0.4);
         }
 
-        /* ========== SCREENSHOTS SECTION ========== */
+        /* SCREENSHOTS */
         .screenshots-section {
             padding: 80px 0;
             background: var(--gray-50);
@@ -544,10 +526,7 @@
             box-shadow: var(--shadow-card-hover);
             transform: translateY(-4px);
         }
-        .screenshot-card img {
-            width: 100%;
-            display: block;
-        }
+        .screenshot-card img { width: 100%; display: block; }
         .screenshot-card .sc-caption {
             padding: 14px 18px;
             font-size: 0.9rem;
@@ -557,9 +536,9 @@
             align-items: center;
             gap: 10px;
         }
-        .screenshot-card .sc-caption i { color: var(--blue-500); }
+        .screenshot-card .sc-caption i { color: #b48554; }
 
-        /* ========== AUDIENCE SECTION ========== */
+        /* AUDIENCE */
         .audience-section {
             padding: 80px 0;
             background: var(--light);
@@ -583,18 +562,15 @@
             transition: var(--transition);
         }
         .audience-card:hover {
-            border-color: var(--blue-300);
+            border-color: #b48554;
             box-shadow: var(--shadow-card-hover);
             transform: translateY(-6px);
         }
-        .audience-icon {
-            font-size: 2.8rem;
-            margin-bottom: 18px;
-        }
+        .audience-icon { font-size: 2.8rem; margin-bottom: 18px; }
         .audience-card h4 { font-size: 1.2rem; color: var(--navy-900); margin-bottom: 8px; }
         .audience-card p { color: var(--gray-500); font-size: 0.9rem; }
 
-        /* ========== FAQ ========== */
+        /* FAQ */
         .faq-section {
             padding: 80px 0;
             background: var(--gray-50);
@@ -622,7 +598,7 @@
             transition: var(--transition);
             user-select: none;
         }
-        .faq-q i { transition: transform 0.3s; color: var(--blue-500); }
+        .faq-q i { transition: transform 0.3s; color: #b48554; }
         .faq-item.active .faq-q i { transform: rotate(180deg); }
         .faq-a {
             padding: 0 24px 20px;
@@ -631,7 +607,7 @@
         }
         .faq-item.active .faq-a { display: block; }
 
-        /* ========== CTA ========== */
+        /* CTA */
         .cta-section {
             padding: 72px 0;
             background: linear-gradient(150deg, #0a1628 0%, #15294d 100%);
@@ -655,18 +631,18 @@
         }
         .cta-price {
             font-family: 'Cairo', sans-serif;
-            font-size: 2.4rem;
+            font-size: 2.8rem;
             font-weight: 900;
             color: var(--gold-light);
         }
-        .cta-price small { font-size: 1rem; color: rgba(255,255,255,0.5); }
+        .cta-price small { font-size: 1.2rem; color: rgba(255,255,255,0.5); }
         .cta-old {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             text-decoration: line-through;
             color: rgba(255,255,255,0.35);
         }
 
-        /* ========== FOOTER ========== */
+        /* FOOTER */
         .site-footer {
             background: var(--navy-900);
             color: rgba(255,255,255,0.55);
@@ -676,7 +652,7 @@
         }
         .site-footer span { color: var(--gold-light); }
 
-        /* ========== نافذة الدفع (بأسلوب متجر نيولا) ========== */
+        /* PAYMENT MODAL */
         .payment-overlay {
             position: fixed;
             inset: 0;
@@ -731,9 +707,7 @@
             padding: 0 5px;
             transition: 0.2s;
         }
-        .payment-header .close-payment:hover {
-            color: var(--nyala-gold);
-        }
+        .payment-header .close-payment:hover { color: var(--nyala-gold); }
         .payment-body {
             flex: 1;
             position: relative;
@@ -745,7 +719,7 @@
             border: none;
         }
 
-        /* ========== RESPONSIVE ========== */
+        /* RESPONSIVE */
         @media (max-width: 768px) {
             .section-heading { font-size: 1.8rem; }
             .hero-content h1 { font-size: 2rem; }
@@ -754,14 +728,11 @@
             .hero-visual-row { flex-direction: column; }
             .hero-visual-row img { width: 100%; }
             .output-gallery img { width: 100%; min-width: 0; }
-            .tools-grid { grid-template-columns: 1fr; }
+            .tools-grid-categories { grid-template-columns: 1fr; }
             .cta-section h3 { font-size: 1.8rem; }
             .header-cta { font-size: 0.85rem; padding: 8px 18px; }
-            .payment-popup {
-                width: 95%;
-                height: 85vh;
-                max-width: 500px;
-            }
+            .payment-popup { width: 95%; height: 85vh; max-width: 500px; }
+            .hero-price { font-size: 2rem; }
         }
     </style>
 </head>
@@ -775,7 +746,7 @@
             <div class="brand-text">المنصة <span>الشاملة</span></div>
         </a>
         <button class="header-cta" id="openModalBtnHeader">
-            <i class="fas fa-rocket"></i> ابدأ الاشتراك
+            <i class="fas fa-rocket"></i> اشتراك سنوي
         </button>
     </div>
 </header>
@@ -785,35 +756,36 @@
     <div class="container hero-grid">
         <div class="hero-content">
             <div class="hero-badge">
-                <i class="fas fa-crown"></i> المنصة الشاملة
+                <i class="fas fa-crown"></i> مجموعة فاروق للاستشارات والأعمال
             </div>
-            <h1>أكثر من 20 أداة مالية وخدمية متكاملة <span>لاتخاذ قرارات ذكية</span> بثقة وأرقام</h1>
+            <h1>أكثر من 23 أداة مالية وإدارية <span>متكاملة</span> لاتخاذ قرارات ذكية</h1>
             <p class="hero-desc">
-                المنصة الأولى من نوعها التي تمنح رجال الأعمال والمدراء ورواد الأعمال
-                أدوات مالية وتشغيلية شاملة مع <strong>رسوم بيانية وتقارير تحليلية وتوصيات</strong>
-                قابلة للتنفيذ الفوري.
+                المنصة الأولى من نوعها التي تمنح رواد الأعمال والمدراء والمستثمرين
+                أدوات مالية وتشغيلية شاملة مع <strong>رسوم بيانية، تقارير تحليلية، وتوصيات</strong>
+                قابلة للتنفيذ الفوري – كل ذلك في اشتراك سنوي واحد.
             </p>
             <div class="hero-stats">
-                <div class="hero-stat"><div class="stat-num">أكثر من 20</div><div class="stat-lbl">أداة متخصصة</div></div>
+                <div class="hero-stat"><div class="stat-num">23+</div><div class="stat-lbl">أداة متخصصة</div></div>
                 <div class="hero-stat"><div class="stat-num">24/7</div><div class="stat-lbl">متاحة دائماً</div></div>
+                <div class="hero-stat"><div class="stat-num">سنوي</div><div class="stat-lbl">اشتراك واحد</div></div>
             </div>
             <div class="hero-price-box">
-                <span class="hero-price-old">$42.99</span>
-                <span class="hero-price">$14.99<small>/شهرياً</small></span>
-                <span class="hero-badge-sub">توفير 65%</span>
+                <span class="hero-price-old">$359</span>
+                <span class="hero-price">$299<small>/سنوياً</small></span>
+                <span class="hero-badge-sub">توفير 17%</span>
             </div>
-            <button class="btn btn-gold" id="openModalBtn"><i class="fas fa-rocket"></i> اشترك الآن بـ 14.99$ شهرياً</button>
+            <button class="btn btn-gold" id="openModalBtn"><i class="fas fa-rocket"></i> اشترك الآن بـ 299$ سنوياً</button>
             <div class="hero-trust" style="margin-top:20px;">
                 <span><i class="fas fa-shield-alt"></i> لا يتجدد تلقائياً</span>
-                <span><i class="fas fa-undo-alt"></i> ضمان الإستفادة</span>
-                <span><i class="fas fa-lock"></i> دفع آمن </span>
+                <span><i class="fas fa-undo-alt"></i> ضمان الاستفادة</span>
+                <span><i class="fas fa-lock"></i> دفع آمن</span>
             </div>
         </div>
         <div class="hero-visual">
-            <img src="https://lh3.googleusercontent.com/d/1VjYS7D9h69CUHmpAvZjsLXdY_GUOgIuT" alt="المنصة الشاملة" loading="lazy">
+            <img src="https://lh3.googleusercontent.com/d/1ShXtjlvdwlAlz6KM2FHjsdVwhqY2MsDB" alt="المنصة الشاملة" loading="lazy">
             <div class="hero-visual-row">
-                <img src="https://lh3.googleusercontent.com/d/1kwa8L_-8x8uIw43dl5oHqqDLs-91uWPf" alt="الرسوم البيانية" loading="lazy">
-                <img src="https://lh3.googleusercontent.com/d/1n7H4U0st_J6mTNvznEvFpzP6-l1XxvN_" alt="التحليل المالي" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/15xeLIV8z7v3kLMJt1m4Ga0dejQA3RI4i" alt="الرسوم البيانية" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1GTYce32PsuKLMIlB6TIPMO5VGTv4X6ti" alt="التحليل المالي" loading="lazy">
             </div>
         </div>
     </div>
@@ -855,7 +827,7 @@
     <div class="container text-center">
         <span class="section-label">الحل</span>
         <h2 class="section-heading">منصة واحدة <span>شاملة</span> تغنيك عن كل الأدوات المنفصلة</h2>
-        <p class="section-subtitle">أكثر من 20 أداة مالية وتشغيلية في منصة واحدة تمنحك كل ما تحتاجه لاتخاذ قرارات مالية صحيحة مبنية على بيانات دقيقة ورسوم بيانية وتوصيات.</p>
+        <p class="section-subtitle">أكثر من 23 أداة مالية وتشغيلية في منصة واحدة تمنحك كل ما تحتاجه لاتخاذ قرارات مالية صحيحة مبنية على بيانات دقيقة ورسوم بيانية وتوصيات.</p>
         <div class="value-grid">
             <div class="value-card">
                 <div class="vc-icon"><i class="fas fa-chart-line"></i></div>
@@ -881,37 +853,68 @@
     </div>
 </section>
 
-<!-- ==================== TOOLS ==================== -->
+<!-- ==================== TOOLS (مفصلة مع الشرح) ==================== -->
 <section class="tools-section">
     <div class="container text-center">
         <span class="section-label">الأدوات</span>
-        <h2 class="section-heading">أدوات مالية <span>وتشغيلية</span> في منصة واحدة</h2>
-        <p class="section-subtitle">كل أداة صُممت بعناية لتخدم جانباً محدداً من احتياجاتك المالية والإدارية والتشغيلية.</p>
-        <div class="tools-grid">
-            <div class="tool-card"><div class="tool-num">01</div><div><h5>دراسة جدوى مالية شاملة</h5><div class="tool-tag"><i class="fas fa-chart-pie"></i> تحليل مالي</div></div></div>
-            <div class="tool-card"><div class="tool-num">02</div><div><h5>حساب التكاليف للمطاعم</h5><div class="tool-tag"><i class="fas fa-calculator"></i> تكاليف</div></div></div>
-            <div class="tool-card"><div class="tool-num">03</div><div><h5>دراسة الجدوى الفنية المتقدمة للمطاعم</h5><div class="tool-tag"><i class="fas fa-microchip"></i> فنية</div></div></div>
-            <div class="tool-card"><div class="tool-num">04</div><div><h5>دراسة الجدوى التسويقية الشاملة</h5><div class="tool-tag"><i class="fas fa-bullhorn"></i> تسويقية</div></div></div>
-            <div class="tool-card"><div class="tool-num">05</div><div><h5>حساب العائد على الاستثمار للعقاري</h5><div class="tool-tag"><i class="fas fa-building"></i> عقاري</div></div></div>
-            <div class="tool-card"><div class="tool-num">06</div><div><h5>محاكاة المخاطر</h5><div class="tool-tag"><i class="fas fa-shield-virus"></i> مخاطر</div></div></div>
-            <div class="tool-card"><div class="tool-num">07</div><div><h5>حاسبة نقطة التعادل</h5><div class="tool-tag"><i class="fas fa-balance-scale"></i> تعادل</div></div></div>
-            <div class="tool-card"><div class="tool-num">08</div><div><h5>حاسبة التدفق النقدي</h5><div class="tool-tag"><i class="fas fa-money-bill-wave"></i> نقدي</div></div></div>
-            <div class="tool-card"><div class="tool-num">09</div><div><h5>حاسبة الإهلاك</h5><div class="tool-tag"><i class="fas fa-arrow-trend-down"></i> أصول</div></div></div>
-            <div class="tool-card"><div class="tool-num">10</div><div><h5>متوسط تكلفة رأس المال المرجح</h5><div class="tool-tag"><i class="fas fa-percent"></i> WACC</div></div></div>
-            <div class="tool-card"><div class="tool-num">11</div><div><h5>حاسبة العائد على الاستثمار</h5><div class="tool-tag"><i class="fas fa-chart-simple"></i> ROI</div></div></div>
-            <div class="tool-card"><div class="tool-num">12</div><div><h5>حاسبة جدولة القروض</h5><div class="tool-tag"><i class="fas fa-calendar-alt"></i> تمويل</div></div></div>
-            <div class="tool-card"><div class="tool-num">13</div><div><h5>حاسبة تكلفة العمالة المثالية</h5><div class="tool-tag"><i class="fas fa-users"></i> موارد بشرية</div></div></div>
-            <div class="tool-card"><div class="tool-num">14</div><div><h5>نظام تحليل المخاطر ونقاط التحكم الحرجة</h5><div class="tool-tag"><i class="fas fa-temperature-high"></i> HACCP</div></div></div>
-            <div class="tool-card"><div class="tool-num">15</div><div><h5>إجراءات التشغيل القياسية</h5><div class="tool-tag"><i class="fas fa-clipboard-list"></i> SOP</div></div></div>
-            <div class="tool-card"><div class="tool-num">16</div><div><h5>آلة حاسبة إدارية</h5><div class="tool-tag"><i class="fas fa-gear"></i> إدارية</div></div></div>
-            <div class="tool-card"><div class="tool-num">17</div><div><h5>تحليل نقطة التعادل متعددة المنتجات</h5><div class="tool-tag"><i class="fas fa-layer-group"></i> متعدد</div></div></div>
-            <div class="tool-card"><div class="tool-num">18</div><div><h5>حاسبة النسب المالية الشاملة</h5><div class="tool-tag"><i class="fas fa-scale-balanced"></i> نسب مالية</div></div></div>
-            <div class="tool-card"><div class="tool-num">19</div><div><h5>التنبؤ المالي المتقدم</h5><div class="tool-tag"><i class="fas fa-crystal-ball"></i> تنبؤ</div></div></div>
-            <div class="tool-card"><div class="tool-num">20</div><div><h5>هندسة قوائم الطعام</h5><div class="tool-tag"><i class="fas fa-calculator"></i> تكاليف</div></div></div>
-            <div class="tool-card"><div class="tool-num">21</div><div><h5>نموذج تقييم الموظفين</h5><div class="tool-tag"><i class="fas fa-users"></i> موارد بشرية</div></div></div>
-            <div class="tool-card"><div class="tool-num">22</div><div><h5>تكلفة الإستحواذ على العميل</h5><div class="tool-tag"><i class="fas fa-calculator"></i> تكاليف</div></div></div>
-            <div class="tool-card"><div class="tool-num">23</div><div><h5>مقياس تقييم الإداري</h5><div class="tool-tag"><i class="fas fa-users"></i> موارد بشرية</div></div></div>
+        <h2 class="section-heading">جميع الأدوات المتاحة <span>في منصة واحدة</span></h2>
+        <p class="section-subtitle">كل أداة صُممت بعناية لتخدم جانباً محدداً من احتياجاتك المالية والإدارية والتشغيلية، مع شرح تفصيلي داخل كل أداة.</p>
+        <div class="tools-grid-categories">
+            <!-- فئة 1: دراسات الجدوى والاستثمار -->
+            <div class="category-box">
+                <h3><i class="fas fa-chart-pie"></i> دراسات الجدوى والاستثمار</h3>
+                <div class="tool-item"><i class="fas fa-chart-pie"></i><span class="tool-name">دراسة جدوى مالية شاملة</span><span class="tool-desc">NPV, IRR, Payback, سيناريوهات</span></div>
+                <div class="tool-item"><i class="fas fa-gear"></i><span class="tool-name">دراسة الجدوى الفنية للمطاعم</span><span class="tool-desc">تحليل المعدات والطاقة الإنتاجية</span></div>
+                <div class="tool-item"><i class="fas fa-chart-simple"></i><span class="tool-name">دراسة الجدوى التسويقية</span><span class="tool-desc">تحليل السوق والجمهور والمنافسين</span></div>
+                <div class="tool-item"><i class="fas fa-building"></i><span class="tool-name">حساب العائد على الاستثمار العقاري</span><span class="tool-desc">مع وبدون تمويل</span></div>
+                <div class="tool-item"><i class="fas fa-chart-line"></i><span class="tool-name">حاسبة العائد على الاستثمار (ROI)</span><span class="tool-desc">بسيطة وسريعة</span></div>
+                <div class="tool-item"><i class="fas fa-ranking-star"></i><span class="tool-name">حاسبة تقييم المطاعم</span><span class="tool-desc">تقدير القيمة السوقية</span></div>
+                <div class="tool-item"><i class="fas fa-laptop-code"></i><span class="tool-name">تقييم الشركات البرمجية</span><span class="tool-desc">نموذج تقييم خاص</span></div>
+                <div class="tool-item"><i class="fas fa-city"></i><span class="tool-name">تقييم الشركات العقارية</span><span class="tool-desc">تحليل الأصول العقارية</span></div>
+                <div class="tool-item"><i class="fas fa-wave-square"></i><span class="tool-name">تحليل الاستثمار (NPV/IRR)</span><span class="tool-desc">تقييم المشاريع الاستثمارية</span></div>
+            </div>
+            <!-- فئة 2: التحليل المالي والمحاسبي -->
+            <div class="category-box">
+                <h3><i class="fas fa-coins"></i> التحليل المالي والمحاسبي</h3>
+                <div class="tool-item"><i class="fas fa-coins"></i><span class="tool-name">حاسبة التدفق النقدي</span><span class="tool-desc">OCF / FCFF مع توقعات</span></div>
+                <div class="tool-item"><i class="fas fa-money-bill-wave"></i><span class="tool-name">حاسبة الفجوة النقدية (CCC)</span><span class="tool-desc">دورة التحويل النقدي</span></div>
+                <div class="tool-item"><i class="fas fa-percentage"></i><span class="tool-name">النسب المالية الشاملة</span><span class="tool-desc">18 نسبة مع تقييم</span></div>
+                <div class="tool-item"><i class="fas fa-arrow-trend-up"></i><span class="tool-name">التنبؤ المالي المتقدم</span><span class="tool-desc">توقعات 5 سنوات</span></div>
+                <div class="tool-item"><i class="fas fa-chart-simple"></i><span class="tool-name">حاسبة الإهلاك</span><span class="tool-desc">4 طرق مختلفة</span></div>
+                <div class="tool-item"><i class="fas fa-scale-balanced"></i><span class="tool-name">حاسبة WACC</span><span class="tool-desc">متوسط تكلفة رأس المال</span></div>
+                <div class="tool-item"><i class="fas fa-lightbulb"></i><span class="tool-name">تحليل السيناريوهات</span><span class="tool-desc">What-If Analysis</span></div>
+                <div class="tool-item"><i class="fas fa-hand-holding-usd"></i><span class="tool-name">حاسبة جدولة القروض</span><span class="tool-desc">جدول سداد كامل</span></div>
+            </div>
+            <!-- فئة 3: التكاليف ونقطة التعادل -->
+            <div class="category-box">
+                <h3><i class="fas fa-calculator"></i> التكاليف ونقطة التعادل</h3>
+                <div class="tool-item"><i class="fas fa-utensils"></i><span class="tool-name">حساب التكاليف للمطاعم</span><span class="tool-desc">تحليل شامل للتكاليف</span></div>
+                <div class="tool-item"><i class="fas fa-chart-line"></i><span class="tool-name">حاسبة نقطة التعادل</span><span class="tool-desc">وحدات وإيرادات</span></div>
+                <div class="tool-item"><i class="fas fa-chart-line"></i><span class="tool-name">نقطة التعادل متعددة المنتجات</span><span class="tool-desc">مع مزيج المنتجات</span></div>
+                <div class="tool-item"><i class="fas fa-object-group"></i><span class="tool-name">هندسة قوائم الطعام</span><span class="tool-desc">مصفوفة BCG</span></div>
+                <div class="tool-item"><i class="fas fa-users"></i><span class="tool-name">تكلفة الإستحواذ على العميل</span><span class="tool-desc">CAC & CLV</span></div>
+                <div class="tool-item"><i class="fas fa-users"></i><span class="tool-name">حاسبة تكلفة العمالة</span><span class="tool-desc">المثالية للمطاعم</span></div>
+            </div>
+            <!-- فئة 4: إدارة المخاطر والجودة -->
+            <div class="category-box">
+                <h3><i class="fas fa-shield"></i> إدارة المخاطر والجودة</h3>
+                <div class="tool-item"><i class="fas fa-wave-square"></i><span class="tool-name">محاكاة المخاطر (مونت كارلو)</span><span class="tool-desc">تحليل احتمالي</span></div>
+                <div class="tool-item"><i class="fas fa-exclamation-triangle"></i><span class="tool-name">تحليل المخاطر (HACCP)</span><span class="tool-desc">تدقيق سلامة الغذاء</span></div>
+                <div class="tool-item"><i class="fas fa-clipboard-list"></i><span class="tool-name">إجراءات التشغيل القياسية (SOPs)</span><span class="tool-desc">قائمة تدقيق شاملة</span></div>
+            </div>
+            <!-- فئة 5: الأدوات الإدارية والموارد البشرية -->
+            <div class="category-box">
+                <h3><i class="fas fa-user-tie"></i> الأدوات الإدارية والموارد البشرية</h3>
+                <div class="tool-item"><i class="fas fa-user-check"></i><span class="tool-name">تقييم الموظفين</span><span class="tool-desc">40 معياراً</span></div>
+                <div class="tool-item"><i class="fas fa-user-check"></i><span class="tool-name">مقياس تقييم الإداري</span><span class="tool-desc">عقلية الاحتفاظ بالمواهب</span></div>
+                <div class="tool-item"><i class="fas fa-award"></i><span class="tool-name">تقييم المعارف والمهارات</span><span class="tool-desc">16 معياراً</span></div>
+                <div class="tool-item"><i class="fas fa-robot"></i><span class="tool-name">توليد المحتوى (تجريبي)</span><span class="tool-desc">ذكاء اصطناعي</span></div>
+                <div class="tool-item"><i class="fas fa-calculator"></i><span class="tool-name">آلة حاسبة إدارية</span><span class="tool-desc">مالية وعلمية</span></div>
+            </div>
         </div>
+        <p style="margin-top:28px; color:var(--gray-500);">
+            <i class="fas fa-info-circle"></i> كل أداة تحتوي على شرح تفصيلي داخلها، بالإضافة إلى إمكانية تصدير التقارير بصيغ Word و Excel.
+        </p>
     </div>
 </section>
 
@@ -939,36 +942,9 @@
             </div>
         </div>
         <div class="output-gallery">
-            <img src="https://lh3.googleusercontent.com/d/1kwa8L_-8x8uIw43dl5oHqqDLs-91uWPf" alt="الرسوم البيانية" loading="lazy">
-            <img src="https://lh3.googleusercontent.com/d/1p6dxYtdNbVM-1kBAbWvZ9CDkEP3h03-R" alt="التدفقات النقدية" loading="lazy">
-            <img src="https://lh3.googleusercontent.com/d/1n7H4U0st_J6mTNvznEvFpzP6-l1XxvN_" alt="التحليل المالي" loading="lazy">
-        </div>
-    </div>
-</section>
-
-<!-- ==================== SCREENSHOTS ==================== -->
-<section class="screenshots-section">
-    <div class="container text-center">
-        <span class="section-label">معاينة</span>
-        <h2 class="section-heading">لمحة من داخل <span>المنصة</span></h2>
-        <p class="section-subtitle">شاهد كيف تبدو الأدوات والتقارير والرسوم البيانية داخل المنصة.</p>
-        <div class="screenshots-grid">
-            <div class="screenshot-card">
-                <img src="https://lh3.googleusercontent.com/d/1kwa8L_-8x8uIw43dl5oHqqDLs-91uWPf" alt="الرسوم البيانية التفاعلية" loading="lazy">
-                <div class="sc-caption"><i class="fas fa-chart-bar"></i> الرسوم البيانية التفاعلية</div>
-            </div>
-            <div class="screenshot-card">
-                <img src="https://lh3.googleusercontent.com/d/1n7H4U0st_J6mTNvznEvFpzP6-l1XxvN_" alt="التحليل المالي المفصل" loading="lazy">
-                <div class="sc-caption"><i class="fas fa-magnifying-glass-chart"></i> التحليل المالي المفصل</div>
-            </div>
-            <div class="screenshot-card">
-                <img src="https://lh3.googleusercontent.com/d/1p6dxYtdNbVM-1kBAbWvZ9CDkEP3h03-R" alt="التدفقات النقدية" loading="lazy">
-                <div class="sc-caption"><i class="fas fa-water"></i> التدفقات النقدية والجداول</div>
-            </div>
-            <div class="screenshot-card">
-                <img src="https://lh3.googleusercontent.com/d/1JUgqA6ZiUH1JD6M2Wu3VK1l73XTFiv6I" alt="المنصة الشاملة" loading="lazy">
-                <div class="sc-caption"><i class="fas fa-desktop"></i> لوحة التحكم الرئيسية</div>
-            </div>
+            <img src="https://lh3.googleusercontent.com/d/1BDI3VHdq1oj3i6_ndSIKhfRYAbxhFJK4" alt="الرسوم البيانية" loading="lazy">
+            <img src="https://lh3.googleusercontent.com/d/18ggWwezXZXET-F2asoymYMTM_FgpLZ-s" alt="التدفقات النقدية" loading="lazy">
+            <img src="https://lh3.googleusercontent.com/d/1opOKlSNdeoWaCWdv5EfrkldOcVDE2MWp" alt="التحليل المالي" loading="lazy">
         </div>
     </div>
 </section>
@@ -1006,24 +982,20 @@
         <h2 class="section-heading">كل ما تريد <span>معرفته</span> عن المنصة</h2>
         <div class="faq-grid">
             <div class="faq-item">
-                <div class="faq-q"><span>هل المنصة مناسبة للمبتدئين في عالم المال والأعمال؟</span><i class="fas fa-chevron-down"></i></div>
-                <div class="faq-a">نعم بالتأكيد. المنصة صُممت لتكون سهلة الاستخدام وتناسب جميع المستويات. كل أداة تأتي مع شرح واضح للمدخلات والمخرجات، بالإضافة إلى توصيات عامة تساعدك على فهم النتائج واتخاذ القرار حتى لو لم تكن خبيراً مالياً.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-q"><span>ما الذي أحصل عليه بالضبط مقابل الاشتراك الشهري؟</span><i class="fas fa-chevron-down"></i></div>
-                <div class="faq-a">تحصل على وصول كامل لجميع الأدوات دون استثناء، مع إمكانية استخدام كل أداة بعدد غير محدود من المرات. كل أداة تمنحك رسوماً بيانية تفاعلية وتقارير شاملة وتوصيات عامة. الاشتراك شهري ولا يتجدد تلقائياً.</div>
+                <div class="faq-q"><span>ما الذي أحصل عليه مقابل الاشتراك السنوي؟</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">تحصل على وصول كامل لجميع الأدوات (أكثر من 23 أداة) دون استثناء، مع إمكانية استخدام كل أداة بعدد غير محدود من المرات. كل أداة تمنحك رسوماً بيانية تفاعلية وتقارير شاملة وتوصيات عامة. الاشتراك سنوي ولا يتجدد تلقائياً.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-q"><span>هل يمكنني تصدير التقارير والرسوم البيانية؟</span><i class="fas fa-chevron-down"></i></div>
-                <div class="faq-a">نعم، المنصة تتيح لك تصدير التقارير بصيغة وورد أو أكسل ومشاركتها مع فريق العمل أو المستثمرين أو الشركاء.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-q"><span>هل يوجد ضمان أو فترة تجربة مجانية؟</span><i class="fas fa-chevron-down"></i></div>
-                <div class="faq-a">لا يوجد فترة مجانية ولكن ثقتنا كبيرة في قيمة الأدوات التي نقدمها ويمكنك التواصل معنا لأي استفسار.</div>
+                <div class="faq-a">نعم، المنصة تتيح لك تصدير التقارير بصيغة Word أو Excel ومشاركتها مع فريق العمل أو المستثمرين أو الشركاء.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-q"><span>هل أحتاج إلى تثبيت أي برامج على جهازي؟</span><i class="fas fa-chevron-down"></i></div>
                 <div class="faq-a">لا تحتاج إلى أي تثبيت. المنصة سحابية بالكامل وتعمل مباشرة من متصفحك على أي جهاز: حاسوب، جهاز لوحي، أو هاتف ذكي. كل ما تحتاجه هو اتصال بالإنترنت.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q"><span>كيف يمكنني تجديد الاشتراك بعد انتهاء السنة؟</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">يمكنك تجديد الاشتراك من خلال نفس رابط الدفع الموجود في المنصة أو بالتواصل مع فريق الدعم. سيتم إرسال تذكير لك قبل انتهاء الاشتراك بفترة كافية.</div>
             </div>
         </div>
     </div>
@@ -1035,11 +1007,11 @@
         <h3>لا تترك قراراتك المالية للتخمين</h3>
         <p>انضم إلى مئات من رواد الأعمال والمدراء ورجال الأعمال الذين يستخدمون المنصة لاتخاذ قرارات مالية صحيحة مبنية على بيانات دقيقة ورسوم بيانية وتوصيات.</p>
         <div class="cta-price-row">
-            <span class="cta-old">$42.99</span>
-            <span class="cta-price">$14.99<small>/شهرياً</small></span>
+            <span class="cta-old">$359</span>
+            <span class="cta-price">$299<small>/سنوياً</small></span>
         </div>
         <button class="btn btn-gold" id="openModalBtn2"><i class="fas fa-rocket"></i> اشترك الآن وابدأ التحليل</button>
-        <p style="margin-top:18px; font-size:0.9rem; opacity:0.65;"><i class="fas fa-lock"></i> دفع آمن  – وصول فوري لجميع الأدوات</p>
+        <p style="margin-top:18px; font-size:0.9rem; opacity:0.65;"><i class="fas fa-lock"></i> دفع آمن – وصول فوري لجميع الأدوات</p>
     </div>
 </section>
 
@@ -1051,11 +1023,11 @@
     </div>
 </footer>
 
-<!-- ==================== نافذة الدفع (أسلوب متجر نيولا) ==================== -->
+<!-- ==================== نافذة الدفع (بأسلوب متجر نيولا) ==================== -->
 <div class="payment-overlay" id="paymentModal">
     <div class="payment-popup">
         <div class="payment-header">
-            <h3><i class="fas fa-lock"></i> إتمام الاشتراك الشهري</h3>
+            <h3><i class="fas fa-lock"></i> إتمام الاشتراك السنوي</h3>
             <button class="close-payment" id="closeModalBtn">&times;</button>
         </div>
         <div class="payment-body">
@@ -1066,7 +1038,8 @@
 
 <script>
     (function() {
-        const PAYMENT_LINK = "https://alfan.link/faroukazem?digital=r89RJK";
+        // الرابط الجديد للدفع السنوي
+        const PAYMENT_LINK = "https://alfan.link/faroukazem?digital=DkPhgz";
         const modal = document.getElementById('paymentModal');
         const iframe = document.getElementById('paymentIframe');
         const openBtns = document.querySelectorAll('#openModalBtn, #openModalBtn2, #openModalBtnHeader');
