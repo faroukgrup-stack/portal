@@ -174,6 +174,80 @@
         }
         .relogin-btn:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.3); }
 
+        /* ============================================================
+           أنماط النافذة المنبثقة (لتجديد الاشتراك) - مأخوذة من الكود الثاني ومعدلة
+           ============================================================ */
+        .payment-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 4000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .payment-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .payment-popup {
+            background: #1a1a2e;
+            border-radius: 24px;
+            width: 95%;
+            max-width: 500px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border: 1px solid rgba(180,133,84,0.2);
+        }
+        .payment-header {
+            background: #0b0e17;
+            color: #cfa776;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            border-bottom: 1px solid rgba(180,133,84,0.15);
+        }
+        .payment-header h3 {
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1.2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .payment-header .close-payment {
+            background: none;
+            border: none;
+            color: #aab7d4;
+            font-size: 1.8rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 5px;
+            transition: 0.2s;
+        }
+        .payment-header .close-payment:hover {
+            color: #f87171;
+        }
+        .payment-body {
+            flex: 1;
+            position: relative;
+            background: #0f1420;
+        }
+        .payment-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
         /* ===== لوحة التحكم ===== */
         .dashboard {
             max-width: 1400px; width: 100%;
@@ -613,6 +687,7 @@
             .service-block .panel-header { font-size: 0.9rem; }
             #installBanner { flex-direction: column; align-items: stretch; text-align: center; }
             #installBanner .banner-actions { justify-content: center; }
+            .payment-popup { width: 95%; height: 80vh; }
         }
 
         @media (max-width: 400px) {
@@ -661,12 +736,28 @@
             <i class="fas fa-exclamation-triangle" style="font-size:2.5rem; color:#fbbf24; margin-bottom:0.5rem;"></i>
             <h2 id="sessionExpiredTitle">⚠️ انتهت صلاحية الجلسة</h2>
             <p id="sessionExpiredMsg">انتهت مدة الجلسة (24 ساعة). الرجاء تسجيل الدخول مجدداً.</p>
-            <a href="https://alfan.link/faroukazem?digital=r89RJK" target="_blank" class="renew-link" id="renewLinkBtn" style="display:none;">
+            <!-- تم تعديل هذا الرابط ليصبح زراً يفتح النافذة المنبثقة -->
+            <a href="#" class="renew-link" id="renewLinkBtn">
                 <i class="fas fa-sync-alt"></i> تجديد الإشتراك
             </a>
             <button class="relogin-btn" id="reloginBtn">
                 <i class="fas fa-sign-in-alt"></i> العودة لشاشة الدخول
             </button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         نافذة منبثقة لتجديد الاشتراك (تمت إضافتها بنفس أسلوب الكود الثاني)
+         ============================================================ -->
+    <div class="payment-overlay" id="renewPopup">
+        <div class="payment-popup">
+            <div class="payment-header">
+                <h3><i class="fas fa-sync-alt"></i> تجديد الاشتراك</h3>
+                <button class="close-payment" id="closeRenewPopup">&times;</button>
+            </div>
+            <div class="payment-body">
+                <iframe id="renewIframe" src="" allow="payment" allowfullscreen title="نافذة تجديد الاشتراك"></iframe>
+            </div>
         </div>
     </div>
 
@@ -784,7 +875,8 @@
             <div class="quick-links-title"><i class="fas fa-link"></i> الوصول السريع لمنصات المجموعة (الإصدار 5.3)</div>
             <div class="links-row">
                 <a href="https://www.farouk-grup.com/" target="_blank" class="link-btn">الموقع الرسمي</a>
-                <a href="https://alfan.link/faroukazem?digital=r89RJK" target="_blank" class="link-btn">تجديد الإشتراك</a>
+                <!-- يمكنك أيضاً جعل هذا الرابط يفتح النافذة المنبثقة بدلاً من الانتقال المباشر إذا أردت -->
+                <a href="#" class="link-btn" id="quickRenewLink">تجديد الإشتراك</a>
                 <a href="survey.html" target="_blank" class="link-btn">★ تقييم المنصة</a>
                 <a href="mailto:faroukgrup@gmail.com" class="link-btn"><i class="fas fa-envelope"></i> البريد</a>
             </div>
@@ -852,6 +944,7 @@
             if (isSubscriptionExpired) {
                 sessionExpiredTitle.textContent = '⚠️ انتهى الاشتراك';
                 sessionExpiredMsg.textContent = reason;
+                // إظهار زر التجديد في رسالة انتهاء الجلسة
                 renewLinkBtn.style.display = 'inline-block';
             } else {
                 sessionExpiredTitle.textContent = '⏰ انتهت الجلسة';
@@ -925,7 +1018,7 @@
                     startSessionTimer();
                     loadAllData();
                 } else if (result.status === 'expired') {
-                    errorMsg.innerHTML = '❌ انتهى اشتراكك. يرجى تجديد الإشتراك. <a href="https://alfan.link/faroukazem?digital=r89RJK" target="_blank" style="color:#cfa776;">من هنا</a>';
+                    errorMsg.innerHTML = '❌ انتهى اشتراكك. يرجى تجديد الإشتراك. <a href="https://alfan.link/faroukazem?digital=DkPhgz" target="_blank" style="color:#cfa776;">من هنا</a>';
                 } else {
                     errorMsg.innerHTML = '❌ ' + (result.message || 'بيانات الدخول غير صحيحة');
                 }
@@ -1429,6 +1522,60 @@
                 installBanner.style.display = 'none';
             }
         }, 5000);
+
+        // ============================================================
+        // إدارة نافذة تجديد الاشتراك (تمت إضافتها حديثاً)
+        // ============================================================
+        (function() {
+            const renewPopup = document.getElementById('renewPopup');
+            const renewIframe = document.getElementById('renewIframe');
+            const closeRenewBtn = document.getElementById('closeRenewPopup');
+            // رابط التجديد (نفس الرابط الموجود في الكود)
+            const RENEW_LINK = "https://alfan.link/faroukazem?digital=DkPhgz";
+
+            // دالة فتح النافذة
+            function openRenewPopup() {
+                renewIframe.src = RENEW_LINK;
+                renewPopup.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            // دالة إغلاق النافذة
+            function closeRenewPopup() {
+                renewPopup.classList.remove('open');
+                renewIframe.src = '';
+                document.body.style.overflow = '';
+            }
+
+            // ربط زر التجديد (في رسالة انتهاء الجلسة) بفتح النافذة
+            if (renewLinkBtn) {
+                renewLinkBtn.addEventListener('click', function(e) {
+                    e.preventDefault(); // منع الانتقال المباشر
+                    openRenewPopup();
+                });
+            }
+
+            // ربط زر التجديد السريع في الروابط السريعة (اختياري)
+            const quickRenewLink = document.getElementById('quickRenewLink');
+            if (quickRenewLink) {
+                quickRenewLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openRenewPopup();
+                });
+            }
+
+            // إغلاق النافذة
+            closeRenewBtn.addEventListener('click', closeRenewPopup);
+            renewPopup.addEventListener('click', function(e) {
+                if (e.target === renewPopup) closeRenewPopup();
+            });
+            window.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && renewPopup.classList.contains('open')) closeRenewPopup();
+            });
+
+            // جعل الدالة عامة إذا أردت استخدامها في مكان آخر
+            window.openRenewPopup = openRenewPopup;
+        })();
     </script>
 </body>
 </html>
