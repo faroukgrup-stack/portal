@@ -419,7 +419,7 @@
             border-top: 1px solid rgba(180,133,84,0.08);
         }
 
-        /* ===== الحاسبة ===== */
+        /* ===== الحاسبة (ترتيب الأزرار: 7 8 9 / 4 5 6 / 1 2 3) ===== */
         #calcDisplay {
             width: 100%; padding: 0.5rem 0.7rem;
             background: rgba(10,14,23,0.7);
@@ -432,7 +432,8 @@
             outline: none;
         }
         .calc-buttons {
-            display: grid; grid-template-columns: repeat(4, 1fr);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 0.3rem;
         }
         .calc-btn {
@@ -828,26 +829,26 @@
                         </div>
                     </div>
 
-                    <!-- الحاسبة -->
+                    <!-- الحاسبة (ترتيب الأزرار: 7 8 9 / 4 5 6 / 1 2 3) -->
                     <div class="service-block">
                         <div class="panel-header"><i class="fas fa-calculator"></i> <span data-i18n="calculator">الحاسبة المالية</span></div>
                         <input type="text" id="calcDisplay" readonly value="0">
                         <div class="calc-buttons">
-                            <button class="calc-btn" onclick="appendCalc('9')">9</button>
-                            <button class="calc-btn" onclick="appendCalc('8')">8</button>
                             <button class="calc-btn" onclick="appendCalc('7')">7</button>
+                            <button class="calc-btn" onclick="appendCalc('8')">8</button>
+                            <button class="calc-btn" onclick="appendCalc('9')">9</button>
                             <button class="calc-btn operator" onclick="setCalcOperator('/')">÷</button>
-                            <button class="calc-btn" onclick="appendCalc('6')">6</button>
-                            <button class="calc-btn" onclick="appendCalc('5')">5</button>
                             <button class="calc-btn" onclick="appendCalc('4')">4</button>
+                            <button class="calc-btn" onclick="appendCalc('5')">5</button>
+                            <button class="calc-btn" onclick="appendCalc('6')">6</button>
                             <button class="calc-btn operator" onclick="setCalcOperator('*')">×</button>
-                            <button class="calc-btn" onclick="appendCalc('3')">3</button>
-                            <button class="calc-btn" onclick="appendCalc('2')">2</button>
                             <button class="calc-btn" onclick="appendCalc('1')">1</button>
+                            <button class="calc-btn" onclick="appendCalc('2')">2</button>
+                            <button class="calc-btn" onclick="appendCalc('3')">3</button>
                             <button class="calc-btn operator" onclick="setCalcOperator('-')">-</button>
                             <button class="calc-btn" onclick="clearCalc()">C</button>
-                            <button class="calc-btn" onclick="appendCalc('.')">.</button>
                             <button class="calc-btn" onclick="appendCalc('0')">0</button>
+                            <button class="calc-btn" onclick="appendCalc('.')">.</button>
                             <button class="calc-btn operator" onclick="setCalcOperator('+')">+</button>
                             <button class="calc-btn equals" onclick="calculateCalc()">=</button>
                         </div>
@@ -969,6 +970,8 @@
                 changePassSuccess: "✅ تم تغيير كلمة المرور بنجاح",
                 changePassError: "❌ فشل تغيير كلمة المرور: ",
                 changePassMismatch: "❌ كلمة المرور الجديدة وتأكيدها غير متطابقين",
+                changePassNotLoggedIn: "❌ يرجى تسجيل الدخول أولاً",
+                changePassWrongEmail: "❌ لا يمكن تغيير كلمة المرور إلا لحسابك الحالي",
 
                 // فئات الأدوات
                 "cat_جدوى": "دراسات الجدوى والاستثمار",
@@ -1076,6 +1079,8 @@
                 changePassSuccess: "✅ Password changed successfully",
                 changePassError: "❌ Failed to change password: ",
                 changePassMismatch: "❌ New password and confirmation do not match",
+                changePassNotLoggedIn: "❌ Please login first",
+                changePassWrongEmail: "❌ You can only change password for your current account",
 
                 // Tool categories
                 "cat_جدوى": "Feasibility & Investment Studies",
@@ -1205,6 +1210,7 @@
             localStorage.removeItem('userName');
             localStorage.removeItem('daysLeft');
             localStorage.removeItem('loginTimestamp');
+            localStorage.removeItem('currentUserEmail');
 
             if (isSubscriptionExpired) {
                 sessionExpiredTitle.textContent = t('sessionExpiredTitle') + ' (⚠️ انتهى الاشتراك)';
@@ -1272,6 +1278,7 @@
                     localStorage.setItem('userName', result.name);
                     localStorage.setItem('daysLeft', result.daysLeft);
                     localStorage.setItem('loginTimestamp', Date.now().toString());
+                    localStorage.setItem('currentUserEmail', user); // ✅ تخزين البريد الحالي
 
                     const savedName = result.name || t('userLabel');
                     document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')} ${result.daysLeft} ${t('day')})`;
@@ -1308,6 +1315,7 @@
             if (isSessionExpired()) {
                 localStorage.removeItem('userToken');
                 localStorage.removeItem('loginTimestamp');
+                localStorage.removeItem('currentUserEmail');
                 showLoginScreen();
                 return;
             }
@@ -1359,6 +1367,7 @@
             localStorage.removeItem('userName');
             localStorage.removeItem('daysLeft');
             localStorage.removeItem('loginTimestamp');
+            localStorage.removeItem('currentUserEmail');
             showLoginScreen();
         });
 
@@ -1406,7 +1415,7 @@
         }
 
         // ============================================================
-        // الحاسبة (تم إصلاح ترتيب الأزرار في الواجهة الرئيسية أيضاً)
+        // الحاسبة (ترتيب الأزرار: 7 8 9 / 4 5 6 / 1 2 3)
         // ============================================================
         let calcInput = '0',
             calcPrev = '',
@@ -1770,7 +1779,7 @@
         });
 
         // ============================================================
-        // تغيير كلمة المرور
+        // تغيير كلمة المرور - مع التحقق من البريد الحالي
         // ============================================================
         const changeEmail = document.getElementById('changeEmail');
         const changeCurrentPass = document.getElementById('changeCurrentPass');
@@ -1784,6 +1793,17 @@
             const current = changeCurrentPass.value.trim();
             const newPass = changeNewPass.value.trim();
             const confirm = changeConfirmPass.value.trim();
+
+            // ✅ التحقق من أن البريد المدخل يطابق البريد الحالي
+            const currentUserEmail = localStorage.getItem('currentUserEmail');
+            if (!currentUserEmail) {
+                changePassMsg.textContent = t('changePassNotLoggedIn');
+                return;
+            }
+            if (email !== currentUserEmail) {
+                changePassMsg.textContent = t('changePassWrongEmail');
+                return;
+            }
 
             if (!email || !current || !newPass || !confirm) {
                 changePassMsg.textContent = currentLang === 'ar' ? '❌ يرجى ملء جميع الحقول' :
