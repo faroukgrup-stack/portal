@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Cash Gap Calculator (CCC) | FAROUK GRUP</title>
+    <script src="auth-check.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
+        }
+
+        /* ===== Remove all vibration-causing properties ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .chart-card, .scenario-card, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== Fixed background ===== */
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.12) 0%, transparent 70%);
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.06) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.08) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
+        }
+
+        /* ===== WRAPPER ===== */
+        .calc-wrapper {
+            max-width: 1050px;
+            margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+        }
+
+        /* ===== CARD ===== */
+        .calc-box {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .calc-box h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+        }
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== Currency row ===== */
+        .currency-row {
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.8rem; background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.2);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
+        }
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
+        .currency-row select, .currency-row input {
+            flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
+        }
+        .currency-row input { flex: 2 1 200px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* ===== Section titles ===== */
+        .section-title-sm {
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
+            margin: 1.2rem 0 0.8rem 0;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== Form rows ===== */
+        .form-row {
+            display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;
+        }
+        .form-group {
+            flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
+        }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-left: 0.3rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+
+        /* ===== Calculate button ===== */
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer;
+            margin: 1.5rem 0; font-family: 'Tajawal', sans-serif;
+        }
+        .btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-calculate:active { transform: scale(0.97); }
+
+        /* ===== Results ===== */
+        .results-section { margin-top: 1.5rem; }
+        .results-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .result-card {
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 20px; padding: 1rem; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .result-card i { font-size: 1.6rem; color: #cfa776; margin-bottom: 0.3rem; }
+        .result-card h4 { font-size: 0.85rem; font-weight: 700; color: #aab7d4; margin-bottom: 0.2rem; }
+        .result-card .value { font-size: 1.3rem; font-weight: 900; color: #cfa776; }
+        .result-card .unit { font-size: 0.75rem; color: #aab7d4; }
+        .result-card .status {
+            font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+            display: inline-block; margin-top: 0.2rem;
+        }
+        .status-good { background: #28a745; color: white; }
+        .status-bad { background: #dc3545; color: white; }
+        .status-warning { background: #ffc107; color: #111; }
+
+        /* ===== Charts ===== */
+        .charts-container {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 1.5rem; margin: 1.5rem 0;
+        }
+        .chart-card {
+            background: rgba(22,30,46,0.6);
+            border: 1px solid rgba(180,133,84,0.08);
+            border-radius: 20px; padding: 0.8rem;
+        }
+        .chart-card h3 { color: #cfa776; font-size: 1rem; text-align: center; margin-bottom: 0.5rem; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 220px;
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            max-height: none;
+        }
+
+        /* ===== Recommendations ===== */
+        .recommendation-box {
+            background: rgba(22,30,46,0.7); border: 2px solid rgba(180,133,84,0.1);
+            border-radius: 20px; padding: 1rem; margin: 1.5rem 0;
+        }
+        .recommendation-box h4 { color: #cfa776; margin-bottom: 0.5rem; font-size: 1rem; }
+        .recommendation-box ul, .recommendation-box p { color: #aab7d4; font-size: 0.9rem; padding-left: 1.2rem; }
+
+        /* ===== Export buttons ===== */
+        .export-container {
+            display: flex; justify-content: center; gap: 0.8rem;
+            flex-wrap: wrap; margin: 1.5rem 0;
+        }
+        .export-word-btn, .export-excel-full-btn {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+            padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.9rem; font-family: 'Tajawal', sans-serif;
+            flex: 1 1 auto; justify-content: center; max-width: 220px;
+        }
+        .export-word-btn:hover, .export-excel-full-btn:hover { background: rgba(180,133,84,0.25); }
+
+        /* ===== Loading screen ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== Footer ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
+        .calc-display {
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: right;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
+
+        /* ===== Floating buttons ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== Messages ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+
+        /* ===================================================
+           Desktop improvements (≥1024px)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .section-title-sm { font-size: 1.4rem; }
+            .form-group { flex: 1 1 220px; }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value { font-size: 1.5rem; }
+            .result-card h4 { font-size: 0.95rem; }
+            .result-card i { font-size: 1.8rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 1rem; padding: 0.8rem 2rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .chart-container { height: 280px; }
+        }
+
+        /* ===================================================
+           Mobile improvements (≤768px)
+           =================================================== */
+        @media (max-width: 768px) {
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; }
+            .currency-row label { font-size: 0.8rem; }
+            .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; }
+            .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+            .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-cards { grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.5rem; }
+            .result-card { padding: 0.6rem 0.4rem; }
+            .result-card i { font-size: 1.2rem; }
+            .result-card h4 { font-size: 0.65rem; }
+            .result-card .value { font-size: 1rem; }
+            .result-card .unit { font-size: 0.6rem; }
+            .charts-container { grid-template-columns: 1fr; gap: 0.8rem; }
+            .chart-card { padding: 0.5rem; }
+            .chart-card h3 { font-size: 0.8rem; }
+            .chart-container { height: 180px; }
+            .export-word-btn, .export-excel-full-btn { font-size: 0.75rem; padding: 0.4rem 1rem; max-width: 160px; }
+            .modal-content { width: 95%; max-width: 320px; }
+            .calc-btn { padding: 8px 0; font-size: 0.9rem; }
+            .footer-simple { font-size: 0.7rem; padding: 0.6rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+        }
+
+        /* ===== Very small screens (≤400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+            .results-cards { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+            .chart-container { height: 150px; }
+        }
+
+        /* ===== Prevent accidental selection ===== */
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        /* ===== Scrollbar improvements ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <!-- Fixed background -->
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+
+    <!-- Export loading screen -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">Generating report...</h3>
+            <p id="loadingMsg">Please wait</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero-mini">
+        <h2>💵 Cash Gap Calculator (CCC)</h2>
+        <p>Cash conversion cycle analysis from balance sheet and income statement</p>
+    </section>
+
+    <!-- WRAPPER -->
+    <section class="calc-wrapper">
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-money-bill-wave"></i><span>Gap</span></div>
+            <h2><i class="fas fa-money-bill-wave" style="color:#cfa776;margin-left:0.5rem;"></i>Cash Conversion Cycle</h2>
+
+            <!-- Currency & Entity -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> Currency:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>USD ($)</option>
+                    <option value="€">EUR (€)</option>
+                    <option value="₺">TRY (₺)</option>
+                    <option value="ج.م">EGP (ج.م)</option>
+                    <option value="د.ك">KWD (د.ك)</option>
+                    <option value="ر.س">SAR (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> Entity Name:</label>
+                <input type="text" id="companyName" value="Company / Organization" placeholder="Beneficiary entity">
+                <label><i class="fas fa-calendar-alt"></i> Period Length:</label>
+                <select id="periodMonths">
+                    <option value="3">Quarterly (3 months)</option>
+                    <option value="6">Semi-Annual (6 months)</option>
+                    <option value="12" selected>Annual (12 months)</option>
+                </select>
+            </div>
+
+            <!-- Balance Sheet Data -->
+            <div class="section-title-sm">📊 Balance Sheet Data (Beginning & Ending)</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-boxes"></i> Beginning Inventory</label>
+                    <input type="number" id="invStart" value="220000" step="1000">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-boxes"></i> Ending Inventory</label>
+                    <input type="number" id="invEnd" value="280000" step="1000">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-users"></i> Beginning Receivables</label>
+                    <input type="number" id="arStart" value="150000" step="1000">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-users"></i> Ending Receivables</label>
+                    <input type="number" id="arEnd" value="210000" step="1000">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-hand-holding-usd"></i> Beginning Payables</label>
+                    <input type="number" id="apStart" value="100000" step="1000">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-hand-holding-usd"></i> Ending Payables</label>
+                    <input type="number" id="apEnd" value="140000" step="1000">
+                </div>
+            </div>
+
+            <!-- Income Statement Data -->
+            <div class="section-title-sm">📈 Income Statement Data (During Period)</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-file-invoice"></i> Cost of Goods Sold (COGS)</label>
+                    <input type="number" id="cogs" value="1200000" step="1000">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-chart-line"></i> Net Credit Sales</label>
+                    <input type="number" id="creditSales" value="1500000" step="1000">
+                </div>
+            </div>
+
+            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Cash Gap</button>
+
+            <!-- Results Area -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-cards" id="kpiCards"></div>
+
+                <div class="section-title-sm">📊 Charts</div>
+                <div class="charts-container">
+                    <div class="chart-card"><h3>Cash Gap Components</h3><div class="chart-container"><canvas id="cccChart"></canvas></div></div>
+                    <div class="chart-card"><h3>Components Distribution</h3><div class="chart-container"><canvas id="componentsChart"></canvas></div></div>
+                </div>
+
+                <div class="section-title-sm">📋 Calculation Details</div>
+                <div class="recommendation-box" id="calculationDetails"></div>
+
+                <div class="section-title-sm">💡 Recommendations & Analysis</div>
+                <div class="recommendation-box" id="recommendations"></div>
+
+                <div class="export-container">
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Full Word Report</button>
+                    <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Export to Full Excel</button>
+                </div>
+            </div>
+
+            <div id="initialMessage" style="margin-top:1rem; color:#aab7d4; text-align:center;">
+                <i class="fas fa-robot" style="color:#cfa776;"></i> Results will appear after clicking the calculate button
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-simple">
+        All rights reserved © 2026 <span>FAROUK GRUP</span>
+    </footer>
+
+    <button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+    <a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="modalClose">&times;</span>
+                <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn" data-val="C">C</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn" data-val="⌫">⌫</button>
+                    <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ===== Calculator =====
+            const calcDisplay = document.getElementById('calcDisplay');
+            let currentCalcInput = '';
+
+            function handleCalc(v) {
+                if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+                if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+                if (v === '=') {
+                    try {
+                        let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
+                        calcDisplay.value = r;
+                        currentCalcInput = r.toString();
+                    } catch (e) { calcDisplay.value = 'Error'; currentCalcInput = ''; }
+                    return;
+                }
+                currentCalcInput += v;
+                calcDisplay.value = currentCalcInput;
+            }
+
+            document.querySelectorAll('.calc-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const v = this.dataset.val;
+                    if (v !== undefined) handleCalc(v);
+                });
+            });
+
+            const modalEl = document.getElementById('calculatorModal');
+            document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                modalEl.classList.add('active');
+                calcDisplay.value = currentCalcInput;
+            });
+            document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+            modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+            document.addEventListener('keydown', function(e) {
+                if (!modalEl.classList.contains('active')) return;
+                e.preventDefault();
+                const k = e.key;
+                if (k >= '0' && k <= '9') handleCalc(k);
+                else if (k === '.') handleCalc('.');
+                else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+                else if (k === 'Enter' || k === '=') handleCalc('=');
+                else if (k === 'Backspace') handleCalc('⌫');
+                else if (k === 'Escape') modalEl.classList.remove('active');
+                else if (k.toLowerCase() === 'c') handleCalc('C');
+            });
+
+            // ===== Loading functions =====
+            function showLoading(title, msg) {
+                document.getElementById('loadingTitle').textContent = title;
+                document.getElementById('loadingMsg').textContent = msg;
+                document.getElementById('exportLoading').classList.add('show');
+            }
+
+            function hideLoading() {
+                document.getElementById('exportLoading').classList.remove('show');
+            }
+
+            // ===== Global variables =====
+            let currentResults = null;
+            let currentInputs = null;
+            let chart1 = null, chart2 = null;
+
+            // ===== Main calculation =====
+            function calculateCCC() {
+                const currency = document.getElementById('currencySelect').value;
+                const company = document.getElementById('companyName').value || 'Entity';
+                const periodMonths = parseInt(document.getElementById('periodMonths').value) || 12;
+
+                const invStart = parseFloat(document.getElementById('invStart').value) || 0;
+                const invEnd = parseFloat(document.getElementById('invEnd').value) || 0;
+                const arStart = parseFloat(document.getElementById('arStart').value) || 0;
+                const arEnd = parseFloat(document.getElementById('arEnd').value) || 0;
+                const apStart = parseFloat(document.getElementById('apStart').value) || 0;
+                const apEnd = parseFloat(document.getElementById('apEnd').value) || 0;
+                const cogs = parseFloat(document.getElementById('cogs').value) || 0;
+                const creditSales = parseFloat(document.getElementById('creditSales').value) || 0;
+
+                if (cogs <= 0 || creditSales <= 0) {
+                    alert('Please enter valid values: COGS > 0 and Net Credit Sales > 0.');
+                    return;
+                }
+
+                const avgInventory = (invStart + invEnd) / 2;
+                const avgReceivables = (arStart + arEnd) / 2;
+                const avgPayables = (apStart + apEnd) / 2;
+                const daysFactor = (periodMonths / 12) * 365;
+
+                const dio = cogs > 0 ? (avgInventory / cogs) * daysFactor : 0;
+                const dso = creditSales > 0 ? (avgReceivables / creditSales) * daysFactor : 0;
+                const dpo = cogs > 0 ? (avgPayables / cogs) * daysFactor : 0;
+                const ccc = dio + dso - dpo;
+
+                let status = '', statusClass = '', recommendation = '';
+                if (ccc <= 0) {
+                    status = 'Excellent (Negative Gap)';
+                    statusClass = 'status-good';
+                    recommendation = '✅ A negative cash gap means you receive cash from customers before paying suppliers – an ideal financing model. Continue improving payment terms with suppliers and increasing collection speed.';
+                } else if (ccc <= 30) {
+                    status = 'Good (Short Gap)';
+                    statusClass = 'status-good';
+                    recommendation = '🟢 Cash gap less than 30 days – good cash management. You can improve further by reducing inventory days or accelerating collections.';
+                } else if (ccc <= 60) {
+                    status = 'Moderate (Moderate Gap)';
+                    statusClass = 'status-warning';
+                    recommendation = '🟡 Cash gap between 30 and 60 days – needs careful monitoring. Review credit and inventory policies to reduce the gap.';
+                } else if (ccc <= 90) {
+                    status = 'High (Long Gap)';
+                    statusClass = 'status-bad';
+                    recommendation = '🔴 Cash gap between 60 and 90 days – liquidity risk. Focus on reducing inventory, accelerating collections, or negotiating with suppliers to extend payment terms.';
+                } else {
+                    status = 'Critical (Very Long Gap)';
+                    statusClass = 'status-bad';
+                    recommendation = '⛔ Cash gap exceeding 90 days – major liquidity risk. You need a radical restructuring of working capital management.';
+                }
+
+                // Calculation details
+                document.getElementById('calculationDetails').innerHTML = `
+                    <h4 style="color:#cfa776;">📐 Formulas Used</h4>
+                    <p><strong>Average Inventory</strong> = (${invStart.toLocaleString()} + ${invEnd.toLocaleString()}) / 2 = ${avgInventory.toFixed(0)}</p>
+                    <p><strong>Average Receivables</strong> = (${arStart.toLocaleString()} + ${arEnd.toLocaleString()}) / 2 = ${avgReceivables.toFixed(0)}</p>
+                    <p><strong>Average Payables</strong> = (${apStart.toLocaleString()} + ${apEnd.toLocaleString()}) / 2 = ${avgPayables.toFixed(0)}</p>
+                    <p style="direction:ltr; text-align:left; font-family:monospace;">
+                        DIO = (${avgInventory.toFixed(0)} ÷ ${cogs.toLocaleString()}) × ${daysFactor.toFixed(0)} = ${dio.toFixed(1)} days
+                    </p>
+                    <p style="direction:ltr; text-align:left; font-family:monospace;">
+                        DSO = (${avgReceivables.toFixed(0)} ÷ ${creditSales.toLocaleString()}) × ${daysFactor.toFixed(0)} = ${dso.toFixed(1)} days
+                    </p>
+                    <p style="direction:ltr; text-align:left; font-family:monospace;">
+                        DPO = (${avgPayables.toFixed(0)} ÷ ${cogs.toLocaleString()}) × ${daysFactor.toFixed(0)} = ${dpo.toFixed(1)} days
+                    </p>
+                    <p style="direction:ltr; text-align:left; font-family:monospace; font-size:1.2rem; font-weight:bold; color:#cfa776;">
+                        CCC = ${dio.toFixed(1)} + ${dso.toFixed(1)} - ${dpo.toFixed(1)} = ${ccc.toFixed(1)} days
+                    </p>
+                    <p style="color:#aab7d4; font-size:0.85rem;">* Days calculated based on period length (${periodMonths} months = ${daysFactor.toFixed(0)} days).</p>
+                `;
+
+                // Recommendations
+                let recHtml = `<h4 style="color:#cfa776;">📌 Assessment & Recommendations</h4>`;
+                recHtml += `<p><strong>Rating:</strong> <span class="status ${statusClass}" style="font-size:1rem; padding:0.3rem 1.2rem;">${status}</span></p>`;
+                recHtml += `<p>${recommendation}</p>`;
+                if (dio > 45) recHtml += `<p>🔹 <strong>High DIO (Inventory Days):</strong> Recommend improving inventory management, reducing excess quantities, or improving turnover rate.</p>`;
+                if (dso > 45) recHtml += `<p>🔹 <strong>High DSO (Sales Days):</strong> Review credit policies, improve collection processes, or offer discounts for early payment.</p>`;
+                if (dpo < 30) recHtml += `<p>🔹 <strong>Low DPO (Payables Days):</strong> Try to negotiate with suppliers to extend payment terms to align with the collection cycle.</p>`;
+                document.getElementById('recommendations').innerHTML = recHtml;
+
+                // Display results
+                document.getElementById('resultsSection').style.display = 'block';
+                document.getElementById('initialMessage').style.display = 'none';
+
+                document.getElementById('kpiCards').innerHTML = `
+                    <div class="result-card"><i class="fas fa-boxes"></i><h4>DIO</h4><div class="value">${dio.toFixed(1)}</div><div class="unit">days</div></div>
+                    <div class="result-card"><i class="fas fa-users"></i><h4>DSO</h4><div class="value">${dso.toFixed(1)}</div><div class="unit">days</div></div>
+                    <div class="result-card"><i class="fas fa-hand-holding-usd"></i><h4>DPO</h4><div class="value">${dpo.toFixed(1)}</div><div class="unit">days</div></div>
+                    <div class="result-card" style="border-color:${ccc <= 30 ? '#28a745' : ccc <= 60 ? '#ffc107' : '#dc3545'};"><i class="fas fa-money-bill-wave"></i><h4>CCC</h4><div class="value" style="color:${ccc <= 30 ? '#4ade80' : ccc <= 60 ? '#fbbf24' : '#f87171'}">${ccc.toFixed(1)}</div><div class="unit">days</div><div><span class="status ${statusClass}">${status}</span></div></div>
+                `;
+
+                // Charts
+                const ctx1 = document.getElementById('cccChart').getContext('2d');
+                const ctx2 = document.getElementById('componentsChart').getContext('2d');
+                if (chart1) chart1.destroy();
+                if (chart2) chart2.destroy();
+
+                chart1 = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: ['DIO', 'DSO', 'DPO', 'CCC'],
+                        datasets: [{
+                            label: 'Days',
+                            data: [dio, dso, dpo, ccc],
+                            backgroundColor: ['rgba(40,167,69,0.7)', 'rgba(23,162,184,0.7)', 'rgba(255,193,7,0.7)', 'rgba(180,133,84,0.8)'],
+                            borderColor: ['#28a745', '#17a2b8', '#ffc107', '#b48554'],
+                            borderWidth: 2,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { color: '#aab7d4' }, grid: { color: 'rgba(180,133,84,0.2)' } },
+                            x: { ticks: { color: '#aab7d4' }, grid: { display: false } }
+                        }
+                    }
+                });
+
+                chart2 = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['DIO (Inventory Days)', 'DSO (Sales Days)', 'DPO (Payables Days)'],
+                        datasets: [{ data: [dio, dso, dpo], backgroundColor: ['#28a745', '#17a2b8', '#ffc107'], borderColor: '#0b0e17', borderWidth: 2 }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#aab7d4' } } }
+                    }
+                });
+
+                // Store results for export
+                currentResults = {
+                    currency, company, periodMonths, daysFactor,
+                    inputs: { invStart, invEnd, arStart, arEnd, apStart, apEnd, cogs, creditSales, avgInventory, avgReceivables, avgPayables },
+                    outputs: { dio, dso, dpo, ccc, status, statusClass, recommendation }
+                };
+                currentInputs = { invStart, invEnd, arStart, arEnd, apStart, apEnd, cogs, creditSales, periodMonths };
+            }
+
+            // ========== Export to Full Excel ==========
+            async function exportToFullExcel() {
+                if (!currentResults) {
+                    alert('Please run the analysis first.');
+                    return;
+                }
+                showLoading('Creating Professional Excel Report...', 'Creating sheets and charts');
+                try {
+                    const D = currentResults;
+                    const currency = D.currency;
+                    const companyName = D.company;
+
+                    const workbook = new ExcelJS.Workbook();
+                    workbook.creator = 'FAROUK GRUP';
+                    workbook.created = new Date();
+
+                    const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+                    const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
+                    const PT = 'FF155724', NT = 'FF721C24', GB = 'FFFFF3CD';
+
+                    function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11, color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' }, border: { top: { style: 'thin', color: { argb: G } }, bottom: { style: 'thin', color: { argb: G } }, left: { style: 'thin', color: { argb: G } }, right: { style: 'thin', color: { argb: G } } } }; }
+
+                    function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial', bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h, vertical: 'middle', wrapText: true, readingOrder: 'ltr' }, border: { top: { style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair', color: { argb: 'FFCCCCCC' } }, left: { style: 'hair', color: { argb: 'FFCCCCCC' } }, right: { style: 'hair', color: { argb: 'FFCCCCCC' } } } }; }
+
+                    function ap(c, s) { if (s.font) c.font = s.font; if (s.fill) c.fill = s.fill; if (s.alignment) c.alignment = s.alignment; if (s.border) c.border = s.border; if (s.numFmt) c.numFmt = s.numFmt; }
+
+                    function mh(ws, fc, tc, r, text, bg = HB, tc2 = GL, fs = 12) { ws.mergeCells(r, fc, r, tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true, size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' }; c.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } }, left: { style: 'medium', color: { argb: G } }, right: { style: 'medium', color: { argb: G } } }; }
+
+                    // 1. Cover Sheet
+                    const cv = workbook.addWorksheet('Report Cover', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
+                    for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
+                    cv.getRow(2).height = 80;
+                    cv.getRow(4).height = 60;
+                    cv.mergeCells(2, 1, 2, 4);
+                    const bc = cv.getCell(2, 1);
+                    bc.value = 'FAROUK GRUP for Consulting & Business\nFAROUK GRUP';
+                    bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
+                    bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
+                    bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' };
+                    bc.border = { bottom: { style: 'thick', color: { argb: G } } };
+                    mh(cv, 1, 4, 4, `Cash Gap (CCC) Analysis Report\n${companyName}`, DB, GL, 18);
+                    const inf = [
+                        ['📋 Entity', companyName],
+                        ['📅 Date', new Date().toLocaleDateString('en-US')],
+                        ['💰 Currency', currency],
+                        ['📊 CCC', `${D.outputs.ccc.toFixed(1)} days`],
+                        ['📈 Rating', D.outputs.status]
+                    ];
+                    let ir = 6;
+                    inf.forEach(([l, v], idx) => {
+                        cv.mergeCells(ir, 1, ir, 2);
+                        cv.mergeCells(ir, 3, ir, 4);
+                        const lc = cv.getCell(ir, 1), vc = cv.getCell(ir, 3);
+                        lc.value = l; vc.value = v;
+                        const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
+                        ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' }, border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' }, right: { style: 'hair' } } });
+                        ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'ltr' }, border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' }, right: { style: 'hair' } } });
+                        cv.getRow(ir).height = 28;
+                        ir++;
+                    });
+
+                    // 2. Inputs
+                    const inputsSheet = workbook.addWorksheet('Inputs & Assumptions', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    inputsSheet.getColumn(1).width = 5;
+                    inputsSheet.getColumn(2).width = 38;
+                    inputsSheet.getColumn(3).width = 22;
+                    inputsSheet.getColumn(4).width = 22;
+                    inputsSheet.getColumn(5).width = 5;
+                    mh(inputsSheet, 1, 5, 1, '📋 Inputs & Assumptions', DB, GL, 14);
+                    inputsSheet.getRow(1).height = 40;
+                    mh(inputsSheet, 2, 4, 2, 'Base Data for CCC Analysis', SB, W, 11);
+                    inputsSheet.getRow(2).height = 28;
+                    const inputsData = [
+                        ['Beginning Inventory', D.inputs.invStart, `${currency} ${D.inputs.invStart.toFixed(0)}`],
+                        ['Ending Inventory', D.inputs.invEnd, `${currency} ${D.inputs.invEnd.toFixed(0)}`],
+                        ['Average Inventory', D.inputs.avgInventory, `${currency} ${D.inputs.avgInventory.toFixed(0)}`],
+                        ['Beginning Receivables', D.inputs.arStart, `${currency} ${D.inputs.arStart.toFixed(0)}`],
+                        ['Ending Receivables', D.inputs.arEnd, `${currency} ${D.inputs.arEnd.toFixed(0)}`],
+                        ['Average Receivables', D.inputs.avgReceivables, `${currency} ${D.inputs.avgReceivables.toFixed(0)}`],
+                        ['Beginning Payables', D.inputs.apStart, `${currency} ${D.inputs.apStart.toFixed(0)}`],
+                        ['Ending Payables', D.inputs.apEnd, `${currency} ${D.inputs.apEnd.toFixed(0)}`],
+                        ['Average Payables', D.inputs.avgPayables, `${currency} ${D.inputs.avgPayables.toFixed(0)}`],
+                        ['COGS', D.inputs.cogs, `${currency} ${D.inputs.cogs.toFixed(0)}`],
+                        ['Net Credit Sales', D.inputs.creditSales, `${currency} ${D.inputs.creditSales.toFixed(0)}`],
+                        ['Period Length', `${D.periodMonths} months`, `${D.daysFactor.toFixed(0)} days`]
+                    ];
+                    let iRow = 3;
+                    inputsData.forEach(([label, val, note], idx) => {
+                        inputsSheet.getRow(iRow).height = 24;
+                        const bg = idx % 2 === 0 ? 'FFFEFCF6' : 'FFFFFFFF';
+                        const lc = inputsSheet.getCell(iRow, 2), vc = inputsSheet.getCell(iRow, 3), nc = inputsSheet.getCell(iRow, 4);
+                        lc.value = label; vc.value = val; nc.value = note;
+                        ap(lc, cs(bg, DT, true, 'right'));
+                        ap(vc, { ...cs(bg, '0000FF', false, 'center'), numFmt: typeof val === 'number' ? '#,##0' : null });
+                        ap(nc, cs(bg, '00695C', false, 'center'));
+                        iRow++;
+                    });
+
+                    // 3. KPI Dashboard
+                    const kpiSheet = workbook.addWorksheet('KPI Dashboard', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    [5, 32, 22, 22, 22, 5].forEach((w, i) => kpiSheet.getColumn(i + 1).width = w);
+                    mh(kpiSheet, 1, 6, 1, '📊 KPI Dashboard', DB, GL, 15);
+                    kpiSheet.getRow(1).height = 45;
+                    mh(kpiSheet, 2, 5, 2, `${companyName} | ${new Date().toLocaleDateString('en-US')}`, HB, W, 10);
+                    kpiSheet.getRow(2).height = 26;
+                    const kpis = [
+                        { label: 'DIO', value: `${D.outputs.dio.toFixed(1)} days` },
+                        { label: 'DSO', value: `${D.outputs.dso.toFixed(1)} days` },
+                        { label: 'DPO', value: `${D.outputs.dpo.toFixed(1)} days` },
+                        { label: 'CCC', value: `${D.outputs.ccc.toFixed(1)} days`, highlight: true }
+                    ];
+                    let kRow = 3;
+                    kpis.forEach((k, idx) => {
+                        kpiSheet.getRow(kRow).height = 40;
+                        kpiSheet.mergeCells(kRow, 2, kRow, 2);
+                        kpiSheet.mergeCells(kRow, 3, kRow, 3);
+                        kpiSheet.mergeCells(kRow, 4, kRow, 4);
+                        kpiSheet.mergeCells(kRow, 5, kRow, 5);
+                        const ic = kpiSheet.getCell(kRow, 2);
+                        ic.value = `🔹 ${idx+1}`;
+                        const lc2 = kpiSheet.getCell(kRow, 3);
+                        lc2.value = k.label;
+                        const vc3 = kpiSheet.getCell(kRow, 4);
+                        vc3.value = k.value;
+                        const nc2 = kpiSheet.getCell(kRow, 5);
+                        nc2.value = '';
+                        const isGood = idx === 3 ? D.outputs.ccc <= 30 : true;
+                        const bg = isGood ? PB : (D.outputs.ccc > 60 && idx === 3 ? NB : GB);
+                        const tc = isGood ? PT : (D.outputs.ccc > 60 && idx === 3 ? NT : 'FF856404');
+                        [ic, lc2, vc3, nc2].forEach(c => { c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }; c.border = { top: { style: 'thin', color: { argb: G } }, bottom: { style: 'thin', color: { argb: G } }, left: { style: 'thin', color: { argb: G } }, right: { style: 'thin', color: { argb: G } } }; });
+                        ic.font = { name: 'Arial', bold: true, size: 14, color: { argb: '555555' } };
+                        ic.alignment = { horizontal: 'center', vertical: 'middle' };
+                        lc2.font = { name: 'Arial', bold: true, size: 11, color: { argb: DT } };
+                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' };
+                        vc3.font = { name: 'Arial', bold: true, size: 13, color: { argb: tc } };
+                        vc3.alignment = { horizontal: 'center', vertical: 'middle' };
+                        nc2.font = { name: 'Arial', size: 9, color: { argb: '444444' } };
+                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' };
+                        kRow++;
+                    });
+                    kRow++;
+                    kpiSheet.mergeCells(kRow, 2, kRow, 5);
+                    const kFinal = kpiSheet.getCell(kRow, 2);
+                    kFinal.value = D.outputs.ccc <= 30 ? '✅ Excellent Cash Management' : D.outputs.ccc <= 60 ? '🟡 Acceptable Cash Management' : '🔴 High Liquidity Risk';
+                    kFinal.font = { name: 'Arial', bold: true, size: 13, color: { argb: D.outputs.ccc <= 30 ? PT : D.outputs.ccc <= 60 ? '856404' : NT } };
+                    kFinal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: D.outputs.ccc <= 30 ? PB : D.outputs.ccc <= 60 ? GB : NB } };
+                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'ltr' };
+                    kFinal.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } }, left: { style: 'medium', color: { argb: G } }, right: { style: 'medium', color: { argb: G } } };
+                    kpiSheet.getRow(kRow).height = 40;
+
+                    // 4. Calculation Details
+                    const detailSheet = workbook.addWorksheet('Calculation Details', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    detailSheet.getColumn(1).width = 5;
+                    detailSheet.getColumn(2).width = 40;
+                    detailSheet.getColumn(3).width = 25;
+                    detailSheet.getColumn(4).width = 25;
+                    detailSheet.getColumn(5).width = 5;
+                    mh(detailSheet, 1, 5, 1, '📋 CCC Calculation Details', DB, GL, 14);
+                    detailSheet.getRow(1).height = 40;
+                    detailSheet.addRow(['Indicator', 'Value', 'Formula']);
+                    const detailRows = [
+                        ['Average Inventory', `${currency} ${D.inputs.avgInventory.toFixed(0)}`, `(${D.inputs.invStart} + ${D.inputs.invEnd}) / 2`],
+                        ['DIO', `${D.outputs.dio.toFixed(1)} days`, `(Avg Inventory ÷ COGS) × ${D.daysFactor.toFixed(0)}`],
+                        ['Average Receivables', `${currency} ${D.inputs.avgReceivables.toFixed(0)}`, `(${D.inputs.arStart} + ${D.inputs.arEnd}) / 2`],
+                        ['DSO', `${D.outputs.dso.toFixed(1)} days`, `(Avg Receivables ÷ Credit Sales) × ${D.daysFactor.toFixed(0)}`],
+                        ['Average Payables', `${currency} ${D.inputs.avgPayables.toFixed(0)}`, `(${D.inputs.apStart} + ${D.inputs.apEnd}) / 2`],
+                        ['DPO', `${D.outputs.dpo.toFixed(1)} days`, `(Avg Payables ÷ COGS) × ${D.daysFactor.toFixed(0)}`],
+                        ['CCC', `${D.outputs.ccc.toFixed(1)} days`, `DIO + DSO - DPO`]
+                    ];
+                    detailRows.forEach(r => detailSheet.addRow(r));
+                    const detHeader = detailSheet.getRow(2);
+                    detHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                    detHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+                    detailSheet.getColumn(2).width = 25;
+                    detailSheet.getColumn(3).width = 25;
+
+                    // 5. Charts
+                    const chartsSheet = workbook.addWorksheet('Charts', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    chartsSheet.getColumn(1).width = 5;
+                    chartsSheet.getColumn(2).width = 50;
+                    chartsSheet.getColumn(3).width = 5;
+                    mh(chartsSheet, 1, 3, 1, '📊 CCC Charts', DB, GL, 14);
+                    chartsSheet.getRow(1).height = 40;
+
+                    const chartContainer = document.querySelector('.chart-card');
+                    if (chartContainer) {
+                        try {
+                            const origBg = chartContainer.style.backgroundColor;
+                            chartContainer.style.backgroundColor = '#ffffff';
+                            const canvasImg = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
+                            chartContainer.style.backgroundColor = origBg;
+                            const imgData = canvasImg.toDataURL('image/png');
+                            const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                            chartsSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 14 }, editAs: 'oneCell' });
+                        } catch (err) { /* silent */ }
+                    }
+
+                    // 6. Recommendations
+                    const recSheet = workbook.addWorksheet('Interpretation & Recommendations', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    recSheet.getColumn(1).width = 5;
+                    recSheet.getColumn(2).width = 50;
+                    recSheet.getColumn(3).width = 5;
+                    mh(recSheet, 1, 3, 1, '📝 Interpretation & Recommendations', DB, GL, 14);
+                    recSheet.getRow(1).height = 45;
+                    const sections = [
+                        { title: '1. Summary', content: `Entity: ${companyName}\nPeriod: ${D.periodMonths} months\nDIO: ${D.outputs.dio.toFixed(1)} days\nDSO: ${D.outputs.dso.toFixed(1)} days\nDPO: ${D.outputs.dpo.toFixed(1)} days\nCCC: ${D.outputs.ccc.toFixed(1)} days` },
+                        { title: '2. Assessment', content: `Rating: ${D.outputs.status}\n${D.outputs.recommendation}` },
+                        { title: '3. Recommendations', content: (D.outputs.dio > 45 ? '• Recommend improving inventory management and reducing holding days.\n' : '• Inventory management is good, continue monitoring.\n') + (D.outputs.dso > 45 ? '• Recommend accelerating collection of receivables or offering early payment discounts.\n' : '• Credit policy is good, continue.\n') + (D.outputs.dpo < 30 ? '• Try to negotiate with suppliers to extend payment terms.\n' : '• Payment terms with suppliers are appropriate.') },
+                        { title: '4. Disclaimer', content: 'This analysis is based on estimated data. Actual results may vary depending on market conditions and operational changes. Consult a financial expert before making decisions.' }
+                    ];
+                    let itRow = 2;
+                    sections.forEach((sec, idx) => {
+                        itRow++;
+                        recSheet.getRow(itRow).height = 30;
+                        recSheet.mergeCells(itRow, 2, itRow, 2);
+                        const tc3 = recSheet.getCell(itRow, 2);
+                        tc3.value = sec.title;
+                        tc3.font = { name: 'Arial', bold: true, size: 12, color: { argb: GL } };
+                        tc3.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: idx % 2 === 0 ? HB : SB } };
+                        tc3.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' };
+                        tc3.border = { bottom: { style: 'medium', color: { argb: G } } };
+                        itRow++;
+                        recSheet.getRow(itRow).height = Math.max(60, sec.content.split('\n').length * 18);
+                        recSheet.mergeCells(itRow, 2, itRow, 2);
+                        const cc = recSheet.getCell(itRow, 2);
+                        cc.value = sec.content;
+                        cc.font = { name: 'Arial', size: 10, color: { argb: DT } };
+                        cc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEFCF6' } };
+                        cc.alignment = { horizontal: 'right', vertical: 'top', wrapText: true, readingOrder: 'ltr' };
+                        cc.border = { top: { style: 'hair' }, bottom: { style: 'hair', color: { argb: G } }, left: { style: 'hair' }, right: { style: 'hair' } };
+                    });
+
+                    const buffer = await workbook.xlsx.writeBuffer();
+                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    const now = new Date();
+                    const fileName = `CCC_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+                    saveAs(blob, fileName);
+                } catch (err) {
+                    console.error(err);
+                    alert('Error creating Excel file: ' + err.message);
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ========== Export to Word ==========
+            async function exportToWord() {
+                if (!currentResults) {
+                    alert('Please run the analysis first.');
+                    return;
+                }
+                showLoading('Creating Professional Word Report...', 'Gathering data and charts');
+                try {
+                    const D = currentResults;
+                    const currency = D.currency;
+                    const companyName = D.company;
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('en-US');
+
+                    const chartContainer = document.querySelector('.chart-card');
+                    let chartImgBase64 = '';
+                    if (chartContainer) {
+                        const origBg = chartContainer.style.backgroundColor;
+                        chartContainer.style.backgroundColor = '#ffffff';
+                        const img = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
+                        chartContainer.style.backgroundColor = origBg;
+                        chartImgBase64 = img.toDataURL('image/png');
+                    }
+
+                    const fullHtml = `<!DOCTYPE html>
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+                    <head><meta charset='utf-8'><title>CCC Report - FAROUK GRUP</title>
+                    <style>
+                        body{font-family:'Arial','Tajawal',sans-serif;direction:ltr;margin:2rem;background:#fff;}
+                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                        .cover h1{font-size:32px;color:#b8860b;margin:0;}
+                        .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                        table{width:100%;border-collapse:collapse;margin:20px 0;direction:ltr;}
+                        th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                        th{background:#fefcf6;color:#b8860b;font-weight:bold;}
+                        .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+                        .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;}
+                    </style></head>
+                    <body>
+                        <div class="cover">
+                            <h1>FAROUK GRUP for Consulting & Business</h1>
+                            <h2>Cash Gap (CCC) Analysis Report</h2>
+                            <p>Entity: ${companyName} | Date: ${dateStr}</p>
+                            <p>Currency: ${currency} | Period: ${D.periodMonths} months</p>
+                        </div>
+                        <h2 style="color:#b8860b;">Base Inputs</h2>
+                        <table><tbody>
+                            <tr><th>Beginning Inventory</th><td>${currency} ${D.inputs.invStart.toFixed(0)}</td><th>Ending Inventory</th><td>${currency} ${D.inputs.invEnd.toFixed(0)}</td></tr>
+                            <tr><th>Average Inventory</th><td><strong>${currency} ${D.inputs.avgInventory.toFixed(0)}</strong></td><th>Beginning Receivables</th><td>${currency} ${D.inputs.arStart.toFixed(0)}</td></tr>
+                            <tr><th>Ending Receivables</th><td>${currency} ${D.inputs.arEnd.toFixed(0)}</td><th>Average Receivables</th><td><strong>${currency} ${D.inputs.avgReceivables.toFixed(0)}</strong></td></tr>
+                            <tr><th>Beginning Payables</th><td>${currency} ${D.inputs.apStart.toFixed(0)}</td><th>Ending Payables</th><td>${currency} ${D.inputs.apEnd.toFixed(0)}</td></tr>
+                            <tr><th>Average Payables</th><td><strong>${currency} ${D.inputs.avgPayables.toFixed(0)}</strong></td><th>COGS</th><td>${currency} ${D.inputs.cogs.toFixed(0)}</td></tr>
+                            <tr><th>Credit Sales</th><td>${currency} ${D.inputs.creditSales.toFixed(0)}</td><th>Period Length</th><td>${D.periodMonths} months</td></tr>
+                        </tbody></table>
+                        <h2 style="color:#b8860b;">📊 CCC Indicators</h2>
+                        <table>
+                            <thead><tr><th>Indicator</th><th>Value (Days)</th></tr></thead>
+                            <tbody>
+                                <tr><td>DIO</td><td>${D.outputs.dio.toFixed(1)}</td></tr>
+                                <tr><td>DSO</td><td>${D.outputs.dso.toFixed(1)}</td></tr>
+                                <tr><td>DPO</td><td>${D.outputs.dpo.toFixed(1)}</td></tr>
+                                <tr style="font-weight:bold;background:#f0f0f0;"><td>CCC</td><td>${D.outputs.ccc.toFixed(1)}</td></tr>
+                            </tbody>
+                        </table>
+                        <div style="margin:20px 0;padding:20px;background:${D.outputs.ccc <= 30 ? '#d4edda' : D.outputs.ccc <= 60 ? '#fff3cd' : '#f8d7da'};border-radius:10px;text-align:center;">
+                            <span style="font-size:1.5rem;font-weight:bold;color:${D.outputs.ccc <= 30 ? '#155724' : D.outputs.ccc <= 60 ? '#856404' : '#721c24'};">Rating: ${D.outputs.status}</span>
+                            <p style="margin-top:10px;">${D.outputs.recommendation}</p>
+                        </div>
+                        <h2 style="color:#b8860b;">📊 Charts</h2>
+                        <div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>
+                        <div class="footer">Created by FAROUK GRUP for Consulting & Business © ${now.getFullYear()}</div>
+                    </body></html>`;
+
+                    const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `CCC_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                } catch (err) {
+                    console.error(err);
+                    alert('Error creating Word report');
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ===== Attach event listeners =====
+            document.getElementById('calculateBtn').addEventListener('click', calculateCCC);
+            document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+            document.getElementById('exportFullExcelBtn').addEventListener('click', exportToFullExcel);
+
+            // Auto-run on load
+            window.addEventListener('load', function() {
+                setTimeout(calculateCCC, 500);
+            });
+
+        })();
+    </script>
+</body>
+</html>

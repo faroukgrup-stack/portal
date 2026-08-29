@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Investment Analysis (NPV/IRR/Payback) | FAROUK GRUP</title>
+    <!-- Page protection -->
+    <script src="auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
+        }
+
+        /* ===== Remove all vibration-causing properties ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .chart-card, .scenario-card, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== Fixed background ===== */
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.12) 0%, transparent 70%);
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.06) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.08) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
+        }
+
+        /* ===== WRAPPER ===== */
+        .calc-wrapper {
+            max-width: 1050px;
+            margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+        }
+
+        /* ===== CARD ===== */
+        .calc-box {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .calc-box h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+        }
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== Currency row ===== */
+        .currency-row {
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.8rem; background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.2);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
+        }
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
+        .currency-row select, .currency-row input {
+            flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
+        }
+        .currency-row input { flex: 2 1 200px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* ===== Section titles ===== */
+        .section-title-sm {
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
+            margin: 1.2rem 0 0.8rem 0;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== Form rows ===== */
+        .form-row {
+            display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;
+        }
+        .form-group {
+            flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
+        }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-left: 0.3rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+
+        /* ===== Cashflow container ===== */
+        .cashflow-container {
+            margin: 1rem 0;
+            border: 1px solid rgba(180,133,84,0.1);
+            border-radius: 20px;
+            padding: 0.8rem;
+            background: rgba(10,14,23,0.4);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .cashflow-container::-webkit-scrollbar { width: 4px; }
+        .cashflow-container::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+        .cashflow-row {
+            display: flex; gap: 0.5rem; margin-bottom: 0.5rem;
+            align-items: center; flex-wrap: wrap;
+        }
+        .cashflow-row .field {
+            display: flex; flex-direction: column; gap: 0.2rem;
+            flex: 1; min-width: 80px;
+        }
+        .cashflow-row .field label {
+            font-size: 0.7rem; color: #aab7d4;
+        }
+        .cashflow-row .field input {
+            width: 100%; padding: 0.4rem 0.6rem;
+            background: rgba(10,14,23,0.7);
+            border: 1px solid rgba(180,133,84,0.2);
+            border-radius: 20px;
+            color: #f0f4fa; font-size: 0.85rem;
+        }
+        .cashflow-row .field input:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+
+        /* ===== Small buttons ===== */
+        .btn-sm {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 30px;
+            padding: 0.3rem 0.8rem;
+            color: #cfa776; cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700; font-size: 0.8rem;
+        }
+        .btn-sm:hover { background: rgba(180,133,84,0.25); border-color: #b48554; }
+        .btn-sm.danger { background: rgba(220,53,69,0.15); color: #f87171; border-color: rgba(220,53,69,0.3); }
+        .btn-sm.danger:hover { background: rgba(220,53,69,0.3); color: #fff; }
+
+        /* ===== Calculate button ===== */
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer;
+            margin: 1.5rem 0; font-family: 'Tajawal', sans-serif;
+        }
+        .btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-calculate:active { transform: scale(0.97); }
+
+        /* ===== Results ===== */
+        .results-section { margin-top: 1.5rem; }
+        .results-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .result-card {
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 20px; padding: 1rem; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .result-card i { font-size: 1.6rem; color: #cfa776; margin-bottom: 0.3rem; }
+        .result-card h4 { font-size: 0.85rem; font-weight: 700; color: #aab7d4; margin-bottom: 0.2rem; }
+        .result-card .value { font-size: 1.3rem; font-weight: 900; color: #cfa776; }
+        .result-card .unit { font-size: 0.75rem; color: #aab7d4; }
+        .result-card .status {
+            font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+            display: inline-block; margin-top: 0.2rem;
+        }
+        .status-good { background: #28a745; color: white; }
+        .status-bad { background: #dc3545; color: white; }
+        .status-warning { background: #ffc107; color: #111; }
+
+        /* ===== Chart ===== */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            background: rgba(22,30,46,0.6);
+            border-radius: 20px;
+            padding: 0.8rem;
+            border: 1px solid rgba(180,133,84,0.08);
+            margin: 1.5rem 0;
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            max-height: none;
+        }
+
+        /* ===== Recommendations ===== */
+        .recommendation-box {
+            background: rgba(22,30,46,0.7); border: 2px solid rgba(180,133,84,0.1);
+            border-radius: 20px; padding: 1rem; margin: 1.5rem 0;
+        }
+        .recommendation-box h4 { color: #cfa776; margin-bottom: 0.5rem; font-size: 1rem; }
+        .recommendation-box ul, .recommendation-box p { color: #aab7d4; font-size: 0.9rem; padding-left: 1.2rem; }
+
+        /* ===== Cashflow table ===== */
+        .table-container {
+            overflow-x: auto; margin-top: 1rem;
+            border: 1px solid rgba(180,133,84,0.1); border-radius: 20px;
+            background: rgba(22,30,46,0.6); padding: 0.5rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.85rem;
+            min-width: 400px;
+        }
+        th {
+            background: rgba(180,133,84,0.15); color: #cfa776;
+            font-weight: 900; padding: 0.6rem 0.8rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15); white-space: nowrap;
+        }
+        td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid rgba(180,133,84,0.06);
+            text-align: center; color: #f0f4fa;
+        }
+        tr:last-child td { border-bottom: none; }
+        .positive { color: #4ade80; font-weight: 700; }
+        .negative { color: #f87171; font-weight: 700; }
+
+        /* ===== Export buttons ===== */
+        .export-container {
+            display: flex; justify-content: center; gap: 0.8rem;
+            flex-wrap: wrap; margin: 1.5rem 0;
+        }
+        .export-word-btn, .export-excel-full-btn {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+            padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.9rem; font-family: 'Tajawal', sans-serif;
+            flex: 1 1 auto; justify-content: center; max-width: 220px;
+        }
+        .export-word-btn:hover, .export-excel-full-btn:hover { background: rgba(180,133,84,0.25); }
+
+        /* ===== Loading screen ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== Footer ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
+        .calc-display {
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: right;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
+
+        /* ===== Floating buttons ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== Messages ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+
+        /* ===================================================
+           Desktop improvements (≥1024px)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .section-title-sm { font-size: 1.4rem; }
+            .form-group { flex: 1 1 220px; }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value { font-size: 1.5rem; }
+            .result-card h4 { font-size: 0.95rem; }
+            .result-card i { font-size: 1.8rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 1rem; padding: 0.8rem 2rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .chart-container { height: 280px; }
+            .cashflow-row .field { min-width: 120px; }
+        }
+
+        /* ===================================================
+           Mobile improvements (≤768px)
+           =================================================== */
+        @media (max-width: 768px) {
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; }
+            .currency-row label { font-size: 0.8rem; }
+            .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; }
+            .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+            .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-cards { grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.5rem; }
+            .result-card { padding: 0.6rem 0.4rem; }
+            .result-card i { font-size: 1.2rem; }
+            .result-card h4 { font-size: 0.65rem; }
+            .result-card .value { font-size: 1rem; }
+            .result-card .unit { font-size: 0.6rem; }
+            .chart-container { height: 180px; padding: 0.5rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 0.75rem; padding: 0.4rem 1rem; max-width: 160px; }
+            .modal-content { width: 95%; max-width: 320px; }
+            .calc-btn { padding: 8px 0; font-size: 0.9rem; }
+            .footer-simple { font-size: 0.7rem; padding: 0.6rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .cashflow-row { flex-direction: column; }
+            .cashflow-row .field { min-width: 100%; }
+            .btn-sm { width: 100%; justify-content: center; }
+        }
+
+        /* ===== Very small screens (≤400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+            .results-cards { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+            .chart-container { height: 150px; }
+        }
+
+        /* ===== Prevent accidental selection ===== */
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        /* ===== Scrollbar improvements ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <!-- Fixed background -->
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+
+    <!-- Export loading screen -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">Generating report...</h3>
+            <p id="loadingMsg">Please wait</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero-mini">
+        <h2>📊 Investment Analysis (NPV / IRR / Payback)</h2>
+        <p>Evaluate project feasibility – Net Present Value, Internal Rate of Return, and Payback Period</p>
+    </section>
+
+    <!-- WRAPPER -->
+    <section class="calc-wrapper">
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-chart-pie"></i><span>Invest</span></div>
+            <h2><i class="fas fa-chart-pie" style="color:#cfa776;margin-left:0.5rem;"></i>Project Evaluation</h2>
+
+            <!-- Currency & Entity -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> Currency:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>USD ($)</option>
+                    <option value="€">EUR (€)</option>
+                    <option value="₺">TRY (₺)</option>
+                    <option value="ج.م">EGP (ج.م)</option>
+                    <option value="د.ك">KWD (د.ك)</option>
+                    <option value="ر.س">SAR (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> Entity Name:</label>
+                <input type="text" id="companyName" value="Company / Organization" placeholder="Beneficiary entity">
+            </div>
+
+            <!-- Project Data -->
+            <div class="section-title-sm">📋 Project Data</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-money-bill-wave"></i> Initial Investment</label>
+                    <input type="number" id="initialInvestment" value="500000" step="1000">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percent"></i> Discount Rate (WACC) (%)</label>
+                    <input type="number" id="discountRate" value="12" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt"></i> Project Duration (Years)</label>
+                    <input type="number" id="projectYears" value="5" step="1" min="1">
+                </div>
+            </div>
+
+            <!-- Cashflows -->
+            <div class="section-title-sm">📈 Annual Cashflows</div>
+            <div class="cashflow-container" id="cashflowContainer"></div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem;">
+                <button class="btn-sm" id="addYearBtn"><i class="fas fa-plus"></i> Add Year</button>
+                <button class="btn-sm" id="removeYearBtn"><i class="fas fa-minus"></i> Remove Last Year</button>
+                <button class="btn-sm" id="fillExampleBtn"><i class="fas fa-file-import"></i> Load Example</button>
+            </div>
+
+            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Investment Metrics</button>
+
+            <!-- Results Area -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-cards" id="kpiCards"></div>
+
+                <div class="section-title-sm">📈 Cashflow Chart</div>
+                <div class="chart-container"><canvas id="cashflowChart"></canvas></div>
+
+                <div class="section-title-sm">📋 Cashflow Table</div>
+                <div class="table-container" id="cashflowTable"></div>
+
+                <div class="section-title-sm">💡 Recommendations & Analysis</div>
+                <div class="recommendation-box" id="recommendations"></div>
+
+                <div class="export-container">
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Full Word Report</button>
+                    <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Export to Full Excel</button>
+                </div>
+            </div>
+
+            <div id="initialMessage" style="margin-top:1rem; color:#aab7d4; text-align:center;">
+                <i class="fas fa-robot" style="color:#cfa776;"></i> Results will appear after clicking the calculate button
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-simple">
+        All rights reserved © 2026 <span>FAROUK GRUP</span>
+    </footer>
+
+    <button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+    <a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="modalClose">&times;</span>
+                <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn" data-val="C">C</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn" data-val="⌫">⌫</button>
+                    <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ===== Calculator =====
+            const calcDisplay = document.getElementById('calcDisplay');
+            let currentCalcInput = '';
+
+            function handleCalc(v) {
+                if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+                if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+                if (v === '=') {
+                    try {
+                        let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
+                        calcDisplay.value = r;
+                        currentCalcInput = r.toString();
+                    } catch (e) { calcDisplay.value = 'Error'; currentCalcInput = ''; }
+                    return;
+                }
+                currentCalcInput += v;
+                calcDisplay.value = currentCalcInput;
+            }
+
+            document.querySelectorAll('.calc-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const v = this.dataset.val;
+                    if (v !== undefined) handleCalc(v);
+                });
+            });
+
+            const modalEl = document.getElementById('calculatorModal');
+            document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                modalEl.classList.add('active');
+                calcDisplay.value = currentCalcInput;
+            });
+            document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+            modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+            document.addEventListener('keydown', function(e) {
+                if (!modalEl.classList.contains('active')) return;
+                e.preventDefault();
+                const k = e.key;
+                if (k >= '0' && k <= '9') handleCalc(k);
+                else if (k === '.') handleCalc('.');
+                else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+                else if (k === 'Enter' || k === '=') handleCalc('=');
+                else if (k === 'Backspace') handleCalc('⌫');
+                else if (k === 'Escape') modalEl.classList.remove('active');
+                else if (k.toLowerCase() === 'c') handleCalc('C');
+            });
+
+            // ===== Loading functions =====
+            function showLoading(title, msg) {
+                document.getElementById('loadingTitle').textContent = title;
+                document.getElementById('loadingMsg').textContent = msg;
+                document.getElementById('exportLoading').classList.add('show');
+            }
+
+            function hideLoading() {
+                document.getElementById('exportLoading').classList.remove('show');
+            }
+
+            // ===== Cashflow management =====
+            let cashflows = [];
+            let chartInstance = null;
+            let currentResults = null;
+
+            function renderCashflows() {
+                const container = document.getElementById('cashflowContainer');
+                const years = parseInt(document.getElementById('projectYears').value) || 5;
+                while (cashflows.length < years) cashflows.push(0);
+                while (cashflows.length > years) cashflows.pop();
+                container.innerHTML = '';
+                cashflows.forEach((val, idx) => {
+                    const row = document.createElement('div');
+                    row.className = 'cashflow-row';
+                    const yearNum = idx + 1;
+                    row.innerHTML = `
+                        <div class="field">
+                            <label>Year ${yearNum}</label>
+                            <input type="number" class="cf-input" data-index="${idx}" value="${val}" step="1000">
+                        </div>
+                    `;
+                    container.appendChild(row);
+                });
+                document.querySelectorAll('.cf-input').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const idx = parseInt(this.dataset.index);
+                        cashflows[idx] = parseFloat(this.value) || 0;
+                    });
+                });
+            }
+
+            function updateCashflowsFromInputs() {
+                document.querySelectorAll('.cf-input').forEach(input => {
+                    const idx = parseInt(input.dataset.index);
+                    cashflows[idx] = parseFloat(input.value) || 0;
+                });
+            }
+
+            document.getElementById('addYearBtn').addEventListener('click', function() {
+                const years = parseInt(document.getElementById('projectYears').value) || 5;
+                document.getElementById('projectYears').value = years + 1;
+                cashflows.push(0);
+                renderCashflows();
+            });
+
+            document.getElementById('removeYearBtn').addEventListener('click', function() {
+                const years = parseInt(document.getElementById('projectYears').value) || 5;
+                if (years > 1) {
+                    document.getElementById('projectYears').value = years - 1;
+                    cashflows.pop();
+                    renderCashflows();
+                }
+            });
+
+            document.getElementById('fillExampleBtn').addEventListener('click', function() {
+                document.getElementById('projectYears').value = 5;
+                cashflows = [150000, 180000, 220000, 200000, 180000];
+                renderCashflows();
+            });
+
+            // ===== Main calculation =====
+            function calculateInvestmentMetrics() {
+                updateCashflowsFromInputs();
+
+                const currency = document.getElementById('currencySelect').value;
+                const company = document.getElementById('companyName').value || 'Entity';
+                const initialInvestment = parseFloat(document.getElementById('initialInvestment').value) || 0;
+                const discountRate = parseFloat(document.getElementById('discountRate').value) / 100 || 0;
+                const years = parseInt(document.getElementById('projectYears').value) || 0;
+
+                while (cashflows.length < years) cashflows.push(0);
+                while (cashflows.length > years) cashflows.pop();
+
+                if (initialInvestment <= 0 || discountRate < 0 || years <= 0) {
+                    alert('Please enter valid values (Investment > 0, Discount Rate >= 0, Years > 0).');
+                    return;
+                }
+
+                // Calculate NPV
+                let npv = -initialInvestment;
+                for (let i = 0; i < years; i++) {
+                    const cf = cashflows[i] || 0;
+                    npv += cf / Math.pow(1 + discountRate, i + 1);
+                }
+
+                // Calculate IRR (Newton-Raphson)
+                let irr = 0.1;
+                const maxIter = 1000;
+                const tolerance = 0.00001;
+                for (let iter = 0; iter < maxIter; iter++) {
+                    let npv_irr = -initialInvestment;
+                    let dnpv = 0;
+                    for (let i = 0; i < years; i++) {
+                        const cf = cashflows[i] || 0;
+                        const denom = Math.pow(1 + irr, i + 1);
+                        npv_irr += cf / denom;
+                        dnpv += -(i + 1) * cf / Math.pow(1 + irr, i + 2);
+                    }
+                    if (Math.abs(npv_irr) < tolerance) break;
+                    if (dnpv === 0) break;
+                    irr = irr - npv_irr / dnpv;
+                    if (irr < -0.99) irr = -0.99;
+                    if (irr > 10) irr = 10;
+                }
+                const irrPercent = irr * 100;
+
+                // Payback period
+                let cumulative = 0;
+                let paybackYear = 0;
+                let paybackRemaining = 0;
+                for (let i = 0; i < years; i++) {
+                    cumulative += cashflows[i] || 0;
+                    if (cumulative >= initialInvestment) {
+                        paybackYear = i + 1;
+                        const excess = cumulative - initialInvestment;
+                        paybackRemaining = (cashflows[i] || 0) > 0 ? (excess / (cashflows[i] || 0)) : 0;
+                        break;
+                    }
+                }
+                let payback = paybackYear > 0 ? paybackYear - paybackRemaining : 0;
+
+                // Discounted payback
+                let discountedCumulative = 0;
+                let dPaybackYear = 0;
+                let dPaybackRemaining = 0;
+                for (let i = 0; i < years; i++) {
+                    const dcf = (cashflows[i] || 0) / Math.pow(1 + discountRate, i + 1);
+                    discountedCumulative += dcf;
+                    if (discountedCumulative >= initialInvestment) {
+                        dPaybackYear = i + 1;
+                        const excess = discountedCumulative - initialInvestment;
+                        dPaybackRemaining = dcf > 0 ? (excess / dcf) : 0;
+                        break;
+                    }
+                }
+                let dPayback = dPaybackYear > 0 ? dPaybackYear - dPaybackRemaining : 0;
+
+                const isAcceptable = npv > 0 && irrPercent > discountRate * 100;
+                let status = '', statusClass = '';
+                if (isAcceptable) {
+                    status = 'Acceptable (Viable Investment)';
+                    statusClass = 'status-good';
+                } else if (npv > 0 || irrPercent > discountRate * 100) {
+                    status = 'Partially Acceptable (Review)';
+                    statusClass = 'status-warning';
+                } else {
+                    status = 'Not Acceptable (Non-Viable)';
+                    statusClass = 'status-bad';
+                }
+
+                currentResults = {
+                    currency, company,
+                    inputs: { initialInvestment, discountRate: discountRate * 100, years, cashflows: [...cashflows] },
+                    outputs: { npv, irr: irrPercent, payback, dPayback, status, statusClass, isAcceptable }
+                };
+
+                document.getElementById('resultsSection').style.display = 'block';
+                document.getElementById('initialMessage').style.display = 'none';
+
+                // KPI Cards
+                document.getElementById('kpiCards').innerHTML = `
+                    <div class="result-card" style="border-color:${npv >= 0 ? '#28a745' : '#dc3545'};">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <h4>NPV</h4>
+                        <div class="value" style="color:${npv >= 0 ? '#4ade80' : '#f87171'}">${currency}${npv.toFixed(2)}</div>
+                        <div class="unit">${npv >= 0 ? '✅ Positive' : '❌ Negative'}</div>
+                    </div>
+                    <div class="result-card">
+                        <i class="fas fa-percent"></i>
+                        <h4>IRR</h4>
+                        <div class="value">${irrPercent.toFixed(2)}%</div>
+                        <div class="unit">vs Discount: ${(discountRate*100).toFixed(2)}%</div>
+                    </div>
+                    <div class="result-card">
+                        <i class="fas fa-clock"></i>
+                        <h4>Payback Period</h4>
+                        <div class="value">${payback.toFixed(2)}</div>
+                        <div class="unit">years</div>
+                    </div>
+                    <div class="result-card">
+                        <i class="fas fa-hourglass-half"></i>
+                        <h4>Discounted Payback</h4>
+                        <div class="value">${dPayback.toFixed(2)}</div>
+                        <div class="unit">years</div>
+                    </div>
+                    <div class="result-card" style="border-color:${isAcceptable ? '#28a745' : '#dc3545'};">
+                        <i class="fas fa-check-circle"></i>
+                        <h4>Final Verdict</h4>
+                        <div class="value" style="font-size:1.1rem;"><span class="status ${statusClass}">${status}</span></div>
+                    </div>
+                `;
+
+                // Cashflow table
+                let tableHtml = `<table><thead><tr><th>Year</th><th>Cashflow</th><th>Discount Factor</th><th>Discounted Value</th><th>Cumulative</th></tr></thead><tbody>`;
+                let cum = -initialInvestment;
+                for (let i = 0; i < years; i++) {
+                    const cf = cashflows[i] || 0;
+                    const dcf = cf / Math.pow(1 + discountRate, i + 1);
+                    cum += dcf;
+                    tableHtml += `<tr>
+                        <td>${i+1}</td>
+                        <td>${currency}${cf.toFixed(0)}</td>
+                        <td>${(1 / Math.pow(1 + discountRate, i + 1)).toFixed(4)}</td>
+                        <td>${currency}${dcf.toFixed(0)}</td>
+                        <td class="${cum >= 0 ? 'positive' : 'negative'}">${currency}${cum.toFixed(0)}</td>
+                    </tr>`;
+                }
+                tableHtml += `</tbody></table>`;
+                document.getElementById('cashflowTable').innerHTML = tableHtml;
+
+                // Recommendations
+                const recDiv = document.getElementById('recommendations');
+                let recHtml = `<h4 style="color:#cfa776;">📌 Feasibility Analysis</h4>`;
+                if (isAcceptable) {
+                    recHtml += `<p style="color:#4ade80;">✅ The project is a viable investment.</p>`;
+                    recHtml += `<p>NPV is positive (${currency}${npv.toFixed(2)}), and IRR (${irrPercent.toFixed(2)}%) exceeds the discount rate (${(discountRate*100).toFixed(2)}%).</p>`;
+                    if (payback < years) {
+                        recHtml += `<p>Payback period (${payback.toFixed(2)} years) is shorter than the project duration (${years} years).</p>`;
+                    } else {
+                        recHtml += `<p>⚠️ Payback period (${payback.toFixed(2)} years) exceeds the project duration (${years} years).</p>`;
+                    }
+                } else if (npv > 0 || irrPercent > discountRate * 100) {
+                    recHtml += `<p style="color:#fbbf24;">🟡 The project is partially acceptable.</p>`;
+                    recHtml += `<p>One indicator is positive but not both. Re-evaluate assumptions or improve cashflows.</p>`;
+                } else {
+                    recHtml += `<p style="color:#f87171;">🔴 The project is not viable.</p>`;
+                    recHtml += `<p>NPV is negative (${currency}${npv.toFixed(2)}), and IRR (${irrPercent.toFixed(2)}%) is below the discount rate (${(discountRate*100).toFixed(2)}%).</p>`;
+                    recHtml += `<p>It is recommended to review the project or explore better investment alternatives.</p>`;
+                }
+                recDiv.innerHTML = recHtml;
+
+                // Chart
+                const ctx = document.getElementById('cashflowChart').getContext('2d');
+                if (chartInstance) chartInstance.destroy();
+
+                const labels = [];
+                const dataValues = [];
+                const cumulativeValues = [];
+                let cumVal = -initialInvestment;
+                for (let i = 0; i < years; i++) {
+                    labels.push(`Year ${i+1}`);
+                    dataValues.push(cashflows[i] || 0);
+                    cumVal += (cashflows[i] || 0);
+                    cumulativeValues.push(cumVal);
+                }
+
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Annual Cashflow',
+                            data: dataValues,
+                            backgroundColor: dataValues.map(v => v >= 0 ? 'rgba(40,167,69,0.7)' : 'rgba(220,53,69,0.7)'),
+                            borderColor: dataValues.map(v => v >= 0 ? '#28a745' : '#dc3545'),
+                            borderWidth: 2,
+                            borderRadius: 4,
+                            order: 2
+                        }, {
+                            label: 'Cumulative',
+                            data: cumulativeValues,
+                            type: 'line',
+                            borderColor: '#b48554',
+                            backgroundColor: 'rgba(180,133,84,0.1)',
+                            fill: true,
+                            tension: 0.1,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#b48554',
+                            order: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#aab7d4' } }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { color: '#aab7d4' }, grid: { color: 'rgba(180,133,84,0.2)' } },
+                            x: { ticks: { color: '#aab7d4' }, grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+            // ========== Export to Full Excel ==========
+            async function exportToFullExcel() {
+                if (!currentResults) { alert('Please run the analysis first.'); return; }
+                showLoading('Creating Professional Excel Report...', 'Creating sheets and charts');
+                try {
+                    const D = currentResults;
+                    const currency = D.currency;
+                    const company = D.company;
+
+                    const workbook = new ExcelJS.Workbook();
+                    workbook.creator = 'FAROUK GRUP';
+                    workbook.created = new Date();
+
+                    const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+                    const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
+                    const PT = 'FF155724', NT = 'FF721C24', GB = 'FFFFF3CD';
+
+                    function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11, color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' }, border: { top: { style: 'thin', color: { argb: G } }, bottom: { style: 'thin', color: { argb: G } }, left: { style: 'thin', color: { argb: G } }, right: { style: 'thin', color: { argb: G } } } }; }
+
+                    function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial', bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h, vertical: 'middle', wrapText: true, readingOrder: 'ltr' }, border: { top: { style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair', color: { argb: 'FFCCCCCC' } }, left: { style: 'hair', color: { argb: 'FFCCCCCC' } }, right: { style: 'hair', color: { argb: 'FFCCCCCC' } } } }; }
+
+                    function ap(c, s) { if (s.font) c.font = s.font; if (s.fill) c.fill = s.fill; if (s.alignment) c.alignment = s.alignment; if (s.border) c.border = s.border; if (s.numFmt) c.numFmt = s.numFmt; }
+
+                    function mh(ws, fc, tc, r, text, bg = HB, tc2 = GL, fs = 12) { ws.mergeCells(r, fc, r, tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true, size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' }; c.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } }, left: { style: 'medium', color: { argb: G } }, right: { style: 'medium', color: { argb: G } } }; }
+
+                    // 1. Cover Sheet
+                    const cv = workbook.addWorksheet('Report Cover', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
+                    for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
+                    cv.getRow(2).height = 80;
+                    cv.getRow(4).height = 60;
+                    cv.mergeCells(2, 1, 2, 4);
+                    const bc = cv.getCell(2, 1);
+                    bc.value = 'FAROUK GRUP for Consulting & Business\nFAROUK GRUP';
+                    bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
+                    bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
+                    bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' };
+                    bc.border = { bottom: { style: 'thick', color: { argb: G } } };
+                    mh(cv, 1, 4, 4, `Investment Analysis Report\n${company}`, DB, GL, 18);
+                    const inf = [
+                        ['📋 Entity', company],
+                        ['📅 Date', new Date().toLocaleDateString('en-US')],
+                        ['💰 Currency', currency],
+                        ['📊 NPV', `${currency}${D.outputs.npv.toFixed(2)}`],
+                        ['📈 IRR', `${D.outputs.irr.toFixed(2)}%`],
+                        ['🏷️ Verdict', D.outputs.status]
+                    ];
+                    let ir = 6;
+                    inf.forEach(([l, v], idx) => {
+                        cv.mergeCells(ir, 1, ir, 2);
+                        cv.mergeCells(ir, 3, ir, 4);
+                        const lc = cv.getCell(ir, 1), vc = cv.getCell(ir, 3);
+                        lc.value = l; vc.value = v;
+                        const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
+                        ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' }, border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' }, right: { style: 'hair' } } });
+                        ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'ltr' }, border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' }, right: { style: 'hair' } } });
+                        cv.getRow(ir).height = 28;
+                        ir++;
+                    });
+
+                    // 2. Inputs
+                    const inputsSheet = workbook.addWorksheet('Inputs & Assumptions', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    inputsSheet.getColumn(1).width = 5;
+                    inputsSheet.getColumn(2).width = 38;
+                    inputsSheet.getColumn(3).width = 22;
+                    inputsSheet.getColumn(4).width = 22;
+                    inputsSheet.getColumn(5).width = 5;
+                    mh(inputsSheet, 1, 5, 1, '📋 Inputs & Assumptions', DB, GL, 14);
+                    inputsSheet.getRow(1).height = 40;
+                    mh(inputsSheet, 2, 4, 2, 'Project Base Data', SB, W, 11);
+                    inputsSheet.getRow(2).height = 28;
+                    const inputFields = [
+                        ['Initial Investment', D.inputs.initialInvestment, `${currency} ${D.inputs.initialInvestment.toFixed(0)}`],
+                        ['Discount Rate', D.inputs.discountRate, `${D.inputs.discountRate.toFixed(2)}%`],
+                        ['Project Duration (Years)', D.inputs.years, '']
+                    ];
+                    let iRow = 3;
+                    inputFields.forEach(([label, val, note], idx) => {
+                        inputsSheet.getRow(iRow).height = 24;
+                        const bg = idx % 2 === 0 ? 'FFFEFCF6' : 'FFFFFFFF';
+                        const lc = inputsSheet.getCell(iRow, 2), vc = inputsSheet.getCell(iRow, 3), nc = inputsSheet.getCell(iRow, 4);
+                        lc.value = label; vc.value = val; nc.value = note;
+                        ap(lc, cs(bg, DT, true, 'right'));
+                        ap(vc, { ...cs(bg, '0000FF', false, 'center'), numFmt: typeof val === 'number' ? '#,##0.00' : null });
+                        ap(nc, cs(bg, '00695C', false, 'center'));
+                        iRow++;
+                    });
+
+                    // 3. Cashflows
+                    const cfSheet = workbook.addWorksheet('Cashflows', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    cfSheet.getColumn(1).width = 5;
+                    cfSheet.getColumn(2).width = 15;
+                    cfSheet.getColumn(3).width = 22;
+                    cfSheet.getColumn(4).width = 22;
+                    cfSheet.getColumn(5).width = 22;
+                    cfSheet.getColumn(6).width = 22;
+                    cfSheet.getColumn(7).width = 5;
+                    mh(cfSheet, 1, 7, 1, '📋 Cashflow Table', DB, GL, 14);
+                    cfSheet.getRow(1).height = 40;
+                    cfSheet.addRow(['Year', 'Cashflow', 'Discount Factor', 'Discounted Value', 'Cumulative']);
+                    let cum = -D.inputs.initialInvestment;
+                    for (let i = 0; i < D.inputs.years; i++) {
+                        const cf = D.inputs.cashflows[i] || 0;
+                        const dcf = cf / Math.pow(1 + D.inputs.discountRate / 100, i + 1);
+                        cum += dcf;
+                        cfSheet.addRow([i + 1, cf, (1 / Math.pow(1 + D.inputs.discountRate / 100, i + 1)).toFixed(4), dcf, cum]);
+                    }
+                    const cfHeader = cfSheet.getRow(2);
+                    cfHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                    cfHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+
+                    // 4. KPI Dashboard
+                    const kpiSheet = workbook.addWorksheet('KPI Dashboard', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    [5, 32, 22, 22, 22, 5].forEach((w, i) => kpiSheet.getColumn(i + 1).width = w);
+                    mh(kpiSheet, 1, 6, 1, '📊 KPI Dashboard', DB, GL, 15);
+                    kpiSheet.getRow(1).height = 45;
+                    mh(kpiSheet, 2, 5, 2, `${company} | ${new Date().toLocaleDateString('en-US')}`, HB, W, 10);
+                    kpiSheet.getRow(2).height = 26;
+                    const kpis = [
+                        { label: 'NPV', value: `${currency}${D.outputs.npv.toFixed(2)}`, good: D.outputs.npv > 0 },
+                        { label: 'IRR', value: `${D.outputs.irr.toFixed(2)}%`, good: D.outputs.irr > D.inputs.discountRate },
+                        { label: 'Payback', value: `${D.outputs.payback.toFixed(2)} years`, good: D.outputs.payback < D.inputs.years },
+                        { label: 'Verdict', value: D.outputs.status, good: D.outputs.isAcceptable }
+                    ];
+                    let kRow = 3;
+                    kpis.forEach((k, idx) => {
+                        kpiSheet.getRow(kRow).height = 40;
+                        kpiSheet.mergeCells(kRow, 2, kRow, 2);
+                        kpiSheet.mergeCells(kRow, 3, kRow, 3);
+                        kpiSheet.mergeCells(kRow, 4, kRow, 4);
+                        kpiSheet.mergeCells(kRow, 5, kRow, 5);
+                        const ic = kpiSheet.getCell(kRow, 2);
+                        ic.value = `🔹 ${idx+1}`;
+                        const lc2 = kpiSheet.getCell(kRow, 3);
+                        lc2.value = k.label;
+                        const vc3 = kpiSheet.getCell(kRow, 4);
+                        vc3.value = k.value;
+                        const nc2 = kpiSheet.getCell(kRow, 5);
+                        nc2.value = '';
+                        const bg = k.good ? PB : NB, tc = k.good ? PT : NT;
+                        [ic, lc2, vc3, nc2].forEach(c => { c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }; c.border = { top: { style: 'thin', color: { argb: G } }, bottom: { style: 'thin', color: { argb: G } }, left: { style: 'thin', color: { argb: G } }, right: { style: 'thin', color: { argb: G } } }; });
+                        ic.font = { name: 'Arial', bold: true, size: 14, color: { argb: '555555' } };
+                        ic.alignment = { horizontal: 'center', vertical: 'middle' };
+                        lc2.font = { name: 'Arial', bold: true, size: 11, color: { argb: DT } };
+                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' };
+                        vc3.font = { name: 'Arial', bold: true, size: 13, color: { argb: tc } };
+                        vc3.alignment = { horizontal: 'center', vertical: 'middle' };
+                        nc2.font = { name: 'Arial', size: 9, color: { argb: '444444' } };
+                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' };
+                        kRow++;
+                    });
+                    kRow++;
+                    kpiSheet.mergeCells(kRow, 2, kRow, 5);
+                    const kFinal = kpiSheet.getCell(kRow, 2);
+                    kFinal.value = D.outputs.isAcceptable ? '✅ Project is viable' : '⚠️ Project is not viable';
+                    kFinal.font = { name: 'Arial', bold: true, size: 13, color: { argb: D.outputs.isAcceptable ? PT : '856404' } };
+                    kFinal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: D.outputs.isAcceptable ? PB : GB } };
+                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'ltr' };
+                    kFinal.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } }, left: { style: 'medium', color: { argb: G } }, right: { style: 'medium', color: { argb: G } } };
+                    kpiSheet.getRow(kRow).height = 40;
+
+                    // 5. Charts
+                    const chartsSheet = workbook.addWorksheet('Charts', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    chartsSheet.getColumn(1).width = 5;
+                    chartsSheet.getColumn(2).width = 50;
+                    chartsSheet.getColumn(3).width = 5;
+                    mh(chartsSheet, 1, 3, 1, '📊 Cashflow Chart', DB, GL, 14);
+                    chartsSheet.getRow(1).height = 40;
+
+                    const chartContainer = document.querySelector('.chart-container');
+                    if (chartContainer) {
+                        try {
+                            const origBg = chartContainer.style.backgroundColor;
+                            chartContainer.style.backgroundColor = '#ffffff';
+                            const canvasImg = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
+                            chartContainer.style.backgroundColor = origBg;
+                            const imgData = canvasImg.toDataURL('image/png');
+                            const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                            chartsSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 18 }, editAs: 'oneCell' });
+                        } catch (err) { /* silent */ }
+                    }
+
+                    // 6. Recommendations
+                    const recSheet = workbook.addWorksheet('Recommendations', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    recSheet.getColumn(1).width = 5;
+                    recSheet.getColumn(2).width = 50;
+                    recSheet.getColumn(3).width = 5;
+                    mh(recSheet, 1, 3, 1, '💡 Recommendations', DB, GL, 14);
+                    recSheet.getRow(1).height = 40;
+                    let recContent = '';
+                    if (D.outputs.isAcceptable) {
+                        recContent = `✅ The project is a viable investment.\nNPV is positive (${currency}${D.outputs.npv.toFixed(2)}), and IRR (${D.outputs.irr.toFixed(2)}%) exceeds the discount rate (${D.inputs.discountRate.toFixed(2)}%).\nPayback period: ${D.outputs.payback.toFixed(2)} years`;
+                    } else {
+                        recContent = `🔴 The project is not viable.\nNPV is negative (${currency}${D.outputs.npv.toFixed(2)}), and IRR (${D.outputs.irr.toFixed(2)}%) is below the discount rate (${D.inputs.discountRate.toFixed(2)}%).\nIt is recommended to review the project or explore better alternatives.`;
+                    }
+                    recSheet.getCell(3, 2).value = recContent;
+                    recSheet.getCell(3, 2).font = { name: 'Arial', size: 11 };
+                    recSheet.getCell(3, 2).alignment = { wrapText: true, readingOrder: 'ltr' };
+
+                    const buffer = await workbook.xlsx.writeBuffer();
+                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    const now = new Date();
+                    const fileName = `Investment_${company}_${now.toISOString().slice(0,10)}.xlsx`;
+                    saveAs(blob, fileName);
+                } catch (err) {
+                    console.error(err);
+                    alert('Error creating Excel file: ' + err.message);
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ========== Export to Word ==========
+            async function exportToWord() {
+                if (!currentResults) { alert('Please run the analysis first.'); return; }
+                showLoading('Creating Professional Word Report...', 'Gathering data and charts');
+                try {
+                    const D = currentResults;
+                    const currency = D.currency;
+                    const company = D.company;
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('en-US');
+
+                    const chartContainer = document.querySelector('.chart-container');
+                    let chartImgBase64 = '';
+                    if (chartContainer) {
+                        const origBg = chartContainer.style.backgroundColor;
+                        chartContainer.style.backgroundColor = '#ffffff';
+                        const img = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
+                        chartContainer.style.backgroundColor = origBg;
+                        chartImgBase64 = img.toDataURL('image/png');
+                    }
+
+                    let cfRows = '';
+                    for (let i = 0; i < D.inputs.years; i++) {
+                        cfRows += `<tr><td>${i+1}</td><td>${currency}${(D.inputs.cashflows[i]||0).toFixed(0)}</td></tr>`;
+                    }
+
+                    const fullHtml = `<!DOCTYPE html>
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+                    <head><meta charset='utf-8'><title>Investment Analysis Report - FAROUK GRUP</title>
+                    <style>
+                        body{font-family:'Arial','Tajawal',sans-serif;direction:ltr;margin:2rem;background:#fff;}
+                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                        .cover h1{font-size:32px;color:#b8860b;margin:0;}
+                        .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                        table{width:100%;border-collapse:collapse;margin:20px 0;direction:ltr;}
+                        th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                        th{background:#fefcf6;color:#b8860b;font-weight:bold;}
+                        .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+                        .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;}
+                        .rec{background:#f9f9f9;padding:15px;border-left:4px solid #b8860b;margin:20px 0;}
+                    </style></head>
+                    <body>
+                        <div class="cover">
+                            <h1>FAROUK GRUP for Consulting & Business</h1>
+                            <h2>Investment Analysis Report</h2>
+                            <p>Entity: ${company} | Date: ${dateStr}</p>
+                            <p>Currency: ${currency}</p>
+                        </div>
+                        <h2 style="color:#b8860b;">Project Data</h2>
+                        <table><tbody>
+                            <tr><th>Initial Investment</th><td>${currency}${D.inputs.initialInvestment.toFixed(0)}</td></tr>
+                            <tr><th>Discount Rate</th><td>${D.inputs.discountRate.toFixed(2)}%</td></tr>
+                            <tr><th>Project Duration</th><td>${D.inputs.years} years</td></tr>
+                        </tbody></table>
+                        <h2 style="color:#b8860b;">📈 Annual Cashflows</h2>
+                        <table><thead><tr><th>Year</th><th>Cashflow</th></tr></thead><tbody>${cfRows}</tbody></table>
+                        <h2 style="color:#b8860b;">📊 Investment Metrics</h2>
+                        <table>
+                            <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+                            <tbody>
+                                <tr><td>NPV</td><td>${currency}${D.outputs.npv.toFixed(2)}</td></tr>
+                                <tr><td>IRR</td><td>${D.outputs.irr.toFixed(2)}%</td></tr>
+                                <tr><td>Payback Period</td><td>${D.outputs.payback.toFixed(2)} years</td></tr>
+                                <tr><td>Discounted Payback</td><td>${D.outputs.dPayback.toFixed(2)} years</td></tr>
+                                <tr style="font-weight:bold;"><td>Final Verdict</td><td style="color:${D.outputs.isAcceptable ? '#28a745' : '#dc3545'};">${D.outputs.status}</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="rec"><h3 style="color:#b8860b;">💡 Recommendation</h3><p>${D.outputs.isAcceptable ? '✅ The project is a viable investment.' : '🔴 The project is not viable.'}</p></div>
+                        ${chartImgBase64 ? `<h2 style="color:#b8860b;">📊 Cashflow Chart</h2><div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>` : ''}
+                        <div class="footer">Created by FAROUK GRUP for Consulting & Business © ${now.getFullYear()}</div>
+                    </body></html>`;
+
+                    const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `Investment_${company}_${now.toISOString().slice(0,10)}.doc`;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                } catch (err) {
+                    console.error(err);
+                    alert('Error creating Word report');
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ===== Attach event listeners =====
+            document.getElementById('calculateBtn').addEventListener('click', calculateInvestmentMetrics);
+            document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+            document.getElementById('exportFullExcelBtn').addEventListener('click', exportToFullExcel);
+
+            // Auto-run with example
+            window.addEventListener('load', function() {
+                document.getElementById('fillExampleBtn').click();
+                setTimeout(calculateInvestmentMetrics, 300);
+            });
+
+        })();
+    </script>
+</body>
+</html>

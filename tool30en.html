@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Restaurant Valuation Calculator | FAROUK GRUP</title>
+    <!-- Page protection -->
+    <script src="auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
+        }
+
+        /* ===== Remove all vibration-causing properties ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .chart-card, .scenario-card, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .capital-injection,
+        .export-word-btn, .export-excel-full-btn {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== Fixed background ===== */
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.12) 0%, transparent 70%);
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.06) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.08) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
+        }
+
+        /* ===== WRAPPER ===== */
+        .calc-wrapper {
+            max-width: 1050px;
+            margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+        }
+
+        /* ===== CARD ===== */
+        .calc-box {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .calc-box h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+        }
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== Currency row ===== */
+        .currency-row {
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.8rem; background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.2);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
+        }
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
+        .currency-row select, .currency-row input {
+            flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
+        }
+        .currency-row input { flex: 2 1 200px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* ===== Section titles ===== */
+        .section-title-sm {
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
+            margin: 1.2rem 0 0.8rem 0;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== Form rows ===== */
+        .form-row {
+            display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;
+        }
+        .form-group {
+            flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
+        }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-left: 0.3rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+
+        /* ===== Tooltip ===== */
+        .tooltip {
+            position: relative; cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background: #121a2b;
+            color: #eef3ff;
+            text-align: left;
+            border-radius: 10px;
+            padding: 8px 10px;
+            position: absolute;
+            z-index: 100;
+            bottom: 130%;
+            left: 0;
+            opacity: 0;
+            font-size: 0.8rem;
+            border: 1px solid #b48554;
+            pointer-events: none;
+            line-height: 1.5;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* ===== Capital injection container ===== */
+        .capital-injection {
+            background: rgba(42,122,90,0.1);
+            border: 1px solid rgba(42,122,90,0.3);
+            border-radius: 20px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .capital-injection h3 {
+            color: #7fc9a5;
+            margin-bottom: 0.8rem;
+        }
+        .capital-injection input[type="checkbox"] {
+            width: auto; margin-right: 0.5rem;
+        }
+
+        /* ===== Warning note ===== */
+        .warning-note {
+            background: rgba(220,53,69,0.1);
+            border-left: 4px solid #dc3545;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            color: #f8d7da;
+        }
+
+        /* ===== Calculate button ===== */
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer;
+            margin: 1.5rem 0; font-family: 'Tajawal', sans-serif;
+        }
+        .btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-calculate:active { transform: scale(0.97); }
+
+        /* ===== Results ===== */
+        .results-section { margin-top: 1.5rem; }
+        .results-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .result-card {
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 20px; padding: 1rem; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .result-card i { font-size: 1.6rem; color: #cfa776; margin-bottom: 0.3rem; }
+        .result-card h4 { font-size: 0.85rem; font-weight: 700; color: #aab7d4; margin-bottom: 0.2rem; }
+        .result-card .value { font-size: 1.3rem; font-weight: 900; color: #cfa776; }
+        .result-card .unit { font-size: 0.75rem; color: #aab7d4; }
+        .result-card .status {
+            font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+            display: inline-block; margin-top: 0.2rem;
+        }
+        .status-good { background: #28a745; color: white; }
+        .status-bad { background: #dc3545; color: white; }
+        .status-warning { background: #ffc107; color: #111; }
+
+        /* ===== Sensitivity table ===== */
+        .table-container {
+            overflow-x: auto; margin-top: 1rem;
+            border: 1px solid rgba(180,133,84,0.1); border-radius: 20px;
+            background: rgba(22,30,46,0.6); padding: 0.5rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.85rem;
+            min-width: 400px;
+        }
+        th {
+            background: rgba(180,133,84,0.15); color: #cfa776;
+            font-weight: 900; padding: 0.6rem 0.8rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15); white-space: nowrap;
+        }
+        td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid rgba(180,133,84,0.06);
+            text-align: center; color: #f0f4fa;
+        }
+        tr:last-child td { border-bottom: none; }
+
+        /* ===== Export buttons ===== */
+        .export-container {
+            display: flex; justify-content: center; gap: 0.8rem;
+            flex-wrap: wrap; margin: 1.5rem 0;
+        }
+        .export-word-btn, .export-excel-full-btn {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+            padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.9rem; font-family: 'Tajawal', sans-serif;
+            flex: 1 1 auto; justify-content: center; max-width: 220px;
+        }
+        .export-word-btn:hover, .export-excel-full-btn:hover { background: rgba(180,133,84,0.25); }
+
+        /* ===== Loading screen ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== Footer ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
+        .calc-display {
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: right;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
+
+        /* ===== Floating buttons ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== Messages ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+
+        /* ===================================================
+           Desktop improvements (≥1024px)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .section-title-sm { font-size: 1.4rem; }
+            .form-group { flex: 1 1 220px; }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value { font-size: 1.5rem; }
+            .result-card h4 { font-size: 0.95rem; }
+            .result-card i { font-size: 1.8rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 1rem; padding: 0.8rem 2rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .table-container { padding: 1rem; }
+            .capital-injection .form-group { flex: 1 1 250px; }
+        }
+
+        /* ===================================================
+           Mobile improvements (≤768px)
+           =================================================== */
+        @media (max-width: 768px) {
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; }
+            .currency-row label { font-size: 0.8rem; }
+            .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; }
+            .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+            .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-cards { grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.5rem; }
+            .result-card { padding: 0.6rem 0.4rem; }
+            .result-card i { font-size: 1.2rem; }
+            .result-card h4 { font-size: 0.65rem; }
+            .result-card .value { font-size: 1rem; }
+            .result-card .unit { font-size: 0.6rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 0.75rem; padding: 0.4rem 1rem; max-width: 160px; }
+            .modal-content { width: 95%; max-width: 320px; }
+            .calc-btn { padding: 8px 0; font-size: 0.9rem; }
+            .footer-simple { font-size: 0.7rem; padding: 0.6rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .capital-injection .form-row { flex-direction: column; }
+            .tooltip .tooltiptext { width: 160px; left: -20px; font-size: 0.7rem; }
+        }
+
+        /* ===== Very small screens (≤400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+            .results-cards { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+        }
+
+        /* ===== Prevent accidental selection ===== */
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        /* ===== Scrollbar improvements ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <!-- Fixed background -->
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+
+    <!-- Export loading screen -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">Generating report...</h3>
+            <p id="loadingMsg">Please wait</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero-mini">
+        <h2>🍽️ Restaurant Valuation Calculator</h2>
+        <p>Fair value based on earnings and debt – with sensitivity analysis and risk factors</p>
+    </section>
+
+    <!-- WRAPPER -->
+    <section class="calc-wrapper">
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-store"></i><span>Valuation</span></div>
+            <h2><i class="fas fa-store" style="color:#cfa776;margin-left:0.5rem;"></i>Restaurant Valuation</h2>
+
+            <!-- Currency & Restaurant Name -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> Currency:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>USD ($)</option>
+                    <option value="€">EUR (€)</option>
+                    <option value="₺">TRY (₺)</option>
+                    <option value="ج.م">EGP (ج.م)</option>
+                    <option value="د.ك">KWD (د.ك)</option>
+                    <option value="ر.س">SAR (ر.س)</option>
+                </select>
+                <label><i class="fas fa-store"></i> Restaurant Name:</label>
+                <input type="text" id="restaurantName" value="Elite Restaurant" placeholder="Restaurant name">
+            </div>
+
+            <!-- Basic Restaurant Data -->
+            <div class="section-title-sm">📋 Basic Restaurant Data</div>
+            <div class="form-row">
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-calendar-alt"></i> Establishment Year</label>
+                    <input type="number" id="estYear" value="2018" min="1990" max="2026">
+                    <span class="tooltiptext">The year the restaurant started its business operations.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-file-contract"></i> Lease Expiry Year</label>
+                    <input type="number" id="leaseExpiry" value="2029" min="2025" max="2050">
+                    <span class="tooltiptext">If less than 3 years remain on the lease, the multiplier is automatically reduced.</span>
+                </div>
+            </div>
+
+            <!-- Financial Data -->
+            <div class="section-title-sm">💰 Financial Data (Annual)</div>
+            <div class="form-row">
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-receipt"></i> Total Revenue</label>
+                    <input type="number" id="revenue" value="500000" step="1000">
+                    <span class="tooltiptext">Annual restaurant sales.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-shopping-cart"></i> Cost of Goods Sold (COGS)</label>
+                    <input type="number" id="cogs" value="200000" step="1000">
+                    <span class="tooltiptext">Cost of raw materials and ingredients.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-tools"></i> Operating Expenses (OPEX)</label>
+                    <input type="number" id="opex" value="150000" step="1000">
+                    <span class="tooltiptext">Rent, salaries, utilities, marketing, etc.</span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-chart-line"></i> Depreciation & Amortization (D&A)</label>
+                    <input type="number" id="depreciation" value="20000" step="1000">
+                    <span class="tooltiptext">Annual decline in asset value.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-hand-holding-usd"></i> Interest Paid</label>
+                    <input type="number" id="interest" value="10000" step="1000">
+                    <span class="tooltiptext">Annual interest on loans.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-file-invoice-dollar"></i> Taxes Paid</label>
+                    <input type="number" id="taxes" value="15000" step="1000">
+                    <span class="tooltiptext">Total annual taxes paid.</span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-university"></i> Total Outstanding Debt</label>
+                    <input type="number" id="totalDebt" value="200000" step="1000">
+                    <span class="tooltiptext">Remaining balance on loans.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-couch"></i> Equipment & Furniture Market Value</label>
+                    <input type="number" id="assetValue" value="80000" step="1000">
+                    <span class="tooltiptext">Estimated value if equipment were sold today.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-sliders-h"></i> Market Multiple (2 - 4)</label>
+                    <input type="number" id="multiplier" value="3" min="2" max="4" step="0.1">
+                    <span class="tooltiptext">Reflects brand strength and profit growth.</span>
+                </div>
+            </div>
+
+            <!-- Capital Injection -->
+            <div class="capital-injection">
+                <h3><i class="fas fa-money-bill-wave"></i> Capital Injection Scenario</h3>
+                <div class="form-row">
+                    <div class="form-group" style="flex:0 0 auto;">
+                        <label><input type="checkbox" id="capitalInjectionEnabled" style="width:auto; margin-right:0.5rem;"> Enable Injection</label>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-coins"></i> Injection Amount</label>
+                        <input type="number" id="injectionAmount" value="50000" step="1000" disabled>
+                        <span class="tooltiptext">Additional amount invested.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-percent"></i> Expected ROI (%)</label>
+                        <input type="number" id="injectionROI" value="20" step="0.5" disabled>
+                        <span class="tooltiptext">Expected annual return on the injection.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ownership Share -->
+            <div class="section-title-sm">👤 Your Share in the Restaurant</div>
+            <div class="form-row">
+                <div class="form-group tooltip" style="flex: 1 1 200px;">
+                    <label><i class="fas fa-percent"></i> Ownership Percentage (%)</label>
+                    <input type="number" id="ownershipPercent" value="50" min="1" max="100" step="0.1">
+                    <span class="tooltiptext">The percentage you own of the restaurant.</span>
+                </div>
+            </div>
+
+            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Valuation</button>
+
+            <!-- Results Area -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-cards" id="kpiCards"></div>
+
+                <div id="leaseWarning" class="warning-note" style="display:none;"></div>
+
+                <div class="result-card" id="efficiencyCard" style="text-align:left; padding:1.2rem; margin-bottom:1.5rem;"></div>
+
+                <div class="section-title-sm">📈 Sensitivity Analysis (Impact of Multiple on Fair Value)</div>
+                <div class="table-container" id="sensitivityTable"></div>
+
+                <div class="export-container">
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Full Word Report</button>
+                    <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Export to Full Excel</button>
+                </div>
+            </div>
+
+            <div id="initialMessage" style="margin-top:1rem; color:#aab7d4; text-align:center;">
+                <i class="fas fa-robot" style="color:#cfa776;"></i> Enter data and click the calculate button
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-simple">
+        All rights reserved © 2026 <span>FAROUK GRUP</span>
+    </footer>
+
+    <button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+    <a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="modalClose">&times;</span>
+                <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn" data-val="C">C</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn" data-val="⌫">⌫</button>
+                    <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ===== Calculator =====
+            const calcDisplay = document.getElementById('calcDisplay');
+            let currentCalcInput = '';
+
+            function handleCalc(v) {
+                if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+                if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+                if (v === '=') {
+                    try {
+                        let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
+                        calcDisplay.value = r;
+                        currentCalcInput = r.toString();
+                    } catch (e) { calcDisplay.value = 'Error'; currentCalcInput = ''; }
+                    return;
+                }
+                currentCalcInput += v;
+                calcDisplay.value = currentCalcInput;
+            }
+
+            document.querySelectorAll('.calc-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const v = this.dataset.val;
+                    if (v !== undefined) handleCalc(v);
+                });
+            });
+
+            const modalEl = document.getElementById('calculatorModal');
+            document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                modalEl.classList.add('active');
+                calcDisplay.value = currentCalcInput;
+            });
+            document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+            modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+            document.addEventListener('keydown', function(e) {
+                if (!modalEl.classList.contains('active')) return;
+                e.preventDefault();
+                const k = e.key;
+                if (k >= '0' && k <= '9') handleCalc(k);
+                else if (k === '.') handleCalc('.');
+                else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+                else if (k === 'Enter' || k === '=') handleCalc('=');
+                else if (k === 'Backspace') handleCalc('⌫');
+                else if (k === 'Escape') modalEl.classList.remove('active');
+                else if (k.toLowerCase() === 'c') handleCalc('C');
+            });
+
+            // ===== Enable/disable capital injection fields =====
+            document.getElementById('capitalInjectionEnabled').addEventListener('change', function(e) {
+                const disabled = !e.target.checked;
+                document.getElementById('injectionAmount').disabled = disabled;
+                document.getElementById('injectionROI').disabled = disabled;
+            });
+
+            // ===== Loading functions =====
+            function showLoading(title, msg) {
+                document.getElementById('loadingTitle').textContent = title;
+                document.getElementById('loadingMsg').textContent = msg;
+                document.getElementById('exportLoading').classList.add('show');
+            }
+
+            function hideLoading() {
+                document.getElementById('exportLoading').classList.remove('show');
+            }
+
+            // ===== Main calculation =====
+            function computeValuation() {
+                const rev = parseFloat(document.getElementById('revenue').value) || 0;
+                const cogs = parseFloat(document.getElementById('cogs').value) || 0;
+                const opex = parseFloat(document.getElementById('opex').value) || 0;
+                const depr = parseFloat(document.getElementById('depreciation').value) || 0;
+                const interest = parseFloat(document.getElementById('interest').value) || 0;
+                const taxes = parseFloat(document.getElementById('taxes').value) || 0;
+                const totalDebt = parseFloat(document.getElementById('totalDebt').value) || 0;
+                const assetValue = parseFloat(document.getElementById('assetValue').value) || 0;
+                const multiplier = parseFloat(document.getElementById('multiplier').value) || 3;
+                const ownership = parseFloat(document.getElementById('ownershipPercent').value) || 100;
+                const estYear = parseInt(document.getElementById('estYear').value) || 2018;
+                const leaseExpiry = parseInt(document.getElementById('leaseExpiry').value) || 2029;
+
+                const EBITDA = rev - cogs - opex;
+                const netProfit = EBITDA - depr - interest - taxes;
+                const enterpriseValue = EBITDA * multiplier;
+                const equityValue = enterpriseValue - totalDebt;
+                const fairValue = equityValue > 0 ? equityValue : 0;
+                const sharePrice = (fairValue * ownership) / 100;
+                const paybackYears = netProfit > 0 ? equityValue / netProfit : Infinity;
+                const efficiencyIndex = assetValue > 0 ? fairValue / assetValue : 0;
+
+                // Lease
+                const currentYear = new Date().getFullYear();
+                const remainingLease = leaseExpiry - currentYear;
+                let leaseWarning = '';
+                let adjustedMultiplier = multiplier;
+                if (remainingLease < 3 && remainingLease >= 0) {
+                    adjustedMultiplier = Math.max(0.2, remainingLease / 10) * multiplier;
+                    leaseWarning =
+                        `⚠️ Warning: The lease has only ${remainingLease} year(s) remaining. The multiplier has been automatically adjusted to ${adjustedMultiplier.toFixed(2)} to reflect higher risk.`;
+                } else if (remainingLease < 0) {
+                    leaseWarning = '⛔ The lease has expired! Immediate renewal is required. Multiplier set to 0.5.';
+                    adjustedMultiplier = 0.5;
+                }
+
+                const finalEV = EBITDA * adjustedMultiplier;
+                const finalEquity = finalEV - totalDebt;
+                const finalFairValue = finalEquity > 0 ? finalEquity : 0;
+
+                // Capital injection
+                const injectionEnabled = document.getElementById('capitalInjectionEnabled').checked;
+                let injectionImpact = null;
+                if (injectionEnabled) {
+                    const injectionAmount = parseFloat(document.getElementById('injectionAmount').value) || 0;
+                    const injectionROI = parseFloat(document.getElementById('injectionROI').value) || 20;
+                    const incrementalEBITDA = injectionAmount * (injectionROI / 100);
+                    const newEBITDA = EBITDA + incrementalEBITDA;
+                    const newEV = newEBITDA * adjustedMultiplier;
+                    const newEquity = newEV - totalDebt;
+                    injectionImpact = {
+                        newFairValue: newEquity > 0 ? newEquity : 0,
+                        incrementalEBITDA: incrementalEBITDA,
+                        newPayback: (netProfit + incrementalEBITDA) > 0 ? newEquity / (netProfit +
+                            incrementalEBITDA) : Infinity
+                    };
+                }
+
+                return {
+                    EBITDA,
+                    netProfit,
+                    enterpriseValue,
+                    equityValue,
+                    fairValue: finalFairValue,
+                    sharePrice,
+                    paybackYears,
+                    efficiencyIndex,
+                    assetValue,
+                    multiplier: adjustedMultiplier,
+                    remainingLease,
+                    leaseWarning,
+                    injectionImpact,
+                    rev,
+                    cogs,
+                    opex,
+                    depr,
+                    interest,
+                    taxes,
+                    totalDebt,
+                    ownership,
+                    estYear,
+                    leaseExpiry,
+                    originalMultiplier: multiplier
+                };
+            }
+
+            // ===== Display results =====
+            function displayResults(res) {
+                const currency = document.getElementById('currencySelect').value;
+                document.getElementById('initialMessage').style.display = 'none';
+                document.getElementById('resultsSection').style.display = 'block';
+
+                // KPI Cards
+                document.getElementById('kpiCards').innerHTML = `
+                    <div class="result-card"><i class="fas fa-chart-bar"></i><h4>EBITDA</h4><div class="value">${currency}${res.EBITDA.toFixed(0)}</div></div>
+                    <div class="result-card"><i class="fas fa-building"></i><h4>Enterprise Value (EV)</h4><div class="value">${currency}${(res.EBITDA * res.multiplier).toFixed(0)}</div><div class="unit">x${res.multiplier.toFixed(2)}</div></div>
+                    <div class="result-card"><i class="fas fa-hand-holding-usd"></i><h4>Fair Value</h4><div class="value">${currency}${res.fairValue.toFixed(0)}</div><div class="status ${res.fairValue > res.totalDebt ? 'status-good' : 'status-bad'}">${res.fairValue > 0 ? 'Positive' : 'Negative'}</div></div>
+                    <div class="result-card"><i class="fas fa-user-check"></i><h4>Your Share Price (${res.ownership}%)</h4><div class="value">${currency}${res.sharePrice.toFixed(0)}</div></div>
+                    <div class="result-card"><i class="fas fa-clock"></i><h4>Payback Period</h4><div class="value">${isFinite(res.paybackYears) ? res.paybackYears.toFixed(2)+' yrs' : 'Infinite'}</div></div>
+                    <div class="result-card"><i class="fas fa-balance-scale"></i><h4>Efficiency Index</h4><div class="value">${res.efficiencyIndex.toFixed(2)}</div><div class="status ${res.efficiencyIndex >= 1 ? 'status-good' : 'status-bad'}">${res.efficiencyIndex >= 1 ? 'Viable' : 'Non-viable'}</div></div>
+                `;
+
+                // Lease warning
+                const leaseDiv = document.getElementById('leaseWarning');
+                if (res.leaseWarning) {
+                    leaseDiv.style.display = 'block';
+                    leaseDiv.innerHTML = res.leaseWarning;
+                } else {
+                    leaseDiv.style.display = 'none';
+                }
+
+                // Efficiency card
+                const effCard = document.getElementById('efficiencyCard');
+                let effHtml = `<strong><i class="fas fa-info-circle"></i> Fair Value vs. Assets:</strong> `;
+                if (res.assetValue > 0) {
+                    effHtml += `Asset market value ${currency}${res.assetValue.toFixed(0)} | `;
+                    effHtml += `Fair value ${currency}${res.fairValue.toFixed(0)} | `;
+                    effHtml += res.fairValue >= res.assetValue ?
+                        '✅ The restaurant generates value above its assets (profitable operations)' :
+                        '❌ Value is below asset value – the restaurant is not operationally viable';
+                } else {
+                    effHtml += 'No asset market value entered for comparison.';
+                }
+
+                // Capital injection impact
+                if (res.injectionImpact) {
+                    const inj = res.injectionImpact;
+                    effHtml += `<br><br><strong>💉 After capital injection:</strong> `;
+                    effHtml += `Expected fair value ${currency}${inj.newFairValue.toFixed(0)} | `;
+                    effHtml +=
+                        `New payback period ${isFinite(inj.newPayback) ? inj.newPayback.toFixed(2)+' yrs' : 'Not calculated'}`;
+                }
+                effCard.innerHTML = effHtml;
+
+                // Sensitivity table
+                const sensDiv = document.getElementById('sensitivityTable');
+                const mults = [2, 2.5, 3, 3.5, 4];
+                let sensRows = '';
+                mults.forEach(m => {
+                    const ev = res.EBITDA * m;
+                    const eq = ev - res.totalDebt;
+                    const fair = eq > 0 ? eq : 0;
+                    sensRows += `<tr>
+                        <td>${m}</td>
+                        <td>${currency}${ev.toFixed(0)}</td>
+                        <td>${currency}${fair.toFixed(0)}</td>
+                        <td>${currency}${((fair * res.ownership)/100).toFixed(0)}</td>
+                    </tr>`;
+                });
+                sensDiv.innerHTML = `
+                    <table>
+                        <thead><tr><th>Multiple</th><th>Enterprise Value</th><th>Fair Value</th><th>Your Share Price</th></tr></thead>
+                        <tbody>${sensRows}</tbody>
+                    </table>
+                `;
+
+                // Store results for export
+                window.lastValuation = res;
+            }
+
+            // ===== Calculate button =====
+            document.getElementById('calculateBtn').addEventListener('click', function() {
+                const res = computeValuation();
+                displayResults(res);
+            });
+
+            // ========== Export to Excel ==========
+            async function exportToFullExcel() {
+                if (!window.lastValuation) { alert('Please run the analysis first.'); return; }
+                showLoading('Creating Professional Excel Report...', 'Creating sheets and tables');
+                try {
+                    const D = window.lastValuation;
+                    const currency = document.getElementById('currencySelect').value;
+                    const name = document.getElementById('restaurantName').value || 'Restaurant';
+
+                    const workbook = new ExcelJS.Workbook();
+                    workbook.creator = 'FAROUK GRUP';
+                    workbook.created = new Date();
+
+                    const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+                    const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
+                    const PT = 'FF155724', NT = 'FF721C24', GB = 'FFFFF3CD';
+
+                    function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11, color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' }, border: { top: { style: 'thin', color: { argb: G } }, bottom: { style: 'thin', color: { argb: G } }, left: { style: 'thin', color: { argb: G } }, right: { style: 'thin', color: { argb: G } } } }; }
+
+                    function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial', bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h, vertical: 'middle', wrapText: true, readingOrder: 'ltr' }, border: { top: { style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair', color: { argb: 'FFCCCCCC' } }, left: { style: 'hair', color: { argb: 'FFCCCCCC' } }, right: { style: 'hair', color: { argb: 'FFCCCCCC' } } } }; }
+
+                    function ap(c, s) { if (s.font) c.font = s.font; if (s.fill) c.fill = s.fill; if (s.alignment) c.alignment = s.alignment; if (s.border) c.border = s.border; if (s.numFmt) c.numFmt = s.numFmt; }
+
+                    function mh(ws, fc, tc, r, text, bg = HB, tc2 = GL, fs = 12) { ws.mergeCells(r, fc, r, tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true, size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' }; c.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } }, left: { style: 'medium', color: { argb: G } }, right: { style: 'medium', color: { argb: G } } }; }
+
+                    // 1. Cover Sheet
+                    const cv = workbook.addWorksheet('Report Cover', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
+                    for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
+                    cv.getRow(2).height = 80;
+                    cv.getRow(4).height = 60;
+                    cv.mergeCells(2, 1, 2, 4);
+                    const bc = cv.getCell(2, 1);
+                    bc.value = 'FAROUK GRUP for Consulting & Business\nFAROUK GRUP';
+                    bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
+                    bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
+                    bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' };
+                    bc.border = { bottom: { style: 'thick', color: { argb: G } } };
+                    mh(cv, 1, 4, 4, `Restaurant Valuation Report\n${name}`, DB, GL, 18);
+                    const inf = [
+                        ['📋 Restaurant Name', name],
+                        ['📅 Date', new Date().toLocaleDateString('en-US')],
+                        ['💰 Currency', currency],
+                        ['📊 Fair Value', `${currency}${D.fairValue.toFixed(0)}`],
+                        ['📈 EBITDA', `${currency}${D.EBITDA.toFixed(0)}`],
+                        ['🔢 Multiple Used', `${D.multiplier.toFixed(2)}x`]
+                    ];
+                    let ir = 6;
+                    inf.forEach(([l, v], idx) => {
+                        cv.mergeCells(ir, 1, ir, 2);
+                        cv.mergeCells(ir, 3, ir, 4);
+                        const lc = cv.getCell(ir, 1), vc = cv.getCell(ir, 3);
+                        lc.value = l; vc.value = v;
+                        const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
+                        ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' }, border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' }, right: { style: 'hair' } } });
+                        ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'ltr' }, border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' }, right: { style: 'hair' } } });
+                        cv.getRow(ir).height = 28;
+                        ir++;
+                    });
+
+                    // 2. Inputs
+                    const inputsSheet = workbook.addWorksheet('Inputs & Assumptions', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    inputsSheet.getColumn(1).width = 5;
+                    inputsSheet.getColumn(2).width = 38;
+                    inputsSheet.getColumn(3).width = 22;
+                    inputsSheet.getColumn(4).width = 22;
+                    inputsSheet.getColumn(5).width = 5;
+                    mh(inputsSheet, 1, 5, 1, '📋 Inputs & Assumptions', DB, GL, 14);
+                    inputsSheet.getRow(1).height = 40;
+                    mh(inputsSheet, 2, 4, 2, 'Annual Financial Data', SB, W, 11);
+                    inputsSheet.getRow(2).height = 28;
+
+                    let iRow = 3;
+                    const addInputRow = (label, val, note = '') => {
+                        inputsSheet.getRow(iRow).height = 24;
+                        const bg = iRow % 2 === 0 ? 'FFFEFCF6' : 'FFFFFFFF';
+                        const lc = inputsSheet.getCell(iRow, 2), vc = inputsSheet.getCell(iRow, 3), nc = inputsSheet.getCell(iRow, 4);
+                        lc.value = label; vc.value = val; nc.value = note;
+                        ap(lc, cs(bg, DT, true, 'right'));
+                        ap(vc, { ...cs(bg, '0000FF', false, 'center'), numFmt: typeof val === 'number' ? '#,##0.00' : null });
+                        ap(nc, cs(bg, '00695C', false, 'center'));
+                        iRow++;
+                    };
+
+                    addInputRow('Total Revenue', D.rev);
+                    addInputRow('Cost of Goods Sold (COGS)', D.cogs);
+                    addInputRow('Operating Expenses (OPEX)', D.opex);
+                    addInputRow('Depreciation & Amortization', D.depr);
+                    addInputRow('Interest Paid', D.interest);
+                    addInputRow('Taxes Paid', D.taxes);
+                    addInputRow('Total Outstanding Debt', D.totalDebt);
+                    addInputRow('Equipment & Furniture Value', D.assetValue);
+                    addInputRow('Market Multiple', D.originalMultiplier);
+                    addInputRow('Ownership Percentage', D.ownership, '%');
+                    addInputRow('Establishment Year', D.estYear);
+                    addInputRow('Lease Expiry Year', D.leaseExpiry);
+                    if (D.injectionImpact) {
+                        addInputRow('Capital Injection Amount', document.getElementById('injectionAmount').value || 0);
+                        addInputRow('Capital Injection ROI %', document.getElementById('injectionROI').value || 0);
+                    }
+
+                    // 3. KPI Dashboard
+                    const kpiSheet = workbook.addWorksheet('KPI Dashboard', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    [5, 32, 22, 22, 22, 5].forEach((w, i) => kpiSheet.getColumn(i + 1).width = w);
+                    mh(kpiSheet, 1, 6, 1, '📊 KPI Dashboard', DB, GL, 15);
+                    kpiSheet.getRow(1).height = 45;
+                    mh(kpiSheet, 2, 5, 2, `${name} | ${new Date().toLocaleDateString('en-US')}`, HB, W, 10);
+                    kpiSheet.getRow(2).height = 26;
+
+                    const kpis = [
+                        { label: 'EBITDA', value: `${currency}${D.EBITDA.toFixed(0)}`, good: D.EBITDA > 0 },
+                        { label: 'Fair Value', value: `${currency}${D.fairValue.toFixed(0)}`, good: D.fairValue > 0 },
+                        { label: 'Share Price', value: `${currency}${D.sharePrice.toFixed(0)}`, good: D.sharePrice > 0 },
+                        { label: 'Payback Period', value: isFinite(D.paybackYears) ? D.paybackYears.toFixed(2) + ' yrs' : 'Infinite', good: isFinite(D.paybackYears) && D.paybackYears < 10 },
+                        { label: 'Efficiency Index', value: D.efficiencyIndex.toFixed(2), good: D.efficiencyIndex >= 1 },
+                        { label: 'Multiple Used', value: D.multiplier.toFixed(2) + 'x', good: D.multiplier >= 2 }
+                    ];
+                    let kRow = 3;
+                    kpis.forEach((k, idx) => {
+                        kpiSheet.getRow(kRow).height = 40;
+                        kpiSheet.mergeCells(kRow, 2, kRow, 2);
+                        kpiSheet.mergeCells(kRow, 3, kRow, 3);
+                        kpiSheet.mergeCells(kRow, 4, kRow, 4);
+                        kpiSheet.mergeCells(kRow, 5, kRow, 5);
+                        const ic = kpiSheet.getCell(kRow, 2);
+                        ic.value = `🔹 ${idx+1}`;
+                        const lc2 = kpiSheet.getCell(kRow, 3);
+                        lc2.value = k.label;
+                        const vc3 = kpiSheet.getCell(kRow, 4);
+                        vc3.value = k.value;
+                        const nc2 = kpiSheet.getCell(kRow, 5);
+                        nc2.value = '';
+                        const bg = k.good ? PB : NB, tc = k.good ? PT : NT;
+                        [ic, lc2, vc3, nc2].forEach(c => { c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }; c.border = { top: { style: 'thin', color: { argb: G } }, bottom: { style: 'thin', color: { argb: G } }, left: { style: 'thin', color: { argb: G } }, right: { style: 'thin', color: { argb: G } } }; });
+                        ic.font = { name: 'Arial', bold: true, size: 14, color: { argb: '555555' } };
+                        ic.alignment = { horizontal: 'center', vertical: 'middle' };
+                        lc2.font = { name: 'Arial', bold: true, size: 11, color: { argb: DT } };
+                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' };
+                        vc3.font = { name: 'Arial', bold: true, size: 13, color: { argb: tc } };
+                        vc3.alignment = { horizontal: 'center', vertical: 'middle' };
+                        nc2.font = { name: 'Arial', size: 9, color: { argb: '444444' } };
+                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' };
+                        kRow++;
+                    });
+                    kRow++;
+                    kpiSheet.mergeCells(kRow, 2, kRow, 5);
+                    const kFinal = kpiSheet.getCell(kRow, 2);
+                    kFinal.value = D.fairValue > 0 ? '✅ Valuation Positive' : '⚠️ Valuation Negative or Zero';
+                    kFinal.font = { name: 'Arial', bold: true, size: 13, color: { argb: D.fairValue > 0 ? PT : '856404' } };
+                    kFinal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: D.fairValue > 0 ? PB : GB } };
+                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'ltr' };
+                    kFinal.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } }, left: { style: 'medium', color: { argb: G } }, right: { style: 'medium', color: { argb: G } } };
+                    kpiSheet.getRow(kRow).height = 40;
+
+                    // 4. Sensitivity Analysis
+                    const sensSheet = workbook.addWorksheet('Sensitivity Analysis', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    sensSheet.getColumn(1).width = 5;
+                    sensSheet.getColumn(2).width = 20;
+                    sensSheet.getColumn(3).width = 22;
+                    sensSheet.getColumn(4).width = 22;
+                    sensSheet.getColumn(5).width = 22;
+                    sensSheet.getColumn(6).width = 5;
+                    mh(sensSheet, 1, 6, 1, '📈 Sensitivity Analysis (Impact of Multiple)', DB, GL, 14);
+                    sensSheet.getRow(1).height = 40;
+                    sensSheet.addRow(['Multiple', 'Enterprise Value', 'Fair Value', 'Your Share Price']);
+                    const mults = [2, 2.5, 3, 3.5, 4];
+                    mults.forEach(m => {
+                        const ev = D.EBITDA * m;
+                        const eq = ev - D.totalDebt;
+                        const fair = eq > 0 ? eq : 0;
+                        sensSheet.addRow([m, ev, fair, (fair * D.ownership) / 100]);
+                    });
+                    const sensHeader = sensSheet.getRow(2);
+                    sensHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                    sensHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+
+                    // 5. Recommendations
+                    const recSheet = workbook.addWorksheet('Recommendations', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    recSheet.getColumn(1).width = 5;
+                    recSheet.getColumn(2).width = 50;
+                    recSheet.getColumn(3).width = 5;
+                    mh(recSheet, 1, 3, 1, '💡 Recommendations', DB, GL, 14);
+                    recSheet.getRow(1).height = 40;
+                    let recContent = '';
+                    if (D.fairValue > 0) {
+                        recContent =
+                            `✅ Valuation is positive: Fair value ${currency}${D.fairValue.toFixed(0)}\n`;
+                        recContent += `Your share price (${D.ownership}%): ${currency}${D.sharePrice.toFixed(0)}\n`;
+                        if (D.leaseWarning) recContent += `⚠️ ${D.leaseWarning}\n`;
+                        if (D.injectionImpact) {
+                            recContent += `💉 After capital injection: Expected fair value ${currency}${D.injectionImpact.newFairValue.toFixed(0)}\n`;
+                        }
+                        recContent += `\nIt is recommended to negotiate based on this range, while improving weak indicators.`;
+                    } else {
+                        recContent =
+                            `🔴 Valuation is negative or zero. You need to review the cost structure, increase revenue, or reduce debt.`;
+                    }
+                    recSheet.getCell(3, 2).value = recContent;
+                    recSheet.getCell(3, 2).font = { name: 'Arial', size: 11 };
+                    recSheet.getCell(3, 2).alignment = { wrapText: true, readingOrder: 'ltr' };
+
+                    const buffer = await workbook.xlsx.writeBuffer();
+                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    const now = new Date();
+                    const fileName = `Restaurant_Valuation_${name}_${now.toISOString().slice(0,10)}.xlsx`;
+                    saveAs(blob, fileName);
+                } catch (err) {
+                    console.error(err);
+                    alert('Error creating Excel file: ' + err.message);
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ========== Export to Word ==========
+            async function exportToWord() {
+                if (!window.lastValuation) { alert('Please run the analysis first.'); return; }
+                showLoading('Creating Professional Word Report...', 'Gathering data');
+                try {
+                    const D = window.lastValuation;
+                    const currency = document.getElementById('currencySelect').value;
+                    const name = document.getElementById('restaurantName').value || 'Restaurant';
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('en-US');
+
+                    let injectionHtml = '';
+                    if (D.injectionImpact) {
+                        injectionHtml = `
+                            <h3 style="color:#b8860b;">💉 Capital Injection Impact</h3>
+                            <p>Fair value after injection: ${currency}${D.injectionImpact.newFairValue.toFixed(0)}</p>
+                            <p>New payback period: ${isFinite(D.injectionImpact.newPayback) ? D.injectionImpact.newPayback.toFixed(2)+' years' : 'Not calculated'}</p>
+                        `;
+                    }
+
+                    const fullHtml = `<!DOCTYPE html>
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+                    <head><meta charset='utf-8'><title>Restaurant Valuation Report - FAROUK GRUP</title>
+                    <style>
+                        body{font-family:'Arial','Tajawal',sans-serif;direction:ltr;margin:2rem;background:#fff;}
+                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                        .cover h1{font-size:32px;color:#b8860b;margin:0;}
+                        .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                        table{width:100%;border-collapse:collapse;margin:20px 0;direction:ltr;}
+                        th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                        th{background:#fefcf6;color:#b8860b;font-weight:bold;}
+                        .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;font-size:10pt;}
+                        .rec{background:#f9f9f9;padding:15px;border-left:4px solid #b8860b;margin:20px 0;}
+                    </style></head>
+                    <body>
+                        <div class="cover">
+                            <h1>FAROUK GRUP for Consulting & Business</h1>
+                            <h2>Restaurant Valuation Report</h2>
+                            <p>Restaurant: ${name} | Date: ${dateStr}</p>
+                            <p>Currency: ${currency}</p>
+                        </div>
+                        <h2 style="color:#b8860b;">📊 Key Indicators</h2>
+                        <table>
+                            <thead><tr><th>Indicator</th><th>Value</th></tr></thead>
+                            <tbody>
+                                <tr><td>EBITDA</td><td>${currency}${D.EBITDA.toFixed(0)}</td></tr>
+                                <tr><td>Fair Value</td><td>${currency}${D.fairValue.toFixed(0)}</td></tr>
+                                <tr><td>Your Share (${D.ownership}%)</td><td>${currency}${D.sharePrice.toFixed(0)}</td></tr>
+                                <tr><td>Payback Period</td><td>${isFinite(D.paybackYears) ? D.paybackYears.toFixed(2)+' years' : 'Infinite'}</td></tr>
+                                <tr><td>Efficiency Index</td><td>${D.efficiencyIndex.toFixed(2)}</td></tr>
+                                <tr><td>Multiple Used</td><td>${D.multiplier.toFixed(2)}x</td></tr>
+                            </tbody>
+                        </table>
+                        ${D.leaseWarning ? `<div style="background:#f8d7da;padding:10px;border-radius:8px;border-left:4px solid #dc3545;margin:20px 0;">${D.leaseWarning}</div>` : ''}
+                        ${injectionHtml}
+                        <div class="rec">
+                            <h3 style="color:#b8860b;">📌 Recommendation</h3>
+                            <p>${D.fairValue > 0 ? '✅ Valuation is positive, proceed with negotiations based on the presented range.' : '🔴 Valuation is negative or zero, review cost structure or increase revenue.'}</p>
+                        </div>
+                        <div class="footer">Created by FAROUK GRUP for Consulting & Business © ${now.getFullYear()}</div>
+                    </body></html>`;
+
+                    const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `Restaurant_Valuation_${name}_${now.toISOString().slice(0,10)}.doc`;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                } catch (err) {
+                    console.error(err);
+                    alert('Error creating Word report');
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ===== Attach export buttons =====
+            document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+            document.getElementById('exportFullExcelBtn').addEventListener('click', exportToFullExcel);
+
+            // ===== Auto-run =====
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    const res = computeValuation();
+                    displayResults(res);
+                }, 400);
+            });
+
+        })();
+    </script>
+</body>
+</html>

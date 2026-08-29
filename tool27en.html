@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Startup Software Company Valuation | FAROUK GRUP</title>
+    <!-- Page protection -->
+    <script src="auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
+        }
+
+        /* ===== Remove all vibration-causing properties ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .chart-card, .scenario-card, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .stage-btn,
+        .kpi-card, .valuation-table, .export-word-btn, .export-excel-full-btn {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== Fixed background ===== */
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.12) 0%, transparent 70%);
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.06) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.08) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
+        }
+
+        /* ===== WRAPPER ===== */
+        .calc-wrapper {
+            max-width: 1050px;
+            margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+        }
+
+        /* ===== CARD ===== */
+        .calc-box {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .calc-box h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+        }
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== Currency row ===== */
+        .currency-row {
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.8rem; background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.2);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
+        }
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
+        .currency-row select, .currency-row input {
+            flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
+        }
+        .currency-row input { flex: 2 1 200px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* ===== Section titles ===== */
+        .section-title-sm {
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
+            margin: 1.2rem 0 0.8rem 0;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== Form rows ===== */
+        .form-row {
+            display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;
+        }
+        .form-group {
+            flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
+        }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-left: 0.3rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+
+        /* ===== Stage buttons ===== */
+        .stage-selector {
+            display: flex; gap: 0.8rem; justify-content: center;
+            margin: 1rem 0 1.5rem; flex-wrap: wrap;
+        }
+        .stage-btn {
+            background: rgba(180,133,84,0.08);
+            border: 2px solid rgba(180,133,84,0.15);
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            color: #aab7d4; font-weight: 700;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+        }
+        .stage-btn.active {
+            background: rgba(180,133,84,0.2);
+            color: #cfa776;
+            border-color: #b48554;
+        }
+
+        /* ===== Calculate button ===== */
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer;
+            margin: 1.5rem 0; font-family: 'Tajawal', sans-serif;
+        }
+        .btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-calculate:active { transform: scale(0.97); }
+
+        /* ===== Results ===== */
+        .results-section { margin-top: 1.5rem; }
+        .results-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .result-card {
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 20px; padding: 1rem; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .result-card i { font-size: 1.6rem; color: #cfa776; margin-bottom: 0.3rem; }
+        .result-card h4 { font-size: 0.85rem; font-weight: 700; color: #aab7d4; margin-bottom: 0.2rem; }
+        .result-card .value { font-size: 1.3rem; font-weight: 900; color: #cfa776; }
+        .result-card .unit { font-size: 0.75rem; color: #aab7d4; }
+        .result-card .status {
+            font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+            display: inline-block; margin-top: 0.2rem;
+        }
+        .status-good { background: #28a745; color: white; }
+        .status-bad { background: #dc3545; color: white; }
+        .status-warning { background: #ffc107; color: #111; }
+
+        /* ===== Charts ===== */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background: rgba(22,30,46,0.6);
+            border-radius: 20px;
+            padding: 0.8rem;
+            border: 1px solid rgba(180,133,84,0.08);
+            margin: 1.5rem 0;
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            max-height: none;
+        }
+
+        /* ===== Table ===== */
+        .table-container {
+            overflow-x: auto; margin-top: 1rem;
+            border: 1px solid rgba(180,133,84,0.1); border-radius: 20px;
+            background: rgba(22,30,46,0.6); padding: 0.5rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.85rem;
+            min-width: 400px;
+        }
+        th {
+            background: rgba(180,133,84,0.15); color: #cfa776;
+            font-weight: 900; padding: 0.6rem 0.8rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15); white-space: nowrap;
+        }
+        td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid rgba(180,133,84,0.06);
+            text-align: center; color: #f0f4fa;
+        }
+        tr:last-child td { border-bottom: none; }
+        .highlight { background: rgba(180,133,84,0.08); font-weight: 700; color: #cfa776; }
+
+        /* ===== Recommendations ===== */
+        .recommendation-box {
+            background: rgba(22,30,46,0.7); border: 2px solid rgba(180,133,84,0.1);
+            border-radius: 20px; padding: 1rem; margin: 1.5rem 0;
+        }
+        .recommendation-box h4 { color: #cfa776; margin-bottom: 0.5rem; font-size: 1rem; }
+        .recommendation-box ul, .recommendation-box p { color: #aab7d4; font-size: 0.9rem; padding-left: 1.2rem; }
+
+        /* ===== Export buttons ===== */
+        .export-container {
+            display: flex; justify-content: center; gap: 0.8rem;
+            flex-wrap: wrap; margin: 1.5rem 0;
+        }
+        .export-word-btn, .export-excel-full-btn {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+            padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.9rem; font-family: 'Tajawal', sans-serif;
+            flex: 1 1 auto; justify-content: center; max-width: 220px;
+        }
+        .export-word-btn:hover, .export-excel-full-btn:hover { background: rgba(180,133,84,0.25); }
+
+        /* ===== Loading screen ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== Footer ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
+        .calc-display {
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: right;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
+
+        /* ===== Floating buttons ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== Messages ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+
+        /* ===== Notes ===== */
+        .note-box {
+            background: rgba(42,100,80,0.08);
+            border: 1px solid rgba(42,100,80,0.2);
+            border-radius: 20px;
+            padding: 0.8rem 1.2rem;
+            margin: 0.8rem 0;
+            color: #b8e6d0;
+            font-size: 0.9rem;
+        }
+
+        /* ===================================================
+           Desktop improvements (≥1024px)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .section-title-sm { font-size: 1.4rem; }
+            .form-group { flex: 1 1 220px; }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value { font-size: 1.5rem; }
+            .result-card h4 { font-size: 0.95rem; }
+            .result-card i { font-size: 1.8rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 1rem; padding: 0.8rem 2rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .chart-container { height: 280px; }
+            .stage-btn { padding: 0.8rem 2.5rem; }
+        }
+
+        /* ===================================================
+           Mobile improvements (≤768px)
+           =================================================== */
+        @media (max-width: 768px) {
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; }
+            .currency-row label { font-size: 0.8rem; }
+            .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; }
+            .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+            .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-cards { grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.5rem; }
+            .result-card { padding: 0.6rem 0.4rem; }
+            .result-card i { font-size: 1.2rem; }
+            .result-card h4 { font-size: 0.65rem; }
+            .result-card .value { font-size: 1rem; }
+            .result-card .unit { font-size: 0.6rem; }
+            .chart-container { height: 200px; padding: 0.5rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 0.75rem; padding: 0.4rem 1rem; max-width: 160px; }
+            .modal-content { width: 95%; max-width: 320px; }
+            .calc-btn { padding: 8px 0; font-size: 0.9rem; }
+            .footer-simple { font-size: 0.7rem; padding: 0.6rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .stage-btn { padding: 0.4rem 1rem; font-size: 0.8rem; }
+            .stage-selector { gap: 0.4rem; }
+        }
+
+        /* ===== Very small screens (≤400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+            .results-cards { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+            .chart-container { height: 160px; }
+        }
+
+        /* ===== Prevent accidental selection ===== */
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        /* ===== Scrollbar improvements ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+
+        /* ===== Tooltip ===== */
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 240px;
+            background: #121a2b;
+            color: #eef3ff;
+            text-align: left;
+            border-radius: 10px;
+            padding: 8px 10px;
+            position: absolute;
+            z-index: 100;
+            bottom: 130%;
+            left: 0;
+            opacity: 0;
+            font-size: 0.8rem;
+            border: 1px solid #b48554;
+            pointer-events: none;
+            line-height: 1.5;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed background -->
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+
+    <!-- Export loading screen -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">Generating report...</h3>
+            <p id="loadingMsg">Please wait</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero-mini">
+        <h2>🚀 Startup Software Company Valuation</h2>
+        <p>Professional valuation range with advanced SaaS metrics – Post-revenue and Pre-revenue stages</p>
+    </section>
+
+    <!-- WRAPPER -->
+    <section class="calc-wrapper">
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-chart-pie"></i><span>Valuation</span></div>
+            <h2><i class="fas fa-rocket" style="color:#cfa776;margin-left:0.5rem;"></i>Startup Valuation Calculator</h2>
+
+            <!-- Currency & Company Name -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> Currency:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>USD ($)</option>
+                    <option value="€">EUR (€)</option>
+                    <option value="₺">TRY (₺)</option>
+                    <option value="ج.م">EGP (ج.م)</option>
+                    <option value="د.ك">KWD (د.ك)</option>
+                    <option value="ر.س">SAR (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> Company Name:</label>
+                <input type="text" id="companyName" value="Promising Software Startup" placeholder="Company name">
+            </div>
+
+            <!-- Stage Selector -->
+            <div class="stage-selector">
+                <button class="stage-btn active" id="stagePostRevenue" onclick="switchStage('post')"><i class="fas fa-chart-line"></i> Post-Revenue</button>
+                <button class="stage-btn" id="stagePreRevenue" onclick="switchStage('pre')"><i class="fas fa-lightbulb"></i> Pre-Revenue</button>
+            </div>
+
+            <!-- Post-Revenue Section -->
+            <div id="postRevenueSection">
+                <div class="section-title-sm">📊 Revenue & Growth</div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-sync-alt"></i> Annual Recurring Revenue (ARR)</label>
+                        <input type="number" id="arrInput" value="1000000" step="1000">
+                        <span class="tooltiptext">Total annual recurring revenue from subscriptions and contracts.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-percent"></i> Annual Growth Rate (%)</label>
+                        <input type="number" id="growthRate" value="50" step="0.1">
+                        <span class="tooltiptext">Year-over-year revenue growth rate.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-chart-pie"></i> Gross Margin (%)</label>
+                        <input type="number" id="grossMargin" value="75" step="0.1">
+                        <span class="tooltiptext">(Revenue - Cost of Service) / Revenue. Strong software exceeds 70%.</span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-chart-line"></i> Operating Profit Margin (%)</label>
+                        <input type="number" id="profitMargin" value="-10" step="0.1">
+                        <span class="tooltiptext">Used for Rule of 40 calculation. May be negative for startups.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-user-slash"></i> Monthly Churn Rate (%)</label>
+                        <input type="number" id="churnRate" value="2" step="0.1" min="0">
+                        <span class="tooltiptext">Percentage of customers canceling subscriptions monthly. Healthy is below 2%.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-undo-alt"></i> Net Revenue Retention NRR (%)</label>
+                        <input type="number" id="nrrInput" value="110" step="0.1">
+                        <span class="tooltiptext">Revenue retained from existing customers. Above 110% means expansion.</span>
+                    </div>
+                </div>
+
+                <div class="section-title-sm">💰 Unit Economics</div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-users"></i> Current Customers</label>
+                        <input type="number" id="customersCount" value="200" step="1">
+                        <span class="tooltiptext">Required to accurately calculate CAC payback period.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-user-plus"></i> Customer Acquisition Cost (CAC)</label>
+                        <input type="number" id="cacInput" value="5000" step="100">
+                        <span class="tooltiptext">Average marketing and sales cost to acquire a new customer.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-user-check"></i> Customer Lifetime Value (LTV)</label>
+                        <input type="number" id="ltvInput" value="25000" step="100">
+                        <span class="tooltiptext">Total expected revenue from a customer over their entire relationship.</span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-fire"></i> Net Monthly Burn</label>
+                        <input type="number" id="netBurnRate" value="40000" step="1000">
+                        <span class="tooltiptext">Net cash outflow per month (expenses - revenue).</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-piggy-bank"></i> Cash on Hand</label>
+                        <input type="number" id="cashOnHand" value="500000" step="10000">
+                        <span class="tooltiptext">Total cash currently in the company's bank account.</span>
+                    </div>
+                </div>
+
+                <div class="section-title-sm">🔮 Advanced Metrics (Optional for accuracy)</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-check"></i> Current Quarter ARR</label>
+                        <input type="number" id="arrCurrentQ" placeholder="Optional">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-minus"></i> Previous Quarter ARR</label>
+                        <input type="number" id="arrPrevQ" placeholder="Optional">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-ad"></i> Sales & Marketing (Prev Quarter)</label>
+                        <input type="number" id="salesMarketingPrevQ" placeholder="Optional">
+                    </div>
+                </div>
+                <div class="note-box" id="magicNumberNote" style="display:none;">
+                    <i class="fas fa-exclamation-triangle"></i> No precise quarterly data entered. The Magic Number shown below is <strong>estimated</strong> based on growth and burn rate.
+                </div>
+
+                <div class="section-title-sm">🎯 Venture Capital (VC) Method</div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-chart-bar"></i> Expected Exit Value</label>
+                        <input type="number" id="exitValue" value="50000000" step="1000000">
+                        <span class="tooltiptext">Expected market value of the company at exit after 5-7 years.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-arrow-up"></i> Target ROI Multiple</label>
+                        <input type="number" id="roiMultiple" value="10" step="0.5" min="1">
+                        <span class="tooltiptext">Number of times the investor expects to multiply their investment.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-clock"></i> Exit Years</label>
+                        <input type="number" id="exitYears" value="6" step="1" min="3" max="10">
+                        <span class="tooltiptext">Expected number of years until exit.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pre-Revenue Section -->
+            <div id="preRevenueSection" style="display:none;">
+                <div class="section-title-sm">🌱 Berkus Method</div>
+                <p style="color:#aab7d4;font-size:0.85rem;margin-bottom:1rem;">Estimate each element up to $500,000. This is a proven method for early-stage rounds.</p>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-lightbulb"></i> Idea & Solution Quality ($)</label>
+                        <input type="number" id="berkusIdea" value="350000" step="10000" max="500000">
+                        <span class="tooltiptext">How innovative the idea is and its market fit.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-code"></i> Prototype & Technology ($)</label>
+                        <input type="number" id="berkusPrototype" value="400000" step="10000" max="500000">
+                        <span class="tooltiptext">Having a working prototype or scalable technology.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-user-tie"></i> Founding Team Strength ($)</label>
+                        <input type="number" id="berkusTeam" value="450000" step="10000" max="500000">
+                        <span class="tooltiptext">Experience and track record of the founders.</span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-handshake"></i> Strategic Relationships ($)</label>
+                        <input type="number" id="berkusRelations" value="200000" step="10000" max="500000">
+                        <span class="tooltiptext">Partnerships, distribution channels, and investor relationships.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-rocket"></i> Execution & Early Sales ($)</label>
+                        <input type="number" id="berkusExecution" value="250000" step="10000" max="500000">
+                        <span class="tooltiptext">Any sales or commitments from potential customers.</span>
+                    </div>
+                </div>
+
+                <div class="section-title-sm">🔧 Replacement Cost Method</div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-dollar-sign"></i> Technology Rebuild Cost ($)</label>
+                        <input type="number" id="rebuildCost" value="300000" step="10000">
+                        <span class="tooltiptext">Estimated cost to rebuild the product and technology from scratch.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-shield-alt"></i> Risk Premium (%)</label>
+                        <input type="number" id="riskPremium" value="25" step="1">
+                        <span class="tooltiptext">Additional percentage reflecting market, competition, and execution risk.</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Valuation Range</button>
+
+            <!-- Results Area -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-cards" id="kpiCards"></div>
+
+                <div id="rule40Badge" style="text-align:center;margin:0.5rem 0;"></div>
+
+                <div class="section-title-sm">📊 Valuation Range (Low / Base / High)</div>
+                <div class="table-container" id="valuationTable"></div>
+
+                <div class="section-title-sm">📈 Valuation Chart</div>
+                <div class="chart-container"><canvas id="valuationChart"></canvas></div>
+
+                <div class="section-title-sm">📝 Interpretation</div>
+                <div class="recommendation-box" id="explainSection"></div>
+
+                <div class="note-box" id="additionalNotes"></div>
+
+                <div class="export-container">
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Full Word Report</button>
+                    <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Export to Full Excel</button>
+                </div>
+            </div>
+
+            <div id="initialMessage" style="margin-top:1rem; color:#aab7d4; text-align:center;">
+                <i class="fas fa-robot" style="color:#cfa776;"></i> Enter data and click the button to see the valuation range
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-simple">
+        All rights reserved © 2026 <span>FAROUK GRUP</span>
+    </footer>
+
+    <button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+    <a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="modalClose">&times;</span>
+                <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn" data-val="C">C</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn" data-val="⌫">⌫</button>
+                    <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ===== Calculator =====
+            const calcDisplay = document.getElementById('calcDisplay');
+            let currentCalcInput = '';
+
+            function handleCalc(v) {
+                if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+                if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+                if (v === '=') {
+                    try {
+                        let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
+                        calcDisplay.value = r;
+                        currentCalcInput = r.toString();
+                    } catch (e) { calcDisplay.value = 'Error'; currentCalcInput = ''; }
+                    return;
+                }
+                currentCalcInput += v;
+                calcDisplay.value = currentCalcInput;
+            }
+
+            document.querySelectorAll('.calc-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const v = this.dataset.val;
+                    if (v !== undefined) handleCalc(v);
+                });
+            });
+
+            const modalEl = document.getElementById('calculatorModal');
+            document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                modalEl.classList.add('active');
+                calcDisplay.value = currentCalcInput;
+            });
+            document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+            modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+            document.addEventListener('keydown', function(e) {
+                if (!modalEl.classList.contains('active')) return;
+                e.preventDefault();
+                const k = e.key;
+                if (k >= '0' && k <= '9') handleCalc(k);
+                else if (k === '.') handleCalc('.');
+                else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+                else if (k === 'Enter' || k === '=') handleCalc('=');
+                else if (k === 'Backspace') handleCalc('⌫');
+                else if (k === 'Escape') modalEl.classList.remove('active');
+                else if (k.toLowerCase() === 'c') handleCalc('C');
+            });
+
+            // ===== Loading functions =====
+            function showLoading(title, msg) {
+                document.getElementById('loadingTitle').textContent = title;
+                document.getElementById('loadingMsg').textContent = msg;
+                document.getElementById('exportLoading').classList.add('show');
+            }
+
+            function hideLoading() {
+                document.getElementById('exportLoading').classList.remove('show');
+            }
+
+            // ===== Global variables =====
+            let currentStage = 'post';
+            let valuationChart = null;
+            let globalSaaSData = null;
+
+            function fmtNum(n) {
+                return Math.round(n).toLocaleString('en-US');
+            }
+
+            window.switchStage = function(stage) {
+                currentStage = stage;
+                document.getElementById('stagePostRevenue').classList.toggle('active', stage === 'post');
+                document.getElementById('stagePreRevenue').classList.toggle('active', stage === 'pre');
+                document.getElementById('postRevenueSection').style.display = (stage === 'post') ? 'block' : 'none';
+                document.getElementById('preRevenueSection').style.display = (stage === 'pre') ? 'block' : 'none';
+                document.getElementById('resultsSection').style.display = 'none';
+                document.getElementById('initialMessage').style.display = 'block';
+            };
+
+            // ===== Main calculation =====
+            function computeSaaS() {
+                const cur = document.getElementById('currencySelect').value;
+
+                if (currentStage === 'pre') {
+                    const berkus = ['berkusIdea', 'berkusPrototype', 'berkusTeam', 'berkusRelations', 'berkusExecution']
+                        .map(id => Math.min(parseFloat(document.getElementById(id).value) || 0, 500000))
+                        .reduce((a, b) => a + b, 0);
+                    const rebuild = parseFloat(document.getElementById('rebuildCost').value) || 0;
+                    const risk = parseFloat(document.getElementById('riskPremium').value) || 0;
+                    const riskCost = rebuild * (1 + risk / 100);
+                    return {
+                        stage: 'pre',
+                        currency: cur,
+                        berkusTotal: berkus,
+                        riskAdjustedCost: riskCost,
+                        preLow: Math.min(berkus, riskCost),
+                        preBase: (berkus + riskCost) / 2,
+                        preHigh: Math.max(berkus, riskCost)
+                    };
+                }
+
+                // Post-revenue stage
+                const ARR = parseFloat(document.getElementById('arrInput').value) || 0;
+                const growth = parseFloat(document.getElementById('growthRate').value) || 0;
+                const gross = parseFloat(document.getElementById('grossMargin').value) || 0;
+                const margin = parseFloat(document.getElementById('profitMargin').value) || 0;
+                const churn = parseFloat(document.getElementById('churnRate').value) || 0;
+                const nrr = parseFloat(document.getElementById('nrrInput').value) || 100;
+                const cust = parseFloat(document.getElementById('customersCount').value) || 0;
+                const cac = parseFloat(document.getElementById('cacInput').value) || 0;
+                const ltv = parseFloat(document.getElementById('ltvInput').value) || 0;
+                const netBurn = parseFloat(document.getElementById('netBurnRate').value) || 0;
+                const cash = parseFloat(document.getElementById('cashOnHand').value) || 0;
+                const arrQ = parseFloat(document.getElementById('arrCurrentQ').value);
+                const arrPrevQ = parseFloat(document.getElementById('arrPrevQ').value);
+                const salesMkt = parseFloat(document.getElementById('salesMarketingPrevQ').value);
+                const exitVal = parseFloat(document.getElementById('exitValue').value) || 0;
+                const roi = parseFloat(document.getElementById('roiMultiple').value) || 10;
+
+                const rule40 = growth + margin;
+                const ltvCac = cac > 0 ? ltv / cac : 0;
+                const grossRatio = gross / 100;
+                const mrrPerCust = cust > 0 ? (ARR / 12) / cust : 0;
+                const cacPayback = (mrrPerCust > 0 && cac > 0) ? cac / (mrrPerCust * grossRatio) : null;
+
+                let magicNum, magicEst = false;
+                if (!isNaN(arrQ) && !isNaN(arrPrevQ) && !isNaN(salesMkt) && salesMkt > 0 && arrPrevQ > 0) {
+                    magicNum = ((arrQ - arrPrevQ) * 4) / salesMkt;
+                } else {
+                    magicNum = (growth > 0 && netBurn > 0) ? (ARR * (growth / 100)) / (netBurn * 12 * 0.6) : 0;
+                    magicEst = true;
+                }
+                document.getElementById('magicNumberNote').style.display = magicEst ? 'block' : 'none';
+
+                const netNewARR = ARR * (growth / 100);
+                const burnMult = (netNewARR > 0 && netBurn > 0) ? (netBurn * 12) / netNewARR : null;
+                const runway = netBurn > 0 ? cash / netBurn : Infinity;
+
+                // Scoring for multiple determination
+                let score = 0;
+                if (growth >= 100) score += 40;
+                else if (growth >= 50) score += 30 + (growth - 50) * 0.2;
+                else if (growth >= 20) score += 15 + (growth - 20) * 0.5;
+                else score += growth * 0.75;
+
+                if (gross >= 80) score += 15;
+                else if (gross >= 60) score += 10 + (gross - 60) * 0.25;
+
+                if (nrr >= 130) score += 15;
+                else if (nrr >= 100) score += 10 + (nrr - 100) * 0.166;
+
+                if (churn <= 1) score += 10;
+                else if (churn <= 2) score += 8;
+                else if (churn <= 5) score += 4;
+
+                if (ltvCac >= 5) score += 10;
+                else if (ltvCac >= 3) score += 6 + (ltvCac - 3) * 2;
+                else if (ltvCac >= 1) score += ltvCac * 2;
+
+                if (rule40 >= 40) score += 10;
+                else if (rule40 >= 0) score += rule40 * 0.25;
+
+                const baseMult = 2 + (score / 100) * 18;
+                const lowMult = Math.max(1.5, baseMult - 2.2);
+                const highMult = Math.min(22, baseMult + 2.2);
+
+                const evLow = ARR * lowMult;
+                const evBase = ARR * baseMult;
+                const evHigh = ARR * highMult;
+
+                const vcBase = roi > 0 ? exitVal / roi : 0;
+                const vcLow = vcBase * 0.7;
+                const vcHigh = vcBase * 1.4;
+
+                return {
+                    stage: 'post',
+                    currency: cur,
+                    ARR,
+                    growthRate: growth,
+                    grossMargin: gross,
+                    profitMargin: margin,
+                    churn,
+                    nrr,
+                    ltvCac,
+                    cacPaybackMonths: cacPayback,
+                    magicNumber: magicNum,
+                    magicEstimated: magicEst,
+                    burnMultiple: burnMult,
+                    runwayMonths: runway,
+                    rule40,
+                    lowMultiple: lowMult,
+                    baseMultiple: baseMult,
+                    highMultiple: highMult,
+                    evLow,
+                    evBase,
+                    evHigh,
+                    vcLow,
+                    vcBase,
+                    vcHigh
+                };
+            }
+
+            // ===== Display results =====
+            function displayResults(res) {
+                document.getElementById('initialMessage').style.display = 'none';
+                document.getElementById('resultsSection').style.display = 'block';
+                const cur = res.currency;
+
+                if (res.stage === 'post') {
+                    // KPI Cards
+                    document.getElementById('kpiCards').innerHTML = `
+                        <div class="result-card"><i class="fas fa-sync-alt"></i><h4>ARR</h4><div class="value">${cur}${(res.ARR/1000).toFixed(0)}K</div></div>
+                        <div class="result-card"><i class="fas fa-chart-line"></i><h4>Growth Rate</h4><div class="value">${res.growthRate.toFixed(1)}%</div></div>
+                        <div class="result-card"><i class="fas fa-undo-alt"></i><h4>NRR</h4><div class="value">${res.nrr.toFixed(0)}%</div></div>
+                        <div class="result-card"><i class="fas fa-balance-scale"></i><h4>LTV/CAC</h4><div class="value">${res.ltvCac.toFixed(2)}x</div></div>
+                        <div class="result-card"><i class="fas fa-clock"></i><h4>CAC Payback</h4><div class="value">${res.cacPaybackMonths !== null ? res.cacPaybackMonths.toFixed(1)+' mos' : 'N/A'}</div></div>
+                        <div class="result-card"><i class="fas fa-magic"></i><h4>Magic Number</h4><div class="value">${res.magicNumber.toFixed(2)}${res.magicEstimated ? '*' : ''}</div></div>
+                        <div class="result-card"><i class="fas fa-fire"></i><h4>Burn Multiple</h4><div class="value">${res.burnMultiple !== null ? res.burnMultiple.toFixed(2)+'x' : 'N/A'}</div></div>
+                        <div class="result-card"><i class="fas fa-hourglass-half"></i><h4>Runway</h4><div class="value">${isFinite(res.runwayMonths) ? res.runwayMonths.toFixed(1)+' mos' : '∞'}</div></div>
+                    `;
+
+                    // Rule of 40
+                    let badgeClass = 'status-good';
+                    if (res.rule40 < 20) badgeClass = 'status-bad';
+                    else if (res.rule40 < 40) badgeClass = 'status-warning';
+                    document.getElementById('rule40Badge').innerHTML = `
+                        <span class="status ${badgeClass}" style="font-size:1.1rem;padding:0.4rem 1.2rem;">
+                            Rule of 40: ${res.rule40.toFixed(1)}% (Growth ${res.growthRate}% + Margin ${res.profitMargin}%) – ${res.rule40 >= 40 ? '✅ Achieved' : '⚠️ Not Achieved'}
+                        </span>
+                    `;
+
+                    // Valuation Table
+                    document.getElementById('valuationTable').innerHTML = `
+                        <table>
+                            <thead><tr><th>Method</th><th>Low</th><th>Base</th><th>High</th></tr></thead>
+                            <tbody>
+                                <tr><td><strong>Revenue Multiple (${res.baseMultiple.toFixed(1)}x)</strong></td><td>${cur}${(res.evLow/1e6).toFixed(2)}M</td><td class="highlight">${cur}${(res.evBase/1e6).toFixed(2)}M</td><td>${cur}${(res.evHigh/1e6).toFixed(2)}M</td></tr>
+                                <tr><td><strong>VC Method</strong></td><td>${cur}${(res.vcLow/1e6).toFixed(2)}M</td><td class="highlight">${cur}${(res.vcBase/1e6).toFixed(2)}M</td><td>${cur}${(res.vcHigh/1e6).toFixed(2)}M</td></tr>
+                                <tr style="background:rgba(180,133,84,0.08);"><td><strong>📊 Overall Range</strong></td><td><strong>${cur}${(Math.min(res.evLow,res.vcLow)/1e6).toFixed(2)}M</strong></td><td><strong>${cur}${(((res.evBase+res.vcBase)/2)/1e6).toFixed(2)}M</strong></td><td><strong>${cur}${(Math.max(res.evHigh,res.vcHigh)/1e6).toFixed(2)}M</strong></td></tr>
+                            </tbody>
+                        </table>
+                    `;
+
+                    // Interpretation
+                    let explainHtml = `<h4 style="color:#cfa776;">📝 Interpretation</h4>`;
+                    explainHtml += `<p><strong>Rule of 40:</strong> ${res.rule40.toFixed(1)}% – ${res.rule40 >= 40 ? '✅ Excellent, growth and profitability are balanced.' : '⚠️ Below 40%, consider improving profitability or growth.'}</p>`;
+                    explainHtml += `<p><strong>LTV/CAC:</strong> ${res.ltvCac.toFixed(2)}x – ${res.ltvCac >= 3 ? '✅ Healthy ratio, acquisition cost is well covered.' : '⚠️ Below 3x, improve marketing efficiency.'}</p>`;
+                    explainHtml += `<p><strong>CAC Payback:</strong> ${res.cacPaybackMonths !== null ? res.cacPaybackMonths.toFixed(1)+' months' : 'N/A'} – ${res.cacPaybackMonths !== null && res.cacPaybackMonths < 12 ? '✅ Fast payback on acquisition cost.' : '⚠️ Relatively long payback period.'}</p>`;
+                    explainHtml += `<p><strong>Magic Number:</strong> ${res.magicNumber.toFixed(2)} – ${res.magicNumber >= 1 ? '✅ High marketing spending efficiency.' : '⚠️ Low return on marketing spend.'}</p>`;
+                    explainHtml += `<p><strong>Burn Multiple:</strong> ${res.burnMultiple !== null ? res.burnMultiple.toFixed(2)+'x' : 'N/A'} – ${res.burnMultiple !== null && res.burnMultiple < 1.5 ? '✅ Efficient cash burn relative to growth.' : '⚠️ Burn is high relative to new revenue.'}</p>`;
+                    explainHtml += `<p><strong>Runway:</strong> ${isFinite(res.runwayMonths) ? res.runwayMonths.toFixed(1)+' months' : '∞'} – ${isFinite(res.runwayMonths) && res.runwayMonths > 18 ? '✅ Healthy runway covering more than 18 months.' : '⚠️ May need a funding round soon.'}</p>`;
+                    explainHtml += `<p style="margin-top:1rem;"><strong>💡 Summary:</strong> The company's base valuation range is <strong>${cur}${(Math.min(res.evLow,res.vcLow)/1e6).toFixed(2)}M – ${cur}${(Math.max(res.evHigh,res.vcHigh)/1e6).toFixed(2)}M</strong> based on both methods. Use this range in investment negotiations.</p>`;
+                    document.getElementById('explainSection').innerHTML = explainHtml;
+
+                    document.getElementById('additionalNotes').innerHTML = `${res.magicEstimated ? '⚠️ Magic Number is estimated. Enter quarterly data for precise calculation. ' : ''}💰 Runway and Burn Multiple are calculated based on net monthly burn.`;
+
+                    // Chart
+                    const ctx = document.getElementById('valuationChart').getContext('2d');
+                    if (valuationChart) valuationChart.destroy();
+                    valuationChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Low', 'Base', 'High'],
+                            datasets: [
+                                { label: 'Revenue Multiple', data: [res.evLow / 1e6, res.evBase / 1e6, res.evHigh / 1e6], backgroundColor: '#c9a050' },
+                                { label: 'VC Method', data: [res.vcLow / 1e6, res.vcBase / 1e6, res.vcHigh / 1e6], backgroundColor: '#4a7a8c' }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { labels: { color: '#f0f4fa' } } },
+                            scales: {
+                                y: { ticks: { callback: v => v + 'M', color: '#f0f4fa' }, grid: { color: 'rgba(180,133,84,0.15)' } },
+                                x: { ticks: { color: '#f0f4fa' } }
+                            }
+                        }
+                    });
+
+                } else {
+                    // Pre-revenue stage
+                    document.getElementById('kpiCards').innerHTML = `
+                        <div class="result-card"><i class="fas fa-seedling"></i><h4>Berkus Value</h4><div class="value">${cur}${(res.berkusTotal/1000).toFixed(0)}K</div></div>
+                        <div class="result-card"><i class="fas fa-cogs"></i><h4>Replacement Cost</h4><div class="value">${cur}${(res.riskAdjustedCost/1000).toFixed(0)}K</div></div>
+                    `;
+                    document.getElementById('rule40Badge').innerHTML = '';
+                    document.getElementById('valuationTable').innerHTML = `
+                        <table>
+                            <thead><tr><th>Method</th><th>Value</th></tr></thead>
+                            <tbody>
+                                <tr><td><strong>Berkus Method</strong></td><td class="highlight">${cur}${(res.berkusTotal/1000).toFixed(0)}K</td></tr>
+                                <tr><td><strong>Replacement Cost</strong></td><td class="highlight">${cur}${(res.riskAdjustedCost/1000).toFixed(0)}K</td></tr>
+                                <tr style="background:rgba(180,133,84,0.08);"><td><strong>📊 Overall Range</strong></td><td><strong>${cur}${(res.preLow/1000).toFixed(0)}K – ${cur}${(res.preHigh/1000).toFixed(0)}K</strong></td></tr>
+                            </tbody>
+                        </table>
+                    `;
+                    document.getElementById('explainSection').innerHTML = `
+                        <h4 style="color:#cfa776;">📝 Interpretation</h4>
+                        <p>In the pre-revenue stage, the valuation range is presented based on both the Berkus Method and Replacement Cost Method separately. The range reflects the minimum and maximum values between the two methods.</p>
+                        <p><strong>Berkus Value:</strong> ${cur}${(res.berkusTotal/1000).toFixed(0)}K – based on five factors: idea, prototype, team, relationships, and execution.</p>
+                        <p><strong>Replacement Cost:</strong> ${cur}${(res.riskAdjustedCost/1000).toFixed(0)}K – cost to rebuild the technology plus a risk premium.</p>
+                        <p style="margin-top:1rem;"><strong>💡 Summary:</strong> The estimated valuation range is <strong>${cur}${(res.preLow/1000).toFixed(0)}K – ${cur}${(res.preHigh/1000).toFixed(0)}K</strong>. Use this range in early-stage negotiations.</p>
+                    `;
+                    document.getElementById('additionalNotes').innerHTML = 'Valuation in early stages is inherently subjective. Actual figures depend on investor conviction and the quality of the pitch.';
+
+                    // Hide chart
+                    if (valuationChart) { valuationChart.destroy(); valuationChart = null; }
+                    document.getElementById('valuationChart').parentElement.style.display = 'none';
+                }
+
+                globalSaaSData = res;
+            }
+
+            // ===== Calculate button =====
+            document.getElementById('calculateBtn').addEventListener('click', function() {
+                const res = computeSaaS();
+                displayResults(res);
+            });
+
+            // ========== Export to Excel ==========
+            async function exportToFullExcel() {
+                if (!globalSaaSData) { alert('Please run the analysis first.'); return; }
+                showLoading('Creating Professional Excel Report...', 'Creating sheets and charts');
+                try {
+                    const D = globalSaaSData;
+                    const cur = D.currency;
+                    const company = document.getElementById('companyName').value || 'Company';
+
+                    const workbook = new ExcelJS.Workbook();
+                    workbook.creator = 'FAROUK GRUP';
+                    workbook.created = new Date();
+
+                    const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+                    const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
+                    const PT = 'FF155724', NT = 'FF721C24', GB = 'FFFFF3CD';
+
+                    function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11, color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' }, border: { top: { style: 'thin', color: { argb: G } }, bottom: { style: 'thin', color: { argb: G } }, left: { style: 'thin', color: { argb: G } }, right: { style: 'thin', color: { argb: G } } } }; }
+
+                    function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial', bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h, vertical: 'middle', wrapText: true, readingOrder: 'ltr' }, border: { top: { style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair', color: { argb: 'FFCCCCCC' } }, left: { style: 'hair', color: { argb: 'FFCCCCCC' } }, right: { style: 'hair', color: { argb: 'FFCCCCCC' } } } }; }
+
+                    function ap(c, s) { if (s.font) c.font = s.font; if (s.fill) c.fill = s.fill; if (s.alignment) c.alignment = s.alignment; if (s.border) c.border = s.border; if (s.numFmt) c.numFmt = s.numFmt; }
+
+                    function mh(ws, fc, tc, r, text, bg = HB, tc2 = GL, fs = 12) { ws.mergeCells(r, fc, r, tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true, size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' }; c.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } }, left: { style: 'medium', color: { argb: G } }, right: { style: 'medium', color: { argb: G } } }; }
+
+                    // 1. Cover Sheet
+                    const cv = workbook.addWorksheet('Report Cover', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
+                    for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
+                    cv.getRow(2).height = 80;
+                    cv.getRow(4).height = 60;
+                    cv.mergeCells(2, 1, 2, 4);
+                    const bc = cv.getCell(2, 1);
+                    bc.value = 'FAROUK GRUP for Consulting & Business\nFAROUK GRUP';
+                    bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
+                    bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
+                    bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' };
+                    bc.border = { bottom: { style: 'thick', color: { argb: G } } };
+                    mh(cv, 1, 4, 4, `Startup Software Valuation Report\n${company}`, DB, GL, 18);
+                    const inf = [
+                        ['📋 Company', company],
+                        ['📅 Date', new Date().toLocaleDateString('en-US')],
+                        ['💰 Currency', cur],
+                        ['📊 Stage', D.stage === 'post' ? 'Post-Revenue' : 'Pre-Revenue']
+                    ];
+                    if (D.stage === 'post') {
+                        inf.push(['📈 Base Valuation', `${cur} ${fmtNum((D.evBase + D.vcBase) / 2)}`]);
+                        inf.push(['🔢 Revenue Multiple', `${D.baseMultiple.toFixed(2)}x`]);
+                        inf.push(['🎯 Rule of 40', `${D.rule40.toFixed(1)}%`]);
+                    } else {
+                        inf.push(['📈 Berkus Value', `${cur} ${fmtNum(D.berkusTotal)}`]);
+                        inf.push(['🔧 Replacement Cost', `${cur} ${fmtNum(D.riskAdjustedCost)}`]);
+                    }
+                    let ir = 6;
+                    inf.forEach(([l, v], idx) => {
+                        cv.mergeCells(ir, 1, ir, 2);
+                        cv.mergeCells(ir, 3, ir, 4);
+                        const lc = cv.getCell(ir, 1), vc = cv.getCell(ir, 3);
+                        lc.value = l; vc.value = v;
+                        const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
+                        ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' }, border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' }, right: { style: 'hair' } } });
+                        ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'ltr' }, border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' }, right: { style: 'hair' } } });
+                        cv.getRow(ir).height = 28;
+                        ir++;
+                    });
+
+                    // 2. Inputs
+                    const inputsSheet = workbook.addWorksheet('Inputs & Assumptions', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    inputsSheet.getColumn(1).width = 5;
+                    inputsSheet.getColumn(2).width = 38;
+                    inputsSheet.getColumn(3).width = 22;
+                    inputsSheet.getColumn(4).width = 22;
+                    inputsSheet.getColumn(5).width = 5;
+                    mh(inputsSheet, 1, 5, 1, '📋 Inputs & Assumptions', DB, GL, 14);
+                    inputsSheet.getRow(1).height = 40;
+                    mh(inputsSheet, 2, 4, 2, 'Base Data', SB, W, 11);
+                    inputsSheet.getRow(2).height = 28;
+
+                    let iRow = 3;
+                    const addInputRow = (label, val, note = '') => {
+                        inputsSheet.getRow(iRow).height = 24;
+                        const bg = iRow % 2 === 0 ? 'FFFEFCF6' : 'FFFFFFFF';
+                        const lc = inputsSheet.getCell(iRow, 2), vc = inputsSheet.getCell(iRow, 3), nc = inputsSheet.getCell(iRow, 4);
+                        lc.value = label; vc.value = val; nc.value = note;
+                        ap(lc, cs(bg, DT, true, 'right'));
+                        ap(vc, { ...cs(bg, '0000FF', false, 'center'), numFmt: typeof val === 'number' ? '#,##0.00' : null });
+                        ap(nc, cs(bg, '00695C', false, 'center'));
+                        iRow++;
+                    };
+
+                    if (D.stage === 'post') {
+                        addInputRow('Annual Recurring Revenue (ARR)', D.ARR);
+                        addInputRow('Annual Growth Rate', D.growthRate, '%');
+                        addInputRow('Gross Margin', D.grossMargin, '%');
+                        addInputRow('Operating Profit Margin', D.profitMargin, '%');
+                        addInputRow('Monthly Churn Rate', D.churn, '%');
+                        addInputRow('Net Revenue Retention (NRR)', D.nrr, '%');
+                        addInputRow('Customers', parseFloat(document.getElementById('customersCount').value) || 0);
+                        addInputRow('Customer Acquisition Cost (CAC)', parseFloat(document.getElementById('cacInput').value) || 0);
+                        addInputRow('Customer Lifetime Value (LTV)', parseFloat(document.getElementById('ltvInput').value) || 0);
+                        addInputRow('Net Monthly Burn', parseFloat(document.getElementById('netBurnRate').value) || 0);
+                        addInputRow('Cash on Hand', parseFloat(document.getElementById('cashOnHand').value) || 0);
+                        addInputRow('Expected Exit Value', parseFloat(document.getElementById('exitValue').value) || 0);
+                        addInputRow('Target ROI Multiple', parseFloat(document.getElementById('roiMultiple').value) || 10);
+                        addInputRow('Exit Years', parseFloat(document.getElementById('exitYears').value) || 6);
+                    } else {
+                        addInputRow('Berkus - Idea', parseFloat(document.getElementById('berkusIdea').value) || 0);
+                        addInputRow('Berkus - Prototype', parseFloat(document.getElementById('berkusPrototype').value) || 0);
+                        addInputRow('Berkus - Team', parseFloat(document.getElementById('berkusTeam').value) || 0);
+                        addInputRow('Berkus - Relationships', parseFloat(document.getElementById('berkusRelations').value) || 0);
+                        addInputRow('Berkus - Execution', parseFloat(document.getElementById('berkusExecution').value) || 0);
+                        addInputRow('Replacement Cost', parseFloat(document.getElementById('rebuildCost').value) || 0);
+                        addInputRow('Risk Premium', parseFloat(document.getElementById('riskPremium').value) || 0, '%');
+                    }
+
+                    // 3. KPI Dashboard
+                    const kpiSheet = workbook.addWorksheet('KPI Dashboard', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    [5, 32, 22, 22, 22, 5].forEach((w, i) => kpiSheet.getColumn(i + 1).width = w);
+                    mh(kpiSheet, 1, 6, 1, '📊 KPI Dashboard', DB, GL, 15);
+                    kpiSheet.getRow(1).height = 45;
+                    mh(kpiSheet, 2, 5, 2, `${company} | ${new Date().toLocaleDateString('en-US')}`, HB, W, 10);
+                    kpiSheet.getRow(2).height = 26;
+
+                    let kpis = [];
+                    if (D.stage === 'post') {
+                        kpis = [
+                            { label: 'ARR', value: `${cur} ${fmtNum(D.ARR)}`, good: true },
+                            { label: 'Growth Rate', value: `${D.growthRate.toFixed(1)}%`, good: D.growthRate > 20 },
+                            { label: 'NRR', value: `${D.nrr.toFixed(0)}%`, good: D.nrr >= 100 },
+                            { label: 'LTV/CAC', value: `${D.ltvCac.toFixed(2)}x`, good: D.ltvCac >= 3 },
+                            { label: 'CAC Payback', value: D.cacPaybackMonths !== null ? `${D.cacPaybackMonths.toFixed(1)} mos` : 'N/A', good: D.cacPaybackMonths !== null && D.cacPaybackMonths < 12 },
+                            { label: 'Magic Number', value: `${D.magicNumber.toFixed(2)}`, good: D.magicNumber >= 1 },
+                            { label: 'Burn Multiple', value: D.burnMultiple !== null ? `${D.burnMultiple.toFixed(2)}x` : 'N/A', good: D.burnMultiple !== null && D.burnMultiple < 1.5 },
+                            { label: 'Runway', value: isFinite(D.runwayMonths) ? `${D.runwayMonths.toFixed(1)} mos` : '∞', good: isFinite(D.runwayMonths) && D.runwayMonths > 12 }
+                        ];
+                    } else {
+                        kpis = [
+                            { label: 'Berkus Value', value: `${cur} ${fmtNum(D.berkusTotal)}`, good: true },
+                            { label: 'Replacement Cost', value: `${cur} ${fmtNum(D.riskAdjustedCost)}`, good: true },
+                            { label: 'Low Range', value: `${cur} ${fmtNum(D.preLow)}`, good: true },
+                            { label: 'High Range', value: `${cur} ${fmtNum(D.preHigh)}`, good: true }
+                        ];
+                    }
+
+                    let kRow = 3;
+                    kpis.forEach((k, idx) => {
+                        kpiSheet.getRow(kRow).height = 40;
+                        kpiSheet.mergeCells(kRow, 2, kRow, 2);
+                        kpiSheet.mergeCells(kRow, 3, kRow, 3);
+                        kpiSheet.mergeCells(kRow, 4, kRow, 4);
+                        kpiSheet.mergeCells(kRow, 5, kRow, 5);
+                        const ic = kpiSheet.getCell(kRow, 2);
+                        ic.value = `🔹 ${idx+1}`;
+                        const lc2 = kpiSheet.getCell(kRow, 3);
+                        lc2.value = k.label;
+                        const vc3 = kpiSheet.getCell(kRow, 4);
+                        vc3.value = k.value;
+                        const nc2 = kpiSheet.getCell(kRow, 5);
+                        nc2.value = '';
+                        const bg = k.good ? PB : NB, tc = k.good ? PT : NT;
+                        [ic, lc2, vc3, nc2].forEach(c => { c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } }; c.border = { top: { style: 'thin', color: { argb: G } }, bottom: { style: 'thin', color: { argb: G } }, left: { style: 'thin', color: { argb: G } }, right: { style: 'thin', color: { argb: G } } }; });
+                        ic.font = { name: 'Arial', bold: true, size: 14, color: { argb: '555555' } };
+                        ic.alignment = { horizontal: 'center', vertical: 'middle' };
+                        lc2.font = { name: 'Arial', bold: true, size: 11, color: { argb: DT } };
+                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' };
+                        vc3.font = { name: 'Arial', bold: true, size: 13, color: { argb: tc } };
+                        vc3.alignment = { horizontal: 'center', vertical: 'middle' };
+                        nc2.font = { name: 'Arial', size: 9, color: { argb: '444444' } };
+                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' };
+                        kRow++;
+                    });
+                    kRow++;
+                    kpiSheet.mergeCells(kRow, 2, kRow, 5);
+                    const kFinal = kpiSheet.getCell(kRow, 2);
+                    const isGood = D.stage === 'post' ? (D.evBase + D.vcBase) / 2 > 0 : D.preBase > 0;
+                    kFinal.value = isGood ? '✅ Positive Valuation' : '⚠️ Valuation Needs Review';
+                    kFinal.font = { name: 'Arial', bold: true, size: 13, color: { argb: isGood ? PT : '856404' } };
+                    kFinal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: isGood ? PB : GB } };
+                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'ltr' };
+                    kFinal.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } }, left: { style: 'medium', color: { argb: G } }, right: { style: 'medium', color: { argb: G } } };
+                    kpiSheet.getRow(kRow).height = 40;
+
+                    // 4. Valuation Range
+                    const valSheet = workbook.addWorksheet('Valuation Range', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    [5, 35, 22, 22, 22, 5].forEach((w, i) => valSheet.getColumn(i + 1).width = w);
+                    mh(valSheet, 1, 6, 1, '📊 Valuation Range', DB, GL, 14);
+                    valSheet.getRow(1).height = 40;
+
+                    if (D.stage === 'post') {
+                        ['Method', 'Low', 'Base', 'High'].forEach((h, i) => { const c = valSheet.getCell(2, i + 2); c.value = h; ap(c, hs(SB, GL)); });
+                        const data = [
+                            [`Revenue Multiple (${D.baseMultiple.toFixed(1)}x)`, D.evLow, D.evBase, D.evHigh],
+                            ['VC Method', D.vcLow, D.vcBase, D.vcHigh],
+                            ['Overall Range', Math.min(D.evLow, D.vcLow), (D.evBase + D.vcBase) / 2, Math.max(D.evHigh, D.vcHigh)]
+                        ];
+                        data.forEach((row, i) => {
+                            const r = 3 + i;
+                            valSheet.getRow(r).height = 30;
+                            row.forEach((v, j) => {
+                                const c = valSheet.getCell(r, j + 2);
+                                c.value = v;
+                                ap(c, { ...cs(i === 2 ? GB : W, i === 2 ? DT : DT, i === 2 || j === 1, 'center'), numFmt: typeof v === 'number' ? '#,##0' : null });
+                                if (j === 0) { c.font = { name: 'Arial', bold: true, size: 10, color: { argb: G } }; c.numFmt = '@'; }
+                            });
+                        });
+                    } else {
+                        ['Method', 'Value'].forEach((h, i) => { const c = valSheet.getCell(2, i + 2); c.value = h; ap(c, hs(SB, GL)); });
+                        [
+                            ['Berkus Method', D.berkusTotal],
+                            ['Replacement Cost', D.riskAdjustedCost],
+                            ['Range', `${fmtNum(D.preLow)} – ${fmtNum(D.preHigh)}`]
+                        ].forEach((row, i) => {
+                            const r = 3 + i;
+                            valSheet.getRow(r).height = 30;
+                            const lc = valSheet.getCell(r, 2), vc = valSheet.getCell(r, 3);
+                            lc.value = row[0];
+                            vc.value = row[1];
+                            ap(lc, cs(W, DT, true, 'right'));
+                            ap(vc, { ...cs(W, DT, true, 'center'), numFmt: typeof row[1] === 'number' ? '#,##0' : null });
+                            if (typeof row[1] !== 'number') vc.numFmt = '@';
+                        });
+                    }
+
+                    // 5. Chart (post-revenue only)
+                    if (D.stage === 'post') {
+                        const chartSheet = workbook.addWorksheet('Chart', { views: [{ rightToLeft: false, showGridLines: false }] });
+                        chartSheet.getColumn(1).width = 5;
+                        chartSheet.getColumn(2).width = 50;
+                        chartSheet.getColumn(3).width = 5;
+                        mh(chartSheet, 1, 3, 1, '📈 Valuation Chart', DB, GL, 14);
+                        chartSheet.getRow(1).height = 40;
+                        const canvasElem = document.getElementById('valuationChart');
+                        if (canvasElem) {
+                            try {
+                                const origBg = canvasElem.style.backgroundColor;
+                                canvasElem.style.backgroundColor = '#ffffff';
+                                const canvasImg = await html2canvas(canvasElem, { scale: 2, backgroundColor: '#ffffff' });
+                                canvasElem.style.backgroundColor = origBg;
+                                const imgData = canvasImg.toDataURL('image/png');
+                                const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                                chartSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 18 }, editAs: 'oneCell' });
+                            } catch (err) { /* silent */ }
+                        }
+                    }
+
+                    // 6. Interpretation
+                    const intSheet = workbook.addWorksheet('Interpretation & Recommendations', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    intSheet.getColumn(1).width = 5;
+                    intSheet.getColumn(2).width = 50;
+                    intSheet.getColumn(3).width = 5;
+                    mh(intSheet, 1, 3, 1, '📝 Interpretation & Recommendations', DB, GL, 14);
+                    intSheet.getRow(1).height = 45;
+
+                    let sections = [];
+                    if (D.stage === 'post') {
+                        const baseVal = (D.evBase + D.vcBase) / 2;
+                        sections = [
+                            { title: '1. Summary', content: `Company: ${company}\nBase Valuation: ${cur} ${fmtNum(baseVal)}\nRevenue Multiple: ${D.baseMultiple.toFixed(2)}x\nRule of 40: ${D.rule40.toFixed(1)}%` },
+                            { title: '2. Metrics Analysis', content: `LTV/CAC: ${D.ltvCac.toFixed(2)}x\nCAC Payback: ${D.cacPaybackMonths !== null ? D.cacPaybackMonths.toFixed(1)+' months' : 'N/A'}\nMagic Number: ${D.magicNumber.toFixed(2)}\nBurn Multiple: ${D.burnMultiple !== null ? D.burnMultiple.toFixed(2)+'x' : 'N/A'}\nRunway: ${isFinite(D.runwayMonths) ? D.runwayMonths.toFixed(1)+' months' : '∞'}` },
+                            { title: '3. Recommendations', content: baseVal > 0 && D.rule40 >= 20 ? '• Use this range in investment negotiations.\n• Improve weak metrics to increase the multiple.\n• Monitor burn rate and runway continuously.' : '• Review cost and revenue structure.\n• Improve marketing and sales efficiency.\n• Seek expert advice before the funding round.' },
+                            { title: '4. Disclaimer', content: 'This analysis is based on estimated assumptions and a scoring model. Actual results may differ. Consult a financial expert before making investment decisions.' }
+                        ];
+                    } else {
+                        sections = [
+                            { title: '1. Summary', content: `Company: ${company} (Pre-Revenue)\nBerkus Value: ${cur} ${fmtNum(D.berkusTotal)}\nReplacement Cost: ${cur} ${fmtNum(D.riskAdjustedCost)}\nRange: ${cur} ${fmtNum(D.preLow)} – ${cur} ${fmtNum(D.preHigh)}` },
+                            { title: '2. Recommendations', content: '• Focus on building the MVP.\n• Strengthen the founding team and strategic relationships.\n• Seek angel investors or seed funds.\n• Valuation currently falls within the seed-stage range.' },
+                            { title: '3. Disclaimer', content: 'Valuation in early stages is inherently subjective. Actual figures depend on investor conviction and the quality of the pitch.' }
+                        ];
+                    }
+
+                    let itRow = 2;
+                    sections.forEach((sec, idx) => {
+                        itRow++;
+                        intSheet.getRow(itRow).height = 28;
+                        intSheet.mergeCells(itRow, 2, itRow, 2);
+                        const tc3 = intSheet.getCell(itRow, 2);
+                        tc3.value = sec.title;
+                        tc3.font = { name: 'Arial', bold: true, size: 12, color: { argb: GL } };
+                        tc3.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: idx % 2 === 0 ? HB : SB } };
+                        tc3.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' };
+                        tc3.border = { bottom: { style: 'medium', color: { argb: G } } };
+                        itRow++;
+                        intSheet.getRow(itRow).height = Math.max(60, sec.content.split('\n').length * 18);
+                        intSheet.mergeCells(itRow, 2, itRow, 2);
+                        const cc = intSheet.getCell(itRow, 2);
+                        cc.value = sec.content;
+                        cc.font = { name: 'Arial', size: 10, color: { argb: DT } };
+                        cc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEFCF6' } };
+                        cc.alignment = { horizontal: 'right', vertical: 'top', wrapText: true, readingOrder: 'ltr' };
+                        cc.border = { top: { style: 'hair' }, bottom: { style: 'hair', color: { argb: G } }, left: { style: 'hair' }, right: { style: 'hair' } };
+                    });
+
+                    const buffer = await workbook.xlsx.writeBuffer();
+                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    const now = new Date();
+                    const fileName = `Startup_Valuation_${company}_${now.toISOString().slice(0,10)}.xlsx`;
+                    saveAs(blob, fileName);
+                } catch (err) {
+                    console.error(err);
+                    alert('Error creating Excel file: ' + err.message);
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ========== Export to Word ==========
+            async function exportToWord() {
+                if (!globalSaaSData) { alert('Please run the analysis first.'); return; }
+                showLoading('Creating Professional Word Report...', 'Gathering data and charts');
+                try {
+                    const D = globalSaaSData;
+                    const cur = D.currency;
+                    const company = document.getElementById('companyName').value || 'Company';
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('en-US');
+
+                    let chartImg = '';
+                    if (D.stage === 'post') {
+                        const canvas = document.getElementById('valuationChart');
+                        if (canvas) {
+                            const origBg = canvas.style.backgroundColor;
+                            canvas.style.backgroundColor = '#ffffff';
+                            const img = await html2canvas(canvas, { scale: 2, backgroundColor: '#ffffff' });
+                            canvas.style.backgroundColor = origBg;
+                            chartImg = img.toDataURL('image/png');
+                        }
+                    }
+
+                    let kpiRows = '', metricsTable = '', sensRows = '';
+                    if (D.stage === 'post') {
+                        const kpis = [
+                            { l: 'ARR', v: `${cur} ${fmtNum(D.ARR)}`, g: true },
+                            { l: 'Growth Rate', v: `${D.growthRate.toFixed(1)}%`, g: D.growthRate > 20 },
+                            { l: 'NRR', v: `${D.nrr.toFixed(0)}%`, g: D.nrr >= 100 },
+                            { l: 'LTV/CAC', v: `${D.ltvCac.toFixed(2)}x`, g: D.ltvCac >= 3 },
+                            { l: 'CAC Payback', v: D.cacPaybackMonths !== null ? `${D.cacPaybackMonths.toFixed(1)} months` : 'N/A', g: D.cacPaybackMonths !== null && D.cacPaybackMonths < 12 },
+                            { l: 'Magic Number', v: `${D.magicNumber.toFixed(2)}`, g: D.magicNumber >= 1 },
+                            { l: 'Burn Multiple', v: D.burnMultiple !== null ? `${D.burnMultiple.toFixed(2)}x` : 'N/A', g: D.burnMultiple !== null && D.burnMultiple < 1.5 },
+                            { l: 'Runway', v: isFinite(D.runwayMonths) ? `${D.runwayMonths.toFixed(1)} months` : '∞', g: isFinite(D.runwayMonths) && D.runwayMonths > 12 }
+                        ];
+                        kpis.forEach(k => {
+                            kpiRows += `<tr><td style="padding:10px;background:${k.g?'#d4edda':'#f8d7da'};text-align:right;">${k.l}</td><td style="padding:10px;background:${k.g?'#d4edda':'#f8d7da'};text-align:center;"><strong style="color:${k.g?'#155724':'#721c24'};">${k.v}</strong></td></tr>`;
+                        });
+                        metricsTable = `
+                            <h3 style="color:#b8860b;">📊 Valuation Range</h3>
+                            <table><thead><tr><th>Method</th><th>Low</th><th>Base</th><th>High</th></tr></thead><tbody>
+                                <tr><td>Revenue Multiple (${D.baseMultiple.toFixed(1)}x)</td><td>${cur} ${fmtNum(D.evLow)}</td><td><strong>${cur} ${fmtNum(D.evBase)}</strong></td><td>${cur} ${fmtNum(D.evHigh)}</td></tr>
+                                <tr><td>VC Method</td><td>${cur} ${fmtNum(D.vcLow)}</td><td><strong>${cur} ${fmtNum(D.vcBase)}</strong></td><td>${cur} ${fmtNum(D.vcHigh)}</td></tr>
+                                <tr style="background:#fefcf6;"><td><strong>Overall Range</strong></td><td><strong>${cur} ${fmtNum(Math.min(D.evLow,D.vcLow))}</strong></td><td><strong>${cur} ${fmtNum((D.evBase+D.vcBase)/2)}</strong></td><td><strong>${cur} ${fmtNum(Math.max(D.evHigh,D.vcHigh))}</strong></td></tr>
+                            </tbody></table>
+                        `;
+                        sensRows = `
+                            <div style="background:#fefcf6;padding:15px;border-radius:10px;border-left:4px solid #b8860b;margin:20px 0;">
+                                <h4 style="color:#b8860b;">📝 Interpretation</h4>
+                                <p><strong>Rule of 40:</strong> ${D.rule40.toFixed(1)}% – ${D.rule40>=40?'✅ Achieved':'⚠️ Not Achieved'}</p>
+                                <p><strong>LTV/CAC:</strong> ${D.ltvCac.toFixed(2)}x – ${D.ltvCac>=3?'✅ Healthy':'⚠️ Needs Improvement'}</p>
+                                <p><strong>CAC Payback:</strong> ${D.cacPaybackMonths!==null?D.cacPaybackMonths.toFixed(1)+' months':'N/A'}</p>
+                                <p><strong>Magic Number:</strong> ${D.magicNumber.toFixed(2)} – ${D.magicNumber>=1?'✅ High Efficiency':'⚠️ Low'}</p>
+                                <p><strong>Burn Multiple:</strong> ${D.burnMultiple!==null?D.burnMultiple.toFixed(2)+'x':'N/A'} – ${D.burnMultiple!==null&&D.burnMultiple<1.5?'✅ Efficient':'⚠️ High'}</p>
+                                <p><strong>Runway:</strong> ${isFinite(D.runwayMonths)?D.runwayMonths.toFixed(1)+' months':'∞'}</p>
+                            </div>
+                        `;
+                    } else {
+                        kpiRows = `
+                            <tr><td style="padding:10px;background:#d4edda;text-align:right;">Berkus Value</td><td style="padding:10px;background:#d4edda;text-align:center;"><strong style="color:#155724;">${cur} ${fmtNum(D.berkusTotal)}</strong></td></tr>
+                            <tr><td style="padding:10px;background:#d4edda;text-align:right;">Replacement Cost</td><td style="padding:10px;background:#d4edda;text-align:center;"><strong style="color:#155724;">${cur} ${fmtNum(D.riskAdjustedCost)}</strong></td></tr>
+                        `;
+                        metricsTable = `
+                            <h3 style="color:#b8860b;">📊 Valuation Range</h3>
+                            <table><thead><tr><th>Method</th><th>Value</th></tr></thead><tbody>
+                                <tr><td>Berkus Method</td><td><strong>${cur} ${fmtNum(D.berkusTotal)}</strong></td></tr>
+                                <tr><td>Replacement Cost</td><td><strong>${cur} ${fmtNum(D.riskAdjustedCost)}</strong></td></tr>
+                                <tr style="background:#fefcf6;"><td><strong>Overall Range</strong></td><td><strong>${cur} ${fmtNum(D.preLow)} – ${cur} ${fmtNum(D.preHigh)}</strong></td></tr>
+                            </tbody></table>
+                        `;
+                    }
+
+                    const fullHtml = `<!DOCTYPE html>
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+                    <head><meta charset='utf-8'><title>Startup Software Valuation Report - FAROUK GRUP</title>
+                    <style>
+                        body{font-family:'Arial','Tajawal',sans-serif;direction:ltr;margin:2rem;background:#fff;}
+                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                        .cover h1{font-size:32px;color:#b8860b;margin:0;}
+                        .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                        .cover p{color:#666;}
+                        table{width:100%;border-collapse:collapse;margin:20px 0;direction:ltr;}
+                        th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                        th{background:#fefcf6;color:#b8860b;font-weight:bold;}
+                        .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+                        .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;font-size:10pt;}
+                    </style></head>
+                    <body>
+                        <div class="cover">
+                            <h1>FAROUK GRUP for Consulting & Business</h1>
+                            <h2>Startup Software Company Valuation Report</h2>
+                            <p>Company: ${company} | Date: ${dateStr}</p>
+                            <p>Stage: ${D.stage==='post'?'Post-Revenue':'Pre-Revenue'} | Currency: ${cur}</p>
+                        </div>
+                        <h2 style="color:#b8860b;">📊 KPI Dashboard</h2>
+                        <table>${kpiRows}</table>
+                        ${metricsTable}
+                        ${sensRows}
+                        ${chartImg?`<h2 style="color:#b8860b;">📈 Valuation Chart</h2><div style="text-align:center;"><img src="${chartImg}" class="chart-img"/></div>`:''}
+                        <div class="footer">Created by FAROUK GRUP for Consulting & Business © ${now.getFullYear()} | www.farouk-grup.com</div>
+                    </body></html>`;
+
+                    const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `Startup_Valuation_${company}_${now.toISOString().slice(0,10)}.doc`;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                } catch (err) {
+                    console.error(err);
+                    alert('Error creating Word report');
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ===== Attach export buttons =====
+            document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+            document.getElementById('exportFullExcelBtn').addEventListener('click', exportToFullExcel);
+
+            // ===== Auto-run with example =====
+            window.addEventListener('load', function() {
+                // Ensure default stage is post-revenue
+                switchStage('post');
+                // Auto-calculate after load
+                setTimeout(function() {
+                    const res = computeSaaS();
+                    displayResults(res);
+                }, 400);
+            });
+
+        })();
+    </script>
+</body>
+</html>

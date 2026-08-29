@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>CAC & CLV Calculator | FAROUK GRUP</title>
+    <!-- Page protection -->
+    <script src="auth-check.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
+        }
+
+        /* ===== Remove all vibration-causing properties ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .summary-card, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== Fixed background ===== */
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.12) 0%, transparent 70%);
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.06) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.08) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
+        }
+
+        /* ===== WRAPPER ===== */
+        .calc-wrapper {
+            max-width: 1050px;
+            margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+        }
+
+        /* ===== CARD ===== */
+        .calc-box {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .calc-box h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+        }
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== Currency row ===== */
+        .currency-row {
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.8rem; background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.2);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
+        }
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
+        .currency-row select, .currency-row input {
+            flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
+        }
+        .currency-row input { flex: 2 1 200px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* ===== Section titles ===== */
+        .section-title-sm {
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
+            margin: 1.2rem 0 0.8rem 0;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== Form rows ===== */
+        .form-row {
+            display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;
+        }
+        .form-group {
+            flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
+        }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-left: 0.3rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+
+        /* ===== Calculate button ===== */
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer;
+            margin: 1.5rem 0; font-family: 'Tajawal', sans-serif;
+        }
+        .btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-calculate:active { transform: scale(0.97); }
+
+        /* ===== Results ===== */
+        .results-section { margin-top: 1.5rem; }
+        .results-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .result-card, .summary-card {
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 20px; padding: 1rem; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .result-card i, .summary-card i { font-size: 1.6rem; color: #cfa776; margin-bottom: 0.3rem; }
+        .result-card h4, .summary-card .label { font-size: 0.85rem; font-weight: 700; color: #aab7d4; margin-bottom: 0.2rem; }
+        .result-card .value, .summary-card .number { font-size: 1.3rem; font-weight: 900; color: #cfa776; }
+        .result-card .unit { font-size: 0.75rem; color: #aab7d4; }
+        .result-card .status, .badge {
+            font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+            display: inline-block; margin-top: 0.2rem;
+        }
+        .badge-excellent, .status-good { background: #28a745; color: white; }
+        .badge-good { background: #17a2b8; color: white; }
+        .badge-fair, .status-warning { background: #ffc107; color: #111; }
+        .badge-poor, .status-bad { background: #dc3545; color: white; }
+
+        /* ===== Tables ===== */
+        .table-container {
+            overflow-x: auto; margin-top: 1rem;
+            border: 1px solid rgba(180,133,84,0.1); border-radius: 20px;
+            background: rgba(22,30,46,0.6); padding: 0.5rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.85rem;
+            min-width: 400px;
+        }
+        th {
+            background: rgba(180,133,84,0.15); color: #cfa776;
+            font-weight: 900; padding: 0.6rem 0.8rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15); white-space: nowrap;
+        }
+        td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid rgba(180,133,84,0.06);
+            text-align: center; color: #f0f4fa;
+        }
+        tr:last-child td { border-bottom: none; }
+
+        /* ===== Charts ===== */
+        .chart-container {
+            position: relative; width: 100%; max-height: 280px;
+            background: rgba(22,30,46,0.6);
+            border: 1px solid rgba(180,133,84,0.08);
+            border-radius: 20px; padding: 0.8rem; margin: 1rem 0;
+        }
+        .chart-container canvas { width: 100% !important; height: auto !important; max-height: 250px; }
+
+        /* ===== Export buttons ===== */
+        .export-container {
+            display: flex; justify-content: center; gap: 0.8rem;
+            flex-wrap: wrap; margin: 1.5rem 0;
+        }
+        .export-word-btn, .export-excel-full-btn {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+            padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.9rem; font-family: 'Tajawal', sans-serif;
+            flex: 1 1 auto; justify-content: center; max-width: 220px;
+        }
+        .export-word-btn:hover, .export-excel-full-btn:hover { background: rgba(180,133,84,0.25); }
+
+        /* ===== Loading screen ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== Recommendations ===== */
+        .recommendation-box {
+            background: rgba(10,14,23,0.5);
+            border-radius: 20px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid #b48554;
+            text-align: left;
+        }
+        .recommendation-box h4 { color: #cfa776; margin-bottom: 0.5rem; }
+        .recommendation-box p { color: #f0f4fa; line-height: 1.7; }
+
+        /* ===== Footer ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
+        .calc-display {
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: right;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
+
+        /* ===== Floating buttons ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== Messages ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+
+        /* ===================================================
+           Desktop improvements (≥1024px)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .section-title-sm { font-size: 1.4rem; }
+            .form-group { flex: 1 1 220px; }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value, .summary-card .number { font-size: 1.5rem; }
+            .result-card h4, .summary-card .label { font-size: 0.95rem; }
+            .result-card i { font-size: 1.8rem; }
+            table { font-size: 0.9rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 1rem; padding: 0.8rem 2rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+        }
+
+        /* ===================================================
+           Mobile improvements (≤768px)
+           =================================================== */
+        @media (max-width: 768px) {
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; }
+            .currency-row label { font-size: 0.8rem; }
+            .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; }
+            .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+            .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-cards { grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.5rem; }
+            .result-card, .summary-card { padding: 0.6rem 0.4rem; }
+            .result-card i { font-size: 1.2rem; }
+            .result-card h4, .summary-card .label { font-size: 0.65rem; }
+            .result-card .value, .summary-card .number { font-size: 1rem; }
+            .result-card .unit { font-size: 0.6rem; }
+            .chart-container { max-height: 220px; }
+            .chart-container canvas { max-height: 190px; }
+            table { font-size: 0.7rem; min-width: 300px; }
+            th, td { padding: 0.3rem 0.4rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 0.75rem; padding: 0.4rem 1rem; max-width: 160px; }
+            .modal-content { width: 95%; max-width: 320px; }
+            .calc-btn { padding: 8px 0; font-size: 0.9rem; }
+            .footer-simple { font-size: 0.7rem; padding: 0.6rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+        }
+
+        /* ===== Very small screens (≤400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+            .results-cards { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+        }
+
+        /* ===== Prevent accidental selection ===== */
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        /* ===== Scrollbar improvements ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <!-- Fixed background -->
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+
+    <!-- Export loading screen -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">Generating report...</h3>
+            <p id="loadingMsg">Please wait</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero-mini">
+        <h2>📊 CAC & CLV Calculator</h2>
+        <p>Measure the viability of your marketing investment – does customer acquisition cost pay off?</p>
+    </section>
+
+    <!-- WRAPPER -->
+    <section class="calc-wrapper">
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-users"></i><span>Loyalty</span></div>
+            <h2><i class="fas fa-users" style="color:#cfa776;margin-left:0.5rem;"></i>Acquisition Cost vs. Lifetime Value Analysis</h2>
+
+            <!-- Currency & Entity -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> Currency:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>USD ($)</option>
+                    <option value="€">EUR (€)</option>
+                    <option value="₺">TRY (₺)</option>
+                    <option value="ج.م">EGP (ج.م)</option>
+                    <option value="د.ك">KWD (د.ك)</option>
+                    <option value="ر.س">SAR (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> Entity Name:</label>
+                <input type="text" id="companyName" value="Company / Organization" placeholder="Entity name">
+            </div>
+
+            <!-- Input Data -->
+            <div class="section-title-sm">📥 Input Data</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-ad"></i> Total Marketing Spend (Monthly)</label>
+                    <input type="number" id="marketingSpend" value="5000" step="100">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user-plus"></i> New Customers (Monthly)</label>
+                    <input type="number" id="newCustomers" value="100" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-receipt"></i> Average Order Value</label>
+                    <input type="number" id="avgOrderValue" value="25" step="0.5">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-check"></i> Visits per Customer per Year</label>
+                    <input type="number" id="visitsPerYear" value="12" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Average Customer Lifespan (Years)</label>
+                    <input type="number" id="customerLifespan" value="3" step="0.5">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percent"></i> Profit Margin (%)</label>
+                    <input type="number" id="profitMargin" value="30" step="1">
+                </div>
+            </div>
+
+            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate CAC & CLV</button>
+
+            <!-- Results Area -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="section-title-sm">📊 Summary Indicators</div>
+                <div class="results-cards" id="summaryCards"></div>
+
+                <div class="section-title-sm">📈 Feasibility Analysis (CAC vs CLV)</div>
+                <div class="chart-container"><canvas id="cacClvChart"></canvas></div>
+
+                <div class="section-title-sm">📋 Strategic Recommendations</div>
+                <div class="recommendation-box" id="recommendationBox"></div>
+
+                <div class="section-title-sm">📄 Calculation Details</div>
+                <div class="table-container" id="detailsTable"></div>
+
+                <div class="export-container">
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Full Word Report</button>
+                    <button class="export-excel-full-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Export to Full Excel</button>
+                </div>
+            </div>
+
+            <div id="initialMessage" style="margin-top:1rem; color:#aab7d4; text-align:center;">
+                <i class="fas fa-robot" style="color:#cfa776;"></i> Results will appear after clicking the calculate button
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-simple">
+        All rights reserved © 2026 <span>FAROUK GRUP</span>
+    </footer>
+
+    <button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+    <a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="modalClose">&times;</span>
+                <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn" data-val="C">C</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn" data-val="⌫">⌫</button>
+                    <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ===== Calculator =====
+            const calcDisplay = document.getElementById('calcDisplay');
+            let currentCalcInput = '';
+
+            function handleCalc(v) {
+                if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+                if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+                if (v === '=') {
+                    try {
+                        let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
+                        calcDisplay.value = r;
+                        currentCalcInput = r.toString();
+                    } catch (e) { calcDisplay.value = 'Error'; currentCalcInput = ''; }
+                    return;
+                }
+                currentCalcInput += v;
+                calcDisplay.value = currentCalcInput;
+            }
+
+            document.querySelectorAll('.calc-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const v = this.dataset.val;
+                    if (v !== undefined) handleCalc(v);
+                });
+            });
+
+            const modalEl = document.getElementById('calculatorModal');
+            document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                modalEl.classList.add('active');
+                calcDisplay.value = currentCalcInput;
+            });
+            document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+            modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+            document.addEventListener('keydown', function(e) {
+                if (!modalEl.classList.contains('active')) return;
+                e.preventDefault();
+                const k = e.key;
+                if (k >= '0' && k <= '9') handleCalc(k);
+                else if (k === '.') handleCalc('.');
+                else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+                else if (k === 'Enter' || k === '=') handleCalc('=');
+                else if (k === 'Backspace') handleCalc('⌫');
+                else if (k === 'Escape') modalEl.classList.remove('active');
+                else if (k.toLowerCase() === 'c') handleCalc('C');
+            });
+
+            // ===== Loading functions =====
+            function showLoading(title, msg) {
+                document.getElementById('loadingTitle').textContent = title;
+                document.getElementById('loadingMsg').textContent = msg;
+                document.getElementById('exportLoading').classList.add('show');
+            }
+            function hideLoading() {
+                document.getElementById('exportLoading').classList.remove('show');
+            }
+
+            // ===== Global variables =====
+            let chartInstance = null;
+            window.lastResults = null;
+
+            // ===== Main calculation =====
+            function calculateCACCLV() {
+                const currency = document.getElementById('currencySelect').value;
+                const company = document.getElementById('companyName').value || 'Entity';
+
+                const marketingSpend = parseFloat(document.getElementById('marketingSpend').value) || 0;
+                const newCustomers = parseInt(document.getElementById('newCustomers').value) || 1;
+                const avgOrder = parseFloat(document.getElementById('avgOrderValue').value) || 0;
+                const visitsPerYear = parseInt(document.getElementById('visitsPerYear').value) || 1;
+                const lifespan = parseFloat(document.getElementById('customerLifespan').value) || 1;
+                const profitMargin = parseFloat(document.getElementById('profitMargin').value) || 0;
+
+                if (marketingSpend <= 0 || newCustomers <= 0 || avgOrder <= 0 || visitsPerYear <= 0 || lifespan <= 0 || profitMargin <= 0) {
+                    alert('Please enter positive values for all fields.');
+                    return;
+                }
+
+                const cac = marketingSpend / newCustomers;
+                const annualRevenuePerCustomer = avgOrder * visitsPerYear;
+                const lifetimeRevenue = annualRevenuePerCustomer * lifespan;
+                const clv = lifetimeRevenue * (profitMargin / 100);
+                const ratio = clv / cac;
+
+                let status, badgeClass, recommendation;
+                if (ratio >= 4) {
+                    status = 'Excellent';
+                    badgeClass = 'badge-excellent';
+                    recommendation = `✅ A ratio of ${ratio.toFixed(2)} means every dollar spent on marketing returns over $4 in profit. Your marketing strategy is excellent and sustainable. Continue investing and look for expansion opportunities.`;
+                } else if (ratio >= 3) {
+                    status = 'Very Good';
+                    badgeClass = 'badge-good';
+                    recommendation = `✅ A ratio of ${ratio.toFixed(2)} means your marketing investment is viable. You can improve performance by increasing average order value or improving customer retention.`;
+                } else if (ratio >= 2) {
+                    status = 'Moderate';
+                    badgeClass = 'badge-fair';
+                    recommendation = `🟡 A ratio of ${ratio.toFixed(2)} indicates the return is not sufficient. Review marketing channels, try to reduce costs, or increase customer lifetime.`;
+                } else {
+                    status = 'Poor';
+                    badgeClass = 'badge-poor';
+                    recommendation = `🔴 A ratio of ${ratio.toFixed(2)} means you are losing money on marketing. You need a radical restructuring: reduce acquisition cost, raise prices, or improve customer loyalty.`;
+                }
+
+                displayResults({
+                    cac, clv, ratio, status, badgeClass, recommendation, currency, company,
+                    marketingSpend, newCustomers, avgOrder, visitsPerYear, lifespan, profitMargin
+                });
+            }
+
+            function displayResults(data) {
+                document.getElementById('initialMessage').style.display = 'none';
+                document.getElementById('resultsSection').style.display = 'block';
+
+                document.getElementById('summaryCards').innerHTML = `
+                    <div class="summary-card">
+                        <div class="number">${data.currency}${data.cac.toFixed(2)}</div>
+                        <div class="label">Acquisition Cost (CAC)</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="number">${data.currency}${data.clv.toFixed(2)}</div>
+                        <div class="label">Lifetime Value (CLV)</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="number">${data.ratio.toFixed(2)}x</div>
+                        <div class="label">CLV / CAC Ratio</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="number"><span class="badge ${data.badgeClass}">${data.status}</span></div>
+                        <div class="label">Rating</div>
+                    </div>
+                `;
+
+                document.getElementById('recommendationBox').innerHTML = `
+                    <h4><i class="fas fa-lightbulb" style="color:#cfa776;"></i> Strategic Recommendation</h4>
+                    <p>${data.recommendation}</p>
+                `;
+
+                document.getElementById('detailsTable').innerHTML = `
+                    <table>
+                        <thead><tr><th>Indicator</th><th>Value</th><th>Explanation</th></tr></thead>
+                        <tbody>
+                            <tr><td>Total Marketing Spend</td><td>${data.currency}${data.marketingSpend}</td><td>Amount spent on ads and promotions monthly</td></tr>
+                            <tr><td>New Customers</td><td>${data.newCustomers}</td><td>Number of customers acquired during the month</td></tr>
+                            <tr><td>Acquisition Cost (CAC)</td><td>${data.currency}${data.cac.toFixed(2)}</td><td>Spend ÷ New Customers</td></tr>
+                            <tr><td>Average Order Value</td><td>${data.currency}${data.avgOrder}</td><td>Average amount spent per visit</td></tr>
+                            <tr><td>Annual Visits</td><td>${data.visitsPerYear}</td><td>Number of purchases per year</td></tr>
+                            <tr><td>Lifespan (Years)</td><td>${data.lifespan}</td><td>Average duration the customer stays</td></tr>
+                            <tr><td>Profit Margin</td><td>${data.profitMargin}%</td><td>Net profit percentage from each sale</td></tr>
+                            <tr><td><strong>Lifetime Value (CLV)</strong></td><td><strong>${data.currency}${data.clv.toFixed(2)}</strong></td><td>Revenue × Profit Margin over customer lifetime</td></tr>
+                            <tr><td><strong>CLV / CAC Ratio</strong></td><td><strong>${data.ratio.toFixed(2)}x</strong></td><td>Viability indicator (preferably ≥ 3)</td></tr>
+                        </tbody>
+                    </table>
+                `;
+
+                const ctx = document.getElementById('cacClvChart').getContext('2d');
+                if (chartInstance) chartInstance.destroy();
+
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Acquisition Cost (CAC)', 'Lifetime Value (CLV)'],
+                        datasets: [{
+                            label: 'Value in Currency',
+                            data: [data.cac, data.clv],
+                            backgroundColor: ['rgba(220,53,69,0.7)', 'rgba(40,167,69,0.7)'],
+                            borderColor: ['#dc3545', '#28a745'],
+                            borderWidth: 2,
+                            borderRadius: 8,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${data.currency}${context.parsed.y.toFixed(2)}`;
+                                    }
+                                }
+                            },
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { color: '#aab7d4', callback: function(value) { return data.currency + value; } },
+                                grid: { color: 'rgba(180,133,84,0.2)' }
+                            },
+                            x: {
+                                ticks: { color: '#aab7d4' },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+
+                window.lastResults = data;
+            }
+
+            // ========== Export to Professional Excel ==========
+            async function exportExcel() {
+                if (!window.lastResults) {
+                    alert('Please run the calculation first.');
+                    return;
+                }
+                showLoading('Creating Professional Excel Report...', 'Creating sheets and formatting');
+                try {
+                    const data = window.lastResults;
+                    const currency = data.currency;
+                    const company = data.company;
+
+                    const workbook = new ExcelJS.Workbook();
+                    workbook.creator = 'FAROUK GRUP';
+                    workbook.created = new Date();
+
+                    const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+                    const AR = 'FFF5F0E8', W = 'FFFFFFFF', DT = 'FF1A1A1A';
+                    const PB = 'FFD4EDDA', NB = 'FFF8D7DA', PT = 'FF155724', NT = 'FF721C24', GB = 'FFFFF3CD';
+
+                    function hs(bg = HB, tc = GL) {
+                        return {
+                            font: { name: 'Arial', bold: true, size: 11, color: { argb: tc } },
+                            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
+                            alignment: { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' },
+                            border: {
+                                top: { style: 'thin', color: { argb: G } },
+                                bottom: { style: 'thin', color: { argb: G } },
+                                left: { style: 'thin', color: { argb: G } },
+                                right: { style: 'thin', color: { argb: G } }
+                            }
+                        };
+                    }
+
+                    function cs(bg = W, tc = DT, bold = false, h = 'center') {
+                        return {
+                            font: { name: 'Arial', bold: bold, size: 10, color: { argb: tc } },
+                            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
+                            alignment: { horizontal: h, vertical: 'middle', wrapText: true, readingOrder: 'ltr' },
+                            border: {
+                                top: { style: 'hair', color: { argb: 'FFCCCCCC' } },
+                                bottom: { style: 'hair', color: { argb: 'FFCCCCCC' } },
+                                left: { style: 'hair', color: { argb: 'FFCCCCCC' } },
+                                right: { style: 'hair', color: { argb: 'FFCCCCCC' } }
+                            }
+                        };
+                    }
+
+                    function mh(ws, fc, tc, r, text, bg = HB, tc2 = GL, fs = 12) {
+                        ws.mergeCells(r, fc, r, tc);
+                        const c = ws.getCell(r, fc);
+                        c.value = text;
+                        c.font = { name: 'Arial', bold: true, size: fs, color: { argb: tc2 } };
+                        c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+                        c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' };
+                        c.border = {
+                            top: { style: 'medium', color: { argb: G } },
+                            bottom: { style: 'medium', color: { argb: G } },
+                            left: { style: 'medium', color: { argb: G } },
+                            right: { style: 'medium', color: { argb: G } }
+                        };
+                    }
+
+                    // 1. Cover Sheet
+                    const cv = workbook.addWorksheet('Report Cover', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
+                    for (let r = 1; r <= 30; r++) cv.getRow(r).height = 22;
+                    cv.getRow(2).height = 80;
+                    cv.getRow(4).height = 60;
+                    cv.mergeCells(2, 1, 2, 4);
+                    const bc = cv.getCell(2, 1);
+                    bc.value = 'FAROUK GRUP for Consulting & Business\nFAROUK GRUP';
+                    bc.font = { name: 'Arial', bold: true, size: 26, color: { argb: GL } };
+                    bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
+                    bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'ltr' };
+                    bc.border = { bottom: { style: 'thick', color: { argb: G } } };
+                    mh(cv, 1, 4, 4, `CAC & CLV Analysis Report\n${company}`, DB, GL, 18);
+
+                    const inf = [
+                        ['📋 Entity', company],
+                        ['📅 Date', new Date().toLocaleDateString('en-US')],
+                        ['💰 Currency', currency],
+                        ['📊 CAC', `${currency}${data.cac.toFixed(2)}`],
+                        ['📈 CLV', `${currency}${data.clv.toFixed(2)}`],
+                        ['🔢 Ratio', `${data.ratio.toFixed(2)}x`],
+                        ['🏷️ Rating', data.status]
+                    ];
+                    let ir = 6;
+                    inf.forEach(([l, v], idx) => {
+                        cv.mergeCells(ir, 1, ir, 2);
+                        cv.mergeCells(ir, 3, ir, 4);
+                        const lc = cv.getCell(ir, 1), vc = cv.getCell(ir, 3);
+                        lc.value = l; vc.value = v;
+                        const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
+                        lc.font = { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } };
+                        lc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+                        lc.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'ltr' };
+                        vc.font = { name: 'Arial', size: 11, color: { argb: DT } };
+                        vc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+                        vc.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'ltr' };
+                        cv.getRow(ir).height = 28;
+                        ir++;
+                    });
+
+                    // 2. Details
+                    const ws = workbook.addWorksheet('CAC_CLV Details', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    ws.getColumn(1).width = 5;
+                    ws.getColumn(2).width = 32;
+                    ws.getColumn(3).width = 22;
+                    ws.getColumn(4).width = 45;
+
+                    mh(ws, 1, 4, 1, `CAC & CLV Report - ${company}`, DB, GL, 16);
+                    ws.getRow(1).height = 40;
+                    mh(ws, 1, 4, 2, `Currency: ${currency}  |  Report Date: ${new Date().toLocaleDateString('en-US')}`, HB, GL, 11);
+                    ws.getRow(2).height = 28;
+
+                    const headers = ['#', 'Indicator', 'Value', 'Explanation'];
+                    headers.forEach((h, idx) => {
+                        const cell = ws.getCell(3, idx + 1);
+                        cell.value = h;
+                        Object.assign(cell, hs(SB, W));
+                    });
+                    ws.getRow(3).height = 28;
+
+                    const rows = [
+                        ['1', 'Total Marketing Spend', `${currency}${data.marketingSpend}`, 'Amount spent on ads and promotions monthly'],
+                        ['2', 'New Customers', data.newCustomers, 'Number of customers acquired during the month'],
+                        ['3', 'Acquisition Cost (CAC)', `${currency}${data.cac.toFixed(2)}`, 'Spend ÷ New Customers'],
+                        ['4', 'Average Order Value', `${currency}${data.avgOrder}`, 'Average amount spent per visit'],
+                        ['5', 'Annual Visits', data.visitsPerYear, 'Number of purchases per year'],
+                        ['6', 'Lifespan (Years)', data.lifespan, 'Average duration the customer stays'],
+                        ['7', 'Profit Margin', `${data.profitMargin}%`, 'Net profit percentage from each sale'],
+                        ['8', 'Lifetime Value (CLV)', `${currency}${data.clv.toFixed(2)}`, 'Revenue × Profit Margin over customer lifetime'],
+                        ['9', 'CLV / CAC Ratio', `${data.ratio.toFixed(2)}x`, 'Viability indicator (preferably ≥ 3)'],
+                        ['10', 'Rating', data.status, data.recommendation]
+                    ];
+
+                    rows.forEach((r, i) => {
+                        const rowNum = i + 4;
+                        const bg = i % 2 === 0 ? AR : 'FFFEFCF6';
+                        const row = ws.getRow(rowNum);
+                        row.height = 26;
+                        r.forEach((val, colIdx) => {
+                            const cell = ws.getCell(rowNum, colIdx + 1);
+                            cell.value = val;
+                            Object.assign(cell, cs(bg, DT, false, colIdx === 0 || colIdx === 2 ? 'center' : 'left'));
+                            if (colIdx === 3) cell.alignment.horizontal = 'left';
+                        });
+                        if (r[0] === '10') {
+                            const statusCell = ws.getCell(rowNum, 3);
+                            if (data.status === 'Excellent') statusCell.font = { name: 'Arial', bold: true, size: 10, color: { argb: 'FF28A745' } };
+                            else if (data.status === 'Very Good') statusCell.font = { name: 'Arial', bold: true, size: 10, color: { argb: 'FF17A2B8' } };
+                            else if (data.status === 'Moderate') statusCell.font = { name: 'Arial', bold: true, size: 10, color: { argb: 'FFD39C0B' } };
+                            else statusCell.font = { name: 'Arial', bold: true, size: 10, color: { argb: 'FFDC3545' } };
+                        }
+                    });
+
+                    const footerRow = rows.length + 5;
+                    ws.mergeCells(footerRow, 1, footerRow, 4);
+                    const footerCell = ws.getCell(footerRow, 1);
+                    footerCell.value = 'This report was created by FAROUK GRUP for Consulting & Business';
+                    footerCell.font = { name: 'Arial', size: 9, color: { argb: 'FF888888' } };
+                    footerCell.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'ltr' };
+                    ws.getRow(footerRow).height = 28;
+
+                    // 3. Recommendations
+                    const recSheet = workbook.addWorksheet('Recommendations', { views: [{ rightToLeft: false, showGridLines: false }] });
+                    recSheet.getColumn(1).width = 5;
+                    recSheet.getColumn(2).width = 70;
+                    recSheet.getColumn(3).width = 5;
+                    mh(recSheet, 1, 3, 1, '📋 Strategic Recommendation', DB, GL, 14);
+                    recSheet.getRow(1).height = 40;
+                    recSheet.mergeCells(3, 2, 3, 2);
+                    const recCell = recSheet.getCell(3, 2);
+                    recCell.value = data.recommendation;
+                    recCell.font = { name: 'Arial', size: 11, color: { argb: DT } };
+                    recCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEFCF6' } };
+                    recCell.alignment = { horizontal: 'left', vertical: 'top', wrapText: true, readingOrder: 'ltr' };
+                    recCell.border = {
+                        top: { style: 'thin', color: { argb: G } },
+                        bottom: { style: 'thin', color: { argb: G } },
+                        left: { style: 'thin', color: { argb: G } },
+                        right: { style: 'thin', color: { argb: G } }
+                    };
+                    recSheet.getRow(3).height = 120;
+
+                    const buffer = await workbook.xlsx.writeBuffer();
+                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    saveAs(blob, `CAC_CLV_${company}_${new Date().toISOString().slice(0,10)}.xlsx`);
+                } catch (err) {
+                    console.error(err);
+                    alert('Error creating Excel file: ' + err.message);
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ========== Export to Word ==========
+            async function exportWord() {
+                if (!window.lastResults) {
+                    alert('Please run the calculation first.');
+                    return;
+                }
+                showLoading('Creating Professional Word Report...', 'Gathering data and charts');
+                try {
+                    const data = window.lastResults;
+                    const currency = data.currency;
+                    const company = data.company;
+
+                    let chartImgBase64 = '';
+                    const chartEl = document.querySelector('.chart-container');
+                    if (chartEl) {
+                        const origBg = chartEl.style.backgroundColor;
+                        chartEl.style.backgroundColor = '#ffffff';
+                        const img = await html2canvas(chartEl, { scale: 2, backgroundColor: '#ffffff' });
+                        chartEl.style.backgroundColor = origBg;
+                        chartImgBase64 = img.toDataURL('image/png');
+                    }
+
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('en-US');
+
+                    const fullHtml = `<!DOCTYPE html>
+                    <html dir="ltr">
+                    <head><meta charset="utf-8"><title>CAC & CLV Report - FAROUK GRUP</title>
+                    <style>
+                        body{font-family:'Tajawal',Arial,sans-serif;margin:2rem;background:#fff;color:#333;direction:ltr;}
+                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                        .cover h1{font-size:28px;color:#b8860b;margin:0;}
+                        .cover h2{font-size:20px;color:#b48554;margin:8px 0;}
+                        table{width:100%;border-collapse:collapse;margin:20px 0;}
+                        th,td{border:1px solid #b8860b;padding:10px;text-align:center;}
+                        th{background:#fefcf6;color:#b8860b;font-weight:bold;}
+                        .highlight{font-weight:bold;color:#b8860b;}
+                        .rec{background:#fefcf6;padding:15px;border-radius:10px;border-left:4px solid #b8860b;margin:20px 0;}
+                        .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+                        .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
+                        .kpi-table td{padding:15px;vertical-align:top;}
+                        .kpi-value{font-size:1.5rem;font-weight:900;color:#b8860b;}
+                    </style></head>
+                    <body>
+                        <div class="cover">
+                            <h1>FAROUK GRUP for Consulting & Business</h1>
+                            <h2>CAC & CLV Analysis Report</h2>
+                            <p>Entity: ${company} | Date: ${dateStr}</p>
+                            <p>Currency: ${currency}</p>
+                        </div>
+
+                        <h2 style="color:#b8860b;">📊 Summary Indicators</h2>
+                        <table class="kpi-table">
+                            <tr>
+                                <td>
+                                    <div>Acquisition Cost (CAC)</div>
+                                    <div class="kpi-value">${currency}${data.cac.toFixed(2)}</div>
+                                </td>
+                                <td>
+                                    <div>Lifetime Value (CLV)</div>
+                                    <div class="kpi-value">${currency}${data.clv.toFixed(2)}</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div>CLV / CAC Ratio</div>
+                                    <div class="kpi-value">${data.ratio.toFixed(2)}x</div>
+                                </td>
+                                <td>
+                                    <div>Rating</div>
+                                    <div class="kpi-value">${data.status}</div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <h2 style="color:#b8860b;">📈 Chart</h2>
+                        <div style="text-align:center;">
+                            ${chartImgBase64 ? `<img src="${chartImgBase64}" class="chart-img" />` : '<p>Chart not available</p>'}
+                        </div>
+
+                        <h2 style="color:#b8860b;">📄 Calculation Details</h2>
+                        <table>
+                            <thead><tr><th>Indicator</th><th>Value</th><th>Explanation</th></tr></thead>
+                            <tbody>
+                                <tr><td>Total Marketing Spend</td><td>${currency}${data.marketingSpend}</td><td>Amount spent on ads and promotions monthly</td></tr>
+                                <tr><td>New Customers</td><td>${data.newCustomers}</td><td>Number of customers acquired during the month</td></tr>
+                                <tr><td class="highlight">Acquisition Cost (CAC)</td><td class="highlight">${currency}${data.cac.toFixed(2)}</td><td>Spend ÷ New Customers</td></tr>
+                                <tr><td>Average Order Value</td><td>${currency}${data.avgOrder}</td><td>Average amount spent per visit</td></tr>
+                                <tr><td>Annual Visits</td><td>${data.visitsPerYear}</td><td>Number of purchases per year</td></tr>
+                                <tr><td>Lifespan (Years)</td><td>${data.lifespan}</td><td>Average duration the customer stays</td></tr>
+                                <tr><td>Profit Margin</td><td>${data.profitMargin}%</td><td>Net profit percentage from each sale</td></tr>
+                                <tr><td class="highlight">Lifetime Value (CLV)</td><td class="highlight">${currency}${data.clv.toFixed(2)}</td><td>Revenue × Profit Margin over customer lifetime</td></tr>
+                                <tr><td class="highlight">CLV / CAC Ratio</td><td class="highlight">${data.ratio.toFixed(2)}x</td><td>Viability indicator (preferably ≥ 3)</td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="rec">
+                            <h3 style="color:#b8860b;margin-top:0;">📌 Strategic Recommendation</h3>
+                            <p>${data.recommendation}</p>
+                        </div>
+
+                        <div class="footer">Created by FAROUK GRUP for Consulting & Business © ${now.getFullYear()}</div>
+                    </body></html>`;
+
+                    const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `CAC_CLV_${company}_${now.toISOString().slice(0,10)}.doc`;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                } catch (error) {
+                    console.error(error);
+                    alert('Error creating Word report');
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ===== Attach event listeners =====
+            document.getElementById('calculateBtn').addEventListener('click', calculateCACCLV);
+            document.getElementById('exportWordBtn').addEventListener('click', exportWord);
+            document.getElementById('exportExcelBtn').addEventListener('click', exportExcel);
+
+            document.addEventListener('touchmove', function(e) {
+                if (e.target.closest('.table-container') || e.target.closest('.modal')) return;
+            }, { passive: true });
+
+        })();
+    </script>
+</body>
+</html>

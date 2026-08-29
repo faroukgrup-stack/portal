@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Smart Content Generation Tool | FAROUK GRUP</title>
+    <!-- Page protection -->
+    <script src="auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 100px !important;
+        }
+
+        /* ===== Remove all vibration-causing properties ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .chart-card, .scenario-card, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .content-card,
+        .export-word-btn, .export-excel-full-btn {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== Fixed background ===== */
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.12) 0%, transparent 70%);
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.06) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.08) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
+        }
+
+        /* ===== WRAPPER ===== */
+        .calc-wrapper {
+            max-width: 1050px;
+            margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+        }
+
+        /* ===== CARD ===== */
+        .calc-box {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .calc-box h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+        }
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== Section titles ===== */
+        .section-title-sm {
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
+            margin: 1.2rem 0 0.8rem 0;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== Form rows ===== */
+        .form-row {
+            display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;
+        }
+        .form-group {
+            flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
+        }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-left: 0.3rem; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group textarea {
+            min-height: 120px; resize: vertical;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+
+        /* ===== Calculate button ===== */
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer;
+            margin: 1.5rem 0; font-family: 'Tajawal', sans-serif;
+        }
+        .btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-calculate:active { transform: scale(0.97); }
+        .btn-cancel {
+            background: rgba(220,53,69,0.15);
+            border-color: rgba(220,53,69,0.3);
+            color: #f87171;
+            display: none;
+        }
+        .btn-cancel:hover { background: rgba(220,53,69,0.25); border-color: #dc3545; }
+
+        /* ===== Results ===== */
+        .results-section { margin-top: 1.5rem; }
+        .results-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .result-card {
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 20px; padding: 1rem; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .result-card i { font-size: 1.6rem; color: #cfa776; margin-bottom: 0.3rem; }
+        .result-card h4 { font-size: 0.85rem; font-weight: 700; color: #aab7d4; margin-bottom: 0.2rem; }
+        .result-card .value { font-size: 1.3rem; font-weight: 900; color: #cfa776; }
+        .result-card .unit { font-size: 0.75rem; color: #aab7d4; }
+
+        /* ===== Content cards ===== */
+        .content-card {
+            background: rgba(22,30,46,0.6);
+            border: 1px solid rgba(180,133,84,0.08);
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .content-card h3 {
+            color: #cfa776;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .content-card p {
+            color: #f0f4fa;
+            line-height: 1.8;
+        }
+
+        /* ===== Export buttons ===== */
+        .export-container {
+            display: flex; justify-content: center; gap: 0.8rem;
+            flex-wrap: wrap; margin: 1.5rem 0;
+        }
+        .export-word-btn, .export-excel-full-btn {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+            padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.9rem; font-family: 'Tajawal', sans-serif;
+            flex: 1 1 auto; justify-content: center; max-width: 220px;
+        }
+        .export-word-btn:hover, .export-excel-full-btn:hover { background: rgba(180,133,84,0.25); }
+
+        /* ===== Loading screen ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== Footer ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== Floating Home Button ===== */
+        .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            right: 20px !important; left: auto !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+            background: #b48554 !important; color: #fff !important;
+            text-decoration: none !important;
+        }
+        .home-floating-btn:hover { opacity: 0.9 !important; }
+        .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== Calculator Floating Button ===== */
+        .calc-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            left: 20px !important; right: auto !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+            background: #b48554 !important; color: #111 !important;
+        }
+        .calc-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== Messages ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
+        .calc-display {
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: right;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
+
+        /* ===================================================
+           Desktop improvements (≥1024px)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .section-title-sm { font-size: 1.4rem; }
+            .form-group { flex: 1 1 220px; }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select, .form-group textarea { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value { font-size: 1.5rem; }
+            .result-card h4 { font-size: 0.95rem; }
+            .result-card i { font-size: 1.8rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 1rem; padding: 0.8rem 2rem; }
+            .home-floating-btn, .calc-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .content-card { padding: 1.5rem; }
+            .form-group textarea { min-height: 150px; }
+        }
+
+        /* ===================================================
+           Mobile improvements (≤768px)
+           =================================================== */
+        @media (max-width: 768px) {
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+            .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group select, .form-group textarea { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .form-group textarea { min-height: 90px; }
+            .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-cards { grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.5rem; }
+            .result-card { padding: 0.6rem 0.4rem; }
+            .result-card i { font-size: 1.2rem; }
+            .result-card h4 { font-size: 0.65rem; }
+            .result-card .value { font-size: 1rem; }
+            .result-card .unit { font-size: 0.6rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 0.75rem; padding: 0.4rem 1rem; max-width: 160px; }
+            .footer-simple { font-size: 0.7rem; padding: 0.6rem; }
+            .home-floating-btn, .calc-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .home-floating-btn i, .calc-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .content-card { padding: 0.8rem; }
+            .content-card h3 { font-size: 1rem; }
+        }
+
+        /* ===== Very small screens (≤400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .results-cards { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .home-floating-btn, .calc-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+        }
+
+        /* ===== Scrollbar improvements ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <!-- Fixed background -->
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+
+    <!-- Export loading screen -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">Generating report...</h3>
+            <p id="loadingMsg">Please wait</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero-mini">
+        <h2>🤖 Analysis & Content Generation Tool</h2>
+        <p>Create professional content, analyze your reports, and get innovative ideas with one click</p>
+    </section>
+
+    <!-- WRAPPER -->
+    <section class="calc-wrapper">
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-magic"></i><span>Smart</span></div>
+            <h2><i class="fas fa-magic" style="color:#cfa776;margin-left:0.5rem;"></i>Generation Settings</h2>
+
+            <!-- Service Selection -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-cogs"></i> Service Type</label>
+                    <select id="toolService">
+                        <option value="reportAnalysis">📊 Report Analysis</option>
+                        <option value="weeklyContent">📅 Weekly Plan</option>
+                        <option value="buildContent">🏗️ Build Full Content</option>
+                        <option value="askQuestion">❓ Answer a Question</option>
+                    </select>
+                </div>
+                <div class="form-group" id="countRow" style="display:none;">
+                    <label><i class="fas fa-hashtag"></i> Count</label>
+                    <input type="number" id="itemCount" min="1" max="30" value="7">
+                </div>
+            </div>
+
+            <!-- User prompt -->
+            <div class="form-group">
+                <label><i class="fas fa-file-alt"></i> Report Text or Details</label>
+                <textarea id="userPrompt" placeholder="Paste your text here..."></textarea>
+            </div>
+
+            <!-- Buttons -->
+            <button class="btn-calculate" id="generateBtn"><i class="fas fa-magic"></i> Start Analysis / Generation</button>
+            <button class="btn-calculate btn-cancel" id="cancelBtn"><i class="fas fa-times-circle"></i> Cancel Request</button>
+
+            <!-- Results Area -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-cards" id="kpiCards"></div>
+                <div class="section-title-sm">📄 Generated Content</div>
+                <div id="aiOutput"></div>
+                <div class="export-container">
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Export to Word</button>
+                </div>
+            </div>
+
+            <div id="initialMessage" style="margin-top:1rem; color:#aab7d4; text-align:center;">
+                <i class="fas fa-robot" style="color:#cfa776;"></i> Results will appear after clicking the generate button
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-simple">
+        All rights reserved © 2026 <span>FAROUK GRUP</span>
+    </footer>
+
+    <!-- Floating buttons -->
+    <button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+    <a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+    <!-- Calculator Modal -->
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="modalClose">&times;</span>
+                <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn" data-val="C">C</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn" data-val="⌫">⌫</button>
+                    <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ===== Calculator =====
+            const calcDisplay = document.getElementById('calcDisplay');
+            let currentCalcInput = '';
+
+            function handleCalc(v) {
+                if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+                if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+                if (v === '=') {
+                    try {
+                        let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
+                        calcDisplay.value = r;
+                        currentCalcInput = r.toString();
+                    } catch (e) { calcDisplay.value = 'Error'; currentCalcInput = ''; }
+                    return;
+                }
+                currentCalcInput += v;
+                calcDisplay.value = currentCalcInput;
+            }
+
+            document.querySelectorAll('.calc-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const v = this.dataset.val;
+                    if (v !== undefined) handleCalc(v);
+                });
+            });
+
+            const modalEl = document.getElementById('calculatorModal');
+            document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                modalEl.classList.add('active');
+                calcDisplay.value = currentCalcInput;
+            });
+            document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+            modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+            document.addEventListener('keydown', function(e) {
+                if (!modalEl.classList.contains('active')) return;
+                e.preventDefault();
+                const k = e.key;
+                if (k >= '0' && k <= '9') handleCalc(k);
+                else if (k === '.') handleCalc('.');
+                else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+                else if (k === 'Enter' || k === '=') handleCalc('=');
+                else if (k === 'Backspace') handleCalc('⌫');
+                else if (k === 'Escape') modalEl.classList.remove('active');
+                else if (k.toLowerCase() === 'c') handleCalc('C');
+            });
+
+            // ===== Loading functions =====
+            function showLoading(title, msg) {
+                document.getElementById('loadingTitle').textContent = title;
+                document.getElementById('loadingMsg').textContent = msg;
+                document.getElementById('exportLoading').classList.add('show');
+            }
+
+            function hideLoading() {
+                document.getElementById('exportLoading').classList.remove('show');
+            }
+
+            // ===== Show/hide count field =====
+            document.getElementById('toolService').addEventListener('change', function() {
+                const needsCount = ['weeklyContent'];
+                document.getElementById('countRow').style.display = needsCount.includes(this.value) ? 'block' : 'none';
+            });
+            document.getElementById('toolService').dispatchEvent(new Event('change'));
+
+            // ===== Control variables =====
+            const PROXY_URL = 'https://falling-sound-3ffcgemini-proxyjs.faroukgrup.workers.dev/';
+            let abortController = null;
+            let generationInProgress = false;
+            let generatedContent = '';
+
+            // ===== Cleaning and display functions =====
+            function cleanText(text) {
+                return text.replace(/Support Pollinations\.AI[\s\S]*/i, '')
+                    .replace(/Powered by[^\n]*/gi, '')
+                    .replace(/https?:\/\/[^\s]*/gi, '')
+                    .replace(/\n\s*\n/g, '\n\n').trim();
+            }
+
+            function displayContent(text, service, count) {
+                const output = document.getElementById('aiOutput');
+                output.innerHTML = '';
+                const cleaned = cleanText(text);
+                const sections = cleaned.split(/###/);
+
+                if (sections.length > 1) {
+                    sections.forEach(sec => {
+                        if (sec.trim().length < 5) return;
+                        const lines = sec.trim().split('\n');
+                        const title = lines[0].replace(/[:\-*]/g, '').trim();
+                        const body = lines.slice(1).join('\n').trim();
+                        const card = document.createElement('div');
+                        card.className = 'content-card';
+                        if (title && body) {
+                            card.innerHTML = `<h3>${title}</h3><p>${body.replace(/\n/g, '<br>')}</p>`;
+                        } else {
+                            card.innerHTML = `<p>${sec.replace(/\n/g, '<br>')}</p>`;
+                        }
+                        output.appendChild(card);
+                    });
+                } else {
+                    const card = document.createElement('div');
+                    card.className = 'content-card';
+                    card.innerHTML = `<p>${cleaned.replace(/\n/g, '<br>')}</p>`;
+                    output.appendChild(card);
+                }
+
+                const wordCount = cleaned.split(/\s+/).length;
+                const charCount = cleaned.length;
+                const serviceNames = {
+                    reportAnalysis: 'Report Analysis',
+                    weeklyContent: 'Weekly Plan',
+                    buildContent: 'Build Content',
+                    askQuestion: 'Answer a Question'
+                };
+                document.getElementById('kpiCards').innerHTML = `
+                    <div class="result-card"><i class="fas fa-tag"></i><h4>Service Type</h4><div class="value">${serviceNames[service] || service}</div></div>
+                    <div class="result-card"><i class="fas fa-file-word"></i><h4>Word Count</h4><div class="value">${wordCount}</div></div>
+                    <div class="result-card"><i class="fas fa-text-width"></i><h4>Character Count</h4><div class="value">${charCount}</div></div>
+                    <div class="result-card"><i class="fas fa-layer-group"></i><h4>Sections</h4><div class="value">${sections.length}</div></div>
+                `;
+            }
+
+            function finishGeneration() {
+                generationInProgress = false;
+                document.getElementById('generateBtn').style.display = 'flex';
+                document.getElementById('cancelBtn').style.display = 'none';
+                abortController = null;
+                hideLoading();
+            }
+
+            // ===== Proxy API call =====
+            async function callGroqViaProxy(prompt, signal) {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 30000);
+                const combinedSignal = signal ? combineSignals(signal, controller.signal) : controller.signal;
+
+                try {
+                    const response = await fetch(PROXY_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt }),
+                        signal: combinedSignal
+                    });
+                    clearTimeout(timeout);
+
+                    if (!response.ok) {
+                        const errData = await response.json().catch(() => ({}));
+                        throw new Error(errData.error || `HTTP ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    if (data.choices && data.choices[0]?.message?.content) {
+                        return data.choices[0].message.content;
+                    }
+                    throw new Error('Unexpected response from server');
+                } catch (err) {
+                    clearTimeout(timeout);
+                    if (err.name === 'AbortError' && !signal?.aborted) throw new Error('Connection timeout');
+                    throw err;
+                }
+            }
+
+            function combineSignals(s1, s2) {
+                if (s1.aborted || s2.aborted) return AbortSignal.abort();
+                const controller = new AbortController();
+                s1.addEventListener('abort', () => controller.abort());
+                s2.addEventListener('abort', () => controller.abort());
+                return controller.signal;
+            }
+
+            // ===== Generate button =====
+            document.getElementById('generateBtn').addEventListener('click', async function() {
+                if (generationInProgress) return;
+
+                const service = document.getElementById('toolService').value;
+                const prompt = document.getElementById('userPrompt').value.trim();
+                const count = document.getElementById('itemCount')?.value || 7;
+
+                if (!prompt) {
+                    alert('Please enter the text.');
+                    return;
+                }
+
+                abortController = new AbortController();
+                generationInProgress = true;
+                document.getElementById('generateBtn').style.display = 'none';
+                document.getElementById('cancelBtn').style.display = 'flex';
+                document.getElementById('initialMessage').style.display = 'none';
+                document.getElementById('resultsSection').style.display = 'none';
+                showLoading('Generating...', 'Please wait');
+
+                let instruction = '';
+                if (service === 'reportAnalysis') instruction = 'Analyze the following report. Sections: Executive Summary, Analysis, Strengths/Weaknesses, Recommendations.';
+                else if (service === 'weeklyContent') instruction = `Weekly content plan (${count} days).`;
+                else if (service === 'buildContent') instruction = `Full content (introduction, 3 sections, conclusion).`;
+                else if (service === 'askQuestion') instruction = `Answer in detail.`;
+
+                const fullPrompt = `${instruction}\nDetails:\n${prompt}\nLanguage: English. Use ### for headings.`;
+
+                try {
+                    const result = await callGroqViaProxy(fullPrompt, abortController.signal);
+                    generatedContent = result;
+                    document.getElementById('resultsSection').style.display = 'block';
+                    displayContent(result, service, count);
+                } catch (err) {
+                    if (err.name === 'AbortError') {
+                        document.getElementById('aiOutput').innerHTML = '<p style="color:#fbbf24; text-align:center;">Request cancelled.</p>';
+                    } else {
+                        document.getElementById('aiOutput').innerHTML = `<p style="color:#f87171; text-align:center;">${err.message}</p>`;
+                    }
+                    document.getElementById('resultsSection').style.display = 'block';
+                } finally {
+                    finishGeneration();
+                }
+            });
+
+            // ===== Cancel button =====
+            document.getElementById('cancelBtn').addEventListener('click', function() {
+                if (abortController) abortController.abort();
+            });
+
+            // ===== Export to Word =====
+            document.getElementById('exportWordBtn').addEventListener('click', function() {
+                if (!generatedContent) {
+                    alert('No content to export.');
+                    return;
+                }
+
+                const contentHtml = document.getElementById('aiOutput').innerHTML;
+                const html = `<!DOCTYPE html>
+                <html dir="ltr">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Smart Content Report</title>
+                    <style>
+                        body { font-family: 'Tajawal', sans-serif; padding: 20px; background: #fff; color: #333; }
+                        h3 { color: #b8860b; border-bottom: 2px solid #b8860b; padding-bottom: 8px; }
+                        .content-card { border: 1px solid #ddd; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+                        .footer { margin-top: 30px; color: #888; text-align: center; border-top: 1px solid #ddd; padding-top: 15px; }
+                    </style>
+                </head>
+                <body>
+                    ${contentHtml}
+                    <div class="footer">Created by FAROUK GRUP for Consulting & Business | ${new Date().toLocaleDateString('en-US')}</div>
+                </body>
+                </html>`;
+
+                const blob = new Blob(['\uFEFF' + html], { type: 'application/msword' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `Smart_Content_${new Date().toISOString().slice(0,10)}.doc`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+            });
+
+        })();
+    </script>
+</body>
+</html>
