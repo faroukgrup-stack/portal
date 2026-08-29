@@ -27,13 +27,12 @@
             display: flex;
             flex-direction: column;
         }
-
         /* ===== إزالة كل ما يسبب الاهتزاز ===== */
         .glow-bg, .glow-bg span, .login-card, .dashboard-panel, .tool-card,
         .btn-primary, .btn-outline, .btn-guide, .link-btn, .calc-btn,
         .todo-item, .appointment-item, .header-bar, .quick-links-panel,
         .login-btn, .logout-btn, .renew-link, .relogin-btn,
-        .session-expired-card, .service-block {
+        .session-expired-card, .service-block, .settings-overlay, .settings-card {
             transform: none !important;
             -webkit-transform: none !important;
             will-change: auto !important;
@@ -42,7 +41,6 @@
             animation: none !important;
             transition: none !important;
         }
-
         /* ===== خلفية ثابتة ===== */
         .glow-bg {
             position: fixed; width: 100%; height: 100%; top: 0; left: 0;
@@ -174,80 +172,6 @@
         }
         .relogin-btn:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.3); }
 
-        /* ============================================================
-           أنماط النافذة المنبثقة (لتجديد الاشتراك) - مأخوذة من الكود الثاني ومعدلة
-           ============================================================ */
-        .payment-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
-            z-index: 4000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        .payment-overlay.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .payment-popup {
-            background: #1a1a2e;
-            border-radius: 24px;
-            width: 95%;
-            max-width: 500px;
-            height: 85vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            border: 1px solid rgba(180,133,84,0.2);
-        }
-        .payment-header {
-            background: #0b0e17;
-            color: #cfa776;
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-            border-bottom: 1px solid rgba(180,133,84,0.15);
-        }
-        .payment-header h3 {
-            font-family: 'Tajawal', sans-serif;
-            font-size: 1.2rem;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .payment-header .close-payment {
-            background: none;
-            border: none;
-            color: #aab7d4;
-            font-size: 1.8rem;
-            cursor: pointer;
-            line-height: 1;
-            padding: 0 5px;
-            transition: 0.2s;
-        }
-        .payment-header .close-payment:hover {
-            color: #f87171;
-        }
-        .payment-body {
-            flex: 1;
-            position: relative;
-            background: #0f1420;
-        }
-        .payment-body iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
         /* ===== لوحة التحكم ===== */
         .dashboard {
             max-width: 1400px; width: 100%;
@@ -291,7 +215,7 @@
             font-size: 0.9rem;
         }
         .user-name i { color: #cfa776; }
-        .logout-btn {
+        .logout-btn, .settings-btn {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(180,133,84,0.2);
             border-radius: 30px;
@@ -303,6 +227,7 @@
             display: flex; align-items: center; gap: 0.3rem;
         }
         .logout-btn:hover { background: rgba(180,133,84,0.15); color: #f87171; border-color: #f87171; }
+        .settings-btn:hover { background: rgba(180,133,84,0.15); color: #cfa776; border-color: #cfa776; }
 
         /* ===== شريط تثبيت التطبيق (PWA) ===== */
         #installBanner {
@@ -643,6 +568,71 @@
         }
         .btn-guide:hover { background: rgba(180,133,84,0.3); border-color: #b48554; }
 
+        /* ===== نافذة الإعدادات ===== */
+        .settings-overlay {
+            position: fixed; inset: 0;
+            background: rgba(6,9,15,0.92); backdrop-filter: blur(12px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 2500;
+        }
+        .settings-overlay.show { display: flex; }
+        .settings-card {
+            background: rgba(18,24,36,0.96);
+            backdrop-filter: blur(12px);
+            padding: 1.8rem;
+            border-radius: 30px;
+            width: 90%; max-width: 420px;
+            border: 2px solid rgba(180,133,84,0.2);
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .settings-card h2 {
+            font-size: 1.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 1.2rem;
+            display: flex; align-items: center; gap: 0.5rem;
+            justify-content: center;
+        }
+        .settings-group {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(180,133,84,0.15);
+            padding-bottom: 1.2rem;
+        }
+        .settings-group:last-child { border-bottom: none; margin-bottom: 0; }
+        .settings-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            margin-bottom: 0.3rem; font-size: 0.95rem;
+        }
+        .settings-group .input-group {
+            display: flex; gap: 0.5rem; flex-wrap: wrap;
+        }
+        .settings-group .input-group select,
+        .settings-group .input-group input {
+            flex: 1; padding: 0.5rem 0.8rem;
+            background: rgba(10,14,23,0.8);
+            border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px;
+            color: #f0f4fa;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .settings-group .input-group select:focus,
+        .settings-group .input-group input:focus {
+            border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+        .settings-group .input-group select option { background: #0b0e17; }
+        .settings-actions {
+            display: flex; gap: 0.5rem; margin-top: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .settings-actions .btn-primary { flex: 1; }
+        .settings-actions .btn-outline { flex: 1; }
+        .settings-card .close-settings {
+            margin-top: 1rem; width: 100%;
+        }
+
         /* ===================================================
            تحسينات الجوال
            =================================================== */
@@ -687,7 +677,7 @@
             .service-block .panel-header { font-size: 0.9rem; }
             #installBanner { flex-direction: column; align-items: stretch; text-align: center; }
             #installBanner .banner-actions { justify-content: center; }
-            .payment-popup { width: 95%; height: 80vh; }
+            .settings-card { padding: 1.2rem; }
         }
 
         @media (max-width: 400px) {
@@ -714,18 +704,23 @@
     <div class="login-overlay" id="loginOverlay">
         <div class="login-card">
             <div class="login-icon"><i class="fas fa-shield-halved"></i></div>
-            <h2>دخول المصرح لهم</h2>
-            <p>مجموعة فاروق للاستشارات والأعمال</p>
-            <input type="email" id="usernameInput" class="login-input" placeholder="البريد الإلكتروني">
+            <h2 data-i18n="loginTitle">دخول المصرح لهم</h2>
+            <p data-i18n="loginSub">مجموعة فاروق للاستشارات والأعمال</p>
+            <!-- زر تبديل اللغة في شاشة الدخول -->
+            <div style="display:flex; gap:0.5rem; justify-content:center; margin-bottom:0.8rem;">
+                <button class="btn-outline lang-toggle" data-lang="ar" style="font-size:0.8rem; padding:0.2rem 0.8rem;">العربية</button>
+                <button class="btn-outline lang-toggle" data-lang="en" style="font-size:0.8rem; padding:0.2rem 0.8rem;">English</button>
+            </div>
+            <input type="email" id="usernameInput" class="login-input" data-i18n-placeholder="emailPlaceholder" placeholder="البريد الإلكتروني">
             <div class="password-wrapper">
-                <input type="password" id="passwordInput" class="login-input" placeholder="كلمة المرور">
+                <input type="password" id="passwordInput" class="login-input" data-i18n-placeholder="passwordPlaceholder" placeholder="كلمة المرور">
                 <button type="button" class="toggle-password" id="togglePasswordBtn" tabindex="-1" aria-label="إظهار كلمة المرور">
                     <i class="fas fa-eye" id="eyeIcon"></i>
                 </button>
             </div>
-            <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> دخول</button>
-            <a href="https://wa.me/905550196682" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i> نسيت كلمة المرور؟ اضغط هنا</a>
-            <a href="https://portal.farouk-grup.com/finance-hub" target="_blank" class="whatsapp-link"><i class="fas fa-star"></i> للإشتراك بالمنصة؟ اضغط هنا</a>
+            <button class="login-btn" id="loginBtn" data-i18n="loginBtn"><i class="fas fa-sign-in-alt"></i> دخول</button>
+            <a href="https://wa.me/905550196682" target="_blank" class="whatsapp-link" data-i18n="forgotPass"><i class="fab fa-whatsapp"></i> نسيت كلمة المرور؟ اضغط هنا</a>
+            <a href="https://portal.farouk-grup.com/finance-hub" target="_blank" class="whatsapp-link" data-i18n="subscribe"><i class="fas fa-star"></i> للإشتراك بالمنصة؟ اضغط هنا</a>
             <div class="error-msg" id="errorMsg"></div>
         </div>
     </div>
@@ -734,30 +729,45 @@
     <div class="session-expired-overlay" id="sessionExpiredOverlay">
         <div class="session-expired-card">
             <i class="fas fa-exclamation-triangle" style="font-size:2.5rem; color:#fbbf24; margin-bottom:0.5rem;"></i>
-            <h2 id="sessionExpiredTitle">⚠️ انتهت صلاحية الجلسة</h2>
-            <p id="sessionExpiredMsg">انتهت مدة الجلسة (24 ساعة). الرجاء تسجيل الدخول مجدداً.</p>
-            <!-- تم تعديل هذا الرابط ليصبح زراً يفتح النافذة المنبثقة -->
-            <a href="#" class="renew-link" id="renewLinkBtn">
+            <h2 id="sessionExpiredTitle" data-i18n="sessionExpiredTitle">⚠️ انتهت صلاحية الجلسة</h2>
+            <p id="sessionExpiredMsg" data-i18n="sessionExpiredMsg">انتهت مدة الجلسة (24 ساعة). الرجاء تسجيل الدخول مجدداً.</p>
+            <a href="https://alfan.link/faroukazem?digital=r89RJK" target="_blank" class="renew-link" id="renewLinkBtn" style="display:none;" data-i18n="renewSubscription">
                 <i class="fas fa-sync-alt"></i> تجديد الإشتراك
             </a>
-            <button class="relogin-btn" id="reloginBtn">
+            <button class="relogin-btn" id="reloginBtn" data-i18n="backToLogin">
                 <i class="fas fa-sign-in-alt"></i> العودة لشاشة الدخول
             </button>
         </div>
     </div>
 
-    <!-- ============================================================
-         نافذة منبثقة لتجديد الاشتراك (تمت إضافتها بنفس أسلوب الكود الثاني)
-         ============================================================ -->
-    <div class="payment-overlay" id="renewPopup">
-        <div class="payment-popup">
-            <div class="payment-header">
-                <h3><i class="fas fa-sync-alt"></i> تجديد الاشتراك</h3>
-                <button class="close-payment" id="closeRenewPopup">&times;</button>
+    <!-- نافذة الإعدادات -->
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-card">
+            <h2><i class="fas fa-cog"></i> <span data-i18n="settingsTitle">الإعدادات</span></h2>
+            <!-- اختيار اللغة -->
+            <div class="settings-group">
+                <label data-i18n="languageLabel">اللغة</label>
+                <div class="input-group">
+                    <select id="languageSelect">
+                        <option value="ar" data-i18n="arabic">العربية</option>
+                        <option value="en" data-i18n="english">English</option>
+                    </select>
+                    <button class="btn-primary" id="applyLanguageBtn"><i class="fas fa-check"></i> <span data-i18n="apply">تطبيق</span></button>
+                </div>
             </div>
-            <div class="payment-body">
-                <iframe id="renewIframe" src="" allow="payment" allowfullscreen title="نافذة تجديد الاشتراك"></iframe>
+            <!-- تغيير كلمة المرور -->
+            <div class="settings-group">
+                <label data-i18n="changePassword">تغيير كلمة المرور</label>
+                <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                    <input type="email" id="changeEmail" placeholder="البريد الإلكتروني" data-i18n-placeholder="emailPlaceholder" style="padding:0.5rem 0.8rem; background:rgba(10,14,23,0.8); border:2px solid rgba(180,133,84,0.2); border-radius:30px; color:#f0f4fa; outline:none;">
+                    <input type="password" id="changeCurrentPass" placeholder="كلمة المرور الحالية" data-i18n-placeholder="currentPassword" style="padding:0.5rem 0.8rem; background:rgba(10,14,23,0.8); border:2px solid rgba(180,133,84,0.2); border-radius:30px; color:#f0f4fa; outline:none;">
+                    <input type="password" id="changeNewPass" placeholder="كلمة المرور الجديدة" data-i18n-placeholder="newPassword" style="padding:0.5rem 0.8rem; background:rgba(10,14,23,0.8); border:2px solid rgba(180,133,84,0.2); border-radius:30px; color:#f0f4fa; outline:none;">
+                    <input type="password" id="changeConfirmPass" placeholder="تأكيد كلمة المرور" data-i18n-placeholder="confirmPassword" style="padding:0.5rem 0.8rem; background:rgba(10,14,23,0.8); border:2px solid rgba(180,133,84,0.2); border-radius:30px; color:#f0f4fa; outline:none;">
+                    <button class="btn-primary" id="changePasswordBtn"><i class="fas fa-key"></i> <span data-i18n="changePassBtn">تغيير</span></button>
+                    <div id="changePassMsg" style="color:#f87171; font-size:0.85rem; margin-top:0.3rem;"></div>
+                </div>
             </div>
+            <button class="btn-outline close-settings" id="closeSettingsBtn"><i class="fas fa-times"></i> <span data-i18n="close">إغلاق</span></button>
         </div>
     </div>
 
@@ -769,21 +779,22 @@
                 <div><i class="fas fa-calendar-alt"></i> <span id="currentDate"></span></div>
                 <div><i class="fas fa-clock"></i> <span id="currentTime"></span></div>
             </div>
-            <div class="header-title">مجموعة فاروق للاستشارات والأعمال</div>
+            <div class="header-title" data-i18n="headerTitle">مجموعة فاروق للاستشارات والأعمال</div>
             <div class="user-profile">
                 <span class="user-name"><i class="fas fa-user-tie"></i> <span id="userNameDisplay">مدير العمليات</span></span>
-                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> خروج</button>
+                <button class="settings-btn" id="settingsBtn"><i class="fas fa-cog"></i> <span data-i18n="settings">الإعدادات</span></button>
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">خروج</span></button>
             </div>
         </div>
 
         <!-- ====== شريط تثبيت التطبيق (يظهر تلقائياً عند توفر التثبيت) ====== -->
         <div id="installBanner">
             <div class="banner-text">
-                <i class="fas fa-download"></i> تثبيت التطبيق للوصول السريع
+                <i class="fas fa-download"></i> <span data-i18n="installBanner">تثبيت التطبيق للوصول السريع</span>
             </div>
             <div class="banner-actions">
-                <button id="installBtn" class="btn-primary"><i class="fas fa-download"></i> تثبيت الآن</button>
-                <button id="closeInstallBanner" class="btn-outline">إغلاق</button>
+                <button id="installBtn" class="btn-primary"><i class="fas fa-download"></i> <span data-i18n="installNow">تثبيت الآن</span></button>
+                <button id="closeInstallBanner" class="btn-outline"><span data-i18n="closeBanner">إغلاق</span></button>
             </div>
         </div>
 
@@ -792,8 +803,8 @@
             <!-- العمود الأيسر: الأدوات -->
             <div class="dashboard-panel">
                 <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.8rem;">
-                    <div class="panel-header" style="border-bottom:none; padding-bottom:0; margin-bottom:0; flex:1;"><i class="fas fa-briefcase"></i> مجموعة الأدوات</div>
-                    <a href="guide.html" target="_blank" class="btn-guide"><i class="fas fa-book-open"></i> دليل الاستخدام</a>
+                    <div class="panel-header" style="border-bottom:none; padding-bottom:0; margin-bottom:0; flex:1;"><i class="fas fa-briefcase"></i> <span data-i18n="toolsTitle">مجموعة الأدوات</span></div>
+                    <a href="guide.html" target="_blank" class="btn-guide"><i class="fas fa-book-open"></i> <span data-i18n="guide">دليل الاستخدام</span></a>
                 </div>
                 <div id="toolsContainer"></div>
             </div>
@@ -803,21 +814,21 @@
                 <div class="services-grid">
                     <!-- المهام -->
                     <div class="service-block">
-                        <div class="panel-header"><i class="fas fa-tasks"></i> إدارة المهام</div>
+                        <div class="panel-header"><i class="fas fa-tasks"></i> <span data-i18n="tasks">إدارة المهام</span></div>
                         <div class="input-group">
-                            <input type="text" id="todoInput" placeholder="أضف مهمة جديدة...">
-                            <button class="btn-primary" id="addTodoBtn"><i class="fas fa-plus"></i></button>
+                            <input type="text" id="todoInput" data-i18n-placeholder="addTask" placeholder="أضف مهمة جديدة...">
+                            <button class="btn-primary" id="addTodoBtn"><i class="fas fa-plus"></i> <span data-i18n="add">إضافة</span></button>
                         </div>
                         <div class="todo-list" id="todoList"></div>
                         <div class="stats-bar">
-                            <span>قيد الانتظار: <span id="pendingCount">0</span></span>
-                            <span>الإجمالي: <span id="totalCount">0</span></span>
+                            <span><span data-i18n="pending">قيد الانتظار</span>: <span id="pendingCount">0</span></span>
+                            <span><span data-i18n="total">الإجمالي</span>: <span id="totalCount">0</span></span>
                         </div>
                     </div>
 
                     <!-- الحاسبة -->
                     <div class="service-block">
-                        <div class="panel-header"><i class="fas fa-calculator"></i> الحاسبة المالية</div>
+                        <div class="panel-header"><i class="fas fa-calculator"></i> <span data-i18n="calculator">الحاسبة المالية</span></div>
                         <input type="text" id="calcDisplay" readonly value="0">
                         <div class="calc-buttons">
                             <button class="calc-btn" onclick="appendCalc('9')">9</button>
@@ -842,28 +853,28 @@
 
                     <!-- الملاحظات -->
                     <div class="service-block">
-                        <div class="panel-header"><i class="fas fa-sticky-note"></i> مسودة الملاحظات</div>
-                        <textarea id="notesArea" placeholder="اكتب ملاحظاتك وتوجيهاتك هنا..."></textarea>
+                        <div class="panel-header"><i class="fas fa-sticky-note"></i> <span data-i18n="notes">مسودة الملاحظات</span></div>
+                        <textarea id="notesArea" data-i18n-placeholder="notesPlaceholder" placeholder="اكتب ملاحظاتك وتوجيهاتك هنا..."></textarea>
                         <div class="action-bar">
-                            <button class="btn-primary" id="saveLocal"><i class="fas fa-save"></i> حفظ</button>
-                            <button class="btn-outline" id="exportNotes"><i class="fas fa-download"></i> تصدير</button>
-                            <button class="btn-outline" id="importNotes"><i class="fas fa-upload"></i> استيراد</button>
+                            <button class="btn-primary" id="saveLocal"><i class="fas fa-save"></i> <span data-i18n="save">حفظ</span></button>
+                            <button class="btn-outline" id="exportNotes"><i class="fas fa-download"></i> <span data-i18n="export">تصدير</span></button>
+                            <button class="btn-outline" id="importNotes"><i class="fas fa-upload"></i> <span data-i18n="import">استيراد</span></button>
                         </div>
                     </div>
 
                     <!-- المواعيد -->
                     <div class="service-block">
-                        <div class="panel-header"><i class="fas fa-calendar-check"></i> جدول المواعيد</div>
+                        <div class="panel-header"><i class="fas fa-calendar-check"></i> <span data-i18n="appointments">جدول المواعيد</span></div>
                         <div class="appointment-form">
-                            <input type="text" id="appTitle" placeholder="عنوان الموعد أو الاجتماع">
-                            <input type="date" id="appDate">
-                            <textarea id="appDesc" placeholder="تفاصيل الموعد..." rows="2"></textarea>
-                            <button class="btn-primary" id="addAppBtn" style="width:100%;"><i class="fas fa-calendar-plus"></i> إضافة للجدول</button>
+                            <input type="text" id="appTitle" data-i18n-placeholder="appointmentTitle" placeholder="عنوان الموعد أو الاجتماع">
+                            <input type="date" id="appDate" data-i18n-placeholder="appointmentDate">
+                            <textarea id="appDesc" data-i18n-placeholder="appointmentDesc" placeholder="تفاصيل الموعد..." rows="2"></textarea>
+                            <button class="btn-primary" id="addAppBtn" style="width:100%;"><i class="fas fa-calendar-plus"></i> <span data-i18n="addAppointment">إضافة للجدول</span></button>
                         </div>
                         <div class="appointments-list" id="appointmentsList"></div>
                         <div class="action-bar" style="margin-bottom:0;">
-                            <button class="btn-outline" id="exportApps"><i class="fas fa-file-csv"></i> تصدير CSV</button>
-                            <button class="btn-outline" onclick="window.open('https://calendar.google.com/calendar/u/0/r','_blank')"><i class="fab fa-google"></i> تقويم جوجل</button>
+                            <button class="btn-outline" id="exportApps"><i class="fas fa-file-csv"></i> <span data-i18n="exportCSV">تصدير CSV</span></button>
+                            <button class="btn-outline" onclick="window.open('https://calendar.google.com/calendar/u/0/r','_blank')"><i class="fab fa-google"></i> <span data-i18n="googleCalendar">تقويم جوجل</span></button>
                         </div>
                     </div>
                 </div>
@@ -872,20 +883,194 @@
 
         <!-- الروابط السريعة -->
         <div class="quick-links-panel">
-            <div class="quick-links-title"><i class="fas fa-link"></i> الوصول السريع لمنصات المجموعة (الإصدار 5.3)</div>
+            <div class="quick-links-title"><i class="fas fa-link"></i> <span data-i18n="quickLinks">الوصول السريع لمنصات المجموعة (الإصدار 5.4)</span></div>
             <div class="links-row">
-                <a href="https://www.farouk-grup.com/" target="_blank" class="link-btn">الموقع الرسمي</a>
-                <!-- يمكنك أيضاً جعل هذا الرابط يفتح النافذة المنبثقة بدلاً من الانتقال المباشر إذا أردت -->
-                <a href="#" class="link-btn" id="quickRenewLink">تجديد الإشتراك</a>
-                <a href="survey.html" target="_blank" class="link-btn">★ تقييم المنصة</a>
-                <a href="mailto:faroukgrup@gmail.com" class="link-btn"><i class="fas fa-envelope"></i> البريد</a>
+                <a href="https://www.farouk-grup.com/" target="_blank" class="link-btn" data-i18n="officialSite">الموقع الرسمي</a>
+                <a href="https://alfan.link/faroukazem?digital=r89RJK" target="_blank" class="link-btn" data-i18n="renew">تجديد الإشتراك</a>
+                <a href="survey.html" target="_blank" class="link-btn" data-i18n="rate">★ تقييم المنصة</a>
+                <a href="mailto:faroukgrup@gmail.com" class="link-btn"><i class="fas fa-envelope"></i> <span data-i18n="email">البريد</span></a>
             </div>
         </div>
 
-        <footer><p>جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></p></footer>
+        <footer><p><span data-i18n="footer">جميع الحقوق محفوظة © 2026</span> <span data-i18n="footerBrand">FAROUK GRUP</span></p></footer>
     </div>
 
     <script>
+        // ============================================================
+        // 1. الترجمة (i18n)
+        // ============================================================
+        const translations = {
+            ar: {
+                appName: "مجموعة فاروق للإستشارات والأعمال",
+                loginTitle: "دخول المصرح لهم",
+                loginSub: "مجموعة فاروق للاستشارات والأعمال",
+                emailPlaceholder: "البريد الإلكتروني",
+                passwordPlaceholder: "كلمة المرور",
+                loginBtn: "دخول",
+                forgotPass: "نسيت كلمة المرور؟ اضغط هنا",
+                subscribe: "للإشتراك بالمنصة؟ اضغط هنا",
+                errorEmpty: "❌ يرجى إدخال البريد الإلكتروني وكلمة المرور",
+                errorEmail: "❌ يرجى إدخال بريد إلكتروني صحيح",
+                errorExpired: "❌ انتهى اشتراكك. يرجى تجديد الإشتراك.",
+                errorInvalid: "❌ بيانات الدخول غير صحيحة",
+                errorNetwork: "❌ فشل الاتصال بالسيرفر. تأكد من اتصالك بالإنترنت.",
+                headerTitle: "مجموعة فاروق للإستشارات والأعمال",
+                userLabel: "مدير العمليات",
+                logout: "خروج",
+                settings: "الإعدادات",
+                toolsTitle: "مجموعة الأدوات",
+                guide: "دليل الاستخدام",
+                tasks: "إدارة المهام",
+                addTask: "أضف مهمة جديدة...",
+                add: "إضافة",
+                pending: "قيد الانتظار",
+                total: "الإجمالي",
+                calculator: "الحاسبة المالية",
+                notes: "مسودة الملاحظات",
+                notesPlaceholder: "اكتب ملاحظاتك وتوجيهاتك هنا...",
+                save: "حفظ",
+                export: "تصدير",
+                import: "استيراد",
+                appointments: "جدول المواعيد",
+                appointmentTitle: "عنوان الموعد أو الاجتماع",
+                appointmentDate: "التاريخ",
+                appointmentDesc: "تفاصيل الموعد...",
+                addAppointment: "إضافة للجدول",
+                exportCSV: "تصدير CSV",
+                googleCalendar: "تقويم جوجل",
+                quickLinks: "الوصول السريع لمنصات المجموعة (الإصدار 5.3)",
+                officialSite: "الموقع الرسمي",
+                renew: "تجديد الإشتراك",
+                rate: "★ تقييم المنصة",
+                email: "البريد",
+                footer: "جميع الحقوق محفوظة © 2026",
+                footerBrand: "FAROUK GRUP",
+                settingsTitle: "الإعدادات",
+                languageLabel: "اللغة",
+                arabic: "العربية",
+                english: "English",
+                apply: "تطبيق",
+                changePassword: "تغيير كلمة المرور",
+                currentPassword: "كلمة المرور الحالية",
+                newPassword: "كلمة المرور الجديدة",
+                confirmPassword: "تأكيد كلمة المرور",
+                changePassBtn: "تغيير",
+                close: "إغلاق",
+                sessionExpiredTitle: "⚠️ انتهت صلاحية الجلسة",
+                sessionExpiredMsg: "انتهت مدة الجلسة (24 ساعة). الرجاء تسجيل الدخول مجدداً.",
+                renewSubscription: "تجديد الإشتراك",
+                backToLogin: "العودة لشاشة الدخول",
+                installBanner: "تثبيت التطبيق للوصول السريع",
+                installNow: "تثبيت الآن",
+                closeBanner: "إغلاق",
+                changePassSuccess: "✅ تم تغيير كلمة المرور بنجاح",
+                changePassError: "❌ فشل تغيير كلمة المرور: ",
+                changePassMismatch: "❌ كلمة المرور الجديدة وتأكيدها غير متطابقين",
+            },
+            en: {
+                appName: "Farouk Group for Consultations and Business",
+                loginTitle: "Authorized Access",
+                loginSub: "Farouk Group for Consultations and Business",
+                emailPlaceholder: "Email",
+                passwordPlaceholder: "Password",
+                loginBtn: "Login",
+                forgotPass: "Forgot password? Click here",
+                subscribe: "Subscribe to the platform? Click here",
+                errorEmpty: "❌ Please enter email and password",
+                errorEmail: "❌ Please enter a valid email",
+                errorExpired: "❌ Your subscription has expired. Please renew.",
+                errorInvalid: "❌ Invalid login credentials",
+                errorNetwork: "❌ Failed to connect to server. Check your internet.",
+                headerTitle: "Farouk Group for Consultations and Business",
+                userLabel: "Operations Manager",
+                logout: "Logout",
+                settings: "Settings",
+                toolsTitle: "Toolbox",
+                guide: "User Guide",
+                tasks: "Task Management",
+                addTask: "Add new task...",
+                add: "Add",
+                pending: "Pending",
+                total: "Total",
+                calculator: "Financial Calculator",
+                notes: "Notes Draft",
+                notesPlaceholder: "Write your notes and directives here...",
+                save: "Save",
+                export: "Export",
+                import: "Import",
+                appointments: "Appointments Schedule",
+                appointmentTitle: "Appointment or meeting title",
+                appointmentDate: "Date",
+                appointmentDesc: "Appointment details...",
+                addAppointment: "Add to schedule",
+                exportCSV: "Export CSV",
+                googleCalendar: "Google Calendar",
+                quickLinks: "Quick access to group platforms (version 5.3)",
+                officialSite: "Official Website",
+                renew: "Renew Subscription",
+                rate: "★ Rate the platform",
+                email: "Email",
+                footer: "All rights reserved © 2026",
+                footerBrand: "FAROUK GRUP",
+                settingsTitle: "Settings",
+                languageLabel: "Language",
+                arabic: "Arabic",
+                english: "English",
+                apply: "Apply",
+                changePassword: "Change Password",
+                currentPassword: "Current Password",
+                newPassword: "New Password",
+                confirmPassword: "Confirm Password",
+                changePassBtn: "Change",
+                close: "Close",
+                sessionExpiredTitle: "⚠️ Session Expired",
+                sessionExpiredMsg: "Session duration (24 hours) has expired. Please log in again.",
+                renewSubscription: "Renew Subscription",
+                backToLogin: "Back to Login",
+                installBanner: "Install app for quick access",
+                installNow: "Install Now",
+                closeBanner: "Close",
+                changePassSuccess: "✅ Password changed successfully",
+                changePassError: "❌ Failed to change password: ",
+                changePassMismatch: "❌ New password and confirmation do not match",
+            }
+        };
+
+        let currentLang = localStorage.getItem('appLanguage') || 'ar';
+
+        function t(key) {
+            return translations[currentLang] && translations[currentLang][key] ? translations[currentLang][key] : key;
+        }
+
+        function applyLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('appLanguage', lang);
+            // تحديث اتجاه الصفحة
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            // تحديث جميع العناصر التي تحمل data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.textContent = t(key);
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                el.placeholder = t(key);
+            });
+            // تحديث خيارات الـ select
+            document.querySelectorAll('#languageSelect option').forEach(opt => {
+                const key = opt.getAttribute('data-i18n');
+                if (key) opt.textContent = t(key);
+            });
+            // تحديث العناوين الديناميكية مثل رسائل الخطأ يمكن تحديثها عند الحاجة
+            // تحديث أدوات القائمة (tools) سيتم إعادة رسمها في renderTools
+            renderTools();
+            // تحديث اسم المستخدم
+            const savedName = localStorage.getItem('userName') || t('userLabel');
+            const savedDays = localStorage.getItem('daysLeft') || '?';
+            document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')||'متبقي'} ${savedDays} ${t('day')||'يوم'})`;
+        }
+
         // ============================================================
         // إظهار/إخفاء كلمة المرور
         // ============================================================
@@ -935,19 +1120,19 @@
 
         function forceLogout(reason, isSubscriptionExpired = false) {
             dashboard.classList.remove('show');
-            if (logoutTimer) { clearTimeout(logoutTimer); logoutTimer = null; }
+            if (logoutTimer) { clearTimeout(logoutTimer);
+                logoutTimer = null; }
             localStorage.removeItem('userToken');
             localStorage.removeItem('userName');
             localStorage.removeItem('daysLeft');
             localStorage.removeItem('loginTimestamp');
 
             if (isSubscriptionExpired) {
-                sessionExpiredTitle.textContent = '⚠️ انتهى الاشتراك';
+                sessionExpiredTitle.textContent = t('sessionExpiredTitle') + ' (⚠️ انتهى الاشتراك)';
                 sessionExpiredMsg.textContent = reason;
-                // إظهار زر التجديد في رسالة انتهاء الجلسة
                 renewLinkBtn.style.display = 'inline-block';
             } else {
-                sessionExpiredTitle.textContent = '⏰ انتهت الجلسة';
+                sessionExpiredTitle.textContent = t('sessionExpiredTitle');
                 sessionExpiredMsg.textContent = reason;
                 renewLinkBtn.style.display = 'none';
             }
@@ -960,10 +1145,10 @@
             const remaining = getRemainingSessionTime();
             if (remaining > 0) {
                 logoutTimer = setTimeout(() => {
-                    forceLogout('انتهت مدة الجلسة المحددة. يرجى تسجيل الدخول مجدداً.', false);
+                    forceLogout(t('sessionExpiredMsg'), false);
                 }, remaining);
             } else {
-                forceLogout('انتهت مدة الجلسة. يرجى تسجيل الدخول مجدداً.', false);
+                forceLogout(t('sessionExpiredMsg'), false);
             }
         }
 
@@ -983,15 +1168,15 @@
             const pass = passwordField.value.trim();
 
             if (!user || !pass) {
-                errorMsg.textContent = '❌ يرجى إدخال البريد الإلكتروني وكلمة المرور';
+                errorMsg.textContent = t('errorEmpty');
                 return;
             }
             if (!user.includes('@') || !user.includes('.')) {
-                errorMsg.textContent = '❌ يرجى إدخال بريد إلكتروني صحيح';
+                errorMsg.textContent = t('errorEmail');
                 return;
             }
 
-            loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري التحقق...';
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> ' + (currentLang === 'ar' ? 'جاري التحقق...' : 'Verifying...');
             loginBtn.disabled = true;
             errorMsg.innerHTML = '';
 
@@ -1009,7 +1194,8 @@
                     localStorage.setItem('daysLeft', result.daysLeft);
                     localStorage.setItem('loginTimestamp', Date.now().toString());
 
-                    document.getElementById('userNameDisplay').textContent = `${result.name} (متبقي ${result.daysLeft} يوم)`;
+                    const savedName = result.name || t('userLabel');
+                    document.getElementById('userNameDisplay').textContent = `${savedName} (${currentLang === 'ar' ? 'متبقي' : 'remaining'} ${result.daysLeft} ${currentLang === 'ar' ? 'يوم' : 'day'})`;
 
                     loginOverlay.classList.remove('show');
                     sessionExpiredOverlay.classList.remove('show');
@@ -1018,14 +1204,14 @@
                     startSessionTimer();
                     loadAllData();
                 } else if (result.status === 'expired') {
-                    errorMsg.innerHTML = '❌ انتهى اشتراكك. يرجى تجديد الإشتراك. <a href="https://alfan.link/faroukazem?digital=DkPhgz" target="_blank" style="color:#cfa776;">من هنا</a>';
+                    errorMsg.innerHTML = t('errorExpired') + ' <a href="https://alfan.link/faroukazem?digital=r89RJK" target="_blank" style="color:#cfa776;">' + (currentLang === 'ar' ? 'من هنا' : 'here') + '</a>';
                 } else {
-                    errorMsg.innerHTML = '❌ ' + (result.message || 'بيانات الدخول غير صحيحة');
+                    errorMsg.innerHTML = t('errorInvalid');
                 }
             } catch (error) {
-                errorMsg.innerHTML = '❌ فشل الاتصال بالسيرفر. تأكد من اتصالك بالإنترنت.';
+                errorMsg.innerHTML = t('errorNetwork');
             } finally {
-                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> ' + t('loginBtn');
                 loginBtn.disabled = false;
             }
         }
@@ -1051,9 +1237,9 @@
             sessionExpiredOverlay.classList.remove('show');
             dashboard.classList.add('show');
 
-            const savedName = localStorage.getItem('userName') || 'مدير العمليات';
+            const savedName = localStorage.getItem('userName') || t('userLabel');
             const savedDays = localStorage.getItem('daysLeft') || '?';
-            document.getElementById('userNameDisplay').textContent = `${savedName} (متبقي ${savedDays} يوم)`;
+            document.getElementById('userNameDisplay').textContent = `${savedName} (${currentLang === 'ar' ? 'متبقي' : 'remaining'} ${savedDays} ${currentLang === 'ar' ? 'يوم' : 'day'})`;
 
             startSessionTimer();
             loadAllData();
@@ -1070,11 +1256,11 @@
                 const resp = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
                 const result = await resp.json();
                 if (result.status === 'expired') {
-                    forceLogout('انتهى اشتراكك. يرجى تجديد الإشتراك.', true);
+                    forceLogout(t('errorExpired'), true);
                 } else if (result.status === 'success') {
                     localStorage.setItem('daysLeft', result.daysLeft);
-                    const savedName = localStorage.getItem('userName') || 'مدير العمليات';
-                    document.getElementById('userNameDisplay').textContent = `${savedName} (متبقي ${result.daysLeft} يوم)`;
+                    const savedName = localStorage.getItem('userName') || t('userLabel');
+                    document.getElementById('userNameDisplay').textContent = `${savedName} (${currentLang === 'ar' ? 'متبقي' : 'remaining'} ${result.daysLeft} ${currentLang === 'ar' ? 'يوم' : 'day'})`;
                 }
             } catch (e) {
                 // نستمر بالجلسة المحلية
@@ -1105,12 +1291,14 @@
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible' && dashboard.classList.contains('show')) {
                 if (isSessionExpired()) {
-                    forceLogout('انتهت مدة الجلسة (24 ساعة) أثناء غيابك.', false);
+                    forceLogout(t('sessionExpiredMsg'), false);
                 }
             }
         });
 
         window.addEventListener('load', () => {
+            // تطبيق اللغة المحفوظة
+            applyLanguage(currentLang);
             initialSessionCheck();
             updateDateTime();
             setInterval(updateDateTime, 1000);
@@ -1124,13 +1312,14 @@
 
         function updateDateTime() {
             const now = new Date();
-            dateSpan.textContent = now.toLocaleDateString('ar-EG', {
+            const locale = currentLang === 'ar' ? 'ar-EG' : 'en-US';
+            dateSpan.textContent = now.toLocaleDateString(locale, {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
-            timeSpan.textContent = now.toLocaleTimeString('ar-EG', {
+            timeSpan.textContent = now.toLocaleTimeString(locale, {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit'
@@ -1179,7 +1368,8 @@
                     res = a * b;
                     break;
                 case '/':
-                    if (b === 0) { alert('خطأ'); return; }
+                    if (b === 0) { alert(currentLang === 'ar' ? 'خطأ' : 'Error');
+                        return; }
                     res = a / b;
                     break;
             }
@@ -1258,7 +1448,7 @@
             });
             document.querySelectorAll('.delete-todo').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    if (confirm('حذف المهمة؟')) {
+                    if (confirm(currentLang === 'ar' ? 'حذف المهمة؟' : 'Delete task?')) {
                         todos.splice(this.dataset.index, 1);
                         saveTodos();
                     }
@@ -1284,7 +1474,7 @@
 
         document.getElementById('saveLocal').addEventListener('click', function() {
             localStorage.setItem('employeeNotes', notes.value);
-            alert('تم حفظ الملاحظات.');
+            alert(currentLang === 'ar' ? 'تم حفظ الملاحظات.' : 'Notes saved.');
         });
 
         document.getElementById('exportNotes').addEventListener('click', function() {
@@ -1325,7 +1515,8 @@
         function renderApps() {
             appList.innerHTML = '';
             apps.slice().sort((a, b) => a.date.localeCompare(b.date)).forEach(function(a, idx) {
-                const d = new Date(a.date).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' });
+                const d = new Date(a.date).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US', { day: 'numeric',
+                    month: 'short' });
                 const div = document.createElement('div');
                 div.className = 'appointment-item';
                 let descHtml = a.desc && a.desc.trim() ? `<div class="appointment-desc">📝 ${a.desc}</div>` : '';
@@ -1341,7 +1532,7 @@
             });
             document.querySelectorAll('.delete-app').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    if (confirm('حذف الموعد؟')) {
+                    if (confirm(currentLang === 'ar' ? 'حذف الموعد؟' : 'Delete appointment?')) {
                         apps.splice(this.dataset.idx, 1);
                         localStorage.setItem('employeeAppointments', JSON.stringify(apps));
                         renderApps();
@@ -1351,7 +1542,8 @@
         }
 
         document.getElementById('addAppBtn').addEventListener('click', function() {
-            if (!appTitle.value || !appDate.value) return alert('يرجى إدخال العنوان والتاريخ');
+            if (!appTitle.value || !appDate.value) return alert(currentLang === 'ar' ? 'يرجى إدخال العنوان والتاريخ' :
+                'Please enter title and date');
             apps.push({ title: appTitle.value, date: appDate.value, desc: appDesc.value });
             localStorage.setItem('employeeAppointments', JSON.stringify(apps));
             renderApps();
@@ -1375,88 +1567,207 @@
         }
 
         // ============================================================
-        // الأدوات
+        // الأدوات (مع دعم اللغة في أسماء الملفات)
         // ============================================================
         const toolCategories = [{
-            name: "دراسات الجدوى والاستثمار",
+            nameKey: "دراسات الجدوى والاستثمار",
             icon: "fa-chart-pie",
             tools: [
-                { name: "دراسة جدوى مالية شاملة", icon: "fa-chart-pie", file: "tool1.html" },
-                { name: "دراسة الجدوى الفنية للمطاعم", icon: "fa-gear", file: "tool3.html" },
-                { name: "دراسة الجدوى التسويقية", icon: "fa-chart-simple", file: "tool4.html" },
-                { name: "حساب العائد على الاستثمار العقاري", icon: "fa-building", file: "tool5.html" },
-                { name: "حاسبة العائد على الاستثمار (ROI)", icon: "fa-chart-line", file: "tool11.html" },
-                { name: "حاسبة تقييم المطاعم", icon: "fa-ranking-star", file: "tool30.html" },
-                { name: "تقييم الشركات البرمجية", icon: "fa-laptop-code", file: "tool27.html" },
-                { name: "تحليل الاستثمار (NPV/IRR)", icon: "fa-wave-square", file: "tool26.html" }
+                { nameKey: "دراسة جدوى مالية شاملة", icon: "fa-chart-pie", file: "tool1.html" },
+                { nameKey: "دراسة الجدوى الفنية للمطاعم", icon: "fa-gear", file: "tool3.html" },
+                { nameKey: "دراسة الجدوى التسويقية", icon: "fa-chart-simple", file: "tool4.html" },
+                { nameKey: "حساب العائد على الاستثمار العقاري", icon: "fa-building", file: "tool5.html" },
+                { nameKey: "حاسبة العائد على الاستثمار (ROI)", icon: "fa-chart-line", file: "tool11.html" },
+                { nameKey: "حاسبة تقييم المطاعم", icon: "fa-ranking-star", file: "tool30.html" },
+                { nameKey: "تقييم الشركات البرمجية", icon: "fa-laptop-code", file: "tool27.html" },
+                { nameKey: "تحليل الاستثمار (NPV/IRR)", icon: "fa-wave-square", file: "tool26.html" }
             ]
         }, {
-            name: "التحليل المالي والمحاسبي",
+            nameKey: "التحليل المالي والمحاسبي",
             icon: "fa-coins",
             tools: [
-                { name: "حاسبة التدفق النقدي", icon: "fa-coins", file: "tool8.html" },
-                { name: "حاسبة الفجوة النقدية", icon: "fas fa-money-bill-wave", file: "tool25.html" },
-                { name: "النسب المالية الشاملة", icon: "fa-percentage", file: "tool18.html" },
-                { name: "التنبؤ المالي المتقدم", icon: "fa-arrow-trend-up", file: "tool19.html" },
-                { name: "حاسبة الإهلاك", icon: "fa-chart-simple", file: "tool9.html" },
-                { name: "حاسبة معدل الخصم (WACC)", icon: "fa-scale-balanced", file: "tool10.html" },
-                { name: "تحليل السيناريوهات", icon: "fas fa-lightbulb", file: "tool28.html" },
-                { name: "حاسبة جدولة القروض", icon: "fa-hand-holding-usd", file: "tool12.html" }
+                { nameKey: "حاسبة التدفق النقدي", icon: "fa-coins", file: "tool8.html" },
+                { nameKey: "حاسبة الفجوة النقدية", icon: "fas fa-money-bill-wave", file: "tool25.html" },
+                { nameKey: "النسب المالية الشاملة", icon: "fa-percentage", file: "tool18.html" },
+                { nameKey: "التنبؤ المالي المتقدم", icon: "fa-arrow-trend-up", file: "tool19.html" },
+                { nameKey: "حاسبة الإهلاك", icon: "fa-chart-simple", file: "tool9.html" },
+                { nameKey: "حاسبة معدل الخصم (WACC)", icon: "fa-scale-balanced", file: "tool10.html" },
+                { nameKey: "تحليل السيناريوهات", icon: "fas fa-lightbulb", file: "tool28.html" },
+                { nameKey: "حاسبة جدولة القروض", icon: "fa-hand-holding-usd", file: "tool12.html" }
             ]
         }, {
-            name: "التكاليف ونقطة التعادل",
+            nameKey: "التكاليف ونقطة التعادل",
             icon: "fa-calculator",
             tools: [
-                { name: "حساب التكاليف للمطاعم", icon: "fa-utensils", file: "tool2.html" },
-                { name: "حاسبة نقطة التعادل", icon: "fa-chart-line", file: "tool7.html" },
-                { name: "نقطة التعادل متعددة المنتجات", icon: "fa-chart-line", file: "tool17.html" },
-                { name: "هندسة قوائم الطعام", icon: "fa-object-group", file: "tool22.html" },
-                { name: "تكلفة الإستحواذ على العميل", icon: "fas fa-users", file: "tool23.html" },
-                { name: "حاسبة تكلفة العمالة", icon: "fa-users", file: "tool13.html" }
+                { nameKey: "حساب التكاليف للمطاعم", icon: "fa-utensils", file: "tool2.html" },
+                { nameKey: "حاسبة نقطة التعادل", icon: "fa-chart-line", file: "tool7.html" },
+                { nameKey: "نقطة التعادل متعددة المنتجات", icon: "fa-chart-line", file: "tool17.html" },
+                { nameKey: "هندسة قوائم الطعام", icon: "fa-object-group", file: "tool22.html" },
+                { nameKey: "تكلفة الإستحواذ على العميل", icon: "fas fa-users", file: "tool23.html" },
+                { nameKey: "حاسبة تكلفة العمالة", icon: "fa-users", file: "tool13.html" }
             ]
         }, {
-            name: "إدارة المخاطر والجودة",
+            nameKey: "إدارة المخاطر والجودة",
             icon: "fa-shield",
             tools: [
-                { name: "محاكاة المخاطر", icon: "fa-wave-square", file: "tool6.html" },
-                { name: "تحليل المخاطر (HACCP)", icon: "fa-exclamation-triangle", file: "tool14.html" },
-                { name: "إجراءات التشغيل القياسية (SOP)", icon: "fa-clipboard-list", file: "tool15.html" }
+                { nameKey: "محاكاة المخاطر", icon: "fa-wave-square", file: "tool6.html" },
+                { nameKey: "تحليل المخاطر (HACCP)", icon: "fa-exclamation-triangle", file: "tool14.html" },
+                { nameKey: "إجراءات التشغيل القياسية (SOP)", icon: "fa-clipboard-list", file: "tool15.html" }
             ]
         }, {
-            name: "الأدوات الإدارية والموارد البشرية",
+            nameKey: "الأدوات الإدارية والموارد البشرية",
             icon: "fa-user-tie",
             tools: [
-                { name: "تقييم الموظفين", icon: "fa-user-check", file: "tool20.html" },
-                { name: "مقياس تقييم الإداري", icon: "fa-user-check", file: "tool21.html" },
-                { name: "تقييم المعارف والمهارات", icon: "fa-award", file: "tool29.html" },
-                { name: "توليد المحتوى (تجريبي)", icon: "fas fa-robot", file: "tool24.html" },
-                { name: "آلة حاسبة إدارية", icon: "fa-calculator", file: "tool16.html" }
+                { nameKey: "تقييم الموظفين", icon: "fa-user-check", file: "tool20.html" },
+                { nameKey: "مقياس تقييم الإداري", icon: "fa-user-check", file: "tool21.html" },
+                { nameKey: "تقييم المعارف والمهارات", icon: "fa-award", file: "tool29.html" },
+                { nameKey: "توليد المحتوى (تجريبي)", icon: "fas fa-robot", file: "tool24.html" },
+                { nameKey: "آلة حاسبة إدارية", icon: "fa-calculator", file: "tool16.html" }
             ]
         }];
 
         function renderTools() {
             const container = document.getElementById('toolsContainer');
             container.innerHTML = '';
+            const lang = currentLang;
             toolCategories.forEach(function(cat) {
                 const catDiv = document.createElement('div');
                 catDiv.className = 'tools-category';
                 const titleDiv = document.createElement('div');
                 titleDiv.className = 'category-title';
-                titleDiv.innerHTML = `<i class="fas ${cat.icon}"></i> ${cat.name}`;
+                // ترجمة اسم الفئة (نفترض أن الترجمة موجودة في كائن الترجمات)
+                const catName = translations[lang] && translations[lang][cat.nameKey] ? translations[lang][cat.nameKey] :
+                    cat.nameKey;
+                titleDiv.innerHTML = `<i class="fas ${cat.icon}"></i> ${catName}`;
                 catDiv.appendChild(titleDiv);
                 const grid = document.createElement('div');
                 grid.className = 'tools-grid';
                 cat.tools.forEach(function(tool) {
                     const card = document.createElement('div');
                     card.className = 'tool-card';
-                    card.onclick = function() { location.href = tool.file; };
-                    card.innerHTML = `<i class="fas ${tool.icon}"></i><h4>${tool.name}</h4>`;
+                    // تحديد اسم الملف مع اللاحقة حسب اللغة
+                    let filePath = tool.file;
+                    if (lang === 'en') {
+                        // إضافة 'en' قبل .html، مثلاً tool1.html -> tool1en.html
+                        filePath = filePath.replace(/\.html$/, 'en.html');
+                    }
+                    card.onclick = function() { location.href = filePath; };
+                    const toolName = translations[lang] && translations[lang][tool.nameKey] ? translations[lang][tool
+                        .nameKey] : tool.nameKey;
+                    card.innerHTML = `<i class="fas ${tool.icon}"></i><h4>${toolName}</h4>`;
                     grid.appendChild(card);
                 });
                 catDiv.appendChild(grid);
                 container.appendChild(catDiv);
             });
         }
+
+        // ============================================================
+        // الإعدادات (فتح/غلق)
+        // ============================================================
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        const languageSelect = document.getElementById('languageSelect');
+        const applyLanguageBtn = document.getElementById('applyLanguageBtn');
+
+        settingsBtn.addEventListener('click', function() {
+            settingsOverlay.classList.add('show');
+            // تعيين القيمة الحالية في الـ select
+            languageSelect.value = currentLang;
+        });
+
+        closeSettingsBtn.addEventListener('click', function() {
+            settingsOverlay.classList.remove('show');
+        });
+
+        // تطبيق اللغة من الإعدادات
+        applyLanguageBtn.addEventListener('click', function() {
+            const newLang = languageSelect.value;
+            applyLanguage(newLang);
+            // إعادة تعيين بعض العناصر الديناميكية
+            const savedName = localStorage.getItem('userName') || t('userLabel');
+            const savedDays = localStorage.getItem('daysLeft') || '?';
+            document.getElementById('userNameDisplay').textContent = `${savedName} (${currentLang === 'ar' ? 'متبقي' : 'remaining'} ${savedDays} ${currentLang === 'ar' ? 'يوم' : 'day'})`;
+            // تحديث شاشة الدخول إذا كانت ظاهرة (نادراً)
+            settingsOverlay.classList.remove('show');
+        });
+
+        // أزرار تبديل اللغة في شاشة الدخول
+        document.querySelectorAll('.lang-toggle').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const lang = this.dataset.lang;
+                applyLanguage(lang);
+                // تحديث نصوص شاشة الدخول (تم بالفعل عن طريق data-i18n)
+                // تحديث الرسائل
+                errorMsg.textContent = '';
+            });
+        });
+
+        // ============================================================
+        // تغيير كلمة المرور
+        // ============================================================
+        const changeEmail = document.getElementById('changeEmail');
+        const changeCurrentPass = document.getElementById('changeCurrentPass');
+        const changeNewPass = document.getElementById('changeNewPass');
+        const changeConfirmPass = document.getElementById('changeConfirmPass');
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const changePassMsg = document.getElementById('changePassMsg');
+
+        changePasswordBtn.addEventListener('click', async function() {
+            const email = changeEmail.value.trim();
+            const current = changeCurrentPass.value.trim();
+            const newPass = changeNewPass.value.trim();
+            const confirm = changeConfirmPass.value.trim();
+
+            if (!email || !current || !newPass || !confirm) {
+                changePassMsg.textContent = currentLang === 'ar' ? '❌ يرجى ملء جميع الحقول' :
+                    '❌ Please fill all fields';
+                return;
+            }
+            if (newPass !== confirm) {
+                changePassMsg.textContent = t('changePassMismatch');
+                return;
+            }
+            if (newPass.length < 6) {
+                changePassMsg.textContent = currentLang === 'ar' ? '❌ كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل' :
+                    '❌ New password must be at least 6 characters';
+                return;
+            }
+
+            changePasswordBtn.disabled = true;
+            changePasswordBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> ' + (currentLang === 'ar' ? 'جاري...' :
+                'Processing...');
+            changePassMsg.textContent = '';
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'changePassword');
+                formData.append('email', email);
+                formData.append('currentPassword', current);
+                formData.append('newPassword', newPass);
+                const resp = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
+                const result = await resp.json();
+                if (result.status === 'success') {
+                    changePassMsg.style.color = '#4ade80';
+                    changePassMsg.textContent = t('changePassSuccess');
+                    // مسح الحقول
+                    changeEmail.value = '';
+                    changeCurrentPass.value = '';
+                    changeNewPass.value = '';
+                    changeConfirmPass.value = '';
+                } else {
+                    changePassMsg.style.color = '#f87171';
+                    changePassMsg.textContent = t('changePassError') + (result.message || '');
+                }
+            } catch (e) {
+                changePassMsg.style.color = '#f87171';
+                changePassMsg.textContent = t('errorNetwork');
+            } finally {
+                changePasswordBtn.disabled = false;
+                changePasswordBtn.innerHTML = '<i class="fas fa-key"></i> ' + t('changePassBtn');
+            }
+        });
 
         // ============================================================
         // تحميل جميع البيانات
@@ -1476,13 +1787,11 @@
         const installBtn = document.getElementById('installBtn');
         const closeInstallBanner = document.getElementById('closeInstallBanner');
 
-        // التحقق مما إذا كان المستخدم قد أغلق الشريط سابقاً
         const bannerClosed = localStorage.getItem('installBannerClosed') === 'true';
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            // إذا لم يكن مغلقاً من قبل، نعرض الشريط
             if (!bannerClosed) {
                 installBanner.style.display = 'flex';
             }
@@ -1497,7 +1806,6 @@
                     installBanner.style.display = 'none';
                 } else {
                     console.log('تم رفض التثبيت');
-                    // لا نخفي الشريط تلقائياً، يمكن للمستخدم إغلاقه يدوياً
                 }
                 deferredPrompt = null;
             }
@@ -1514,67 +1822,20 @@
             localStorage.setItem('installBannerClosed', 'true');
         });
 
-        // في حالة فشل الحدث (مثلاً متصفح لا يدعم) نخفي الشريط
         setTimeout(() => {
             if (installBanner.style.display === 'flex' && !deferredPrompt) {
-                // إذا لم يتم تفعيل الحدث بعد فترة، نخفي الشريط
                 installBanner.style.display = 'none';
             }
         }, 5000);
 
         // ============================================================
-        // إدارة نافذة تجديد الاشتراك (تمت إضافتها حديثاً)
+        // إضافة دالة ترجمة إضافية للاستخدام في الكود
         // ============================================================
-        (function() {
-            const renewPopup = document.getElementById('renewPopup');
-            const renewIframe = document.getElementById('renewIframe');
-            const closeRenewBtn = document.getElementById('closeRenewPopup');
-            // رابط التجديد (نفس الرابط الموجود في الكود)
-            const RENEW_LINK = "https://alfan.link/faroukazem?digital=DkPhgz";
-
-            // دالة فتح النافذة
-            function openRenewPopup() {
-                renewIframe.src = RENEW_LINK;
-                renewPopup.classList.add('open');
-                document.body.style.overflow = 'hidden';
-            }
-
-            // دالة إغلاق النافذة
-            function closeRenewPopup() {
-                renewPopup.classList.remove('open');
-                renewIframe.src = '';
-                document.body.style.overflow = '';
-            }
-
-            // ربط زر التجديد (في رسالة انتهاء الجلسة) بفتح النافذة
-            if (renewLinkBtn) {
-                renewLinkBtn.addEventListener('click', function(e) {
-                    e.preventDefault(); // منع الانتقال المباشر
-                    openRenewPopup();
-                });
-            }
-
-            // ربط زر التجديد السريع في الروابط السريعة (اختياري)
-            const quickRenewLink = document.getElementById('quickRenewLink');
-            if (quickRenewLink) {
-                quickRenewLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    openRenewPopup();
-                });
-            }
-
-            // إغلاق النافذة
-            closeRenewBtn.addEventListener('click', closeRenewPopup);
-            renewPopup.addEventListener('click', function(e) {
-                if (e.target === renewPopup) closeRenewPopup();
-            });
-            window.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && renewPopup.classList.contains('open')) closeRenewPopup();
-            });
-
-            // جعل الدالة عامة إذا أردت استخدامها في مكان آخر
-            window.openRenewPopup = openRenewPopup;
-        })();
+        // إضافة بعض الترجمات الناقصة
+        translations.ar['remaining'] = 'متبقي';
+        translations.ar['day'] = 'يوم';
+        translations.en['remaining'] = 'remaining';
+        translations.en['day'] = 'day';
     </script>
 </body>
 </html>
