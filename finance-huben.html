@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Comprehensive Platform – Farouk Business & Consulting Group</title>
+    <meta name="description" content="The comprehensive platform for entrepreneurs and managers: over 23 integrated financial and operational tools with charts, reports, and recommendations for sound financial decision-making.">
+    <meta name="keywords" content="feasibility study, financial calculator, break-even, cash flow, risk analysis, HACCP, costs, investment, loan amortization, restaurant platform, Farouk Group">
+    <meta name="author" content="Farouk Azem">
+
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --navy-900: #0a1628;
+            --navy-800: #0f1f3a;
+            --navy-700: #15294d;
+            --navy-600: #1b3360;
+            --gold: #ca8a04;
+            --gold-light: #eab308;
+            --gold-pale: #fef9c3;
+            --teal-500: #14b8a6;
+            --teal-400: #2dd4bf;
+            --teal-100: #ccfbf1;
+            --red-500: #ef4444;
+            --red-100: #fee2e2;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-500: #64748b;
+            --gray-700: #334155;
+            --gray-900: #0f172a;
+            --light: #ffffff;
+            --shadow-card: 0 4px 24px rgba(10,22,40,0.08);
+            --shadow-card-hover: 0 12px 40px rgba(10,22,40,0.14);
+            --shadow-btn: 0 6px 20px rgba(37,99,235,0.35);
+            --shadow-btn-hover: 0 10px 30px rgba(37,99,235,0.5);
+            --radius-sm: 12px;
+            --radius: 16px;
+            --radius-lg: 24px;
+            --radius-full: 50px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --nyala-primary: #2a1b3d;
+            --nyala-gold: #e5b73b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        .container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+        .section-label {
+            display: inline-block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #b48554;
+            background: rgba(180,133,84,0.12);
+            padding: 6px 18px;
+            border-radius: var(--radius-full);
+            margin-bottom: 16px;
+        }
+        .section-heading {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: var(--navy-900);
+            margin-bottom: 18px;
+            line-height: 1.35;
+        }
+        .section-heading span { color: #b48554; }
+        .section-subtitle {
+            font-size: 1.15rem;
+            color: var(--gray-500);
+            max-width: 680px;
+            margin: 0 auto 48px;
+        }
+        .text-center { text-align: center; }
+
+        /* HEADER */
+        .site-header {
+            background: var(--navy-900);
+            padding: 18px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(12px);
+        }
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #fff;
+        }
+        .brand-text {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #fff;
+        }
+        .brand-text span { color: var(--gold-light); }
+        .header-cta {
+            background: #b48554;
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-full);
+            padding: 10px 24px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .header-cta:hover {
+            background: #d4b15a;
+            box-shadow: 0 0 20px rgba(180,133,84,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(170deg, var(--navy-900) 0%, var(--navy-700) 60%, #0f1f3a 100%);
+            padding: 72px 0 80px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: -120px;
+            right: -120px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(180,133,84,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .hero-grid {
+            display: flex;
+            align-items: center;
+            gap: 56px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-content { flex: 1.1; min-width: 320px; }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            padding: 8px 22px;
+            border-radius: var(--radius-full);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #d4b15a;
+            backdrop-filter: blur(8px);
+        }
+        .hero-badge i { color: var(--gold-light); }
+        .hero-content h1 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            line-height: 1.35;
+            margin-bottom: 20px;
+        }
+        .hero-content h1 span { color: var(--gold-light); }
+        .hero-content .hero-desc {
+            font-size: 1.15rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 32px;
+            line-height: 1.8;
+        }
+        .hero-stats {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+        .hero-stat { text-align: left; }
+        .hero-stat .stat-num {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--gold-light);
+        }
+        .hero-stat .stat-lbl { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+        .hero-price-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 18px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-lg);
+            padding: 18px 28px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(8px);
+        }
+        .hero-price {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: #fff;
+        }
+        .hero-price small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.55);
+        }
+        .hero-price-old {
+            font-size: 1.1rem;
+            text-decoration: line-through;
+            color: rgba(255,255,255,0.4);
+        }
+        .hero-badge-sub {
+            background: #14b8a6;
+            color: #000;
+            font-weight: 800;
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+        }
+        .hero-trust {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+        }
+        .hero-trust span { display: flex; align-items: center; gap: 7px; }
+        .hero-trust i { color: var(--teal-400); }
+        .hero-visual {
+            flex: 0.9;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .hero-visual img {
+            width: 100%;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .hero-visual-row {
+            display: flex;
+            gap: 14px;
+        }
+        .hero-visual-row img {
+            width: 50%;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            border-radius: var(--radius-full);
+            padding: 16px 36px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        .btn-gold {
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #1e1e1e;
+            box-shadow: 0 6px 22px rgba(180,133,84,0.4);
+        }
+        .btn-gold:hover {
+            box-shadow: 0 10px 32px rgba(180,133,84,0.55);
+            transform: translateY(-3px);
+        }
+        .btn-outline-light {
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.3);
+            color: #fff;
+        }
+        .btn-outline-light:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        /* PROBLEM SECTION */
+        .problem-section {
+            padding: 80px 0;
+            background: var(--light);
+        }
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+        .problem-card {
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 30px 26px;
+            transition: var(--transition);
+            border-top: 4px solid transparent;
+            text-align: left;
+        }
+        .problem-card:hover {
+            border-top-color: var(--red-500);
+            box-shadow: var(--shadow-card-hover);
+        }
+        .problem-card .icon-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--red-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: var(--red-500);
+            margin-bottom: 18px;
+        }
+        .problem-card h4 { font-size: 1.15rem; color: var(--navy-900); margin-bottom: 10px; }
+        .problem-card p { color: var(--gray-500); font-size: 0.95rem; }
+
+        /* VALUE SECTION */
+        .value-section {
+            padding: 80px 0;
+            background: var(--gray-50);
+        }
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 28px;
+            margin-top: 32px;
+        }
+        .value-card {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 32px 24px;
+            text-align: center;
+            border: 1px solid var(--gray-200);
+            transition: var(--transition);
+        }
+        .value-card:hover {
+            box-shadow: var(--shadow-card-hover);
+            border-color: #b48554;
+            transform: translateY(-6px);
+        }
+        .value-card .vc-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(180,133,84,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #b48554;
+            margin: 0 auto 20px;
+        }
+        .value-card h4 { font-size: 1.15rem; color: var(--navy-900); margin-bottom: 10px; }
+        .value-card p { color: var(--gray-500); font-size: 0.95rem; }
+
+        /* TOOLS LIST - NEW STYLED */
+        .tools-section {
+            padding: 80px 0;
+            background: var(--light);
+        }
+        .tools-grid-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 28px;
+            margin-top: 32px;
+        }
+        .category-box {
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+            transition: var(--transition);
+            text-align: left;
+        }
+        .category-box:hover { box-shadow: var(--shadow-card-hover); }
+        .category-box h3 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.25rem;
+            color: var(--navy-900);
+            border-bottom: 2px solid #b48554;
+            padding-bottom: 8px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .category-box h3 i { color: #b48554; }
+        .tool-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .tool-item:last-child { border-bottom: none; }
+        .tool-item i {
+            color: #b48554;
+            width: 20px;
+            text-align: center;
+        }
+        .tool-item .tool-name {
+            font-weight: 600;
+            color: var(--navy-800);
+            font-size: 0.95rem;
+        }
+        .tool-item .tool-desc {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-left: auto;
+            max-width: 180px;
+            text-align: right;
+        }
+        @media (max-width: 600px) {
+            .tool-item { flex-wrap: wrap; }
+            .tool-item .tool-desc { max-width: 100%; margin-left: 0; text-align: left; }
+        }
+
+        /* OUTPUTS SECTION */
+        .outputs-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-700) 100%);
+            color: #fff;
+        }
+        .outputs-section .section-heading { color: #fff; }
+        .outputs-section .section-heading span { color: var(--gold-light); }
+        .outputs-section .section-label {
+            background: rgba(255,255,255,0.08);
+            color: #d4b15a;
+        }
+        .outputs-section .section-subtitle { color: rgba(255,255,255,0.6); }
+        .outputs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 28px;
+            margin: 40px 0 48px;
+        }
+        .output-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius);
+            padding: 30px 24px;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            transition: var(--transition);
+        }
+        .output-card:hover { background: rgba(255,255,255,0.08); }
+        .output-card .oc-icon { font-size: 2.4rem; margin-bottom: 18px; }
+        .output-card h4 { font-size: 1.2rem; margin-bottom: 10px; }
+        .output-card p { color: rgba(255,255,255,0.6); font-size: 0.95rem; }
+        .output-gallery {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .output-gallery img {
+            width: 30%;
+            min-width: 260px;
+            border-radius: var(--radius);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+
+        /* SCREENSHOTS */
+        .screenshots-section {
+            padding: 80px 0;
+            background: var(--gray-50);
+        }
+        .screenshots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+        .screenshot-card {
+            background: #fff;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-card);
+            transition: var(--transition);
+        }
+        .screenshot-card:hover {
+            box-shadow: var(--shadow-card-hover);
+            transform: translateY(-4px);
+        }
+        .screenshot-card img { width: 100%; display: block; }
+        .screenshot-card .sc-caption {
+            padding: 14px 18px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--navy-800);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .screenshot-card .sc-caption i { color: #b48554; }
+
+        /* AUDIENCE */
+        .audience-section {
+            padding: 80px 0;
+            background: var(--light);
+        }
+        .audience-grid {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 32px;
+        }
+        .audience-card {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+            text-align: center;
+            padding: 36px 24px;
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+        .audience-card:hover {
+            border-color: #b48554;
+            box-shadow: var(--shadow-card-hover);
+            transform: translateY(-6px);
+        }
+        .audience-icon { font-size: 2.8rem; margin-bottom: 18px; }
+        .audience-card h4 { font-size: 1.2rem; color: var(--navy-900); margin-bottom: 8px; }
+        .audience-card p { color: var(--gray-500); font-size: 0.9rem; }
+
+        /* FAQ */
+        .faq-section {
+            padding: 80px 0;
+            background: var(--gray-50);
+        }
+        .faq-grid {
+            max-width: 800px;
+            margin: 32px auto 0;
+        }
+        .faq-item {
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            overflow: hidden;
+            text-align: left;
+        }
+        .faq-q {
+            padding: 20px 24px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            color: var(--navy-900);
+            transition: var(--transition);
+            user-select: none;
+        }
+        .faq-q i { transition: transform 0.3s; color: #b48554; }
+        .faq-item.active .faq-q i { transform: rotate(180deg); }
+        .faq-a {
+            padding: 0 24px 20px;
+            color: var(--gray-500);
+            display: none;
+        }
+        .faq-item.active .faq-a { display: block; }
+
+        /* CTA */
+        .cta-section {
+            padding: 72px 0;
+            background: linear-gradient(150deg, #0a1628 0%, #15294d 100%);
+            color: #fff;
+            text-align: center;
+        }
+        .cta-section h3 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin-bottom: 16px;
+        }
+        .cta-section p { max-width: 600px; margin: 0 auto 32px; opacity: 0.8; font-size: 1.1rem; }
+        .cta-price-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .cta-price {
+            font-family: 'Cairo', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: var(--gold-light);
+        }
+        .cta-price small { font-size: 1.2rem; color: rgba(255,255,255,0.5); }
+        .cta-old {
+            font-size: 1.2rem;
+            text-decoration: line-through;
+            color: rgba(255,255,255,0.35);
+        }
+
+        /* FOOTER */
+        .site-footer {
+            background: var(--navy-900);
+            color: rgba(255,255,255,0.55);
+            padding: 36px 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .site-footer span { color: var(--gold-light); }
+
+        /* PAYMENT MODAL */
+        .payment-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 4000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s ease;
+        }
+        .payment-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .payment-popup {
+            background: #fff;
+            border-radius: 24px;
+            width: 95%;
+            max-width: 500px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        .payment-header {
+            background: var(--nyala-primary);
+            color: #fff;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .payment-header h3 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .payment-header .close-payment {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 5px;
+            transition: 0.2s;
+        }
+        .payment-header .close-payment:hover { color: var(--nyala-gold); }
+        .payment-body {
+            flex: 1;
+            position: relative;
+            background: #fafafa;
+        }
+        .payment-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .section-heading { font-size: 1.8rem; }
+            .hero-content h1 { font-size: 2rem; }
+            .hero-grid { gap: 36px; }
+            .hero-stats { gap: 18px; }
+            .hero-visual-row { flex-direction: column; }
+            .hero-visual-row img { width: 100%; }
+            .output-gallery img { width: 100%; min-width: 0; }
+            .tools-grid-categories { grid-template-columns: 1fr; }
+            .cta-section h3 { font-size: 1.8rem; }
+            .header-cta { font-size: 0.85rem; padding: 8px 18px; }
+            .payment-popup { width: 95%; height: 85vh; max-width: 500px; }
+            .hero-price { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="#" class="brand">
+            <div class="brand-icon"><i class="fas fa-chart-pie"></i></div>
+            <div class="brand-text">Comprehensive <span>Platform</span></div>
+        </a>
+        <button class="header-cta" id="openModalBtnHeader">
+            <i class="fas fa-rocket"></i> Annual Subscription
+        </button>
+    </div>
+</header>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+    <div class="container hero-grid">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-crown"></i> Farouk Business & Consulting Group
+            </div>
+            <h1>Over 23 <span>Integrated</span> Financial & Administrative Tools for Smart Decisions</h1>
+            <p class="hero-desc">
+                The first platform of its kind that provides entrepreneurs, managers, and investors
+                with comprehensive financial and operational tools featuring <strong>charts, analytical reports, and actionable</strong>
+                recommendations – all in a single annual subscription.
+            </p>
+            <div class="hero-stats">
+                <div class="hero-stat"><div class="stat-num">23+</div><div class="stat-lbl">Specialized Tools</div></div>
+                <div class="hero-stat"><div class="stat-num">24/7</div><div class="stat-lbl">Always Available</div></div>
+                <div class="hero-stat"><div class="stat-num">Annual</div><div class="stat-lbl">Single Subscription</div></div>
+            </div>
+            <div class="hero-price-box">
+                <span class="hero-price-old">$359</span>
+                <span class="hero-price">$299<small>/year</small></span>
+                <span class="hero-badge-sub">Save 17%</span>
+            </div>
+            <button class="btn btn-gold" id="openModalBtn"><i class="fas fa-rocket"></i> Subscribe Now for $299/year</button>
+            <div class="hero-trust" style="margin-top:20px;">
+                <span><i class="fas fa-shield-alt"></i> No Auto-Renewal</span>
+                <span><i class="fas fa-undo-alt"></i> Value Guarantee</span>
+                <span><i class="fas fa-lock"></i> Secure Payment</span>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <img src="https://lh3.googleusercontent.com/d/1ShXtjlvdwlAlz6KM2FHjsdVwhqY2MsDB" alt="The Comprehensive Platform" loading="lazy">
+            <div class="hero-visual-row">
+                <img src="https://lh3.googleusercontent.com/d/15xeLIV8z7v3kLMJt1m4Ga0dejQA3RI4i" alt="Charts" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1GTYce32PsuKLMIlB6TIPMO5VGTv4X6ti" alt="Financial Analysis" loading="lazy">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== PROBLEM ==================== -->
+<section class="problem-section">
+    <div class="container text-center">
+        <span class="section-label">The Challenge</span>
+        <h2 class="section-heading">Are you struggling with <span>Financial Decision-Making</span> for your project?</h2>
+        <p class="section-subtitle">Without accurate tools, financial decisions become a gamble that can cost you dearly. The platform gives you the clear vision you need.</p>
+        <div class="problem-grid">
+            <div class="problem-card">
+                <div class="icon-circle"><i class="fas fa-file-excel"></i></div>
+                <h4>Cumbersome and Inaccurate Spreadsheets</h4>
+                <p>Spending hours building complex financial models on Excel without ensuring result accuracy or freedom from human error.</p>
+            </div>
+            <div class="problem-card">
+                <div class="icon-circle"><i class="fas fa-chart-simple"></i></div>
+                <h4>Lack of Explanatory Charts</h4>
+                <p>Numbers alone are not enough. You need interactive charts that reveal hidden trends and patterns in your financial performance.</p>
+            </div>
+            <div class="problem-card">
+                <div class="icon-circle"><i class="fas fa-circle-question"></i></div>
+                <h4>Absence of Practical Recommendations</h4>
+                <p>Most tools only give you numbers. You need clear and actionable recommendations to improve your project performance.</p>
+            </div>
+            <div class="problem-card">
+                <div class="icon-circle"><i class="fas fa-triangle-exclamation"></i></div>
+                <h4>Multiple Tools and Fragmented Data</h4>
+                <p>Being forced to use several separate platforms for each study or calculator, scattering your data and hindering a comprehensive overview.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== VALUE ==================== -->
+<section class="value-section">
+    <div class="container text-center">
+        <span class="section-label">The Solution</span>
+        <h2 class="section-heading">One <span>Comprehensive</span> Platform Replacing All Separate Tools</h2>
+        <p class="section-subtitle">Over 23 financial and operational tools in a single platform giving you everything you need to make sound financial decisions based on accurate data, charts, and recommendations.</p>
+        <div class="value-grid">
+            <div class="value-card">
+                <div class="vc-icon"><i class="fas fa-chart-line"></i></div>
+                <h4>Interactive Charts</h4>
+                <p>Complete visualization of your financial data making it easy to understand performance and make quick decisions.</p>
+            </div>
+            <div class="value-card">
+                <div class="vc-icon"><i class="fas fa-file-invoice"></i></div>
+                <h4>Comprehensive Reports</h4>
+                <p>Financial and analytical reports ready for printing and presentation to investors and decision-makers.</p>
+            </div>
+            <div class="value-card">
+                <div class="vc-icon"><i class="fas fa-lightbulb"></i></div>
+                <h4>General Recommendations</h4>
+                <p>Receive guiding recommendations based on your analysis results to help direct your decisions.</p>
+            </div>
+            <div class="value-card">
+                <div class="vc-icon"><i class="fas fa-cloud"></i></div>
+                <h4>Fully Cloud-Based</h4>
+                <p>No software installation required. All tools work directly from your browser on any device.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== TOOLS (Detailed) ==================== -->
+<section class="tools-section">
+    <div class="container text-center">
+        <span class="section-label">Tools</span>
+        <h2 class="section-heading">All Available Tools <span>in One Platform</span></h2>
+        <p class="section-subtitle">Each tool has been carefully designed to serve a specific aspect of your financial, administrative, and operational needs, with detailed explanations inside each tool.</p>
+        <div class="tools-grid-categories">
+            <!-- Category 1: Feasibility Studies and Investment -->
+            <div class="category-box">
+                <h3><i class="fas fa-chart-pie"></i> Feasibility & Investment</h3>
+                <div class="tool-item"><i class="fas fa-chart-pie"></i><span class="tool-name">Comprehensive Financial Feasibility</span><span class="tool-desc">NPV, IRR, Payback, Scenarios</span></div>
+                <div class="tool-item"><i class="fas fa-gear"></i><span class="tool-name">Restaurant Technical Feasibility</span><span class="tool-desc">Equipment & Production Capacity</span></div>
+                <div class="tool-item"><i class="fas fa-chart-simple"></i><span class="tool-name">Marketing Feasibility Study</span><span class="tool-desc">Market, Audience & Competitor Analysis</span></div>
+                <div class="tool-item"><i class="fas fa-building"></i><span class="tool-name">Real Estate ROI Calculator</span><span class="tool-desc">With & Without Financing</span></div>
+                <div class="tool-item"><i class="fas fa-chart-line"></i><span class="tool-name">Return on Investment (ROI) Calculator</span><span class="tool-desc">Simple & Fast</span></div>
+                <div class="tool-item"><i class="fas fa-ranking-star"></i><span class="tool-name">Restaurant Valuation Calculator</span><span class="tool-desc">Market Value Estimation</span></div>
+                <div class="tool-item"><i class="fas fa-laptop-code"></i><span class="tool-name">Software Company Valuation</span><span class="tool-desc">Custom Valuation Model</span></div>
+                <div class="tool-item"><i class="fas fa-city"></i><span class="tool-name">Real Estate Company Valuation</span><span class="tool-desc">Real Estate Asset Analysis</span></div>
+                <div class="tool-item"><i class="fas fa-wave-square"></i><span class="tool-name">Investment Analysis (NPV/IRR)</span><span class="tool-desc">Investment Project Evaluation</span></div>
+            </div>
+            <!-- Category 2: Financial & Accounting Analysis -->
+            <div class="category-box">
+                <h3><i class="fas fa-coins"></i> Financial & Accounting Analysis</h3>
+                <div class="tool-item"><i class="fas fa-coins"></i><span class="tool-name">Cash Flow Calculator</span><span class="tool-desc">OCF / FCFF with Projections</span></div>
+                <div class="tool-item"><i class="fas fa-money-bill-wave"></i><span class="tool-name">Cash Conversion Cycle (CCC)</span><span class="tool-desc">Conversion Cycle Calculator</span></div>
+                <div class="tool-item"><i class="fas fa-percentage"></i><span class="tool-name">Comprehensive Financial Ratios</span><span class="tool-desc">18 Ratios with Evaluation</span></div>
+                <div class="tool-item"><i class="fas fa-arrow-trend-up"></i><span class="tool-name">Advanced Financial Forecasting</span><span class="tool-desc">5-Year Projections</span></div>
+                <div class="tool-item"><i class="fas fa-chart-simple"></i><span class="tool-name">Depreciation Calculator</span><span class="tool-desc">4 Different Methods</span></div>
+                <div class="tool-item"><i class="fas fa-scale-balanced"></i><span class="tool-name">WACC Calculator</span><span class="tool-desc">Weighted Average Cost of Capital</span></div>
+                <div class="tool-item"><i class="fas fa-lightbulb"></i><span class="tool-name">Scenario Analysis</span><span class="tool-desc">What-If Analysis</span></div>
+                <div class="tool-item"><i class="fas fa-hand-holding-usd"></i><span class="tool-name">Loan Amortization Calculator</span><span class="tool-desc">Complete Repayment Schedule</span></div>
+            </div>
+            <!-- Category 3: Costs and Break-Even -->
+            <div class="category-box">
+                <h3><i class="fas fa-calculator"></i> Costs & Break-Even</h3>
+                <div class="tool-item"><i class="fas fa-utensils"></i><span class="tool-name">Restaurant Cost Calculation</span><span class="tool-desc">Comprehensive Cost Analysis</span></div>
+                <div class="tool-item"><i class="fas fa-chart-line"></i><span class="tool-name">Break-Even Point Calculator</span><span class="tool-desc">Units & Revenue</span></div>
+                <div class="tool-item"><i class="fas fa-chart-line"></i><span class="tool-name">Multi-Product Break-Even</span><span class="tool-desc">With Product Mix</span></div>
+                <div class="tool-item"><i class="fas fa-object-group"></i><span class="tool-name">Menu Engineering</span><span class="tool-desc">BCG Matrix</span></div>
+                <div class="tool-item"><i class="fas fa-users"></i><span class="tool-name">Customer Acquisition Cost</span><span class="tool-desc">CAC & CLV</span></div>
+                <div class="tool-item"><i class="fas fa-users"></i><span class="tool-name">Labor Cost Calculator</span><span class="tool-desc">Ideal for Restaurants</span></div>
+            </div>
+            <!-- Category 4: Risk Management & Quality -->
+            <div class="category-box">
+                <h3><i class="fas fa-shield"></i> Risk Management & Quality</h3>
+                <div class="tool-item"><i class="fas fa-wave-square"></i><span class="tool-name">Risk Simulation (Monte Carlo)</span><span class="tool-desc">Probabilistic Analysis</span></div>
+                <div class="tool-item"><i class="fas fa-exclamation-triangle"></i><span class="tool-name">Risk Analysis (HACCP)</span><span class="tool-desc">Food Safety Audit</span></div>
+                <div class="tool-item"><i class="fas fa-clipboard-list"></i><span class="tool-name">Standard Operating Procedures (SOPs)</span><span class="tool-desc">Comprehensive Checklist</span></div>
+            </div>
+            <!-- Category 5: Administrative & HR Tools -->
+            <div class="category-box">
+                <h3><i class="fas fa-user-tie"></i> Administrative & HR Tools</h3>
+                <div class="tool-item"><i class="fas fa-user-check"></i><span class="tool-name">Employee Evaluation</span><span class="tool-desc">40 Criteria</span></div>
+                <div class="tool-item"><i class="fas fa-user-check"></i><span class="tool-name">Managerial Assessment Scale</span><span class="tool-desc">Talent Retention Mindset</span></div>
+                <div class="tool-item"><i class="fas fa-award"></i><span class="tool-name">Knowledge & Skills Assessment</span><span class="tool-desc">16 Criteria</span></div>
+                <div class="tool-item"><i class="fas fa-robot"></i><span class="tool-name">Content Generation (Beta)</span><span class="tool-desc">Artificial Intelligence</span></div>
+                <div class="tool-item"><i class="fas fa-calculator"></i><span class="tool-name">Administrative Calculator</span><span class="tool-desc">Financial & Scientific</span></div>
+            </div>
+        </div>
+        <p style="margin-top:28px; color:var(--gray-500);">
+            <i class="fas fa-info-circle"></i> Each tool includes a detailed explanation inside, along with the ability to export reports in Word and Excel formats.
+        </p>
+    </div>
+</section>
+
+<!-- ==================== OUTPUTS ==================== -->
+<section class="outputs-section">
+    <div class="container text-center">
+        <span class="section-label">Outputs</span>
+        <h2 class="section-heading">Charts, <span>Reports, and Recommendations</span> at Your Fingertips</h2>
+        <p class="section-subtitle">Every tool provides professional outputs: interactive charts, comprehensive reports, and general recommendations you can use immediately.</p>
+        <div class="outputs-grid">
+            <div class="output-card">
+                <div class="oc-icon">📊</div>
+                <h4>Interactive Charts</h4>
+                <p>Dynamic diagrams illustrating cash flows, break-even points, and returns in a visually easy-to-understand format.</p>
+            </div>
+            <div class="output-card">
+                <div class="oc-icon">📋</div>
+                <h4>Comprehensive Analytical Reports</h4>
+                <p>Complete financial reports that can be exported and shared with partners, investors, and decision-makers.</p>
+            </div>
+            <div class="output-card">
+                <div class="oc-icon">💡</div>
+                <h4>Actionable General Recommendations</h4>
+                <p>Receive practical guiding recommendations based on your analysis results to make confident decisions.</p>
+            </div>
+        </div>
+        <div class="output-gallery">
+            <img src="https://lh3.googleusercontent.com/d/1BDI3VHdq1oj3i6_ndSIKhfRYAbxhFJK4" alt="Charts" loading="lazy">
+            <img src="https://lh3.googleusercontent.com/d/18ggWwezXZXET-F2asoymYMTM_FgpLZ-s" alt="Cash Flows" loading="lazy">
+            <img src="https://lh3.googleusercontent.com/d/1opOKlSNdeoWaCWdv5EfrkldOcVDE2MWp" alt="Financial Analysis" loading="lazy">
+        </div>
+    </div>
+</section>
+
+<!-- ==================== AUDIENCE ==================== -->
+<section class="audience-section">
+    <div class="container text-center">
+        <span class="section-label">Audience</span>
+        <h2 class="section-heading">Designed for <span>Everyone</span> Who Needs Accurate Financial Decisions</h2>
+        <p class="section-subtitle">Whether you are starting your first project or managing a restaurant chain, the platform gives you the tools you need.</p>
+        <div class="audience-grid">
+            <div class="audience-card">
+                <div class="audience-icon">🚀</div>
+                <h4>Entrepreneurs</h4>
+                <p>Study the feasibility of your idea, calculate your costs and cash flows before spending your first dollar.</p>
+            </div>
+            <div class="audience-card">
+                <div class="audience-icon">📈</div>
+                <h4>Executive Managers</h4>
+                <p>Monitor your project performance, analyze the break-even point, and get recommendations to improve profitability.</p>
+            </div>
+            <div class="audience-card">
+                <div class="audience-icon">🏢</div>
+                <h4>Businessmen & Investors</h4>
+                <p>Accurately evaluate investment opportunities, calculate expected returns, and compare scenarios.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== FAQ ==================== -->
+<section class="faq-section">
+    <div class="container text-center">
+        <span class="section-label">FAQ</span>
+        <h2 class="section-heading">Everything You Want to <span>Know</span> About the Platform</h2>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <div class="faq-q"><span>What do I get with the annual subscription?</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">You get full access to all tools (over 23 tools) without exception, with the ability to use each tool an unlimited number of times. Each tool provides interactive charts, comprehensive reports, and general recommendations. The subscription is annual and does not auto-renew.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q"><span>Can I export reports and charts?</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">Yes, the platform allows you to export reports in Word or Excel format and share them with your team, investors, or partners.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q"><span>Do I need to install any software on my device?</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">No installation is required. The platform is fully cloud-based and works directly from your browser on any device: computer, tablet, or smartphone. All you need is an internet connection.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q"><span>How can I renew my subscription after the year ends?</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-a">You can renew your subscription through the same payment link on the platform or by contacting the support team. A reminder will be sent to you well before the subscription expires.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== CTA ==================== -->
+<section class="cta-section">
+    <div class="container">
+        <h3>Don't Leave Your Financial Decisions to Guesswork</h3>
+        <p>Join hundreds of entrepreneurs, managers, and business owners who use the platform to make sound financial decisions based on accurate data, charts, and recommendations.</p>
+        <div class="cta-price-row">
+            <span class="cta-old">$359</span>
+            <span class="cta-price">$299<small>/year</small></span>
+        </div>
+        <button class="btn btn-gold" id="openModalBtn2"><i class="fas fa-rocket"></i> Subscribe Now & Start Analyzing</button>
+        <p style="margin-top:18px; font-size:0.9rem; opacity:0.65;"><i class="fas fa-lock"></i> Secure Payment – Instant Access to All Tools</p>
+    </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="site-footer">
+    <div class="container">
+        <p>© 2026 Farouk Business & Consulting Group. All rights reserved.</p>
+        <p style="margin-top:10px;"><span>Comprehensive Platform</span> – Financial and operational tools for entrepreneurs and managers.</p>
+    </div>
+</footer>
+
+<!-- ==================== PAYMENT MODAL (Nyala Store Style) ==================== -->
+<div class="payment-overlay" id="paymentModal">
+    <div class="payment-popup">
+        <div class="payment-header">
+            <h3><i class="fas fa-lock"></i> Complete Annual Subscription</h3>
+            <button class="close-payment" id="closeModalBtn">&times;</button>
+        </div>
+        <div class="payment-body">
+            <iframe id="paymentIframe" src="" allow="payment" allowfullscreen title="Payment Window"></iframe>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // New annual payment link
+        const PAYMENT_LINK = "https://alfan.link/faroukazem?digital=DkPhgz";
+        const modal = document.getElementById('paymentModal');
+        const iframe = document.getElementById('paymentIframe');
+        const openBtns = document.querySelectorAll('#openModalBtn, #openModalBtn2, #openModalBtnHeader');
+        const closeBtn = document.getElementById('closeModalBtn');
+
+        function openModal() {
+            iframe.src = PAYMENT_LINK;
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        openBtns.forEach(btn => btn.addEventListener('click', openModal));
+
+        function closeModal() {
+            modal.classList.remove('open');
+            iframe.src = '';
+            document.body.style.overflow = '';
+        }
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+        });
+
+        // FAQ accordion
+        document.querySelectorAll('.faq-q').forEach(q => {
+            q.addEventListener('click', () => {
+                const item = q.closest('.faq-item');
+                document.querySelectorAll('.faq-item').forEach(f => {
+                    if (f !== item) f.classList.remove('active');
+                });
+                item.classList.toggle('active');
+            });
+        });
+    })();
+</script>
+
+</body>
+</html>

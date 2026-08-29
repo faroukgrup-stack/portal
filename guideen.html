@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>User Guide – Comprehensive Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Inter', 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        /* ===== Remove all vibration causes ===== */
+        .container, header, .search-wrapper, .tool-card, .back-btn,
+        .tool-content, .no-results, footer, .collapsible-header {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== Static background ===== */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: radial-gradient(circle at 70% 30%, #141c2b, #0a0e16);
+            z-index: -1;
+        }
+
+        /* ===== Container ===== */
+        .container {
+            max-width: 1100px; margin: 0 auto;
+            position: relative; z-index: 1;
+        }
+
+        /* ===== Header ===== */
+        header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-top: 0.5rem;
+        }
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #d4b15a;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        header h1 i { color: #b48554; }
+        header p {
+            color: #aab7d4;
+            font-size: 0.95rem;
+            margin-top: 0.3rem;
+        }
+
+        /* ===== Back button ===== */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(180,133,84,0.12);
+            border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 50px;
+            padding: 0.4rem 1.2rem;
+            color: #cfa776;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+        .back-btn:hover { background: rgba(180,133,84,0.25); border-color: #b48554; }
+        .back-btn i { color: #b48554; }
+
+        /* ===== Search ===== */
+        .search-wrapper {
+            position: relative;
+            max-width: 100%;
+            margin: 0.8rem auto 1.5rem;
+        }
+        .search-wrapper i {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #b48554;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 0.8rem 1.2rem 0.8rem 3rem;
+            border-radius: 50px;
+            border: 2px solid rgba(180,133,84,0.2);
+            background: rgba(18,24,36,0.8);
+            backdrop-filter: blur(8px);
+            color: #f0f4fa;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            outline: none;
+        }
+        #searchInput:focus {
+            border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+            background: rgba(22,30,46,0.9);
+        }
+        #searchInput::placeholder {
+            color: #6a7a8e;
+        }
+
+        /* ===== Tools grid ===== */
+        .tools-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* ===== Tool card (collapsible) ===== */
+        .tool-card {
+            background: rgba(22,30,46,0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.4);
+        }
+        .tool-card:hover {
+            border-color: rgba(180,133,84,0.3);
+        }
+
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.2rem;
+            cursor: pointer;
+            gap: 0.8rem;
+            user-select: none;
+            background: rgba(15,20,30,0.3);
+        }
+        .collapsible-header h2 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #cfa776;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+        .collapsible-header h2 i {
+            color: #b48554;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .collapsible-header .toggle-icon {
+            color: #aab7d4;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            transition: transform 0.15s;
+        }
+        .collapsible-header .toggle-icon.open {
+            transform: rotate(180deg);
+        }
+
+        .tool-content {
+            padding: 0 1.2rem 1.2rem;
+            color: #d0d9e8;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            display: none;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .tool-content.open {
+            display: block;
+        }
+
+        .tool-content h3 {
+            font-size: 1.1rem;
+            margin: 1.2rem 0 0.6rem;
+            color: #e2c5a3;
+        }
+        .tool-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.6rem 0;
+            font-size: 0.85rem;
+            background: rgba(10,14,23,0.4);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .tool-content th,
+        .tool-content td {
+            border: 1px solid rgba(180,133,84,0.15);
+            padding: 0.4rem 0.6rem;
+            text-align: left;
+        }
+        .tool-content th {
+            background: rgba(180,133,84,0.1);
+            color: #f0e6d2;
+            font-weight: 700;
+        }
+        .tool-content td {
+            color: #d0d9e8;
+        }
+
+        /* ===== No results ===== */
+        .no-results {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #aab7d4;
+            margin-top: 2rem;
+            display: none;
+        }
+        .no-results i {
+            color: #b48554;
+            margin-right: 0.5rem;
+        }
+
+        /* ===== Footer ===== */
+        footer {
+            text-align: center;
+            color: #aab7d4;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            padding-bottom: 0.5rem;
+        }
+        footer span {
+            color: #cfa776;
+            font-weight: 700;
+        }
+
+        /* ===================================================
+           Mobile improvements
+           =================================================== */
+        @media (max-width: 768px) {
+            body { padding: 0.8rem; }
+            header h1 { font-size: 1.5rem; }
+            header p { font-size: 0.85rem; }
+            .back-btn { font-size: 0.8rem; padding: 0.3rem 1rem; }
+            #searchInput { font-size: 0.9rem; padding: 0.7rem 1rem 0.7rem 2.8rem; }
+            .collapsible-header { padding: 0.8rem 1rem; }
+            .collapsible-header h2 { font-size: 1rem; }
+            .collapsible-header h2 i { font-size: 1rem; }
+            .tool-content { font-size: 0.9rem; padding: 0 0.8rem 0.8rem; }
+            .tool-content table { font-size: 0.8rem; }
+            .tool-content th, .tool-content td { padding: 0.3rem 0.5rem; }
+        }
+
+        @media (max-width: 400px) {
+            header h1 { font-size: 1.2rem; }
+            .collapsible-header h2 { font-size: 0.9rem; flex-wrap: wrap; }
+            .collapsible-header .toggle-icon { font-size: 1rem; }
+            .tool-content { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Back button -->
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+
+        <!-- Header -->
+        <header>
+            <h1><i class="fas fa-book-open"></i> Comprehensive User Guide</h1>
+            <p>Search for any tool or browse the list below</p>
+        </header>
+
+        <!-- Search -->
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search tool name ..." autofocus>
+        </div>
+
+        <!-- No results message -->
+        <div id="noResults" class="no-results">
+            <i class="fas fa-exclamation-circle"></i> No matching tools found
+        </div>
+
+        <!-- Tools list -->
+        <div class="tools-grid" id="toolsContainer"></div>
+
+        <!-- Footer -->
+        <footer>© 2026 <span>FAROUK GRUP</span> · All rights reserved</footer>
+    </div>
+
+    <script>
+        // ============================================================
+        // Data – all tools with their content (English version)
+        // ============================================================
+        const tools = [{
+            name: "Comprehensive Financial Feasibility Study",
+            icon: "fa-chart-pie",
+            content: `
+📌 Before You Start
+This tool helps you evaluate any project idea financially in minutes, without the need for complex accounting software.
+
+1. What can you do with this tool?
+- Calculate the working capital needed to operate the project safely.
+- Forecast revenues, expenses, and profits for future years.
+- Provides indicators such as: Net Present Value (NPV), Internal Rate of Return (IRR), Payback Period, and more.
+- Know when you reach the break-even point (i.e., when you start making a profit).
+- Test 3 scenarios: optimistic, expected, pessimistic.
+- Test the impact of changing any number (e.g., sales or costs) on the results.
+- Export a professional report in Word or Excel format to present to investors or management.
+
+2. How to fill in the data (step by step)
+
+🔹 Step 1: Choose currency and entity name
+- From the top menu, select the currency (e.g., Dollar or Riyal).
+- Enter the entity name that will appear in the report (e.g., "Al-Noor Company").
+
+🔹 Step 2: Fixed and setup capital
+- Fixed capital: the cost of machinery, buildings, vehicles... etc.
+- Setup capital: pre-operating expenses such as licenses and studies.
+
+🔹 Step 3: Monthly operating data (to calculate required liquidity)
+This is the most important set, as it determines how much cash you need initially:
+<table><tr><th>Field</th><th>What to enter?</th></tr>
+<tr><td>Monthly cash sales</td><td>How much do you expect to sell monthly (cash).</td></tr>
+<tr><td>Number of employees</td><td>How many people will work in the project.</td></tr>
+<tr><td>Average monthly net salary</td><td>The salary the employee receives in hand.</td></tr>
+<tr><td>Employee cost factor</td><td>A number to convert net salary to total cost on the company (e.g., 1.61 in some countries). If unsure, ask your accountant or leave the default value.</td></tr>
+<tr><td>Monthly net rent</td><td>Rent value before tax.</td></tr>
+<tr><td>VAT on rent</td><td>Tax percentage (e.g., 20).</td></tr>
+<tr><td>Total variable costs (% of sales)</td><td>How much do you deduct from each sale for raw materials and commissions? Example: if it's 30%, enter 0.3.</td></tr>
+<tr><td>Monthly fixed operating expenses</td><td>Electricity, internet, stationery bills...</td></tr>
+<tr><td>Monthly cash reserve</td><td>An amount you keep for emergencies monthly.</td></tr>
+<tr><td>Working capital coverage (months)</td><td>How many months of expenses do you want to secure in cash (usually 3 to 6 months).</td></tr></table>
+
+🔹 Step 4: Growth and valuation assumptions
+- Annual sales growth (%): How much will your sales increase each year (e.g., 10).
+- Annual expense growth (%): How much will costs rise due to inflation (e.g., 5).
+- Discount rate (%): The return required by the investor (if unknown, use 10%).
+- Income tax rate (%): The percentage imposed by the state on profits (e.g., 25).
+- Economic life (years): How many years will the assets work (usually 5 to 10).
+
+🔹 Step 5: Break-even data
+- Unit selling price: At what price will you sell the product or service? Enter the price here.
+
+🔹 Step 6: Optional fields
+- Reinvestment rate (MIRR): Usually leave it like the discount rate.
+- Annual debt service: If you have a loan, enter the total annual installments here.
+
+3. Click "Calculate Feasibility and Indicators"
+After entering the data, click the large blue button. Results will appear immediately below.
+
+4. How to read the results?
+🟩 Indicator cards: NPV (positive = profitable), IRR (greater than discount = good), Payback period, Break-even point. Colors: Green=excellent, Yellow=acceptable, Red=risk.
+📊 Charts: Columns for cash flows, lines for revenue and expenses, NPV curve, break-even chart.
+📋 Annual table: Details for each year (revenue, expenses, profit, cash flow).
+🔮 Scenarios: Three cards (optimistic, expected, pessimistic).
+🔍 Sensitivity analysis: Change the percentage and watch the change instantly.
+
+5. Export the final report
+📄 Word report: A formatted file with all details.
+📊 Excel report: Multiple sheets (inputs, indicators, cash flows, charts).
+
+💡 Quick tips
+- You can modify any number and click "Calculate" again.
+- Use the floating calculator (bottom left).
+- Don't forget to enter the entity name.`
+        }, {
+            name: "Comprehensive Restaurant Cost Calculator",
+            icon: "fa-utensils",
+            content: `
+📌 What is this tool and how does it help you?
+Designed specifically for restaurant owners and investors in the food industry. It allows you to:
+- Calculate your revenue and costs accurately.
+- Know your net profit and profit margin.
+- Determine the break-even point (when you start making a profit).
+- Measure your restaurant's health using 4 global indicators.
+- Test scenarios (optimistic, pessimistic).
+- Analyze location and its impact on customer numbers.
+- Run Monte Carlo simulation to predict risks.
+- Estimate your restaurant's market value.
+- Export a professional report in Word or Excel format.
+
+1. Before you start – The main interface
+At the top: currency selection, entity name, then the main input sections.
+
+2. How to fill in the data (step by step)
+🔹 Section 1: Basic information
+<table><tr><th>Field</th><th>What to enter?</th></tr>
+<tr><td>Daily customers (estimated)</td><td>Average number of customers visiting the restaurant per day.</td></tr>
+<tr><td>Average bill value</td><td>How much does one customer spend approximately (in the selected currency).</td></tr>
+<tr><td>Working days per month</td><td>How many days do you open the restaurant per month (usually 26 or 30).</td></tr></table>
+
+🔹 Section 2: Monthly fixed costs
+<table><tr><th>Field</th><th>Explanation</th></tr>
+<tr><td>Monthly rent</td><td>Shop rent value.</td></tr>
+<tr><td>Employee salaries (net)</td><td>Total what all employees receive in hand.</td></tr>
+<tr><td>Employee cost factor (%)</td><td>Additional percentage you pay above salary (insurance, allowances).</td></tr>
+<tr><td>Utilities (electricity, water, gas)</td><td>Monthly average.</td></tr>
+<tr><td>Internet and subscriptions</td><td>Internet and POS software.</td></tr>
+<tr><td>Maintenance and cleaning</td><td>Periodic maintenance + cleaning supplies.</td></tr>
+<tr><td>Marketing and advertising</td><td>What you spend monthly on advertisements.</td></tr>
+<tr><td>Other expenses</td><td>Any other fixed costs not mentioned.</td></tr></table>
+
+🔹 Section 3: Variable costs (% of revenue)
+<table><tr><th>Field</th><th>What to enter?</th></tr>
+<tr><td>Food cost (%)</td><td>How much does food cost as a percentage of the meal price? (e.g., 30 means 30%)</td></tr>
+<tr><td>Drink cost (%)</td><td>Same for beverages.</td></tr>
+<tr><td>Packaging and supplies (%)</td><td>Percentage cost of bags and containers.</td></tr>
+<tr><td>Delivery commissions (%)</td><td>The percentage taken by delivery platforms (e.g., 15%).</td></tr>
+<tr><td>Delivery sales percentage (%)</td><td>What percentage of your sales are delivery orders? (e.g., 30%).</td></tr>
+<tr><td>Waste percentage (%)</td><td>Food that spoils or burns and is not sold (usually 2-5%).</td></tr></table>
+
+🔹 Section 4: Taxes and initial investment
+<table><tr><th>Field</th><th>Explanation</th></tr>
+<tr><td>Value Added Tax (VAT) (%)</td><td>The percentage applied to sales (if applicable).</td></tr>
+<tr><td>Initial investment (setup)</td><td>How much did you pay to set up the restaurant (equipment, decor, licenses).</td></tr></table>
+
+🔹 Section 5: Location analysis (optional but important)
+Click the arrow next to "Location Analysis" to reveal fields: daily foot traffic, entry rate (%), purchase rate (%), number of tables, seats, session duration, and operating hours.
+
+3. Click "Calculate Costs & Profits"
+
+4. How to read the results?
+🟩 Top indicator cards: Monthly revenue, fixed costs, variable costs, net profit (green = profit, red = loss), profit margin (%).
+⚠️ Smart alerts: Notifications like food cost above 35%, salaries too high...
+📊 Charts: Pie chart (revenue distribution), line chart (break-even point).
+📋 Monthly cost breakdown: Full table with every item and its percentage.
+⏱️ Investment payback period.
+🔍 Profitability sensitivity analysis: Three scenarios.
+🩺 Restaurant health score: Score out of 100 based on 4 global criteria.
+💰 Market value estimate: Enter the sector multiple.
+
+5. Advanced analytics (click the arrow to open): Monte Carlo simulation, operational shutdown point, operating leverage, margin of safety, capacity & occupancy analysis.
+
+6. Export reports: 📄 Word and 📊 Excel (multiple sheets).
+
+💡 Additional tips: Use default values if unsure, and try changing the number of customers.`
+        }, {
+            name: "Advanced Technical Feasibility Study for Restaurants",
+            icon: "fa-gear",
+            content: `
+📌 What is this tool and what does it offer?
+Dedicated to entrepreneurs and investors in the restaurant sector. It helps you evaluate the location, input all kitchen equipment, calculate production capacity, forecast revenue, costs, and profits, break-even point, get a technical and financial evaluation (score out of 100), know the investment payback period, receive automatic warnings, and export a Word or Excel report.
+
+1. Before you start
+Choose the currency and enter the entity name. The page is divided into clear sections.
+
+2. Explanation of inputs – step by step
+🔹 Section 1: Scope and specifications
+<table><tr><th>Field</th><th>What to choose / enter?</th></tr>
+<tr><td>Kitchen type</td><td>Choose from the list (fast food, fine dining, Eastern...).</td></tr>
+<tr><td>Number of seats</td><td>Total seating capacity.</td></tr>
+<tr><td>Service model</td><td>Table service, self-service, delivery only, or mixed.</td></tr>
+<tr><td>Daily operating hours</td><td>How many hours is the restaurant open per day.</td></tr>
+<tr><td>Operating shifts</td><td>Single shift, two shifts, or multiple.</td></tr></table>
+
+🔹 Location analysis
+<table><tr><th>Field</th><th>What to enter?</th></tr>
+<tr><td>Total area (m²)</td><td>The shop area in square meters.</td></tr>
+<tr><td>Kitchen area ratio (%)</td><td>How much of the space will you allocate to the kitchen (e.g., 35).</td></tr>
+<tr><td>Available electrical capacity (Amps)</td><td>The existing electrical capacity.</td></tr>
+<tr><td>Water source</td><td>Suitable or needs development?</td></tr>
+<tr><td>Ventilation system</td><td>Suitable, needs development, or unsuitable.</td></tr>
+<tr><td>Delivery accessibility</td><td>Excellent, moderate, or difficult.</td></tr></table>
+
+🔹 Equipment section (dynamic): Add any number of equipment (name, power kW, cost, space). The tool aggregates totals and shows a warning if electricity is exceeded.
+
+🔹 Production capacity and operational efficiency: Table turnover rate, peak hours, occupancy rate, average meal price, food cost, number of employees, salaries, rent, other expenses, equipment life.
+
+🔹 Establishment costs: Fit-out & construction, licenses & fees, working capital (3 months).
+
+3. Click "Calculate Technical Study"
+
+4. How to read the results?
+🟩 Main indicator cards: Monthly revenue, net profit, break-even revenue, payback period.
+⚠️ Smart warnings: Alerts like tight space, high prime cost...
+📊 Charts: Financial performance analysis, risk analysis.
+🏆 Project evaluation (technical and financial) out of 100.
+
+5. Export reports: 📄 Word and 📊 Excel (4 sheets).
+
+💡 Tips: Enter equipment data accurately, and monitor electricity warnings.`
+        }, {
+            name: "Comprehensive Marketing Feasibility Study",
+            icon: "fa-chart-simple",
+            content: `
+📌 What does this tool offer?
+Market analysis, target audience, competitors, marketing strategy (4P), marketing channels with budgets and expected customers, calculate precise marketing financial indicators (revenue, CAC, LTV, ROAS...), instant warnings, export Word/PDF/Excel.
+
+1. Before you start: Choose currency and entity name.
+
+2. Filling data (step by step)
+🟡 Right section: Project definition (name, description, location, duration), market analysis (TAM, SAM, SOM, annual growth, trends), target audience (age, gender, region, income, interests, audience size).
+🟡 Left section: Competitors (name, strength, weakness), marketing strategy (product, meal price and cost, place, promotion, team size, plan duration), monthly operating expenses (rent, salaries, utilities, other).
+🟡 Bottom sections: Marketing channels (monthly budget, expected customers), customer behavior (purchases per month, loyalty duration, walk-in customers).
+
+3. Click "Calculate Study Now"
+
+4. How to read the results?
+🟩 Indicator cards: Active customers, annual revenue, marketing costs, marketing contribution, CAC, LTV, ROAS, break-even customers.
+⚠️ Warnings: Red alerts if any.
+📊 Competitor analysis and market attractiveness: Text evaluation and score out of 10.
+📈 Charts: Revenue vs marketing costs, current customers vs break-even.
+
+5. Export reports: 📄 Word and 📊 Excel (multiple sheets).
+
+💡 Tips: Ensure selling price > meal cost, aim for LTV/CAC > 3.`
+        }, {
+            name: "Real Estate Investment Return Calculator",
+            icon: "fa-building",
+            content: `
+📌 What is this tool and what does it offer?
+Evaluate any real estate investment opportunity accurately, with or without bank financing. NPV, IRR, MIRR, Payback, Cash on Cash, cash flows, sensitivity analysis, export Word or Excel.
+
+1. Before you start: Choose currency and entity name.
+
+2. Filling data (step by step)
+🏢 Property & operations data: Property value, number of units, monthly rent per unit, monthly expenses, occupancy rate, property tax, assessed discount, annual rent increase, land appreciation, purchase fees & taxes.
+🏦 Mortgage financing (optional): Loan-to-value, interest rate, loan term.
+📈 Evaluation criteria: Discount rate, reinvestment rate, number of years.
+
+3. Click "Calculate Return"
+
+4. How to read the results?
+🟩 Indicator cards: NPV, IRR, MIRR, Payback, PI, Cash on Cash, ROI.
+🏆 Project evaluation: Score out of 100.
+📈 Chart: Cash flow and cumulative.
+📊 Cash flow table.
+🔍 Sensitivity analysis: Four buttons (+/-10% rent/occupancy).
+
+5. Export reports: 📄 Word and 📊 Excel (5 sheets).
+
+💡 Tips: If buying cash, set loan to 0%, try the sensitivity buttons.`
+        }, {
+            name: "Advanced Risk Simulation (Monte Carlo)",
+            icon: "fa-wave-square",
+            content: `
+📌 What is this tool and how does it help?
+Two-way sensitivity analysis and Monte Carlo simulation (thousands of scenarios). NPV, IRR, Payback, PI, probability of loss, export Word or Excel.
+
+1. Before you start: Choose currency and entity name. Choose between sensitivity analysis or Monte Carlo simulation.
+
+2. Filling data
+🟡 Base case: Initial investment, annual revenue and costs, depreciation, growth, discount, tax, duration.
+🔵 Sensitivity: Percentage change in revenue and costs.
+🎲 Monte Carlo: Revenue/cost volatility (σ%), number of iterations.
+
+3. Click "Run Analysis"
+
+4. How to read the results?
+🟩 Indicator cards: NPV, IRR, Payback, PI.
+In sensitivity: 3×3 matrix.
+In Monte Carlo: Histogram, statistics (VaR, best 5%, probability of loss, CV...).
+
+5. Export reports: 📊 Excel (5 sheets) and 📄 Word.
+
+💡 Tips: Increase iterations for accuracy, probability of loss >40% means high risk.`
+        }, {
+            name: "Break-Even Point Calculator",
+            icon: "fa-chart-line",
+            content: `
+📌 What is this tool and when to use it?
+Calculates the number of units and revenue needed to cover costs, contribution margin, with a chart.
+
+1. Tool interface: Currency, entity name, only three fields.
+
+2. Inputs – only three numbers
+<table><tr><th>Field</th><th>What to enter?</th></tr>
+<tr><td>Monthly fixed costs</td><td>All expenses that do not change with sales.</td></tr>
+<tr><td>Unit selling price</td><td>The price you sell the product or service for.</td></tr>
+<tr><td>Variable cost per unit</td><td>The direct cost to produce one unit.</td></tr></table>
+
+3. Click "Calculate Break-even"
+
+4. How to read the results?
+🟩 Indicator cards: Break-even units, break-even revenue, contribution margin and ratio.
+📊 Chart: Revenue (green), total costs (red), break-even point (gold).
+📋 Summary table.
+✅ Final verdict.
+
+5. Export reports: 📄 Word and 📊 Excel (6 sheets).
+
+💡 Tips: If break-even is close to your maximum capacity, reduce costs or increase price.`
+        }, {
+            name: "Advanced Cash Flow Calculator",
+            icon: "fa-coins",
+            content: `
+📌 What is this tool and when to use it?
+Calculate and analyze operating cash flow (OCF) or free cash flow (FCFF) with forecasts for the next five periods.
+
+1. Before you start: Choose currency, entity name, period (monthly/quarterly/yearly), and flow type.
+
+2. Filling data
+📊 Income data: Revenue, operating expenses, depreciation, tax, CAPEX, change in working capital.
+📈 Forecast option: Growth rate per period.
+
+3. Click "Calculate Cash Flow"
+
+4. How to read the results?
+🟩 Indicator cards: Revenue per period, EBIT, NOPAT, final cash flow (green=positive, red=negative).
+📋 Calculation breakdown table.
+📈 Forecast chart.
+
+5. Export reports: 📄 Word and 📊 Excel (7 sheets).
+
+💡 Tips: Large negative FCFF? Review CAPEX or working capital.`
+        }, {
+            name: "Advanced Depreciation Calculator",
+            icon: "fa-chart-simple",
+            content: `
+📌 What is this tool and when to use it?
+Calculate asset depreciation using four accepted methods, with an annual schedule and chart.
+
+1. Before you start: Choose currency and entity name.
+
+2. Filling data
+<table><tr><th>Field</th><th>What to enter?</th></tr>
+<tr><td>Asset cost</td><td>Total purchase price of the asset.</td></tr>
+<tr><td>Salvage value</td><td>Expected value after the end of useful life.</td></tr>
+<tr><td>Useful life (years)</td><td>How many years do you expect to use the asset?</td></tr>
+<tr><td>Depreciation method</td><td>Straight line, declining balance, double declining, or custom rate.</td></tr>
+<tr><td>Purchase month</td><td>The month you bought the asset.</td></tr></table>
+
+3. Click "Calculate Depreciation"
+
+4. How to read the results?
+🟩 Indicator cards: Total depreciation, final book value, actual years, average annual depreciation.
+📉 Chart: Book value decline over time.
+📋 Annual depreciation schedule (depreciation, accumulated, book value).
+
+5. Export reports: 📄 Word and 📊 Excel (6 sheets).
+
+💡 Tips: Double declining method usually leaves no salvage value and stops automatically.`
+        }, {
+            name: "WACC Calculator",
+            icon: "fa-scale-balanced",
+            content: `
+📌 What is this tool and when to use it?
+Calculate the weighted average cost of capital. You can use manual entry or CAPM. Capital structure pie chart.
+
+1. Before you start: Choose currency and entity name.
+
+2. Filling data
+🟢 Equity: Value, Re calculation method (manual or CAPM: Rf, Beta, Market risk premium).
+🔴 Debt: Value, cost, tax rate.
+
+3. Click "Calculate WACC"
+
+4. How to read the results?
+🟩 WACC card with classification (low/moderate/high).
+📊 Pie chart: Capital structure.
+📋 Calculation breakdown table.
+💡 Interpretation.
+
+5. Export reports: 📄 Word and 📊 Excel (6 sheets).
+
+💡 Tips: WACC is the minimum required return for projects.`
+        }, {
+            name: "ROI Calculator",
+            icon: "fa-chart-line",
+            content: `
+📌 What is this tool and when to use it?
+Calculate ROI and payback period with a cumulative cash flow chart.
+
+1. Before you start: Choose currency and entity name.
+
+2. Filling data
+<table><tr><th>Field</th><th>What to enter?</th></tr>
+<tr><td>Total investment cost</td><td>Total amount to start the project.</td></tr>
+<tr><td>Expected net profit</td><td>Net profit in the specified period.</td></tr>
+<tr><td>Profit period</td><td>Yearly, half-yearly, quarterly, monthly.</td></tr>
+<tr><td>Number of years to display</td><td>Up to 20 years.</td></tr></table>
+
+3. Click "Calculate ROI"
+
+4. How to read the results?
+🟩 Indicator cards: ROI (green=profitable), payback period, annual net profit.
+📈 Cumulative cash flow chart.
+
+5. Export reports: 📄 Word and 📊 Excel (5 sheets).
+
+💡 Tips: Payback > 5 years means high risk.`
+        }, {
+            name: "Advanced Loan Amortization Calculator",
+            icon: "fa-hand-holding-usd",
+            content: `
+📌 What does it offer?
+Calculate periodic payment, total interest, down payment, extra payments, grace period, full repayment schedule, charts.
+
+1. Tool interface: Currency, entity name, basic fields, advanced settings.
+
+2. Filling data
+🟡 Basic fields: Loan amount, annual interest, term, payment frequency.
+🔧 Advanced settings: Down payment, periodic extra payment, grace period.
+
+3. Click "Calculate Amortization Schedule"
+
+4. How to read the results?
+🟩 Indicator cards: Periodic payment, total interest, total payments, number of payments.
+⚠️ Summary and alerts.
+📊 Charts: Pie (interest/principal), stacked columns.
+📋 Full amortization table.
+
+5. Export reports: 📄 Word and 📊 Excel (6 sheets).
+
+💡 Tips: Try a small extra payment to see how much you save.`
+        }, {
+            name: "Optimal Labor Cost Calculator",
+            icon: "fa-users",
+            content: `
+📌 What is this tool and when to use it?
+Calculate labor cost, labor-to-sales ratio, employee efficiency, recommendations for improving shifts and leaves.
+
+1. Before you start: Choose currency and entity name.
+
+2. Filling data
+🟡 Basic inputs: Monthly sales, average bill, average monthly wage, working days, target ratio, daily shifts.
+🕒 Shifts section (dynamic): Number of employees and shift hours.
+📅 Leave distribution: Same holiday or staggered.
+
+3. Click "Calculate Optimal Cost"
+
+4. How to read the results?
+🟩 9 cards: Total employees, labor cost, labor ratio, sales per employee...
+⚠️ Alert message (green/yellow/red).
+💡 Recommendations to improve efficiency.
+📊 Chart: Two bars (sales/labor).
+
+5. Export reports: 📄 Word and 📊 Excel (6 sheets).
+
+💡 Tips: Ideal labor ratio is 20-30% for restaurants.`
+        }, {
+            name: "Advanced HACCP Audit System",
+            icon: "fa-exclamation-triangle",
+            content: `
+📌 What is this tool and when to use it?
+Daily checklist for 10 main areas, instant corrective recommendations, compliance percentage, export Word and Excel.
+
+1. Before you start: Fill in date and responsible person.
+
+2. How to use the checklist?
+10 sections (Receiving, Storage, Preparation, Cooking, Cooling, Personal Hygiene, Cleaning, Pest Control, Documentation, Training). Check ✅ on applicable items. Non-applicable items show a recommendation with risk level (🔴🟡🟢).
+
+3. Click "Calculate Results & Recommendations"
+
+4. Results: Compliance percentage, overall risk level.
+
+5. Export reports: 📊 Excel (3 sheets) and 📄 Word.
+
+💡 Tips: Focus on high-risk items (red).`
+        }, {
+            name: "Standard Operating Procedures (SOPs) Audit System",
+            icon: "fa-clipboard-list",
+            content: `
+📌 What is this tool and when to use it?
+Comprehensive daily checklist (66 items) across ten operational sections, instant recommendations, compliance percentage, Word export.
+
+1. Before you start: Fill in date and responsible person.
+
+2. How to use the checklist: 10 sections (Receiving, Storage... etc.). Check ✅ on applicable items. Non-applicable items show corrective recommendations.
+
+3. Click "Calculate Results & Recommendations": Compliance percentage, overall risk level.
+
+4. Export Word report: All items and recommendations, ready to print.
+
+💡 Tips: Start with high-risk items.`
+        }, {
+            name: "Financial & Advisory Calculator",
+            icon: "fa-calculator",
+            content: `
+📌 What is this tool and what does it offer?
+Scientific and financial calculator (tax, discount, ROI, interest) with memory, operation history, and CSV export.
+
+1. Interface overview: Calculator (right), history panel (left), date and time at top.
+
+2. Quick financial tools
+<table><tr><th>Button</th><th>What does it do?</th></tr>
+<tr><td>Tax</td><td>Adds tax percentage to the amount.</td></tr>
+<tr><td>Discount</td><td>Subtracts discount percentage from the amount.</td></tr>
+<tr><td>ROI</td><td>Calculates return on investment.</td></tr>
+<tr><td>Interest</td><td>Calculates simple interest.</td></tr></table>
+
+3. Operation history panel: Filter, export CSV, clear.
+
+💡 Tips: Use the keyboard directly, M+ to accumulate numbers in memory.`
+        }, {
+            name: "Multi-Product Break-Even Analysis",
+            icon: "fa-chart-line",
+            content: `
+📌 What is this tool and when to use it?
+Calculate break-even for multiple products based on sales mix, contribution margin, and break-even units per product.
+
+1. Before you start: Choose currency and entity name.
+
+2. Filling data
+🍽️ Products section: Add products (name, price, cost, mix ratio).
+💰 Monthly fixed costs.
+📈 Actual sales (optional).
+
+3. Click "Calculate Break-even"
+
+4. How to read the results?
+🟩 Cards: Weighted average price, weighted contribution margin ratio, break-even revenue, total break-even units.
+📋 Product breakdown table.
+📊 Charts: Pie and bar.
+🛡️ Margin of safety.
+
+5. Export reports: 📄 Word and 📊 Excel (6 sheets).
+
+💡 Tips: Focus on products with the highest contribution margin.`
+        }, {
+            name: "Comprehensive Financial Ratios Calculator",
+            icon: "fa-percentage",
+            content: `
+📌 What is this tool and when to use it?
+Calculate 18 financial ratios (liquidity, profitability, solvency, activity) with instant evaluation and recommendations.
+
+1. Before you start: Choose currency and company name.
+
+2. Filling data
+🏦 Balance sheet column: Cash, inventory, other current assets, fixed assets, current and long-term liabilities.
+📈 Income statement and cash flow column: Revenue, cost of goods sold, operating expenses, interest, tax, credit sales, debtors and creditors.
+
+3. Click "Calculate Financial Ratios"
+
+4. How to read the results?
+🟩 10 quick cards.
+📋 Full detailed table: 18 ratios with evaluation.
+📊 Charts: Radar and bar.
+💡 Smart recommendations.
+
+5. Export reports: 📄 Word and 📊 Excel (5 sheets).
+
+💡 Tips: Current ratio < 1 is a danger signal, ROE should be > 15%.`
+        }, {
+            name: "Advanced Financial Forecasting Tool",
+            icon: "fa-arrow-trend-up",
+            content: `
+📌 What is this tool and when to use it?
+Build financial forecasts for several years, calculate NPV, IRR, Payback, Terminal Value.
+
+1. Before you start: Choose currency and company name.
+
+2. Filling data
+📊 Historical data column: Revenue, COGS %, operating expenses %, tax, depreciation, CAPEX, DSO, DIO, DPO.
+📈 Growth and valuation assumptions column: Revenue growth, forecast years, WACC, initial working capital, initial investment, terminal value %.
+
+3. Click "Run Financial Forecast"
+
+4. How to read the results?
+🟩 Cards: NPV, IRR, Payback, TV.
+📋 Forecasted income statement.
+💵 Free cash flows.
+📈 Charts.
+💰 Project valuation.
+
+5. Export reports: 📄 Word and 📊 Excel (7 sheets).
+
+💡 Tips: If NPV is negative, review assumptions.`
+        }, {
+            name: "Employee Evaluation Form",
+            icon: "fa-user-check",
+            content: `
+📌 What is this tool and when to use it?
+Evaluate employee performance using 40 criteria across 7 areas, score out of 200, development recommendations, export Word and Excel.
+
+1. Tool interface: Employee data, progress bar, 7 question sections.
+
+2. How to use: Fill in employee data, rate each criterion from 1 to 5.
+
+3. Progress bar: Shows number of answered criteria.
+
+4. View results and recommendations: Total score (out of 200), overall grade, detailed recommendations.
+
+5. Export reports: 📄 Word and 📊 Excel.
+
+💡 Tips: Use recommendations as an individual development plan.`
+        }, {
+            name: "Manager Assessment Scale (Talent Retention Mindset)",
+            icon: "fa-user-check",
+            content: `
+📌 What is this tool and when to use it?
+Self-assessment for leaders using 26 statements to measure talent retention mindset.
+
+1. Tool interface: No personal data needed, progress bar, 4 options per statement.
+
+2. Assessment method: Choose answer (Always/Often/Sometimes/Never). Higher score = higher risk of losing talent.
+
+3. Progress bar: 26 statements.
+
+4. View results and recommendations: Score out of 104, classification (Excellent/Moderate/Low/Critical), detailed recommendations.
+
+5. Export reports: 📄 Word and 📊 Excel.
+
+💡 Tips: Be honest, if in the orange or red zone start implementing recommendations immediately.`
+        }, {
+            name: "Menu Engineering",
+            icon: "fa-object-group",
+            content: `
+📌 What is this tool and what does it offer?
+Analyze your menu using the BCG matrix (Stars, Cash Cows, Question Marks, Dogs).
+
+1. Before you start: Choose currency and establishment name.
+
+2. Filling data
+🟡 Add dish manually: Name, price, cost, sales quantity.
+🟢 Import from Excel: Ready-made template.
+
+3. Click "Analyze Menu & Generate Recommendations"
+
+4. How to read the results?
+🟩 Summary cards: Number of dishes, classifications, revenue, net profit.
+📈 Interactive chart (BCG matrix).
+📋 Recommendations table: For each dish (Keep, Improve, Raise Price, Remove).
+
+5. Export reports: 📄 Word and 📊 Excel.
+
+💡 Tips: Turn Question Marks into Stars through marketing, remove non-strategic Dogs.`
+        }, {
+            name: "CAC & CLV Calculator",
+            icon: "fas fa-users",
+            content: `
+📌 What is this tool and when to use it?
+Compare Customer Acquisition Cost (CAC) with Customer Lifetime Value (CLV).
+
+1. Tool interface: Currency, entity name, 6 fields.
+
+2. Filling data: Monthly marketing expenses, new customers, average order, visits per year, retention years, profit margin.
+
+3. Click "Calculate CAC & CLV"
+
+4. How to read the results?
+🟩 Cards: CAC, CLV, CLV/CAC ratio (greater than 3 is excellent), classification.
+📈 Chart.
+💡 Strategic recommendations.
+
+5. Export reports: 📄 Word and 📊 Excel.
+
+💡 Tips: Aim for ratio > 3.`
+        }, {
+            name: "Smart Content Generator & Analysis Tool",
+            icon: "fas fa-robot",
+            content: `
+📌 What is this tool and what does it offer?
+AI-powered content generation (report analysis, weekly plans, viral ideas, article writing, Q&A, video scripts).
+
+1. Before you start: No currency or entity name needed.
+
+2. How to use
+Step 1: Choose service type (Report Analysis, Weekly Plan, Content Building, Answer Question...).
+Step 2: Write your request or paste your report.
+Step 3: Click "Start Analysis / Generation".
+
+3. Understanding the results: Quick statistic cards, generated content in cards.
+
+4. Export content: 📄 "Export to Word" button.
+
+💡 Tips: Be specific in your description.`
+        }, {
+            name: "Cash Gap (CCC) Calculator",
+            icon: "fas fa-money-bill-wave",
+            content: `
+📌 What is this tool and what does it measure?
+Cash Conversion Cycle (DIO + DSO - DPO).
+
+1. Before you start: Currency, entity name, period duration.
+
+2. Filling data
+🟡 Balance sheet: Inventory, accounts receivable, accounts payable (beginning and end of period).
+📈 Income statement: Cost of goods sold, net credit sales.
+
+3. Click "Calculate Cash Gap"
+
+4. How to read the results?
+🟩 Cards: DIO, DSO, DPO, CCC with classification (less than 30 days = excellent).
+📊 Charts.
+📋 Calculation details.
+💡 Recommendations.
+
+5. Export reports: 📄 Word and 📊 Excel (6 sheets).
+
+💡 Tips: Negative CCC means excellent supplier financing.`
+        }, {
+            name: "Investment Analysis (NPV / IRR / Payback)",
+            icon: "fa-wave-square",
+            content: `
+📌 What is this tool and when to use it?
+Evaluate any investment project using NPV, IRR, Payback.
+
+1. Tool interface: Currency, entity name, 3 basic fields, annual cash flows container.
+
+2. Filling data: Initial investment, discount rate, duration, cash flows per year.
+
+3. Click "Calculate Investment Indicators"
+
+4. How to read the results?
+🟩 Cards: NPV (positive=profitable), IRR (greater than discount=acceptable), Payback, Discounted Payback, final verdict.
+📋 Cash flow table.
+📊 Chart.
+💡 Recommendations.
+
+5. Export reports: 📄 Word and 📊 Excel (2 sheets).
+
+💡 Tips: Higher NPV is better, IRR should be > discount rate.`
+        }, {
+            name: "Scenario (What-If) Analysis",
+            icon: "fas fa-lightbulb",
+            content: `
+📌 What is this tool and when to use it?
+Simulate the impact of changes in sales, salaries, and raw materials on net profit and profit margin.
+
+1. Tool interface: Currency, entity name, 4 basic fields, 3 change percentage fields.
+
+2. Filling data
+🟡 Current state: Monthly revenue, salaries, raw materials, other expenses.
+⚡ Scenario changes: Percentage change in sales, salaries, raw materials.
+
+3. Click "Run Simulation"
+
+4. How to read the results?
+🟩 4 comparison cards (current/scenario).
+📈 Charts.
+📋 Detailed comparison table.
+💡 Recommendations and analysis.
+
+5. Export reports: 📄 Word and 📊 Excel.
+
+💡 Tips: Try changing one factor at a time.`
+        }, {
+            name: "Knowledge & Personal Skills Assessment",
+            icon: "fa-award",
+            content: `
+📌 What is this tool and when to use it?
+Quick self-assessment test (16 criteria) in knowledge, abilities, orientations, behaviors, with development recommendations.
+
+1. Tool interface: Personal data, progress bar, 16 criteria.
+
+2. How to evaluate: Scale from 0 (unaware) to 5 (expert). Coloring: Red (0-1), Orange (2).
+
+3. View results and recommendations: Total score out of 80, overall level, recommendations for red and orange areas.
+
+4. Export reports: 📄 Word and 📊 Excel with highlighted scores.
+
+💡 Tips: Focus on red areas first.`
+        }, {
+            name: "Restaurant Valuation Calculator",
+            icon: "fa-ranking-star",
+            content: `
+📌 What is this tool and when to use it?
+Estimate the market value of a restaurant based on EBITDA and multiple, with the impact of the lease and your share.
+
+1. Before you start: Choose currency and restaurant name.
+
+2. Explanation of inputs
+🟡 Basic data: Year founded, lease expiry year.
+💰 Financial data: Revenue, COGS, OPEX, D&A, interest, taxes, debt, asset value, market multiple.
+💉 Additional capital injection (optional).
+👤 Your share (%).
+
+3. Click "Calculate Valuation"
+
+4. How to read the results?
+🟩 Cards: EBITDA, entity value, fair value, your share price, payback period, efficiency indicator.
+⚠️ Lease warning.
+📈 Sensitivity analysis.
+
+5. Export reports: 📄 Word and 📊 Excel.
+
+💡 Tips: Natural multiple is 2.5 – 3.5.`
+        }];
+
+        // ============================================================
+        // Display tools with collapsible functionality
+        // ============================================================
+        const container = document.getElementById('toolsContainer');
+        const searchInput = document.getElementById('searchInput');
+        const noResults = document.getElementById('noResults');
+
+        // Function to render tools
+        function renderTools(filter = '') {
+            const filtered = tools.filter(tool =>
+                tool.name.toLowerCase().includes(filter.toLowerCase()) || filter === ''
+            );
+            container.innerHTML = '';
+            if (filtered.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            }
+            noResults.style.display = 'none';
+
+            filtered.forEach((tool, index) => {
+                const card = document.createElement('div');
+                card.className = 'tool-card';
+
+                // Collapsible header
+                const header = document.createElement('div');
+                header.className = 'collapsible-header';
+                header.innerHTML = `
+                    <h2><i class="fas ${tool.icon}"></i> ${tool.name}</h2>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                `;
+
+                // Content
+                const content = document.createElement('div');
+                content.className = 'tool-content';
+                content.innerHTML = tool.content;
+
+                // Toggle event
+                header.addEventListener('click', function() {
+                    const isOpen = content.classList.contains('open');
+                    content.classList.toggle('open');
+                    const icon = this.querySelector('.toggle-icon');
+                    if (icon) {
+                        icon.classList.toggle('open');
+                    }
+                });
+
+                // Open the first card by default
+                if (index === 0 && filter === '') {
+                    content.classList.add('open');
+                    header.querySelector('.toggle-icon').classList.add('open');
+                }
+
+                card.appendChild(header);
+                card.appendChild(content);
+                container.appendChild(card);
+            });
+        }
+
+        // Live search
+        searchInput.addEventListener('input', function(e) {
+            const val = e.target.value.trim();
+            renderTools(val);
+        });
+
+        // Initial render
+        renderTools();
+    </script>
+</body>
+</html>
