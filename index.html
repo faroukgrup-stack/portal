@@ -431,10 +431,12 @@
             margin-bottom: 0.5rem;
             outline: none;
         }
+        /* إضافة dir=ltr للحافظة على ترتيب الأزرار بغض النظر عن RTL */
         .calc-buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 0.3rem;
+            direction: ltr; /* يثبت الترتيب */
         }
         .calc-btn {
             background: rgba(15,20,30,0.7);
@@ -829,11 +831,11 @@
                         </div>
                     </div>
 
-                    <!-- ===== الحاسبة (ترتيب الأزرار: 7 8 9 / 4 5 6 / 1 2 3) ===== -->
+                    <!-- ===== الحاسبة (ترتيب الأزرار: 7 8 9 / 4 5 6 / 1 2 3) مع dir=ltr ===== -->
                     <div class="service-block">
                         <div class="panel-header"><i class="fas fa-calculator"></i> <span data-i18n="calculator">الحاسبة المالية</span></div>
                         <input type="text" id="calcDisplay" readonly value="0">
-                        <div class="calc-buttons">
+                        <div class="calc-buttons" dir="ltr"> <!-- إضافة dir=ltr هنا -->
                             <button class="calc-btn" onclick="appendCalc('7')">7</button>
                             <button class="calc-btn" onclick="appendCalc('8')">8</button>
                             <button class="calc-btn" onclick="appendCalc('9')">9</button>
@@ -1415,7 +1417,7 @@
         }
 
         // ============================================================
-        // الحاسبة (ترتيب الأزرار: 7 8 9 / 4 5 6 / 1 2 3) — ثابت في كلتا اللغتين
+        // الحاسبة (ترتيب الأزرار: 7 8 9 / 4 5 6 / 1 2 3)
         // ============================================================
         let calcInput = '0',
             calcPrev = '',
