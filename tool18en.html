@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Comprehensive Financial Ratios Calculator | FAROUK GRUP</title>
+<!-- Page protection -->
+<script src="auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
+        }
+
+        /* ===== Remove all vibration-causing properties ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .btn-export, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .form-group input,
+        .form-group select, .grid-2, .results-grid, .chart-grid,
+        .action-bar, .export-loading, .export-loading-box, .modal, .modal-content {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== Fixed background ===== */
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.20;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.10) 0%, transparent 70%);
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.05) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.06) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
+        }
+
+        /* ===== WRAPPER ===== */
+        .calc-wrapper {
+            max-width: 1050px; margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+        }
+
+        /* ===== CARD ===== */
+        .calc-box {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .calc-box h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+        }
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== Currency row ===== */
+        .currency-row {
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.8rem; background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.2);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
+        }
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
+        .currency-row select, .currency-row input {
+            flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
+        }
+        .currency-row input { flex: 2 1 200px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* ===== Section titles ===== */
+        .section-title-sm {
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
+            margin: 1.2rem 0 0.8rem 0;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== Grid ===== */
+        .grid-2 {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+            gap: 0.8rem; margin-bottom: 0.5rem;
+        }
+
+        /* ===== Form groups ===== */
+        .form-group {
+            flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
+        }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-left: 0.3rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+
+        /* ===== Calculate button ===== */
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer; margin: 1.5rem 0; font-family: 'Tajawal', sans-serif;
+        }
+        .btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-calculate:active { transform: scale(0.97); }
+
+        /* ===== Results ===== */
+        .results-section { margin-top: 1.5rem; }
+        .results-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+            gap: 0.8rem; margin-bottom: 1rem;
+        }
+        .result-card {
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.12);
+            border-radius: 16px; padding: 0.8rem; text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        .result-card .label { font-size: 0.75rem; color: #aab7d4; margin-bottom: 0.2rem; font-weight: 700; }
+        .result-card .value { font-size: 1.2rem; font-weight: 900; color: #cfa776; }
+        .result-card .status {
+            font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 20px;
+            display: inline-block; margin-top: 0.2rem;
+        }
+        .status-good { background: #28a745; color: white; }
+        .status-bad { background: #dc3545; color: white; }
+        .status-warning { background: #ffc107; color: #111; }
+
+        /* ===== Tables ===== */
+        .table-container {
+            overflow-x: auto; margin-top: 1rem;
+            border: 1px solid rgba(180,133,84,0.1); border-radius: 20px;
+            background: rgba(22,30,46,0.6); padding: 0.5rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.85rem;
+            min-width: 500px;
+        }
+        th {
+            background: rgba(180,133,84,0.15); color: #cfa776;
+            font-weight: 900; padding: 0.5rem 0.6rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15); white-space: nowrap;
+        }
+        td {
+            padding: 0.5rem 0.6rem;
+            border-bottom: 1px solid rgba(180,133,84,0.06);
+            text-align: center; color: #f0f4fa;
+        }
+        tr:last-child td { border-bottom: none; }
+
+        /* ===== Charts ===== */
+        .chart-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 1rem; margin: 1rem 0;
+        }
+        .chart-container {
+            background: rgba(22,30,46,0.6); border-radius: 16px;
+            padding: 0.6rem; border: 1px solid rgba(180,133,84,0.08);
+            height: 220px;
+            position: relative;
+        }
+        .chart-container canvas { width: 100% !important; height: 100% !important; }
+
+        /* ===== Export buttons ===== */
+        .action-bar {
+            display: flex; gap: 0.8rem; margin: 1rem 0;
+            flex-wrap: wrap; justify-content: flex-end;
+        }
+        .btn-export {
+            background: rgba(180,133,84,0.10); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 40px; padding: 0.6rem 1.2rem;
+            color: #cfa776; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.85rem; font-family: 'Tajawal', sans-serif;
+        }
+        .btn-export:hover { background: rgba(180,133,84,0.25); }
+        .btn-export.word { background: rgba(30,74,122,0.15); border-color: #1e4a7a; color: #8ab8ff; }
+        .btn-export.word:hover { background: rgba(30,74,122,0.3); }
+        .btn-export.excel { background: rgba(40,167,69,0.12); border-color: #28a745; color: #6fbf6f; }
+        .btn-export.excel:hover { background: rgba(40,167,69,0.25); }
+
+        /* ===== Loading screen ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== Footer ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
+        .calc-display {
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: right;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
+
+        /* ===== Floating buttons ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Tajawal', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== Messages ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+        .tooltip .tooltiptext { display: none; }
+
+        /* ===================================================
+           Desktop improvements (≥1024px)
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .section-title-sm { font-size: 1.4rem; }
+            .form-group { flex: 1 1 220px; }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value { font-size: 1.4rem; }
+            .result-card .label { font-size: 0.85rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .chart-container { height: 260px; }
+            .grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px,1fr)); }
+        }
+
+        /* ===================================================
+           Mobile improvements (≤768px)
+           =================================================== */
+        @media (max-width: 768px) {
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; }
+            .currency-row label { font-size: 0.8rem; }
+            .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; }
+            .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+            .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-grid { grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 0.5rem; }
+            .result-card { padding: 0.6rem 0.4rem; }
+            .result-card .value { font-size: 1rem; }
+            .result-card .label { font-size: 0.65rem; }
+            .chart-grid { grid-template-columns: 1fr; gap: 0.8rem; }
+            .chart-container { height: 180px; padding: 0.5rem; }
+            table { font-size: 0.7rem; min-width: 360px; }
+            th, td { padding: 0.3rem 0.4rem; }
+            .action-bar { justify-content: center; flex-direction: column; }
+            .btn-export { width: 100%; justify-content: center; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .grid-2 { grid-template-columns: 1fr; gap: 0.5rem; }
+        }
+
+        /* ===== Very small screens (≤400px) ===== */
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+            .results-grid { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+            .chart-container { height: 150px; }
+        }
+
+        /* ===== Prevent accidental selection ===== */
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        /* ===== Scrollbar improvements ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+
+        /* Fix title appearance */
+        .section-title-sm, .result-card .label, .hero-mini h2 {
+            -webkit-text-fill-color: initial !important;
+            color: #cfa776 !important;
+            background: none !important;
+            background-image: none !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .readonly-input { background: rgba(10,14,23,0.4); cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- Export loading screen -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">Generating report...</h3>
+        <p id="loadingMsg">Please wait</p>
+    </div>
+</div>
+
+<section class="hero-mini">
+    <h2>📊 Comprehensive Financial Ratios Calculator</h2>
+    <p>Liquidity, profitability, solvency, and activity analysis with smart recommendations</p>
+</section>
+
+<div class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-chart-pie"></i><span>Ratios</span></div>
+        <h2><i class="fas fa-chart-line" style="color:#cfa776;margin-left:0.5rem;"></i>Core Financial Data</h2>
+
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> Currency:</label>
+            <select id="currencySelect">
+                <option value="$" selected>USD ($)</option>
+                <option value="€">EUR (€)</option>
+                <option value="₺">TRY (₺)</option>
+                <option value="ج.م">EGP (ج.م)</option>
+                <option value="د.ك">KWD (د.ك)</option>
+                <option value="ر.س">SAR (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> Entity Name:</label>
+            <input type="text" id="companyName" value="Beneficiary Entity" placeholder="Beneficiary entity">
+        </div>
+
+        <div class="grid-2">
+            <!-- Balance Sheet -->
+            <div>
+                <div class="section-title-sm">🏦 Balance Sheet (Annual Values)</div>
+                <div class="form-group tooltip"><label>Cash & Equivalents</label><input type="number" id="cash" placeholder="e.g. 100000"><span class="tooltiptext">Cash balance and current deposits.</span></div>
+                <div class="form-group tooltip"><label>Inventory</label><input type="number" id="inventory" placeholder="e.g. 200000"><span class="tooltiptext">Inventory value (goods, raw materials).</span></div>
+                <div class="form-group tooltip"><label>Other Current Assets</label><input type="number" id="otherCurrentAssets" placeholder="e.g. 100000"><span class="tooltiptext">Accounts receivable, short-term investments, etc.</span></div>
+                <div class="form-group tooltip"><label>Fixed Assets</label><input type="number" id="fixedAssets" placeholder="e.g. 500000"><span class="tooltiptext">Buildings, machinery, equipment.</span></div>
+                <div class="form-group tooltip"><label>Current Liabilities</label><input type="number" id="currentLiabilities" placeholder="e.g. 300000"><span class="tooltiptext">Debts due within one year.</span></div>
+                <div class="form-group tooltip"><label>Long-Term Liabilities</label><input type="number" id="longTermLiabilities" placeholder="e.g. 200000"><span class="tooltiptext">Long-term loans, bonds.</span></div>
+            </div>
+            <!-- Income Statement & Cash Flows -->
+            <div>
+                <div class="section-title-sm">📈 Income Statement & Cash Flows</div>
+                <div class="form-group tooltip"><label>Revenue (Sales)</label><input type="number" id="revenue" placeholder="e.g. 2000000"><span class="tooltiptext">Total sales (cash and credit).</span></div>
+                <div class="form-group tooltip"><label>Cost of Goods Sold</label><input type="number" id="cogs" placeholder="e.g. 1200000"><span class="tooltiptext">Cost of goods sold.</span></div>
+                <div class="form-group tooltip"><label>Operating Expenses</label><input type="number" id="operatingExpenses" placeholder="e.g. 400000"><span class="tooltiptext">Selling, administrative, marketing expenses, etc.</span></div>
+                <div class="form-group tooltip"><label>Interest Expense</label><input type="number" id="interestExpense" placeholder="e.g. 50000"><span class="tooltiptext">Interest on loans.</span></div>
+                <div class="form-group tooltip"><label>Tax Rate (%)</label><input type="number" id="taxRate" placeholder="e.g. 25" value="25"><span class="tooltiptext">Income tax rate (%).</span></div>
+                <div class="form-group tooltip"><label>Credit Sales (Optional)</label><input type="number" id="creditSales" placeholder="Leave blank = Revenue"><span class="tooltiptext">Sales not yet collected. If left blank, equals revenue.</span></div>
+                <div class="form-group tooltip"><label>Accounts Receivable (A/R)</label><input type="number" id="receivables" placeholder="e.g. 150000"><span class="tooltiptext">Amounts due from customers.</span></div>
+                <div class="form-group tooltip"><label>Accounts Payable (A/P)</label><input type="number" id="payables" placeholder="e.g. 100000"><span class="tooltiptext">Amounts due to suppliers.</span></div>
+            </div>
+        </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Financial Ratios</button>
+
+        <div class="results-section" id="resultsSection" style="display:none;">
+            <div class="action-bar">
+                <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> Word</button>
+                <button class="btn-export excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Full Excel</button>
+            </div>
+            <div class="results-grid" id="summaryCards"></div>
+            <div class="table-container" id="ratiosTable"></div>
+            <div class="chart-grid">
+                <div class="chart-container"><canvas id="radarChart"></canvas></div>
+                <div class="chart-container"><canvas id="barsChart"></canvas></div>
+            </div>
+            <div id="recommendations" class="result-card" style="text-align:right;"></div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center;">
+            <i class="fas fa-robot" style="color:var(--accent-soft);"></i> Results will appear after clicking the calculate button
+        </div>
+    </div>
+</div>
+
+<footer class="footer-simple">All rights reserved © 2026 <span>FAROUK GRUP</span></footer>
+
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+<a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+<!-- Calculator modal -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <!-- Row 1: 7 8 9 ÷ -->
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <!-- Row 2: 4 5 6 × -->
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <!-- Row 3: 1 2 3 − -->
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <!-- Row 4: C 0 . + -->
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <!-- Row 5: ⌫ = (span 2) -->
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column: span 2;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: true, offset: 100 });
+
+    // ===== Calculator =====
+    const calcDisplay = document.getElementById('calcDisplay');
+    let currentCalcInput = '';
+    function handleCalc(v) {
+        if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+        if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+        if (v === '=') {
+            try {
+                let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/'));
+                calcDisplay.value = r;
+                currentCalcInput = r.toString();
+            } catch(e) { calcDisplay.value = 'Error'; currentCalcInput = ''; }
+            return;
+        }
+        currentCalcInput += v;
+        calcDisplay.value = currentCalcInput;
+    }
+    document.querySelectorAll('.calc-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const v = this.dataset.val;
+            if (v !== undefined) handleCalc(v);
+        });
+    });
+    const modalEl = document.getElementById('calculatorModal');
+    document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        modalEl.classList.add('active');
+        calcDisplay.value = currentCalcInput;
+    });
+    document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+    modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+    document.addEventListener('keydown', function(e) {
+        if (!modalEl.classList.contains('active')) return;
+        e.preventDefault();
+        const k = e.key;
+        if (k >= '0' && k <= '9') handleCalc(k);
+        else if (k === '.') handleCalc('.');
+        else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+        else if (k === 'Enter' || k === '=') handleCalc('=');
+        else if (k === 'Backspace') handleCalc('⌫');
+        else if (k === 'Escape') modalEl.classList.remove('active');
+        else if (k.toLowerCase() === 'c') handleCalc('C');
+    });
+
+    // ===== Loading overlay =====
+    function showLoading(title, msg) {
+        document.getElementById('loadingTitle').textContent = title;
+        document.getElementById('loadingMsg').textContent = msg;
+        document.getElementById('exportLoading').classList.add('show');
+    }
+    function hideLoading() {
+        document.getElementById('exportLoading').classList.remove('show');
+    }
+
+    // ===== Calculation functions =====
+    let lastCalculation = null;
+
+    function getInputs() {
+        const cash = parseFloat(document.getElementById('cash').value) || 0;
+        const inventory = parseFloat(document.getElementById('inventory').value) || 0;
+        const otherCurrent = parseFloat(document.getElementById('otherCurrentAssets').value) || 0;
+        const currentAssets = cash + inventory + otherCurrent;
+        const fixedAssets = parseFloat(document.getElementById('fixedAssets').value) || 0;
+        const totalAssets = currentAssets + fixedAssets;
+        const currentLiabilities = parseFloat(document.getElementById('currentLiabilities').value) || 0;
+        const longTermLiabilities = parseFloat(document.getElementById('longTermLiabilities').value) || 0;
+        const totalLiabilities = currentLiabilities + longTermLiabilities;
+        const equity = totalAssets - totalLiabilities;
+
+        const revenue = parseFloat(document.getElementById('revenue').value) || 0;
+        const cogs = parseFloat(document.getElementById('cogs').value) || 0;
+        const operatingExpenses = parseFloat(document.getElementById('operatingExpenses').value) || 0;
+        const interestExpense = parseFloat(document.getElementById('interestExpense').value) || 0;
+        const taxRate = parseFloat(document.getElementById('taxRate').value) / 100 || 0;
+
+        let creditSales = parseFloat(document.getElementById('creditSales').value) || 0;
+        if (creditSales === 0 && revenue > 0) creditSales = revenue;
+
+        const receivables = parseFloat(document.getElementById('receivables').value) || 0;
+        const payables = parseFloat(document.getElementById('payables').value) || 0;
+
+        const operatingProfit = revenue - cogs - operatingExpenses;
+        const ebit = operatingProfit;
+        const profitBeforeTax = operatingProfit - interestExpense;
+        const netProfit = profitBeforeTax > 0 ? profitBeforeTax * (1 - taxRate) : profitBeforeTax;
+
+        return {
+            currency: document.getElementById('currencySelect').value,
+            companyName: document.getElementById('companyName').value || 'Entity',
+            currentAssets, cash, inventory, currentLiabilities, totalAssets, totalLiabilities, equity,
+            revenue, cogs, operatingExpenses, interestExpense, taxRate,
+            operatingProfit, ebit, netProfit,
+            creditSales, receivables, payables,
+            fixedAssets, longTermLiabilities
+        };
+    }
+
+    function evaluateRatio(value, thresholds) {
+        if (value === undefined || isNaN(value)) return { status: 'warning', text: 'Undefined', class: 'status-warning' };
+        if (value >= thresholds.good) return { status: 'good', text: 'Good', class: 'status-good' };
+        if (value >= thresholds.warning) return { status: 'warning', text: 'Acceptable', class: 'status-warning' };
+        return { status: 'bad', text: 'Poor', class: 'status-bad' };
+    }
+
+    function calculateRatios(inputs) {
+        const currentRatio = inputs.currentLiabilities ? inputs.currentAssets / inputs.currentLiabilities : 0;
+        const quickRatio = inputs.currentLiabilities ? (inputs.currentAssets - inputs.inventory) / inputs.currentLiabilities : 0;
+        const cashRatio = inputs.currentLiabilities ? inputs.cash / inputs.currentLiabilities : 0;
+
+        const grossMargin = inputs.revenue ? (inputs.revenue - inputs.cogs) / inputs.revenue : 0;
+        const operatingMargin = inputs.revenue ? inputs.operatingProfit / inputs.revenue : 0;
+        const netMargin = inputs.revenue ? inputs.netProfit / inputs.revenue : 0;
+        const roa = inputs.totalAssets ? inputs.netProfit / inputs.totalAssets : 0;
+        const roe = inputs.equity ? inputs.netProfit / inputs.equity : 0;
+
+        const debtToEquity = inputs.equity ? inputs.totalLiabilities / inputs.equity : 0;
+        const debtToAssets = inputs.totalAssets ? inputs.totalLiabilities / inputs.totalAssets : 0;
+        const interestCoverage = inputs.interestExpense ? inputs.ebit / inputs.interestExpense : 0;
+        const equityRatio = inputs.totalAssets ? inputs.equity / inputs.totalAssets : 0;
+
+        const inventoryTurnover = (inputs.cogs && inputs.inventory) ? inputs.cogs / inputs.inventory : 0;
+        const daysInventory = inventoryTurnover ? 365 / inventoryTurnover : 0;
+        const receivablesTurnover = (inputs.creditSales && inputs.receivables) ? inputs.creditSales / inputs.receivables : 0;
+        const daysSalesOutstanding = receivablesTurnover ? 365 / receivablesTurnover : 0;
+        const payablesTurnover = (inputs.cogs && inputs.payables) ? inputs.cogs / inputs.payables : 0;
+        const daysPayables = payablesTurnover ? 365 / payablesTurnover : 0;
+        const cashConversionCycle = daysInventory + daysSalesOutstanding - daysPayables;
+
+        return {
+            currentRatio, quickRatio, cashRatio,
+            grossMargin, operatingMargin, netMargin, roa, roe,
+            debtToEquity, debtToAssets, interestCoverage, equityRatio,
+            inventoryTurnover, daysInventory, receivablesTurnover, daysSalesOutstanding,
+            payablesTurnover, daysPayables, cashConversionCycle
+        };
+    }
+
+    function getRecommendation(ratios) {
+        let rec = [];
+        if (ratios.currentRatio < 1) rec.push('⚠️ Liquidity is very low, risk of financial distress.');
+        else if (ratios.currentRatio < 1.5) rec.push('🟡 Liquidity is acceptable, it is preferable to increase current assets.');
+        else rec.push('✅ Liquidity is good, ability to pay short-term obligations.');
+
+        if (ratios.quickRatio < 0.5) rec.push('⚠️ Quick ratio is low, reliance on inventory to pay debts.');
+        if (ratios.roe < 0.1) rec.push('⚠️ Return on equity is low, improve profitability.');
+        if (ratios.debtToEquity > 2) rec.push('🔴 Debt ratio is very high, high bankruptcy risk.');
+        if (ratios.interestCoverage < 1.5) rec.push('⚠️ Interest coverage is weak, difficulty paying debt obligations.');
+        if (ratios.cashConversionCycle < 0) rec.push('✅ Cash conversion cycle is negative (excellent financing from suppliers).');
+        else if (ratios.cashConversionCycle > 90) rec.push('⚠️ Cash conversion cycle is very long, working capital tied up.');
+
+        return rec;
+    }
+
+    // ===== Display results =====
+    let radarChart, barsChart;
+
+    function displayResults() {
+        const inputs = getInputs();
+        const ratios = calculateRatios(inputs);
+        const currency = inputs.currency;
+        const company = inputs.companyName;
+
+        lastCalculation = { inputs, ratios, currency, company };
+
+        document.getElementById('resultsSection').style.display = 'block';
+        document.getElementById('initialMessage').style.display = 'none';
+
+        const formatMoney = (num) => `${currency} ${num.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0})}`;
+
+        document.getElementById('summaryCards').innerHTML = `
+            <div class="result-card"><div class="label">Current Ratio</div><div class="value">${ratios.currentRatio.toFixed(2)}</div><div class="status ${evaluateRatio(ratios.currentRatio,{good:1.5,warning:1}).class}">${evaluateRatio(ratios.currentRatio,{good:1.5,warning:1}).text}</div></div>
+            <div class="result-card"><div class="label">Net Profit Margin</div><div class="value">${(ratios.netMargin*100).toFixed(1)}%</div><div class="status ${evaluateRatio(ratios.netMargin,{good:0.15,warning:0.05}).class}">${evaluateRatio(ratios.netMargin,{good:0.15,warning:0.05}).text}</div></div>
+            <div class="result-card"><div class="label">ROA</div><div class="value">${(ratios.roa*100).toFixed(1)}%</div><div class="status ${evaluateRatio(ratios.roa,{good:0.1,warning:0.05}).class}">${evaluateRatio(ratios.roa,{good:0.1,warning:0.05}).text}</div></div>
+            <div class="result-card"><div class="label">ROE</div><div class="value">${(ratios.roe*100).toFixed(1)}%</div><div class="status ${evaluateRatio(ratios.roe,{good:0.2,warning:0.1}).class}">${evaluateRatio(ratios.roe,{good:0.2,warning:0.1}).text}</div></div>
+            <div class="result-card"><div class="label">Debt to Equity</div><div class="value">${ratios.debtToEquity.toFixed(2)}</div><div class="status ${evaluateRatio(ratios.debtToEquity,{good:1,warning:2}).class}">${evaluateRatio(ratios.debtToEquity,{good:1,warning:2}).text}</div></div>
+            <div class="result-card"><div class="label">Cash Conversion Cycle (Days)</div><div class="value">${ratios.cashConversionCycle.toFixed(0)}</div><div class="status ${ratios.cashConversionCycle<0?'status-good':(ratios.cashConversionCycle<60?'status-warning':'status-bad')}">${ratios.cashConversionCycle<0?'Excellent':(ratios.cashConversionCycle<60?'Acceptable':'Long')}</div></div>
+            <div class="result-card"><div class="label">Total Current Assets</div><div class="value">${formatMoney(inputs.currentAssets)}</div></div>
+            <div class="result-card"><div class="label">Total Assets</div><div class="value">${formatMoney(inputs.totalAssets)}</div></div>
+            <div class="result-card"><div class="label">Total Liabilities</div><div class="value">${formatMoney(inputs.totalLiabilities)}</div></div>
+            <div class="result-card"><div class="label">Equity</div><div class="value">${formatMoney(inputs.equity)}</div><div class="status ${inputs.equity<0?'status-bad':'status-good'}">${inputs.equity<0?'Negative':'Positive'}</div></div>
+        `;
+
+        let tableHtml = `<thead><tr><th>Category</th><th>Ratio</th><th>Value</th><th>Assessment</th></tr></thead><tbody>`;
+        const addRow = (cat, name, value, ev) => { tableHtml += `<tr><td>${cat}</td><td>${name}</td><td>${value}</td><td class="${ev.class}">${ev.text}</td></tr>`; };
+        addRow('Liquidity','Current Ratio', ratios.currentRatio.toFixed(2), evaluateRatio(ratios.currentRatio,{good:1.5,warning:1}));
+        addRow('Liquidity','Quick Ratio', ratios.quickRatio.toFixed(2), evaluateRatio(ratios.quickRatio,{good:1,warning:0.5}));
+        addRow('Liquidity','Cash Ratio', ratios.cashRatio.toFixed(2), evaluateRatio(ratios.cashRatio,{good:0.5,warning:0.2}));
+        addRow('Profitability','Gross Profit Margin', (ratios.grossMargin*100).toFixed(1)+'%', evaluateRatio(ratios.grossMargin,{good:0.4,warning:0.2}));
+        addRow('Profitability','Operating Profit Margin', (ratios.operatingMargin*100).toFixed(1)+'%', evaluateRatio(ratios.operatingMargin,{good:0.2,warning:0.1}));
+        addRow('Profitability','Net Profit Margin', (ratios.netMargin*100).toFixed(1)+'%', evaluateRatio(ratios.netMargin,{good:0.15,warning:0.05}));
+        addRow('Profitability','ROA', (ratios.roa*100).toFixed(1)+'%', evaluateRatio(ratios.roa,{good:0.1,warning:0.05}));
+        addRow('Profitability','ROE', (ratios.roe*100).toFixed(1)+'%', evaluateRatio(ratios.roe,{good:0.2,warning:0.1}));
+        addRow('Solvency','Debt to Equity', ratios.debtToEquity.toFixed(2), evaluateRatio(ratios.debtToEquity,{good:1,warning:2}));
+        addRow('Solvency','Debt to Assets', ratios.debtToAssets.toFixed(2), evaluateRatio(ratios.debtToAssets,{good:0.5,warning:0.7}));
+        addRow('Solvency','Interest Coverage', ratios.interestCoverage.toFixed(2), evaluateRatio(ratios.interestCoverage,{good:3,warning:1.5}));
+        addRow('Solvency','Equity Ratio', (ratios.equityRatio*100).toFixed(1)+'%', evaluateRatio(ratios.equityRatio,{good:0.5,warning:0.3}));
+        addRow('Activity','Inventory Turnover', ratios.inventoryTurnover.toFixed(2), {text:'Times', class:'status-warning'});
+        addRow('Activity','Days Inventory', ratios.daysInventory.toFixed(0)+' Days', {text:'', class:'status-warning'});
+        addRow('Activity','Receivables Turnover', ratios.receivablesTurnover.toFixed(2), {text:'Times', class:'status-warning'});
+        addRow('Activity','Days Sales Outstanding', ratios.daysSalesOutstanding.toFixed(0)+' Days', {text:'', class:'status-warning'});
+        addRow('Activity','Payables Turnover', ratios.payablesTurnover.toFixed(2), {text:'Times', class:'status-warning'});
+        addRow('Activity','Days Payables', ratios.daysPayables.toFixed(0)+' Days', {text:'', class:'status-warning'});
+        addRow('Activity','Cash Conversion Cycle', ratios.cashConversionCycle.toFixed(0)+' Days', {text:'', class:ratios.cashConversionCycle<0?'status-good':'status-warning'});
+        tableHtml += `</tbody>`;
+        document.getElementById('ratiosTable').innerHTML = `<table>${tableHtml}</table>`;
+
+        const recs = getRecommendation(ratios);
+        document.getElementById('recommendations').innerHTML = `<strong><i class="fas fa-lightbulb"></i> Recommendations & Analysis:</strong><br>${recs.map(r=>'• '+r).join('<br>')}`;
+
+        const radarData = {
+            labels: ['Liquidity','Profitability','Solvency','Activity'],
+            datasets: [{
+                label: 'Score (0-100)',
+                data: [
+                    Math.min(100, ratios.currentRatio * 50),
+                    Math.min(100, ratios.netMargin * 400),
+                    Math.min(100, (1 - Math.min(1, ratios.debtToAssets)) * 100),
+                    Math.min(100, Math.min(1, ratios.inventoryTurnover / 10) * 100)
+                ],
+                backgroundColor: 'rgba(180,133,84,0.2)',
+                borderColor: '#b8860b',
+                borderWidth: 2
+            }]
+        };
+        if (radarChart) radarChart.destroy();
+        const ctxRadar = document.getElementById('radarChart').getContext('2d');
+        radarChart = new Chart(ctxRadar, { type: 'radar', data: radarData, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { stepSize: 20 } } } } });
+
+        const barData = {
+            labels: ['ROA', 'ROE', 'Net Profit Margin'],
+            datasets: [{ label: 'Ratio (%)', data: [ratios.roa*100, ratios.roe*100, ratios.netMargin*100], backgroundColor: '#b8860b' }]
+        };
+        if (barsChart) barsChart.destroy();
+        const ctxBars = document.getElementById('barsChart').getContext('2d');
+        barsChart = new Chart(ctxBars, { type: 'bar', data: barData, options: { responsive: true, maintainAspectRatio: false } });
+    }
+
+    document.getElementById('calculateBtn').addEventListener('click', displayResults);
+
+    // ================================================================
+    // ========== Export to Professional Excel ==========
+    // ================================================================
+    document.getElementById('exportExcelBtn').addEventListener('click', async function() {
+        if (!lastCalculation) { alert('Please run the analysis first.'); return; }
+        showLoading('Creating Excel report...', 'Creating sheets and charts');
+        try {
+            const { inputs, ratios, currency, company } = lastCalculation;
+            const companyName = company || 'Entity';
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US');
+
+            function safeNum(val, defaultVal = 0) {
+                return (typeof val === 'number' && !isNaN(val) && isFinite(val)) ? val : defaultVal;
+            }
+            function safeToFixed(val, digits = 2) {
+                const num = safeNum(val);
+                return num.toFixed(digits);
+            }
+            function safePct(val) {
+                return (safeNum(val) * 100).toFixed(1) + '%';
+            }
+
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'FAROUK GRUP';
+            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+            const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
+            const PT = 'FF155724', NT = 'FF721C24';
+
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'ltr'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'ltr'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'ltr'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+
+            // 1. Cover sheet
+            const cv = workbook.addWorksheet('Report Cover', { views: [{ rightToLeft: false, showGridLines: false }] });
+            [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+            cv.getRow(2).height=80; cv.getRow(4).height=60;
+            cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+            bc.value='FAROUK GRUP for Consulting & Business\nFAROUK GRUP';
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'ltr'};
+            mh(cv,1,4,4,`Comprehensive Financial Ratios Report\n${companyName}`,DB,GL,18);
+            const inf = [
+                ['📋 Entity', companyName],
+                ['📅 Date', dateStr],
+                ['💰 Currency', currency],
+                ['📊 Net Profit', `${currency} ${safeToFixed(inputs.netProfit, 0)}`],
+                ['📈 ROE', safePct(ratios.roe)]
+            ];
+            let ir=6;
+            inf.forEach(([l,v],idx)=>{
+                cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+                const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+                const bg=idx%2===0?AR:'FFFEFCF6';
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'ltr'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'ltr'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                cv.getRow(ir).height=28; ir++;
+            });
+
+            // 2. Inputs
+            const inpSheet = workbook.addWorksheet('Financial Inputs', { views: [{ rightToLeft: false }] });
+            inpSheet.getColumn(1).width=5; inpSheet.getColumn(2).width=35; inpSheet.getColumn(3).width=20; inpSheet.getColumn(4).width=20;
+            mh(inpSheet,1,4,1,'📋 Financial Inputs',DB,GL,14);
+            const inputRows = [
+                ['Cash & Equivalents', inputs.cash], ['Inventory', inputs.inventory],
+                ['Other Current Assets', inputs.otherCurrent], ['Fixed Assets', inputs.fixedAssets],
+                ['Current Liabilities', inputs.currentLiabilities], ['Long-Term Liabilities', inputs.longTermLiabilities],
+                ['Revenue', inputs.revenue], ['COGS', inputs.cogs],
+                ['Operating Expenses', inputs.operatingExpenses], ['Interest Expense', inputs.interestExpense],
+                ['Tax Rate', (safeNum(inputs.taxRate)*100).toFixed(0)+'%'],
+                ['Credit Sales', inputs.creditSales], ['Accounts Receivable', inputs.receivables],
+                ['Accounts Payable', inputs.payables]
+            ];
+            let iRow=3;
+            inputRows.forEach(([l,v],idx)=>{
+                inpSheet.getRow(iRow).height=24;
+                const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+                const lc=inpSheet.getCell(iRow,2), vc=inpSheet.getCell(iRow,3);
+                lc.value=l; vc.value=v;
+                ap(lc,cs(bg,DT,true,'right'));
+                ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof v==='number'?'#,##0':null});
+                iRow++;
+            });
+
+            // 3. Financial Ratios
+            const ratioSheet = workbook.addWorksheet('Financial Ratios', { views: [{ rightToLeft: false }] });
+            ratioSheet.getColumn(1).width=5; ratioSheet.getColumn(2).width=25; ratioSheet.getColumn(3).width=20; ratioSheet.getColumn(4).width=15;
+            mh(ratioSheet,1,4,1,'📊 Financial Ratios',DB,GL,14);
+            const rHeader = ratioSheet.getRow(3);
+            ['Category','Ratio','Value','Assessment'].forEach((h,i)=>{const c=rHeader.getCell(i+2);c.value=h;ap(c,hs(HB,GL));});
+            const ratioList = [
+                ['Liquidity','Current Ratio', safeToFixed(ratios.currentRatio,2), evaluateRatio(ratios.currentRatio,{good:1.5,warning:1}).text],
+                ['Liquidity','Quick Ratio', safeToFixed(ratios.quickRatio,2), evaluateRatio(ratios.quickRatio,{good:1,warning:0.5}).text],
+                ['Liquidity','Cash Ratio', safeToFixed(ratios.cashRatio,2), evaluateRatio(ratios.cashRatio,{good:0.5,warning:0.2}).text],
+                ['Profitability','Gross Profit Margin', safePct(ratios.grossMargin), evaluateRatio(ratios.grossMargin,{good:0.4,warning:0.2}).text],
+                ['Profitability','Operating Profit Margin', safePct(ratios.operatingMargin), evaluateRatio(ratios.operatingMargin,{good:0.2,warning:0.1}).text],
+                ['Profitability','Net Profit Margin', safePct(ratios.netMargin), evaluateRatio(ratios.netMargin,{good:0.15,warning:0.05}).text],
+                ['Profitability','ROA', safePct(ratios.roa), evaluateRatio(ratios.roa,{good:0.1,warning:0.05}).text],
+                ['Profitability','ROE', safePct(ratios.roe), evaluateRatio(ratios.roe,{good:0.2,warning:0.1}).text],
+                ['Solvency','Debt to Equity', safeToFixed(ratios.debtToEquity,2), evaluateRatio(ratios.debtToEquity,{good:1,warning:2}).text],
+                ['Solvency','Debt to Assets', safeToFixed(ratios.debtToAssets,2), evaluateRatio(ratios.debtToAssets,{good:0.5,warning:0.7}).text],
+                ['Solvency','Interest Coverage', safeToFixed(ratios.interestCoverage,2), evaluateRatio(ratios.interestCoverage,{good:3,warning:1.5}).text],
+                ['Activity','Inventory Turnover', safeToFixed(ratios.inventoryTurnover,2), 'Times'],
+                ['Activity','Days Inventory', safeToFixed(ratios.daysInventory,0)+' Days', ''],
+                ['Activity','Receivables Turnover', safeToFixed(ratios.receivablesTurnover,2), 'Times'],
+                ['Activity','Days Sales Outstanding', safeToFixed(ratios.daysSalesOutstanding,0)+' Days', ''],
+                ['Activity','Payables Turnover', safeToFixed(ratios.payablesTurnover,2), 'Times'],
+                ['Activity','Days Payables', safeToFixed(ratios.daysPayables,0)+' Days', ''],
+                ['Activity','Cash Conversion Cycle', safeToFixed(ratios.cashConversionCycle,0)+' Days', '']
+            ];
+            let rRow=4;
+            ratioList.forEach(r=>{
+                const row=ratioSheet.getRow(rRow);
+                [2,3,4,5].forEach((c,i)=>{const cell=row.getCell(c);cell.value=r[i];ap(cell,cs(AR,DT,false,'center'));});
+                rRow++;
+            });
+
+            // 4. Charts
+            const chartSheet = workbook.addWorksheet('Charts', { views: [{ rightToLeft: false }] });
+            chartSheet.getColumn(1).width=5; chartSheet.getColumn(2).width=60;
+            mh(chartSheet,1,2,1,'📈 Charts',DB,GL,14);
+            const chartGrid = document.querySelector('.chart-grid');
+            if (chartGrid) {
+                try {
+                    const origBg = chartGrid.style.backgroundColor;
+                    chartGrid.style.backgroundColor = '#ffffff';
+                    const canvasImg = await html2canvas(chartGrid, { scale: 2, backgroundColor: '#ffffff' });
+                    chartGrid.style.backgroundColor = origBg;
+                    const imgData = canvasImg.toDataURL('image/png');
+                    const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                    chartSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 30 }, editAs: 'oneCell' });
+                } catch(e) {}
+            }
+
+            // 5. Recommendations
+            const recSheet = workbook.addWorksheet('Recommendations', { views: [{ rightToLeft: false }] });
+            recSheet.getColumn(1).width=5; recSheet.getColumn(2).width=60;
+            mh(recSheet,1,2,1,'💡 Recommendations',DB,GL,14);
+            const recs = getRecommendation(ratios);
+            let recRow=3;
+            recs.forEach(r=>{
+                recSheet.getRow(recRow).height=25;
+                const cell = recSheet.getCell(recRow,2);
+                cell.value = '• ' + r;
+                cell.font = { name: 'Arial', size: 11, color: { argb: DT } };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEFCF6' } };
+                cell.alignment = { horizontal: 'right', vertical: 'middle', wrapText: true, readingOrder: 'ltr' };
+                recRow++;
+            });
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const fileName = `Financial_Ratios_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+            saveAs(blob, fileName);
+        } catch(err) {
+            console.error(err);
+            alert('Excel error: ' + err.message);
+        } finally {
+            hideLoading();
+        }
+    });
+
+    // ================================================================
+    // ========== Export to Professional Word ==========
+    // ================================================================
+    document.getElementById('exportWordBtn').addEventListener('click', async function() {
+        if (!lastCalculation) { alert('Please run the analysis first.'); return; }
+        showLoading('Creating Word report...', 'Gathering data and charts');
+        try {
+            const { inputs, ratios, currency, company } = lastCalculation;
+            const companyName = company || 'Entity';
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US');
+
+            const chartGrid = document.querySelector('.chart-grid');
+            let chartImgBase64 = '';
+            if (chartGrid) {
+                const origBg = chartGrid.style.backgroundColor;
+                chartGrid.style.backgroundColor = '#ffffff';
+                const img = await html2canvas(chartGrid, { scale: 2, backgroundColor: '#ffffff' });
+                chartGrid.style.backgroundColor = origBg;
+                chartImgBase64 = img.toDataURL('image/png');
+            }
+
+            const cardsHtml = document.getElementById('summaryCards').innerHTML;
+            const tableHtml = document.getElementById('ratiosTable').innerHTML;
+            const recHtml = document.getElementById('recommendations').innerHTML;
+
+            const fullHtml = `<!DOCTYPE html>
+            <html dir="ltr">
+            <head><meta charset="UTF-8"><title>Financial Ratios Report - FAROUK GRUP</title>
+            <style>
+                body{font-family:'Arial','Tajawal',sans-serif;direction:ltr;margin:2rem;background:#fff;color:#333;}
+                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                .cover h1{font-size:32px;color:#b8860b;margin:0;}
+                .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                th{background:#fefcf6;color:#b8860b;}
+                .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
+            </style></head>
+            <body>
+                <div class="cover">
+                    <h1>FAROUK GRUP for Consulting & Business</h1>
+                    <h2>Comprehensive Financial Ratios Report</h2>
+                    <p>Entity: ${companyName} | Date: ${dateStr}</p>
+                    <p>Currency: ${currency}</p>
+                </div>
+                <h2 style="color:#b8860b;">📊 Summary</h2>
+                <div style="display:flex;flex-wrap:wrap;gap:10px;">${cardsHtml}</div>
+                <h2 style="color:#b8860b;">📋 Detailed Analysis</h2>
+                ${tableHtml}
+                <h2 style="color:#b8860b;">📈 Charts</h2>
+                <div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>
+                <h2 style="color:#b8860b;">💡 Recommendations</h2>
+                <div style="background:#fefcf6;padding:15px;border-radius:10px;border-left:4px solid #b8860b;">
+                    ${recHtml}
+                </div>
+                <div class="footer">Created by FAROUK GRUP for Consulting & Business © ${now.getFullYear()}</div>
+            </body></html>`;
+
+            const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Financial_Ratios_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        } catch(err) { alert('Word error: ' + err.message); } finally { hideLoading(); }
+    });
+</script>
+</body>
+</html>

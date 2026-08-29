@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Optimal Labor Cost Calculator | FAROUK GRUP</title>
+<script src="auth-check.js"></script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- ExcelJS & FileSaver -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Inter', 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
+            min-height: 100vh;
+        }
+
+        /* ===== Remove all vibration causes ===== */
+        .calculator-card, .result-card, .chart-container, canvas,
+        .btn-primary, .btn-add, .btn-export, .currency-row,
+        .calc-floating-btn, .home-floating-btn, .shift-row,
+        .remove-shift, .suggestion-box, .alert, .results-grid,
+        .featured-badge, .glow-bg, .floating-shape,
+        .form-group input, .form-group select {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== Static background ===== */
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.20;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.10) 0%, transparent 70%);
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.05) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.06) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1050px; margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* ===== CARD ===== */
+        .calculator-card {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            margin-bottom: 2rem;
+            width: 100%; max-width: 100%;
+        }
+        .calculator-card h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.5rem;
+        }
+        .calculator-card h2 i { color: #cfa776; margin-right: 0.4rem; }
+
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== Currency row ===== */
+        .currency-row {
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.8rem; background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.2);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
+            width: 100%;
+        }
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
+        .currency-row select, .currency-row input {
+            flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+            font-family: 'Inter', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
+        }
+        .currency-row input { flex: 2 1 200px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* ===== Section titles ===== */
+        .section-title-sm {
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
+            margin: 1.2rem 0 0.8rem 0;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== Form rows ===== */
+        .input-section {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+            gap: 0.8rem; margin-bottom: 0.5rem;
+        }
+        .form-group { margin-bottom: 0.6rem; }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-right: 0.3rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Inter', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+
+        /* ===== Add button ===== */
+        .btn-add {
+            background: transparent; border: 2px solid rgba(180,133,84,0.2);
+            color: #cfa776; border-radius: 50px; padding: 0.4rem 1.2rem;
+            font-weight: 900; cursor: pointer; margin: 0.3rem 0;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-family: 'Inter', sans-serif; font-size: 0.9rem;
+        }
+        .btn-add:hover { background: rgba(180,133,84,0.2); border-color: #b48554; }
+
+        /* ===== Shifts section ===== */
+        .shifts-section {
+            background: rgba(180,133,84,0.08); border: 2px solid rgba(180,133,84,0.12);
+            border-radius: 24px; padding: 1rem; margin: 1rem 0;
+        }
+        .shifts-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;
+        }
+        .shifts-header h3 { color: #cfa776; font-weight: 900; font-size: 1.1rem; }
+        .shift-row {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;
+            background: rgba(22,30,46,0.6); padding: 0.6rem 0.8rem;
+            border-radius: 30px; margin-bottom: 0.6rem;
+            border: 1px solid rgba(180,133,84,0.1);
+        }
+        .shift-row input {
+            flex: 1 1 100px; min-width: 70px;
+            background: rgba(10,14,23,0.4); border: 1px solid rgba(180,133,84,0.1);
+            border-radius: 20px; padding: 0.4rem 0.6rem;
+            color: #f0f4fa; font-size: 0.85rem;
+        }
+        .shift-row span { color: #cfa776; font-weight: 700; font-size: 0.85rem; white-space: nowrap; }
+        .remove-shift {
+            background: #dc3545; color: white; border: none;
+            border-radius: 50%; width: 32px; height: 32px;
+            cursor: pointer; font-weight: bold; font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .remove-shift:hover { background: #c82333; }
+        .hint { color: #aab7d4; font-size: 0.85rem; margin-top: 0.3rem; }
+
+        /* ===== Primary button ===== */
+        .btn-primary {
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer; margin: 1.5rem 0; font-family: 'Inter', sans-serif;
+        }
+        .btn-primary:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-primary:active { transform: scale(0.97); }
+
+        /* ===== Results ===== */
+        .results-section { margin-top: 1.5rem; width: 100%; max-width: 100%; overflow: hidden; }
+        .results-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+            gap: 0.8rem; margin-bottom: 1rem;
+            width: 100%;
+        }
+        .result-card {
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.12);
+            border-radius: 16px; padding: 0.8rem; text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            word-break: break-word;
+        }
+        .result-card i { font-size: 1.4rem; color: #cfa776; margin-bottom: 0.2rem; display: block; }
+        .result-card .label { font-size: 0.75rem; color: #aab7d4; margin-bottom: 0.2rem; font-weight: 700; }
+        .result-card .value { font-size: 1.2rem; font-weight: 900; color: #cfa776; }
+        .result-card .unit { font-size: 0.7rem; color: #aab7d4; }
+
+        /* ===== Alerts ===== */
+        .alert { padding: 0.8rem; border-radius: 20px; font-weight: 700; margin: 0.8rem 0; }
+        .alert-success { background: rgba(40,167,69,0.15); color: #4ade80; border: 1px solid #28a745; }
+        .alert-warning { background: rgba(255,193,7,0.15); color: #fbbf24; border: 1px solid #ffc107; }
+        .alert-danger { background: rgba(220,53,69,0.15); color: #f87171; border: 1px solid #dc3545; }
+
+        /* ===== Suggestion box ===== */
+        .suggestion-box {
+            background: rgba(22,30,46,0.7); border: 2px solid rgba(180,133,84,0.1);
+            border-radius: 20px; padding: 1rem; margin: 1.5rem 0;
+        }
+        .suggestion-box h4 { color: #cfa776; margin-bottom: 0.5rem; font-size: 1rem; }
+        .suggestion-box ul, .suggestion-box p { color: #aab7d4; font-size: 0.9rem; padding-left: 1.2rem; }
+
+        /* ===== Charts ===== */
+        .chart-container {
+            background: rgba(22,30,46,0.6); border-radius: 16px;
+            padding: 0.8rem; border: 1px solid rgba(180,133,84,0.08);
+            height: 230px; position: relative; margin-top: 1rem;
+            width: 100%; max-width: 100%; overflow: hidden;
+        }
+        .chart-container canvas { width: 100% !important; height: 100% !important; }
+
+        /* ===== Action bar ===== */
+        .action-bar {
+            display: flex; gap: 0.8rem; margin: 1rem 0;
+            flex-wrap: wrap; justify-content: flex-end;
+        }
+        .btn-export {
+            background: rgba(180,133,84,0.10); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 40px; padding: 0.6rem 1.2rem;
+            color: #cfa776; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.85rem; font-family: 'Inter', sans-serif;
+        }
+        .btn-export:hover { background: rgba(180,133,84,0.25); }
+        .btn-export.word { background: rgba(30,74,122,0.15); border-color: #1e4a7a; color: #8ab8ff; }
+        .btn-export.word:hover { background: rgba(30,74,122,0.3); }
+        .btn-export.excel { background: rgba(40,167,69,0.12); border-color: #28a745; color: #6fbf6f; }
+        .btn-export.excel:hover { background: rgba(40,167,69,0.25); }
+
+        /* ===== Loading overlay ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== Footer ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
+        .calc-display {
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: left;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
+
+        /* ===== Floating buttons ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Inter', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== Messages ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+
+        /* ===================================================
+           Responsive improvements
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calculator-card { padding: 2rem 2.5rem; }
+            .calculator-card h2 { font-size: 2rem; }
+            .input-section { grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-primary { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value { font-size: 1.4rem; }
+            .result-card .label { font-size: 0.85rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .chart-container { height: 280px; }
+        }
+
+        @media (max-width: 768px) {
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .container { margin: 1rem auto; padding: 0 0.6rem; }
+            .calculator-card { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calculator-card h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; flex-direction: column; align-items: stretch; }
+            .currency-row label { font-size: 0.8rem; }
+            .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; flex: 1 1 auto; width: 100%; }
+            .input-section { grid-template-columns: 1fr; gap: 0.5rem; }
+            .form-group label { font-size: 0.75rem; }
+            .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .btn-primary { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-grid { grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 0.5rem; }
+            .result-card { padding: 0.6rem 0.4rem; }
+            .result-card .value { font-size: 1rem; }
+            .result-card .label { font-size: 0.65rem; }
+            .result-card i { font-size: 1.1rem; }
+            .chart-container { height: 180px; padding: 0.5rem; }
+            .action-bar { justify-content: center; flex-direction: column; }
+            .btn-export { width: 100%; justify-content: center; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .shift-row { flex-direction: column; align-items: stretch; }
+            .shift-row input { flex: 1 1 auto; min-width: 0; }
+            .remove-shift { align-self: center; width: 36px; height: 36px; }
+            .btn-add { width: 100%; justify-content: center; }
+            .shifts-section { padding: 0.8rem; }
+            .suggestion-box { padding: 0.8rem; }
+        }
+
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calculator-card h2 { font-size: 1.1rem; }
+            .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+            .results-grid { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+            .chart-container { height: 150px; }
+            table { font-size: 0.6rem; min-width: 200px; }
+            th, td { padding: 0.2rem 0.3rem; }
+        }
+
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+
+        .section-title-sm, .result-card .label, .hero-mini h2 {
+            -webkit-text-fill-color: initial !important;
+            color: #cfa776 !important;
+            background: none !important;
+            background-image: none !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .note {
+            background: rgba(180,133,84,0.08); padding: 0.6rem 1rem;
+            border-radius: 16px; font-size: 0.85rem; color: #aab7d4;
+            margin-top: 0.5rem; border-left: 3px solid #b48554;
+        }
+    </style>
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- Export loading screen -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">Generating report...</h3>
+        <p id="loadingMsg">Please wait</p>
+    </div>
+</div>
+
+<section class="hero-mini">
+    <h2>💰 Optimal Labor Cost Calculator</h2>
+    <p>Advanced analysis of labor costs, productivity, and operational efficiency</p>
+</section>
+
+<div class="container">
+    <div class="calculator-card" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-users"></i><span>Labor</span></div>
+        <h2><i class="fas fa-users" style="color:#cfa776;margin-right:0.5rem;"></i>Project & Shifts Data</h2>
+
+        <!-- Currency and entity name -->
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> Currency:</label>
+            <select id="currencySelect">
+                <option value="$" selected>US Dollar ($)</option>
+                <option value="€">Euro (€)</option>
+                <option value="₺">Turkish Lira (₺)</option>
+                <option value="ج.م">Egyptian Pound (ج.م)</option>
+                <option value="د.ك">Kuwaiti Dinar (د.ك)</option>
+                <option value="ر.س">Saudi Riyal (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> Entity Name:</label>
+            <input type="text" id="companyName" value="Beneficiary Entity Name" placeholder="Beneficiary entity">
+        </div>
+
+        <!-- Basic inputs -->
+        <div class="section-title-sm">📊 Basic Data</div>
+        <div class="input-section">
+            <div>
+                <div class="form-group">
+                    <label><i class="fas fa-chart-line"></i> Target Monthly Sales</label>
+                    <input type="number" id="monthlySales" value="50000" step="1000" min="0">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-receipt"></i> Average Bill per Customer</label>
+                    <input type="number" id="avgBill" value="25" step="1" min="0">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Average Monthly Wage per Employee</label>
+                    <input type="number" id="avgMonthlyWage" value="2500" step="100" min="0">
+                </div>
+            </div>
+            <div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-week"></i> Working Days per Week</label>
+                    <input type="number" id="workingDays" value="6" min="1" max="7">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percent"></i> Target Labor Cost (%)</label>
+                    <input type="number" id="targetLaborPercent" value="25" step="1" min="0" max="100">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-moon"></i> Number of Daily Shifts</label>
+                    <select id="numShifts">
+                        <option value="1">Single Shift</option>
+                        <option value="2" selected>Two Shifts</option>
+                        <option value="3">Three Shifts</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shifts section -->
+        <div class="section-title-sm">🕒 Shift Details</div>
+        <div class="shifts-section">
+            <div class="shifts-header">
+                <h3><i class="fas fa-clock"></i> Shifts</h3>
+                <button class="btn-add" id="addShiftBtn"><i class="fas fa-plus"></i> Add Shift</button>
+            </div>
+            <div id="shiftsContainer"></div>
+            <p class="hint"><i class="fas fa-info-circle"></i> Enter the number of employees and hours per shift.</p>
+        </div>
+
+        <div class="section-title-sm">📋 Additional Settings</div>
+        <div class="form-group" style="max-width:350px;">
+            <label><i class="fas fa-umbrella-beach"></i> Weekly Leave Distribution</label>
+            <select id="vacationDistribution">
+                <option value="same">All employees on the same leave day</option>
+                <option value="staggered" selected>Staggered leaves (to ensure coverage)</option>
+            </select>
+        </div>
+
+        <button class="btn-primary" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Optimal Cost</button>
+
+        <!-- Results -->
+        <div class="results-section" id="resultsSection" style="display:none;">
+            <div class="action-bar">
+                <button class="btn-export excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Export to Excel</button>
+                <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> Export Word</button>
+            </div>
+
+            <div class="results-grid" id="resultsGrid"></div>
+            <div id="evaluationAlert"></div>
+            <div class="suggestion-box" id="suggestions"></div>
+            <div class="chart-container"><canvas id="laborChart"></canvas></div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center;">
+            <i class="fas fa-robot" style="color:var(--accent-soft);"></i> Results will appear after clicking Calculate
+        </div>
+    </div>
+</div>
+
+<footer class="footer-simple">All rights reserved © 2026 <span>FAROUK GRUP</span></footer>
+
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+<a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+<!-- Calculator Modal with fixed button order -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <!-- Fixed order: 7 8 9 / 4 5 6 × / 1 2 3 - -->
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: true, offset: 100 });
+
+    // ===== Calculator =====
+    const calcDisplay = document.getElementById('calcDisplay');
+    let currentCalcInput = '';
+    function handleCalc(v) {
+        if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+        if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+        if (v === '=') {
+            try {
+                let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/'));
+                calcDisplay.value = r;
+                currentCalcInput = r.toString();
+            } catch(e) { calcDisplay.value = 'Error'; currentCalcInput = ''; }
+            return;
+        }
+        currentCalcInput += v;
+        calcDisplay.value = currentCalcInput;
+    }
+    document.querySelectorAll('.calc-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const v = this.dataset.val;
+            if (v !== undefined) handleCalc(v);
+        });
+    });
+    const modalEl = document.getElementById('calculatorModal');
+    document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        modalEl.classList.add('active');
+        calcDisplay.value = currentCalcInput;
+    });
+    document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+    modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+    document.addEventListener('keydown', function(e) {
+        if (!modalEl.classList.contains('active')) return;
+        e.preventDefault();
+        const k = e.key;
+        if (k >= '0' && k <= '9') handleCalc(k);
+        else if (k === '.') handleCalc('.');
+        else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+        else if (k === 'Enter' || k === '=') handleCalc('=');
+        else if (k === 'Backspace') handleCalc('⌫');
+        else if (k === 'Escape') modalEl.classList.remove('active');
+        else if (k.toLowerCase() === 'c') handleCalc('C');
+    });
+
+    // ===== Loading functions =====
+    function showLoading(title, msg) {
+        document.getElementById('loadingTitle').textContent = title;
+        document.getElementById('loadingMsg').textContent = msg;
+        document.getElementById('exportLoading').classList.add('show');
+    }
+    function hideLoading() {
+        document.getElementById('exportLoading').classList.remove('show');
+    }
+
+    // ===== Shift management =====
+    let shiftCount = 2;
+    function renderShifts() {
+        const container = document.getElementById('shiftsContainer');
+        container.innerHTML = '';
+        for (let i = 1; i <= shiftCount; i++) {
+            const div = document.createElement('div');
+            div.className = 'shift-row';
+            div.innerHTML = `
+                <input type="number" id="shiftEmployees${i}" placeholder="Number of employees" value="" min="0" step="1">
+                <input type="number" id="shiftHours${i}" placeholder="Shift hours" value="" min="1" step="0.5">
+                <span style="color:#cfa776;font-weight:700;">Shift ${i}</span>
+                ${i > 1 ? `<button class="remove-shift" onclick="removeShift(${i})"><i class="fas fa-times"></i></button>` : ''}
+            `;
+            container.appendChild(div);
+        }
+    }
+    window.removeShift = function(index) {
+        shiftCount--;
+        renderShifts();
+    };
+    document.getElementById('addShiftBtn').addEventListener('click', function() {
+        shiftCount++;
+        renderShifts();
+    });
+    document.getElementById('numShifts').addEventListener('change', function() {
+        shiftCount = parseInt(this.value);
+        renderShifts();
+    });
+
+    // ===== Main calculation =====
+    let laborChart;
+    let globalLaborData = null;
+
+    document.getElementById('calculateBtn').addEventListener('click', function() {
+        const currency = document.getElementById('currencySelect').value;
+        const companyName = document.getElementById('companyName').value || 'Beneficiary Entity';
+
+        const monthlySales = parseFloat(document.getElementById('monthlySales').value) || 0;
+        const avgBill = parseFloat(document.getElementById('avgBill').value) || 1;
+        const avgMonthlyWage = parseFloat(document.getElementById('avgMonthlyWage').value) || 0;
+        const workingDays = parseInt(document.getElementById('workingDays').value) || 6;
+        const targetPercent = parseFloat(document.getElementById('targetLaborPercent').value) || 25;
+        const vacationType = document.getElementById('vacationDistribution').value;
+
+        let totalEmployees = 0;
+        let totalShiftHours = 0;
+        const shiftsDetail = [];
+        for (let i = 1; i <= shiftCount; i++) {
+            const emp = parseInt(document.getElementById(`shiftEmployees${i}`)?.value) || 0;
+            const hours = parseFloat(document.getElementById(`shiftHours${i}`)?.value) || 0;
+            totalEmployees += emp;
+            totalShiftHours += emp * hours;
+            shiftsDetail.push({ shift: i, employees: emp, hours: hours });
+        }
+
+        if (totalEmployees === 0 || totalShiftHours === 0) {
+            alert('Please enter the number of employees and working hours for each shift');
+            return;
+        }
+
+        const weeksPerMonth = 4.33;
+        const daysPerMonth = workingDays * weeksPerMonth;
+
+        const monthlyLaborCost = totalEmployees * avgMonthlyWage;
+        const laborPercent = monthlySales ? (monthlyLaborCost / monthlySales) * 100 : 0;
+
+        const salesPerEmployee = totalEmployees ? monthlySales / totalEmployees : 0;
+        const dailyLaborCost = daysPerMonth ? monthlyLaborCost / daysPerMonth : 0;
+        const avgHoursPerEmployee = totalEmployees ? totalShiftHours / totalEmployees : 0;
+        const expectedCustomers = monthlySales / avgBill;
+        const customersPerEmployee = totalEmployees ? expectedCustomers / totalEmployees : 0;
+
+        const idealMin = targetPercent - 5;
+        const idealMax = targetPercent + 5;
+        let alertClass = '', alertMessage = '';
+        if (laborPercent < idealMin) {
+            alertClass = 'alert-warning';
+            alertMessage = `⚠️ Labor cost (${laborPercent.toFixed(1)}%) is below the target (${targetPercent}%). Staff may be insufficient to serve expected sales.`;
+        } else if (laborPercent > idealMax) {
+            alertClass = 'alert-danger';
+            alertMessage = `🔴 Labor cost (${laborPercent.toFixed(1)}%) is above the ideal level (${targetPercent}%). This indicates wage waste.`;
+        } else {
+            alertClass = 'alert-success';
+            alertMessage = `✅ Labor cost (${laborPercent.toFixed(1)}%) is within the ideal range (${idealMin}-${idealMax}%).`;
+        }
+
+        let efficiencyRating = '';
+        if (laborPercent < 20) efficiencyRating = 'Excellent';
+        else if (laborPercent <= 30) efficiencyRating = 'Good';
+        else if (laborPercent <= 35) efficiencyRating = 'High';
+        else efficiencyRating = 'Risk';
+
+        document.getElementById('resultsSection').style.display = 'block';
+        document.getElementById('initialMessage').style.display = 'none';
+
+        document.getElementById('resultsGrid').innerHTML = `
+            <div class="result-card"><i class="fas fa-user-friends"></i><div class="label">Total Employees</div><div class="value">${totalEmployees}</div><div class="unit">Employees</div></div>
+            <div class="result-card"><i class="fas fa-money-bill-wave"></i><div class="label">Monthly Labor Cost</div><div class="value">${currency}${monthlyLaborCost.toLocaleString()}</div><div class="unit">Approx.</div></div>
+            <div class="result-card"><i class="fas fa-percent"></i><div class="label">Labor Ratio</div><div class="value">${laborPercent.toFixed(1)}%</div><div class="unit">of sales</div></div>
+            <div class="result-card"><i class="fas fa-chart-bar"></i><div class="label">Sales per Employee</div><div class="value">${currency}${salesPerEmployee.toFixed(0)}</div><div class="unit">Monthly</div></div>
+            <div class="result-card"><i class="fas fa-sun"></i><div class="label">Daily Labor Cost</div><div class="value">${currency}${dailyLaborCost.toFixed(0)}</div><div class="unit">Per day</div></div>
+            <div class="result-card"><i class="fas fa-hourglass-half"></i><div class="label">Avg Working Hours</div><div class="value">${avgHoursPerEmployee.toFixed(1)}</div><div class="unit">Hours/Employee/Day</div></div>
+            <div class="result-card"><i class="fas fa-users"></i><div class="label">Expected Customers</div><div class="value">${Math.round(expectedCustomers)}</div><div class="unit">Customers/Month</div></div>
+            <div class="result-card"><i class="fas fa-user-check"></i><div class="label">Customers per Employee</div><div class="value">${customersPerEmployee.toFixed(0)}</div><div class="unit">Customer/Employee</div></div>
+            <div class="result-card"><i class="fas fa-tachometer-alt"></i><div class="label">Efficiency Indicator</div><div class="value">${efficiencyRating}</div><div class="unit">${laborPercent.toFixed(1)}%</div></div>
+        `;
+
+        document.getElementById('evaluationAlert').innerHTML = `<div class="alert ${alertClass}">${alertMessage}</div>`;
+
+        let suggestions = '';
+        if (laborPercent > idealMax) {
+            suggestions += '<li>Reduce the number of employees during quiet periods (analyze peak times).</li>';
+            suggestions += '<li>Combine some tasks or use multi-skilled employees.</li>';
+            suggestions += '<li>Increase sales (marketing) to reduce the ratio without changing staff numbers.</li>';
+        } else if (laborPercent < idealMin) {
+            suggestions += '<li>You may need to increase staff to better serve customers.</li>';
+            suggestions += '<li>Ensure the target sales are realistic and achievable.</li>';
+        } else {
+            suggestions += '<li>The current distribution is good. Continue monitoring performance.</li>';
+        }
+
+        if (vacationType === 'staggered') {
+            suggestions += '<li>Staggered leaves ensure coverage without waste. It is recommended to continue this system.</li>';
+        } else {
+            suggestions += '<li>Unified leave system may cause coverage gaps on the day off. Consider implementing staggered leaves.</li>';
+        }
+
+        const shiftAnalysis = shiftsDetail.map(s => `Shift ${s.shift}: ${s.employees} employees, ${s.hours} hours.`).join('<br>');
+        suggestions += '<br><strong>Current shift distribution:</strong><br>' + shiftAnalysis;
+
+        document.getElementById('suggestions').innerHTML = `<h4><i class="fas fa-lightbulb"></i> Recommendations to reduce waste and improve efficiency</h4><ul>${suggestions}</ul>`;
+
+        const ctx = document.getElementById('laborChart').getContext('2d');
+        if (laborChart) laborChart.destroy();
+        laborChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Monthly Sales', 'Labor Cost'],
+                datasets: [{
+                    label: `Value (${currency})`,
+                    data: [monthlySales, monthlyLaborCost],
+                    backgroundColor: ['#28a745', '#b8860b']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#aab7d4' } },
+                    x: { ticks: { color: '#aab7d4' } }
+                },
+                plugins: {
+                    legend: { labels: { color: '#cfa776' } }
+                }
+            }
+        });
+
+        globalLaborData = {
+            currency, companyName,
+            monthlySales, avgBill, avgMonthlyWage, workingDays,
+            targetPercent, vacationType: vacationType === 'staggered' ? 'Staggered leaves' : 'All employees same leave',
+            totalEmployees, totalShiftHours, monthlyLaborCost, laborPercent,
+            salesPerEmployee, dailyLaborCost, avgHoursPerEmployee,
+            expectedCustomers, customersPerEmployee, efficiencyRating,
+            alertMessage, suggestionsHtml: suggestions, shiftsDetail,
+            idealMin, idealMax
+        };
+    });
+
+    // ================================================================
+    // ========== Export to Excel ==========
+    // ================================================================
+    document.getElementById('exportExcelBtn').addEventListener('click', async function() {
+        if (!globalLaborData) { alert('Please run the analysis first.'); return; }
+        showLoading('Generating Excel report...', 'Creating sheets and charts');
+        try {
+            const D = globalLaborData;
+            const currency = D.currency;
+            const companyName = D.companyName;
+
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'FAROUK GRUP';
+            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+            const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA', GB = 'FFFFF3CD';
+            const PT = 'FF155724', NT = 'FF721C24';
+            const nc = '#,##0;(#,##0);"-"';
+
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+
+            // 1. Cover
+            const cv = workbook.addWorksheet('Cover Page', { views: [{ showGridLines: false }] });
+            [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+            cv.getRow(2).height=80; cv.getRow(4).height=60;
+            cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+            bc.value='FAROUK GRUP\nConsulting & Business';
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true};
+            mh(cv,1,4,4,`Labor Cost Analysis Report\n${companyName}`,DB,GL,18);
+            const inf=[['📋 Entity',companyName],['📅 Date',new Date().toLocaleDateString('en-US')],['💰 Currency',currency],['📊 Labor Ratio',`${D.laborPercent.toFixed(1)}%`],['👥 Total Employees',D.totalEmployees]];
+            let ir=6;
+            inf.forEach(([l,v],idx)=>{
+                cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+                const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+                const bg=idx%2===0?AR:'FFFEFCF6';
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                cv.getRow(ir).height=28; ir++;
+            });
+
+            // 2. Inputs
+            const inputsSheet = workbook.addWorksheet('Inputs & Assumptions', { views: [{ showGridLines: false }] });
+            inputsSheet.getColumn(1).width=5; inputsSheet.getColumn(2).width=38; inputsSheet.getColumn(3).width=22; inputsSheet.getColumn(4).width=22; inputsSheet.getColumn(5).width=5;
+            mh(inputsSheet,1,5,1,'📋 Inputs & Assumptions',DB,GL,14);
+            inputsSheet.getRow(1).height=40;
+            mh(inputsSheet,2,4,2,'Basic Data',SB,'FFFFFFFF',11);
+            inputsSheet.getRow(2).height=28;
+            const inputFields = [
+                ['Target Monthly Sales', D.monthlySales, `${currency} ${D.monthlySales.toFixed(0)}`],
+                ['Average Bill per Customer', D.avgBill, `${currency} ${D.avgBill}`],
+                ['Average Monthly Wage', D.avgMonthlyWage, `${currency} ${D.avgMonthlyWage}`],
+                ['Working Days per Week', D.workingDays, ''],
+                ['Target Labor Ratio', `${D.targetPercent}%`, ''],
+                ['Number of Shifts', D.shiftsDetail.length, ''],
+                ['Leave System', D.vacationType, '']
+            ];
+            let iRow=3;
+            inputFields.forEach(([label,val,note],idx)=>{
+                inputsSheet.getRow(iRow).height=24;
+                const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+                const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
+                lc.value=label; vc.value=val; nc.value=note;
+                ap(lc,cs(bg,DT,true,'left'));
+                ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?nc:null});
+                ap(nc,cs(bg,'00695C',false,'center'));
+                iRow++;
+            });
+
+            // 3. Shift details
+            const shiftsSheet = workbook.addWorksheet('Shift Details', { views: [{ showGridLines: false }] });
+            shiftsSheet.getColumn(1).width=5; shiftsSheet.getColumn(2).width=20; shiftsSheet.getColumn(3).width=25; shiftsSheet.getColumn(4).width=25; shiftsSheet.getColumn(5).width=5;
+            mh(shiftsSheet,1,5,1,'🕒 Shift Details',DB,GL,14);
+            shiftsSheet.getRow(1).height=40;
+            shiftsSheet.addRow(['Shift', 'Employees', 'Shift Hours', 'Total Working Hours']);
+            D.shiftsDetail.forEach(s => { shiftsSheet.addRow([s.shift, s.employees, s.hours, s.employees * s.hours]); });
+            const shiftHeader = shiftsSheet.getRow(2);
+            shiftHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            shiftHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+
+            // 4. KPIs
+            const kpiSheet = workbook.addWorksheet('Key Performance Indicators', { views: [{ showGridLines: false }] });
+            [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
+            mh(kpiSheet,1,6,1,'📊 KPI Dashboard',DB,GL,15);
+            kpiSheet.getRow(1).height=45;
+            mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('en-US')}`,HB,'FFFFFFFF',10);
+            kpiSheet.getRow(2).height=26;
+            const kpis = [
+                { label: 'Labor Ratio', value: `${D.laborPercent.toFixed(1)}%`, good: D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax },
+                { label: 'Monthly Labor Cost', value: `${currency} ${D.monthlyLaborCost.toFixed(0)}`, good: true },
+                { label: 'Sales per Employee', value: `${currency} ${D.salesPerEmployee.toFixed(0)}`, good: true },
+                { label: 'Avg Working Hours', value: `${D.avgHoursPerEmployee.toFixed(1)} hrs`, good: true },
+                { label: 'Customers per Employee', value: D.customersPerEmployee.toFixed(0), good: true }
+            ];
+            let kRow=3;
+            kpis.forEach((k,idx)=>{
+                kpiSheet.getRow(kRow).height=40;
+                kpiSheet.mergeCells(kRow,2,kRow,2); kpiSheet.mergeCells(kRow,3,kRow,3); kpiSheet.mergeCells(kRow,4,kRow,4); kpiSheet.mergeCells(kRow,5,kRow,5);
+                const ic=kpiSheet.getCell(kRow,2); ic.value=`🔹 ${idx+1}`;
+                const lc2=kpiSheet.getCell(kRow,3); lc2.value=k.label;
+                const vc3=kpiSheet.getCell(kRow,4); vc3.value=k.value;
+                const nc2=kpiSheet.getCell(kRow,5); nc2.value='';
+                const bg=k.good?PB:NB, tc=k.good?PT:NT;
+                [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
+                ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
+                lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'left',vertical:'middle'};
+                vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
+                kRow++;
+            });
+            kRow++;
+            kpiSheet.mergeCells(kRow,2,kRow,5);
+            const kFinal=kpiSheet.getCell(kRow,2);
+            kFinal.value=D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax ? '✅ Ratio is within the ideal range' : '⚠️ Ratio is outside the ideal range';
+            kFinal.font={name:'Arial',bold:true,size:13,color:{argb:D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax?PT:'856404'}};
+            kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax?PB:GB}};
+            kFinal.alignment={horizontal:'center',vertical:'middle'};
+            kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
+            kpiSheet.getRow(kRow).height=40;
+
+            // 5. Chart
+            const chartsSheet = workbook.addWorksheet('Chart', { views: [{ showGridLines: false }] });
+            chartsSheet.getColumn(1).width=5; chartsSheet.getColumn(2).width=50; chartsSheet.getColumn(3).width=5;
+            mh(chartsSheet,1,3,1,'📈 Sales vs Labor Cost',DB,GL,14);
+            chartsSheet.getRow(1).height=40;
+            const chartContainer = document.querySelector('.chart-container');
+            if (chartContainer) {
+                try {
+                    const origBg = chartContainer.style.backgroundColor;
+                    chartContainer.style.backgroundColor = '#ffffff';
+                    const canvasImg = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
+                    chartContainer.style.backgroundColor = origBg;
+                    const imgData = canvasImg.toDataURL('image/png');
+                    const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                    chartsSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 18 }, editAs: 'oneCell' });
+                } catch(err) {}
+            }
+
+            // 6. Recommendations
+            const recSheet = workbook.addWorksheet('Recommendations', { views: [{ showGridLines: false }] });
+            recSheet.getColumn(1).width=5; recSheet.getColumn(2).width=50; recSheet.getColumn(3).width=5;
+            mh(recSheet,1,3,1,'💡 Recommendations',DB,GL,14);
+            recSheet.getRow(1).height=40;
+            recSheet.getCell(3,2).value = D.suggestionsHtml.replace(/<[^>]*>/g, '\n').replace(/•/g, '-');
+            recSheet.getCell(3,2).font = { name: 'Arial', size: 11 };
+            recSheet.getCell(3,2).alignment = { wrapText: true };
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const now = new Date();
+            const fileName = `Labor_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+            saveAs(blob, fileName);
+        } catch(err) { alert('Excel Error: ' + err.message); } finally { hideLoading(); }
+    });
+
+    // ================================================================
+    // ========== Export to Word ==========
+    // ================================================================
+    document.getElementById('exportWordBtn').addEventListener('click', async function() {
+        if (!globalLaborData) { alert('Please run the analysis first.'); return; }
+        showLoading('Generating Word report...', 'Collecting data and charts');
+        try {
+            const D = globalLaborData;
+            const currency = D.currency;
+            const companyName = D.companyName;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US');
+
+            const chartContainer = document.querySelector('.chart-container');
+            let chartImgBase64 = '';
+            if (chartContainer) {
+                const origBg = chartContainer.style.backgroundColor;
+                chartContainer.style.backgroundColor = '#ffffff';
+                const img = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
+                chartContainer.style.backgroundColor = origBg;
+                chartImgBase64 = img.toDataURL('image/png');
+            }
+
+            const kpiCards = document.querySelectorAll('.result-card');
+            let kpiRows = ''; let row = ''; let count = 0;
+            kpiCards.forEach((card, index) => {
+                const icon = card.querySelector('i') ? card.querySelector('i').outerHTML : '';
+                const label = card.querySelector('.label') ? card.querySelector('.label').innerText : '';
+                const value = card.querySelector('.value') ? card.querySelector('.value').innerText : '';
+                const unit = card.querySelector('.unit') ? card.querySelector('.unit').innerText : '';
+                const cell = `<td style="border:1px solid #b8860b; padding:12px; text-align:center; background:#fefcf6;">${icon}<div style="font-weight:700; color:#666;">${label}</div><div style="font-size:1.5rem; font-weight:900; color:#b8860b;">${value}</div><div style="font-size:0.85rem; color:#777;">${unit}</div></td>`;
+                row += cell; count++;
+                if (count % 2 === 0 || index === kpiCards.length - 1) { kpiRows += `<tr>${row}</tr>`; row = ''; }
+            });
+
+            const fullHtml = `<!DOCTYPE html>
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+            <head><meta charset='utf-8'><title>Labor Cost Report - FAROUK GRUP</title>
+            <style>
+                body{font-family:'Arial',sans-serif;direction:ltr;margin:2rem;background:#fff;color:#333;}
+                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                .cover h1{font-size:32px;color:#b8860b;margin:0;}
+                .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                th{background:#fefcf6;color:#b8860b;}
+                .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
+            </style></head>
+            <body>
+                <div class="cover">
+                    <h1>FAROUK GRUP</h1>
+                    <h2>Optimal Labor Cost Analysis Report</h2>
+                    <p>Entity: ${companyName} | Date: ${dateStr}</p>
+                    <p>Currency: ${currency} | Labor Ratio: ${D.laborPercent.toFixed(1)}%</p>
+                </div>
+                <h2 style="color:#b8860b;">Input Overview</h2>
+                <table><tbody>
+                    <tr><th>Monthly Sales</th><td>${currency} ${D.monthlySales}</td><th>Average Bill</th><td>${currency} ${D.avgBill}</td></tr>
+                    <tr><th>Average Monthly Wage</th><td>${currency} ${D.avgMonthlyWage}</td><th>Working Days</th><td>${D.workingDays}</td></tr>
+                    <tr><th>Target Labor Ratio</th><td>${D.targetPercent}%</td><th>Number of Shifts</th><td>${D.shiftsDetail.length}</td></tr>
+                </tbody></table>
+                <h2 style="color:#b8860b;">📊 Key Performance Indicators</h2>
+                <table>${kpiRows}</table>
+                <h2 style="color:#b8860b;">📈 Chart</h2>
+                <div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>
+                <h2 style="color:#b8860b;">💡 Recommendations</h2>
+                <div style="background:#fefcf6;padding:15px;border-radius:10px;border-left:4px solid #b8860b;">
+                    <ul>${D.suggestionsHtml}</ul>
+                </div>
+                <div class="footer">Generated by FAROUK GRUP © ${now.getFullYear()}</div>
+            </body></html>`;
+
+            const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Labor_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        } catch(err) { alert('Word Error: ' + err.message); } finally { hideLoading(); }
+    });
+
+    // ===== Initial setup =====
+    renderShifts();
+</script>
+</body>
+</html>
