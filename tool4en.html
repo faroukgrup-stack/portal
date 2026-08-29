@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Comprehensive Marketing Feasibility Study | FAROUK GRUP</title>
+<!-- Page protection -->
+<script src="auth-check.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Inter', 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.5;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 120px !important;
+            min-height: 100vh;
+        }
+
+        /* ===== Remove vibration ===== */
+        .calculator-card, .result-card, .chart-container, canvas, .table-container,
+        .btn-primary, .btn-add, .btn-export, .section, .currency-row,
+        .calc-floating-btn, .home-floating-btn, .competitor-row, .channel-row,
+        .remove-btn, .suggestion-box, .alert, .results-grid,
+        .settings-overlay, .settings-card, .form-group input, .form-group select {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
+            position: absolute; border-radius: 50%; filter: blur(80px);
+            opacity: 0.20;
+            background: radial-gradient(circle, rgba(180,133,84,0.10) 0%, transparent 70%);
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.05) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.06) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 2rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.2rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.3rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.1rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.9; padding: 0 0.5rem;
+        }
+
+        .container {
+            max-width: 1050px; margin: 1.5rem auto; padding: 0 0.8rem;
+            position: relative; z-index: 2;
+            width: 100%;
+        }
+
+        /* ===== Main Card ===== */
+        .calculator-card {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 24px; padding: 1.2rem;
+            box-shadow: 0 10px 30px -8px rgba(0,0,0,0.5);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            margin-bottom: 1.5rem;
+            width: 100%; max-width: 100%;
+        }
+        .calculator-card h2 {
+            font-size: 1.5rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1rem; padding-bottom: 0.4rem;
+            border-bottom: 2px solid rgba(180,133,84,0.12);
+        }
+        .calculator-card h2 i { color: #cfa776; margin-right: 0.4rem; }
+
+        /* ===== Currency row ===== */
+        .currency-row {
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.5rem; background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.12);
+            padding: 0.5rem 0.8rem; border-radius: 40px; margin-bottom: 1rem;
+            width: 100%;
+        }
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.8rem; white-space: nowrap; }
+        .currency-row select, .currency-row input {
+            flex: 1 1 120px; min-width: 80px; padding: 0.4rem 0.7rem;
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Inter', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.6); color: #f0f4fa; font-size: 0.85rem;
+        }
+        .currency-row input { flex: 2 1 160px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* ===== Grid ===== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== Sections ===== */
+        .section {
+            background: rgba(22,30,46,0.6); border: 1px solid rgba(180,133,84,0.08);
+            border-radius: 16px; padding: 0.8rem;
+            margin-bottom: 0.6rem;
+        }
+        .section h3 {
+            color: #cfa776; margin-bottom: 0.5rem; font-weight: 900;
+            font-size: 1rem; border-bottom: 1px dashed rgba(180,133,84,0.1);
+            padding-bottom: 0.3rem;
+        }
+        .section h3 i { color: #cfa776; margin-right: 0.3rem; }
+
+        /* ===== Forms ===== */
+        .form-group { margin-bottom: 0.4rem; }
+        label {
+            display: block; margin-bottom: 0.1rem;
+            font-weight: 700; color: #cfa776; font-size: 0.75rem;
+        }
+        label i { color: #cfa776; margin-right: 0.2rem; }
+        input, select, textarea {
+            width: 100%; padding: 0.4rem 0.7rem;
+            border: 1px solid rgba(180,133,84,0.12); border-radius: 25px;
+            background: rgba(10,14,23,0.5); color: #f0f4fa;
+            font-family: 'Inter', sans-serif; font-size: 0.85rem;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 2px rgba(180,133,84,0.12);
+            background: rgba(15,20,30,0.7);
+        }
+        textarea { min-height: 50px; resize: vertical; }
+        .row-2 { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .row-2 > * { flex: 1 1 140px; }
+
+        /* ===== Add buttons ===== */
+        .btn-add {
+            background: transparent; border: 1px solid rgba(180,133,84,0.15);
+            color: #cfa776; border-radius: 40px; padding: 0.3rem 1rem;
+            font-weight: 700; cursor: pointer; margin: 0.2rem 0;
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            font-family: 'Inter', sans-serif; font-size: 0.8rem;
+        }
+        .btn-add:hover { background: rgba(180,133,84,0.15); border-color: #b48554; }
+
+        /* ===== Competitor & Channel rows ===== */
+        .competitor-row, .channel-row {
+            display: flex; gap: 0.3rem; margin-bottom: 0.3rem;
+            align-items: center; flex-wrap: wrap;
+            background: rgba(10,14,23,0.3); border: 1px solid rgba(180,133,84,0.06);
+            padding: 0.3rem 0.5rem; border-radius: 25px;
+        }
+        .competitor-row input, .channel-row input {
+            flex: 1 1 80px; min-width: 60px;
+            background: rgba(10,14,23,0.3); border: 1px solid rgba(180,133,84,0.06);
+            color: #f0f4fa; padding: 0.3rem 0.5rem; border-radius: 18px;
+            font-size: 0.75rem;
+        }
+        .remove-btn {
+            background: #dc3545; color: white; border: none;
+            border-radius: 50%; width: 24px; height: 24px;
+            cursor: pointer; font-weight: bold; font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .remove-btn:hover { background: #c82333; }
+
+        /* ===== Primary button ===== */
+        .btn-primary {
+            display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+            width: 100%; padding: 0.8rem; border-radius: 50px;
+            background: rgba(180,133,84,0.15);
+            border: 1px solid rgba(180,133,84,0.2);
+            color: #cfa776; font-weight: 900; font-size: 1rem;
+            cursor: pointer; margin: 1rem 0; font-family: 'Inter', sans-serif;
+        }
+        .btn-primary:hover { background: rgba(180,133,84,0.3); border-color: #b48554; }
+        .btn-primary:active { transform: scale(0.97); }
+
+        /* ===== Results ===== */
+        .results-section { margin-top: 1rem; width: 100%; max-width: 100%; overflow: hidden; }
+        .results-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+            gap: 0.5rem; margin-bottom: 0.8rem;
+            width: 100%;
+        }
+        .result-card {
+            background: rgba(22,30,46,0.7); border: 1px solid rgba(180,133,84,0.08);
+            border-radius: 14px; padding: 0.6rem; text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            word-break: break-word;
+        }
+        .result-card .label { font-size: 0.7rem; color: #aab7d4; margin-bottom: 0.1rem; }
+        .result-card .value { font-size: 1.1rem; font-weight: 900; color: #cfa776; }
+        .result-card .unit { font-size: 0.65rem; color: #aab7d4; }
+
+        .alert { padding: 0.6rem; border-radius: 16px; font-weight: 700; margin: 0.5rem 0; }
+        .alert-danger { background: rgba(220,53,69,0.15); color: #f87171; border: 1px solid #dc3545; }
+        .alert-warning { background: rgba(255,193,7,0.15); color: #fbbf24; border: 1px solid #ffc107; }
+
+        .suggestion-box {
+            background: rgba(22,30,46,0.6); border: 1px solid rgba(180,133,84,0.08);
+            border-radius: 16px; padding: 0.8rem; margin: 1rem 0;
+        }
+        .suggestion-box h4 { color: #cfa776; margin-bottom: 0.3rem; font-size: 1rem; }
+
+        /* ===== Charts ===== */
+        .chart-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+            gap: 0.8rem; margin-top: 0.8rem;
+            width: 100%;
+        }
+        .chart-container {
+            background: rgba(22,30,46,0.5); border-radius: 14px;
+            padding: 0.5rem; border: 1px solid rgba(180,133,84,0.06);
+            height: 200px;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+        .chart-container canvas { width: 100% !important; height: 100% !important; }
+
+        /* ===== Action bar ===== */
+        .action-bar {
+            display: flex; gap: 0.5rem; margin: 0.8rem 0;
+            flex-wrap: wrap; justify-content: flex-end;
+        }
+        .btn-export {
+            background: rgba(180,133,84,0.08); border: 1px solid rgba(180,133,84,0.1);
+            border-radius: 40px; padding: 0.4rem 1rem;
+            color: #cfa776; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            font-size: 0.8rem; font-family: 'Inter', sans-serif;
+        }
+        .btn-export:hover { background: rgba(180,133,84,0.2); }
+        .btn-export.word { background: rgba(30,74,122,0.12); border-color: #1e4a7a; color: #8ab8ff; }
+        .btn-export.word:hover { background: rgba(30,74,122,0.25); }
+        .btn-export.excel { background: rgba(40,167,69,0.10); border-color: #28a745; color: #6fbf6f; }
+        .btn-export.excel:hover { background: rgba(40,167,69,0.2); }
+        .btn-export.pdf { background: rgba(220,53,69,0.10); border-color: #dc3545; color: #f87171; }
+        .btn-export.pdf:hover { background: rgba(220,53,69,0.2); }
+
+        /* ===== Loading overlay ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.5rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i { font-size: 2rem; color: #cfa776; animation: spin 0.8s linear infinite; display: block; margin-bottom: 0.4rem; }
+        .export-loading-box h3 { color: #cfa776; font-size: 1rem; margin-bottom: 0.2rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.85rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .footer-simple {
+            text-align: center; padding: 0.8rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.3); border-top: 1px solid rgba(180,133,84,0.06);
+            color: #aab7d4; font-size: 0.75rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 340px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.08);
+            border-bottom: 1px solid rgba(180,133,84,0.08);
+            padding: 0.5rem 1rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 0.95rem; font-weight: 900; }
+        .modal-header .close { color: #aab7d4; font-size: 1.5rem; font-weight: bold; cursor: pointer; line-height: 1; }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 0.8rem; }
+        .calc-display {
+            width: 100%; height: 38px; font-size: 1.1rem; text-align: left;
+            padding: 0 10px; border: 1px solid rgba(180,133,84,0.12);
+            border-radius: 14px; margin-bottom: 10px;
+            background: rgba(10,14,23,0.6); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 4px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.06);
+            border: 1px solid rgba(180,133,84,0.06); border-radius: 12px;
+            padding: 8px 0; font-size: 0.95rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.18); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals { background: rgba(180,133,84,0.2); color: white; grid-column: span 2; }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.35); }
+
+        /* ===== Floating buttons ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 20px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Inter', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 5px !important;
+            padding: 10px 16px !important; font-size: 0.85rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 15px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 15px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===================================================
+           Responsive improvements
+           =================================================== */
+        @media (max-width: 768px) {
+            .hero-mini { padding: 1.5rem 0.8rem; }
+            .hero-mini h2 { font-size: 1.5rem; }
+            .hero-mini p { font-size: 0.9rem; }
+            .container { margin: 0.8rem auto; padding: 0 0.5rem; }
+            .calculator-card { padding: 0.8rem 0.6rem; border-radius: 18px; }
+            .calculator-card h2 { font-size: 1.2rem; margin-bottom: 0.8rem; }
+            .currency-row { gap: 0.3rem; padding: 0.4rem 0.6rem; flex-direction: column; align-items: stretch; }
+            .currency-row label { font-size: 0.75rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; font-size: 0.8rem; padding: 0.3rem 0.6rem; }
+            .grid-2 { grid-template-columns: 1fr; gap: 0.5rem; }
+            .section { padding: 0.6rem; }
+            .section h3 { font-size: 0.95rem; }
+            .form-group { margin-bottom: 0.3rem; }
+            label { font-size: 0.7rem; }
+            input, select, textarea { font-size: 0.8rem; padding: 0.35rem 0.6rem; }
+            .row-2 { flex-direction: column; gap: 0.3rem; }
+            .row-2 > * { width: 100%; }
+            .btn-primary { font-size: 0.9rem; padding: 0.7rem; margin: 0.8rem 0; }
+            .results-grid { grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.3rem; }
+            .result-card { padding: 0.4rem; }
+            .result-card .value { font-size: 0.95rem; }
+            .result-card .label { font-size: 0.6rem; }
+            .chart-grid { grid-template-columns: 1fr; }
+            .chart-container { height: 160px; padding: 0.4rem; }
+            .action-bar { justify-content: center; flex-direction: column; }
+            .btn-export { width: 100%; justify-content: center; font-size: 0.75rem; padding: 0.4rem 0.8rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 12px !important; padding: 7px 12px !important; font-size: 0.7rem !important; gap: 3px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.8rem !important; }
+            .competitor-row, .channel-row { flex-direction: column; align-items: stretch; gap: 0.2rem; }
+            .competitor-row input, .channel-row input { flex: 1 1 auto; min-width: 0; }
+            .remove-btn { align-self: center; width: 32px; height: 32px; font-size: 1rem; }
+            .btn-add { width: 100%; justify-content: center; font-size: 0.8rem; }
+            .suggestion-box { padding: 0.6rem; }
+        }
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calculator-card h2 { font-size: 1rem; }
+            .results-grid { grid-template-columns: 1fr 1fr; gap: 0.2rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 8px !important; padding: 5px 8px !important; font-size: 0.6rem !important; }
+            .chart-container { height: 140px; }
+            table { font-size: 0.6rem; min-width: 200px; }
+            th, td { padding: 0.2rem 0.3rem; }
+        }
+
+        ::-webkit-scrollbar { width: 3px; height: 3px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.2); border-radius: 10px; }
+    </style>
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- Export loading overlay -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">Generating report...</h3>
+        <p id="loadingMsg">Please wait</p>
+    </div>
+</div>
+
+<section class="hero-mini">
+    <h2>📊 Comprehensive Marketing Feasibility Study</h2>
+    <p>Integrated analysis of market, audience, competitors, channels, and financial marketing projections</p>
+</section>
+
+<div class="container">
+    <div class="calculator-card" data-aos="fade-up">
+        <h2><i class="fas fa-chart-pie"></i>Marketing Study Data</h2>
+
+        <!-- Currency + Company Name -->
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> Currency:</label>
+            <select id="currencySelect">
+                <option value="$" selected>US Dollar ($)</option>
+                <option value="€">Euro (€)</option>
+                <option value="₺">Turkish Lira (₺)</option>
+                <option value="ج.م">Egyptian Pound (ج.م)</option>
+                <option value="د.ك">Kuwaiti Dinar (د.ك)</option>
+                <option value="ر.س">Saudi Riyal (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> Company Name:</label>
+            <input type="text" id="companyName" value="Beneficiary Entity Name" placeholder="Beneficiary entity">
+        </div>
+
+        <!-- Multi-input grid -->
+        <div class="grid-2">
+            <div>
+                <div class="section">
+                    <h3><i class="fas fa-tag"></i> Project Definition</h3>
+                    <div class="form-group"><label>Project / Product Name</label><input type="text" id="projectName" value="Burger Restaurant"></div>
+                    <div class="form-group"><label>Brief Description</label><textarea id="projectDesc" rows="2">Fast food restaurant specialized in burgers</textarea></div>
+                    <div class="row-2"><div class="form-group"><label>Location</label><input type="text" id="location" value="Riyadh"></div><div class="form-group"><label>Study Duration (months)</label><input type="number" id="studyMonths" value="12"></div></div>
+                </div>
+                <div class="section">
+                    <h3><i class="fas fa-chart-bar"></i> Market Analysis</h3>
+                    <div class="form-group"><label>Total Addressable Market (TAM)</label><input type="number" id="tam" value="10000000"></div>
+                    <div class="form-group"><label>Serviceable Addressable Market (SAM)</label><input type="number" id="sam" value="4000000"></div>
+                    <div class="form-group"><label>Target Share (SOM)</label><input type="number" id="som" value="200000"></div>
+                    <div class="row-2"><div class="form-group"><label>Annual Growth %</label><input type="number" id="growthRate" value="5" step="0.1"></div></div>
+                    <div class="form-group"><label>Key Trends</label><textarea id="trends" rows="2">Healthy options, fast delivery</textarea></div>
+                </div>
+                <div class="section">
+                    <h3><i class="fas fa-users"></i> Target Audience</h3>
+                    <div class="row-2"><div class="form-group"><label>Age Group</label><input type="text" id="ageGroup" value="18-35"></div><div class="form-group"><label>Gender</label><select id="gender"><option value="all">All</option><option value="male">Male</option><option value="female">Female</option></select></div></div>
+                    <div class="row-2"><div class="form-group"><label>Geography</label><input type="text" id="geoArea" value="City Center"></div><div class="form-group"><label>Income Level</label><select id="income"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div></div>
+                    <div class="form-group"><label>Interests / Behavior</label><textarea id="interests" rows="2">Burger lovers, prefer delivery</textarea></div>
+                    <div class="form-group"><label>Potential Audience Size</label><input type="number" id="audienceSize" value="500000"></div>
+                </div>
+            </div>
+            <div>
+                <div class="section">
+                    <h3><i class="fas fa-store-alt"></i> Competitors</h3>
+                    <div id="competitorsContainer"></div>
+                    <button class="btn-add" id="addCompetitor"><i class="fas fa-plus"></i> Add Competitor</button>
+                </div>
+                <div class="section">
+                    <h3><i class="fas fa-bullhorn"></i> Marketing Strategy</h3>
+                    <div class="form-group"><label>Product</label><textarea id="productStrategy" rows="2">Premium burgers, healthy options</textarea></div>
+                    <div class="row-2"><div class="form-group"><label>Meal Price</label><input type="number" id="price" value="50"></div><div class="form-group"><label>Cost per Meal</label><input type="number" id="costPerMeal" value="15"></div></div>
+                    <div class="form-group"><label>Place (Distribution)</label><textarea id="placeStrategy" rows="2">Strategic location, delivery apps</textarea></div>
+                    <div class="form-group"><label>Promotion</label><textarea id="promotionStrategy" rows="2">Ads, launch offers</textarea></div>
+                    <div class="row-2"><div class="form-group"><label>Marketing Team Size</label><input type="number" id="marketingTeam" value="2"></div><div class="form-group"><label>Plan Duration (months)</label><input type="number" id="planDuration" value="12"></div></div>
+                </div>
+                <div class="section">
+                    <h3><i class="fas fa-file-invoice-dollar"></i> Monthly Operating Expenses</h3>
+                    <div class="row-2"><div class="form-group"><label>Rent</label><input type="number" id="rent" value="20000"></div><div class="form-group"><label>Salaries</label><input type="number" id="salaries" value="30000"></div></div>
+                    <div class="row-2"><div class="form-group"><label>Utilities</label><input type="number" id="utilities" value="5000"></div><div class="form-group"><label>Other</label><input type="number" id="otherOpCost" value="5000"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="section">
+                <h3><i class="fas fa-wifi"></i> Marketing Channels</h3>
+                <div id="channelsContainer"></div>
+                <button class="btn-add" id="addChannel"><i class="fas fa-plus"></i> Add Channel</button>
+            </div>
+            <div class="section">
+                <h3><i class="fas fa-shopping-cart"></i> Customer Behavior</h3>
+                <div class="row-2"><div class="form-group"><label>Purchases per Month</label><input type="number" id="purchaseFrequency" value="2" step="0.5"></div><div class="form-group"><label>Loyalty Duration (months)</label><input type="number" id="loyaltyMonths" value="6"></div></div>
+                <div class="form-group"><label>Walk-in Customers (monthly)</label><input type="number" id="walkIn" value="1000"></div>
+            </div>
+        </div>
+
+        <button class="btn-primary" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Study Now</button>
+
+        <!-- Results area -->
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="action-bar">
+                <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> Word</button>
+                <button class="btn-export pdf" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> PDF</button>
+                <button class="btn-export excel" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Excel</button>
+            </div>
+
+            <div id="reportHeader" class="result-card" style="text-align:left;"></div>
+            <div class="results-grid" id="resultsGrid"></div>
+            <div id="alerts"></div>
+            <div class="suggestion-box" id="strategicAdvice"></div>
+            <div class="chart-grid">
+                <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+                <div class="chart-container"><canvas id="breakEvenChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer-simple">All rights reserved © 2026 <span>FAROUK GRUP</span></footer>
+
+<div class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</div>
+<a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+<!-- Calculator Modal -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <!-- Fixed order: 7 8 9 / 4 5 6 × / 1 2 3 - -->
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: true, offset: 100 });
+
+    // ===== Calculator =====
+    const calcDisplay = document.getElementById('calcDisplay');
+    let currentCalcInput = '';
+
+    function handleCalc(v) {
+        if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+        if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+        if (v === '=') {
+            try {
+                let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
+                calcDisplay.value = r;
+                currentCalcInput = r.toString();
+            } catch(e) { calcDisplay.value = 'Error'; currentCalcInput = ''; }
+            return;
+        }
+        currentCalcInput += v;
+        calcDisplay.value = currentCalcInput;
+    }
+
+    document.querySelectorAll('.calc-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const v = this.dataset.val;
+            if (v !== undefined) handleCalc(v);
+        });
+    });
+
+    const modalEl = document.getElementById('calculatorModal');
+    document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        modalEl.classList.add('active');
+        calcDisplay.value = currentCalcInput;
+    });
+    document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+    modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+    document.addEventListener('keydown', function(e) {
+        if (!modalEl.classList.contains('active')) return;
+        e.preventDefault();
+        const k = e.key;
+        if (k >= '0' && k <= '9') handleCalc(k);
+        else if (k === '.') handleCalc('.');
+        else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+        else if (k === 'Enter' || k === '=') handleCalc('=');
+        else if (k === 'Backspace') handleCalc('⌫');
+        else if (k === 'Escape') modalEl.classList.remove('active');
+        else if (k.toLowerCase() === 'c') handleCalc('C');
+    });
+
+    // ===== Competitors =====
+    let competitorCount = 2;
+
+    function renderCompetitors() {
+        const container = document.getElementById('competitorsContainer');
+        container.innerHTML = '';
+        for (let i = 1; i <= competitorCount; i++) {
+            const div = document.createElement('div');
+            div.className = 'competitor-row';
+            div.innerHTML = `
+                <input type="text" class="comp-name" placeholder="Competitor name" value="">
+                <input type="number" class="comp-strength" placeholder="Strength (1-10)" value="" min="1" max="10">
+                <input type="number" class="comp-weakness" placeholder="Weakness (1-10)" value="" min="1" max="10">
+                ${i > 1 ? '<button class="remove-btn" onclick="removeCompetitor(this)">×</button>' : ''}
+            `;
+            container.appendChild(div);
+        }
+    }
+    window.removeCompetitor = function(btn) { btn.parentElement.remove(); competitorCount--; };
+    document.getElementById('addCompetitor').addEventListener('click', () => { competitorCount++; renderCompetitors(); });
+
+    // ===== Channels =====
+    let channelCount = 2;
+
+    function renderChannels() {
+        const container = document.getElementById('channelsContainer');
+        container.innerHTML = '';
+        for (let i = 1; i <= channelCount; i++) {
+            const div = document.createElement('div');
+            div.className = 'channel-row';
+            div.innerHTML = `
+                <input type="text" class="channel-name" placeholder="Channel name" value="">
+                <input type="number" class="channel-budget" placeholder="Monthly budget" value="">
+                <input type="number" class="channel-customers" placeholder="Expected customers/month" value="">
+                ${i > 1 ? '<button class="remove-btn" onclick="removeChannel(this)">×</button>' : ''}
+            `;
+            container.appendChild(div);
+        }
+    }
+    window.removeChannel = function(btn) { btn.parentElement.remove(); channelCount--; };
+    document.getElementById('addChannel').addEventListener('click', () => { channelCount++; renderChannels(); });
+
+    // ===== Loading =====
+    function showLoading(title, msg) {
+        document.getElementById('loadingTitle').textContent = title;
+        document.getElementById('loadingMsg').textContent = msg;
+        document.getElementById('exportLoading').classList.add('show');
+    }
+
+    function hideLoading() {
+        document.getElementById('exportLoading').classList.remove('show');
+    }
+
+    // ===== Get data =====
+    function getData() {
+        const competitors = [];
+        document.querySelectorAll('.competitor-row').forEach(row => {
+            const name = row.querySelector('.comp-name')?.value.trim();
+            const strength = parseFloat(row.querySelector('.comp-strength')?.value) || 0;
+            const weakness = parseFloat(row.querySelector('.comp-weakness')?.value) || 0;
+            if (name) competitors.push({ name, strength, weakness });
+        });
+        const channels = [];
+        document.querySelectorAll('.channel-row').forEach(row => {
+            const name = row.querySelector('.channel-name')?.value.trim();
+            const budget = parseFloat(row.querySelector('.channel-budget')?.value) || 0;
+            const customers = parseFloat(row.querySelector('.channel-customers')?.value) || 0;
+            if (name) channels.push({ name, budget, customers });
+        });
+        return {
+            currency: document.getElementById('currencySelect').value,
+            companyName: document.getElementById('companyName').value || 'Beneficiary Entity',
+            projectName: document.getElementById('projectName').value || 'Project',
+            projectDesc: document.getElementById('projectDesc').value || '',
+            location: document.getElementById('location').value || '',
+            studyMonths: parseFloat(document.getElementById('studyMonths').value) || 12,
+            tam: parseFloat(document.getElementById('tam').value) || 0,
+            sam: parseFloat(document.getElementById('sam').value) || 0,
+            som: parseFloat(document.getElementById('som').value) || 0,
+            growthRate: parseFloat(document.getElementById('growthRate').value) / 100 || 0,
+            trends: document.getElementById('trends').value || '',
+            ageGroup: document.getElementById('ageGroup').value || '',
+            gender: document.getElementById('gender').value || 'all',
+            geoArea: document.getElementById('geoArea').value || '',
+            income: document.getElementById('income').value || 'medium',
+            interests: document.getElementById('interests').value || '',
+            audienceSize: parseFloat(document.getElementById('audienceSize').value) || 0,
+            competitors,
+            productStrategy: document.getElementById('productStrategy').value || '',
+            price: parseFloat(document.getElementById('price').value) || 0,
+            costPerMeal: parseFloat(document.getElementById('costPerMeal').value) || 0,
+            placeStrategy: document.getElementById('placeStrategy').value || '',
+            promotionStrategy: document.getElementById('promotionStrategy').value || '',
+            marketingTeam: parseFloat(document.getElementById('marketingTeam').value) || 0,
+            planDuration: parseFloat(document.getElementById('planDuration').value) || 12,
+            rent: parseFloat(document.getElementById('rent').value) || 0,
+            salaries: parseFloat(document.getElementById('salaries').value) || 0,
+            utilities: parseFloat(document.getElementById('utilities').value) || 0,
+            otherOpCost: parseFloat(document.getElementById('otherOpCost').value) || 0,
+            channels,
+            purchaseFrequency: parseFloat(document.getElementById('purchaseFrequency').value) || 1,
+            loyaltyMonths: parseFloat(document.getElementById('loyaltyMonths').value) || 6,
+            walkIn: parseFloat(document.getElementById('walkIn').value) || 0
+        };
+    }
+
+    // ===== Main calculation =====
+    let revenueChart, breakEvenChart;
+
+    document.getElementById('calculateBtn').addEventListener('click', function() {
+        const d = getData();
+
+        const totalChannelCustomers = d.channels.reduce((sum, ch) => sum + ch.customers, 0);
+        const totalMarketingBudget = d.channels.reduce((sum, ch) => sum + ch.budget, 0);
+        const totalActiveCustomers = totalChannelCustomers + d.walkIn;
+        const avgOrderValue = d.price;
+        const monthlyRevenue = totalActiveCustomers * avgOrderValue * d.purchaseFrequency;
+        const annualRevenue = monthlyRevenue * 12;
+        const annualMarketingCost = totalMarketingBudget * d.planDuration;
+        const marketingContribution = annualRevenue - annualMarketingCost;
+        const cac = totalChannelCustomers > 0 ? totalMarketingBudget / totalChannelCustomers : 0;
+        const roas = annualMarketingCost > 0 ? (annualRevenue / annualMarketingCost).toFixed(2) : 0;
+        const ltv = (d.price - d.costPerMeal) * d.purchaseFrequency * d.loyaltyMonths;
+        const breakEvenCustomers = cac > 0 ? annualMarketingCost / (avgOrderValue * d.purchaseFrequency * 12) : 0;
+
+        let compStrengthAvg = 0, compWeaknessAvg = 0;
+        d.competitors.forEach(c => { compStrengthAvg += c.strength; compWeaknessAvg += c.weakness; });
+        if (d.competitors.length) { compStrengthAvg /= d.competitors.length; compWeaknessAvg /= d.competitors.length; }
+        const compIndex = compStrengthAvg - compWeaknessAvg;
+        let compDesc = '', compColor = '';
+        if (compIndex > 3) { compDesc = 'Tough market (strong competition)'; compColor = '🔴'; }
+        else if (compIndex > 1) { compDesc = 'Moderate competition'; compColor = '🟡'; }
+        else { compDesc = 'Excellent opportunity (weak competition)'; compColor = '🟢'; }
+
+        let marketScore = (d.growthRate * 40) + (Math.log10(d.tam+1) * 10) + (Math.max(0, 10 - compIndex) * 3);
+        marketScore = marketScore / 10;
+        if (marketingContribution < 0) marketScore = Math.min(marketScore, 5);
+        if (annualRevenue > d.som * 1.2) marketScore = Math.min(marketScore, 3);
+        marketScore = Math.min(10, Math.max(0, marketScore)).toFixed(1);
+        let marketColor = marketScore >= 7 ? '🟢' : (marketScore >= 4 ? '🟡' : '🔴');
+
+        let warnings = [];
+        if (d.costPerMeal >= d.price) warnings.push('🔴 Error: Meal cost is greater than or equal to selling price!');
+        if (ltv / cac < 3 && cac > 0) warnings.push('🟡 Warning: LTV/CAC ratio is less than 3 (ideal > 3)');
+        if (breakEvenCustomers > totalActiveCustomers) {
+            warnings.push(`🔴 Customer gap: Need ${Math.ceil(breakEvenCustomers - totalActiveCustomers)} additional customers per month to cover marketing costs.`);
+        }
+        if (annualRevenue > d.som) {
+            warnings.push(`🔴 Expected revenue (${d.currency}${annualRevenue.toLocaleString()}) exceeds the SOM target (${d.currency}${d.som.toLocaleString()}). Not realistic!`);
+        } else if (annualRevenue < d.som * 0.5) {
+            warnings.push(`🟡 Revenue represents only ${(annualRevenue/d.som*100).toFixed(1)}% of the SOM target.`);
+        }
+
+        document.getElementById('resultsSection').style.display = 'block';
+
+        document.getElementById('reportHeader').innerHTML = `
+            <h3 style="color:#cfa776;">📌 Report: ${d.projectName}</h3>
+            <p><strong>Entity:</strong> ${d.companyName} | <strong>Location:</strong> ${d.location} | <strong>Description:</strong> ${d.projectDesc}</p>
+        `;
+
+        document.getElementById('resultsGrid').innerHTML = `
+            <div class="result-card"><div class="label">Active Customers (Monthly)</div><div class="value">${totalActiveCustomers}</div></div>
+            <div class="result-card"><div class="label">Annual Revenue</div><div class="value">${d.currency}${annualRevenue.toLocaleString()}</div></div>
+            <div class="result-card"><div class="label">Annual Marketing Costs</div><div class="value">${d.currency}${annualMarketingCost.toLocaleString()}</div></div>
+            <div class="result-card"><div class="label">Annual Marketing Contribution</div><div class="value" style="color:${marketingContribution>=0?'#4ade80':'#f87171'}">${d.currency}${marketingContribution.toLocaleString()}</div></div>
+            <div class="result-card"><div class="label">Customer Acquisition Cost (CAC)</div><div class="value">${d.currency}${cac.toFixed(2)}</div></div>
+            <div class="result-card"><div class="label">Lifetime Value (LTV)</div><div class="value">${d.currency}${ltv.toFixed(2)}</div></div>
+            <div class="result-card"><div class="label">Return on Ad Spend (ROAS)</div><div class="value">${roas}x</div></div>
+            <div class="result-card"><div class="label">Break-even Customers (Monthly)</div><div class="value">${Math.ceil(breakEvenCustomers)}</div></div>
+        `;
+
+        let alertHtml = '';
+        if (warnings.length) {
+            alertHtml = '<div class="alert alert-danger"><ul>' + warnings.map(w => `<li>${w}</li>`).join('') + '</ul></div>';
+        }
+        document.getElementById('alerts').innerHTML = alertHtml;
+
+        let advice = `<h4>🏢 Competitor Analysis (${d.competitors.length} competitors)</h4>`;
+        advice += `<p>Average Strength: ${compStrengthAvg.toFixed(1)}/10 | Average Weakness: ${compWeaknessAvg.toFixed(1)}/10 | Competition Index: ${compIndex.toFixed(1)} ${compColor} (${compDesc})</p>`;
+        advice += `<h4>🌟 Market Attractiveness Score: ${marketScore}/10 ${marketColor}</h4>`;
+        advice += `<h4>💡 Strategic Guidance</h4>`;
+        let finalAdvice = `The marketing contribution is ${marketingContribution >=0 ? 'positive' : 'negative'} by ${d.currency}${Math.abs(marketingContribution).toLocaleString()}. `;
+        if (marketingContribution > 0 && roas > 2) {
+            finalAdvice += 'The marketing model looks promising; consider increasing the budget to capture a larger share.';
+        } else if (marketingContribution > 0 && roas <= 2) {
+            finalAdvice += 'The marketing contribution is positive but ROAS is low, review channel efficiency.';
+        } else {
+            finalAdvice += 'Marketing spend does not cover its costs; revisit acquisition strategy or pricing.';
+        }
+        finalAdvice += '<br><small>* Marketing contribution represents revenue minus marketing costs only, excluding other operating expenses.</small>';
+        advice += `<p>${finalAdvice}</p>`;
+        document.getElementById('strategicAdvice').innerHTML = advice;
+
+        if (revenueChart) revenueChart.destroy();
+        const ctx1 = document.getElementById('revenueChart').getContext('2d');
+        revenueChart = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['Annual Revenue', 'Annual Marketing Costs'],
+                datasets: [{ label: `Value (${d.currency})`, data: [annualRevenue, annualMarketingCost], backgroundColor: ['#b8860b', '#dc3545'] }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, animation: false }
+        });
+
+        if (breakEvenChart) breakEvenChart.destroy();
+        const ctx2 = document.getElementById('breakEvenChart').getContext('2d');
+        breakEvenChart = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Current Customers', 'Break-even Customers (Marketing Cost)'],
+                datasets: [{ data: [totalActiveCustomers, Math.ceil(breakEvenCustomers)], backgroundColor: ['#28a745', '#17a2b8'] }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, animation: false }
+        });
+
+        window.lastMarketingResults = {
+            inputs: d,
+            outputs: {
+                totalActiveCustomers, annualRevenue, annualMarketingCost, marketingContribution,
+                cac, roas, ltv, breakEvenCustomers,
+                compStrengthAvg, compWeaknessAvg, compIndex, compDesc, compColor,
+                marketScore, marketColor, warnings
+            }
+        };
+    });
+
+    // ================================================================
+    // ========== Export to Word ==========
+    // ================================================================
+    document.getElementById('exportWordBtn').addEventListener('click', function() {
+        if (document.getElementById('resultsSection').style.display === 'none') {
+            alert('Please run the analysis first');
+            return;
+        }
+        showLoading('Generating Word report...', 'Collecting data');
+        try {
+            const d = getData();
+            const res = window.lastMarketingResults?.outputs || {};
+            const currency = d.currency;
+            const companyName = d.companyName;
+
+            const chart1 = document.getElementById('revenueChart');
+            const chart2 = document.getElementById('breakEvenChart');
+            let img1 = '', img2 = '';
+            if (chart1) img1 = chart1.toDataURL('image/png');
+            if (chart2) img2 = chart2.toDataURL('image/png');
+
+            const kpiCards = document.querySelectorAll('.result-card');
+            let kpiRows = ''; let row = ''; let count = 0;
+            kpiCards.forEach((card, index) => {
+                const icon = card.querySelector('i') ? card.querySelector('i').outerHTML : '';
+                const title = card.querySelector('.label') ? card.querySelector('.label').innerText : '';
+                const value = card.querySelector('.value') ? card.querySelector('.value').innerText : '';
+                const unit = card.querySelector('.unit') ? card.querySelector('.unit').innerText : '';
+                const cell = `<td style="border:1px solid #b8860b; padding:10px; text-align:center; background:#fefcf6;">${icon}<h4 style="margin:0.3rem 0; color:#666; font-size:0.9rem;">${title}</h4><div style="font-size:1.4rem; font-weight:900; color:#b8860b;">${value}</div>${unit ? `<div style="font-size:0.8rem; color:#777;">${unit}</div>` : ''}</td>`;
+                row += cell; count++;
+                if (count % 2 === 0 || index === kpiCards.length - 1) { kpiRows += `<tr>${row}</tr>`; row = ''; }
+            });
+
+            const warningsHTML = document.getElementById('alerts')?.innerHTML || '';
+            const strategicHTML = document.getElementById('strategicAdvice')?.innerHTML || '';
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            const fullHtml = `<!DOCTYPE html>
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head><meta charset='utf-8'><title>Marketing Report - FAROUK GRUP</title>
+            <style>
+                body{font-family:'Arial',sans-serif;direction:ltr;margin:2rem;background:#fff;color:#333;}
+                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                .cover h1{font-size:28px;color:#b8860b;margin:0;}.cover h2{font-size:20px;color:#b48554;margin:5px 0;}
+                table{width:100%;border-collapse:collapse;margin:15px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                th{background:#fefcf6;color:#b8860b;}
+                .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:8px;margin:15px 0;}
+                .footer{text-align:center;margin-top:30px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
+                .alert-box{background:#fff3cd;padding:12px;border-radius:8px;border-left:4px solid #ffc107;margin:15px 0;}
+                .strategic-box{background:#fefcf6;padding:12px;border-radius:8px;border-left:4px solid #b8860b;margin:15px 0;}
+            </style></head>
+            <body>
+                <div class="cover">
+                    <h1>FAROUK GRUP</h1>
+                    <h2>Comprehensive Marketing Study Report</h2>
+                    <p>Entity: ${companyName} | Date: ${dateStr}</p>
+                    <p>Currency: ${currency}</p>
+                </div>
+                <h2 style="color:#b8860b;">Input Overview</h2>
+                <table>
+                    <tr><th>Project Name</th><td>${d.projectName}</td><th>Location</th><td>${d.location}</td></tr>
+                    <tr><th>Total Market (TAM)</th><td>${d.tam.toLocaleString()}</td><th>Serviceable Market (SAM)</th><td>${d.sam.toLocaleString()}</td></tr>
+                    <tr><th>Target Share (SOM)</th><td>${d.som.toLocaleString()}</td><th>Annual Growth</th><td>${(d.growthRate*100).toFixed(1)}%</td></tr>
+                    <tr><th>Number of Competitors</th><td>${d.competitors.length}</td><th>Study Duration</th><td>${d.studyMonths} months</td></tr>
+                    <tr><th>Meal Price</th><td>${currency} ${d.price}</td><th>Cost per Meal</th><td>${currency} ${d.costPerMeal}</td></tr>
+                </table>
+                <h2 style="color:#b8860b;">Marketing Performance Indicators</h2>
+                <table>${kpiRows}</table>
+                ${warningsHTML ? `<div class="alert-box">${warningsHTML}</div>` : ''}
+                <div class="strategic-box">${strategicHTML}</div>
+                <h2 style="color:#b8860b;">📈 Charts</h2>
+                <div style="display:flex;gap:15px;flex-wrap:wrap;justify-content:center;">
+                    ${img1 ? `<div style="flex:1;min-width:280px;"><img src="${img1}" class="chart-img"/></div>` : ''}
+                    ${img2 ? `<div style="flex:1;min-width:280px;"><img src="${img2}" class="chart-img"/></div>` : ''}
+                </div>
+                <div class="footer">Generated by FAROUK GRUP © ${now.getFullYear()}</div>
+            </body></html>`;
+
+            const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Marketing_${d.projectName}_${now.toISOString().slice(0,10)}.doc`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        } catch (err) { alert('Word Error: ' + err.message); } finally { hideLoading(); }
+    });
+
+    // ================================================================
+    // ========== Export to Excel (Professional) ==========
+    // ================================================================
+    document.getElementById('exportFullExcelBtn').addEventListener('click', async function() {
+        if (!window.lastMarketingResults) {
+            alert('Please run the analysis first (click "Calculate Study Now").');
+            return;
+        }
+        showLoading('Generating Excel report...', 'Creating sheets and charts');
+        try {
+            const data = window.lastMarketingResults;
+            const d = data.inputs;
+            const out = data.outputs;
+            const currency = d.currency;
+            const companyName = d.companyName;
+
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'FAROUK GRUP';
+            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+            const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA', GB = 'FFFFF3CD';
+            const PT = 'FF155724', NT = 'FF721C24';
+
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+
+            // 1. Cover
+            const cv = workbook.addWorksheet('Cover Page', { views: [{ showGridLines: false }] });
+            [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+            cv.getRow(2).height=70; cv.getRow(4).height=50;
+            cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+            bc.value='FAROUK GRUP\nConsulting & Business';
+            bc.font={name:'Arial',bold:true,size:26,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true};
+            mh(cv,1,4,4,`Marketing Feasibility Study\n${companyName}`,DB,GL,17);
+            const inf=[['📋 Entity',companyName],['📅 Date',new Date().toLocaleDateString('en-US')],['💰 Currency',currency],['📊 Annual Revenue',`${currency} ${out.annualRevenue.toLocaleString()}`],['📈 ROAS',`${out.roas}x`]];
+            let ir=6;
+            inf.forEach(([l,v],idx)=>{
+                cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+                const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+                const bg=idx%2===0?AR:'FFFEFCF6';
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                cv.getRow(ir).height=26; ir++;
+            });
+
+            // 2. Inputs
+            const inputsSheet = workbook.addWorksheet('Inputs & Assumptions', { views: [{ showGridLines: false }] });
+            inputsSheet.getColumn(1).width=5; inputsSheet.getColumn(2).width=38; inputsSheet.getColumn(3).width=22; inputsSheet.getColumn(4).width=22; inputsSheet.getColumn(5).width=5;
+            mh(inputsSheet,1,5,1,'📋 Inputs & Assumptions',DB,GL,14);
+            inputsSheet.getRow(1).height=35;
+            mh(inputsSheet,2,4,2,'Project Basic Data',SB,'FFFFFFFF',11);
+            inputsSheet.getRow(2).height=24;
+            const inputFields = [
+                ['Project Name', d.projectName, ''],
+                ['Location', d.location, ''],
+                ['Study Duration', d.studyMonths, 'months'],
+                ['Total Market (TAM)', d.tam, ''],
+                ['Serviceable Market (SAM)', d.sam, ''],
+                ['Target Share (SOM)', d.som, ''],
+                ['Annual Growth', d.growthRate*100, '%'],
+                ['Age Group', d.ageGroup, ''],
+                ['Geography', d.geoArea, ''],
+                ['Potential Audience', d.audienceSize, ''],
+                ['Competitors Count', d.competitors.length, ''],
+                ['Avg Competitor Strength', out.compStrengthAvg.toFixed(1), '/10'],
+                ['Avg Competitor Weakness', out.compWeaknessAvg.toFixed(1), '/10'],
+                ['Meal Price', d.price, ''],
+                ['Cost per Meal', d.costPerMeal, ''],
+                ['Marketing Team Size', d.marketingTeam, ''],
+                ['Plan Duration', d.planDuration, 'months'],
+                ['Monthly Rent', d.rent, ''],
+                ['Monthly Salaries', d.salaries, ''],
+                ['Utilities', d.utilities, ''],
+                ['Other OPEX', d.otherOpCost, ''],
+                ['Purchases per Month', d.purchaseFrequency, ''],
+                ['Loyalty Duration', d.loyaltyMonths, 'months'],
+                ['Walk-in Customers', d.walkIn, '']
+            ];
+            let iRow=3;
+            inputFields.forEach(([label,val,note],idx)=>{
+                inputsSheet.getRow(iRow).height=22;
+                const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+                const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
+                lc.value=label; vc.value=val; nc.value=note;
+                ap(lc,cs(bg,DT,true,'left'));
+                ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?'#,##0':null});
+                ap(nc,cs(bg,'00695C',false,'center'));
+                iRow++;
+            });
+
+            // 3. KPIs
+            const kpiSheet = workbook.addWorksheet('Marketing KPIs', { views: [{ showGridLines: false }] });
+            [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
+            mh(kpiSheet,1,6,1,'📊 Marketing KPI Dashboard',DB,GL,15);
+            kpiSheet.getRow(1).height=40;
+            mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('en-US')}`,HB,'FFFFFFFF',10);
+            kpiSheet.getRow(2).height=24;
+            const kpis = [
+                { label: 'Active Customers', value: out.totalActiveCustomers, good: true },
+                { label: 'Annual Revenue', value: `${currency} ${out.annualRevenue.toLocaleString()}`, good: out.annualRevenue>0 },
+                { label: 'Annual Marketing Cost', value: `${currency} ${out.annualMarketingCost.toLocaleString()}`, good: true },
+                { label: 'Marketing Contribution', value: `${currency} ${out.marketingContribution.toLocaleString()}`, good: out.marketingContribution>0 },
+                { label: 'Customer Acquisition Cost', value: `${currency} ${out.cac.toFixed(2)}`, good: out.cac>0 },
+                { label: 'Lifetime Value (LTV)', value: `${currency} ${out.ltv.toFixed(2)}`, good: out.ltv>0 }
+            ];
+            let kRow=3;
+            kpis.forEach((k,idx)=>{
+                kpiSheet.getRow(kRow).height=36;
+                kpiSheet.mergeCells(kRow,2,kRow,2); kpiSheet.mergeCells(kRow,3,kRow,3); kpiSheet.mergeCells(kRow,4,kRow,4); kpiSheet.mergeCells(kRow,5,kRow,5);
+                const ic=kpiSheet.getCell(kRow,2); ic.value=`🔹 ${idx+1}`;
+                const lc2=kpiSheet.getCell(kRow,3); lc2.value=k.label;
+                const vc3=kpiSheet.getCell(kRow,4); vc3.value=k.value;
+                const nc2=kpiSheet.getCell(kRow,5); nc2.value='';
+                const bg=k.good?PB:NB, tc=k.good?PT:NT;
+                [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
+                ic.font={name:'Arial',bold:true,size:13,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
+                lc2.font={name:'Arial',bold:true,size:10,color:{argb:DT}}; lc2.alignment={horizontal:'left',vertical:'middle'};
+                vc3.font={name:'Arial',bold:true,size:12,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
+                kRow++;
+            });
+            kRow++;
+            kpiSheet.mergeCells(kRow,2,kRow,5);
+            const kFinal=kpiSheet.getCell(kRow,2);
+            kFinal.value=out.marketingContribution>0?'✅ Marketing contribution is positive (promising model)':'⚠️ Marketing contribution is negative (needs review)';
+            kFinal.font={name:'Arial',bold:true,size:12,color:{argb:out.marketingContribution>0?PT:'856404'}};
+            kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:out.marketingContribution>0?PB:GB}};
+            kFinal.alignment={horizontal:'center',vertical:'middle'};
+            kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
+            kpiSheet.getRow(kRow).height=36;
+
+            // 4. Warnings
+            if (out.warnings && out.warnings.length) {
+                const warnSheet = workbook.addWorksheet('Warnings', { views: [{ showGridLines: false }] });
+                warnSheet.getColumn(1).width=5; warnSheet.getColumn(2).width=50; warnSheet.getColumn(3).width=5;
+                mh(warnSheet,1,3,1,'⚠️ Warnings List',DB,'FFDC3545',14);
+                warnSheet.getRow(1).height=35;
+                let wRow=2;
+                out.warnings.forEach((w,idx)=>{
+                    warnSheet.getRow(wRow).height=22;
+                    warnSheet.mergeCells(wRow,2,wRow,2);
+                    const c=warnSheet.getCell(wRow,2);
+                    c.value=`${idx+1}. ${w}`;
+                    c.font={name:'Arial',size:10,color:{argb:'FF721C24'}};
+                    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF8D7DA'}};
+                    c.alignment={horizontal:'left',vertical:'middle',wrapText:true};
+                    c.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
+                    wRow++;
+                });
+            }
+
+            // 5. Charts
+            const chartsSheet = workbook.addWorksheet('Charts', { views: [{ showGridLines: false }] });
+            chartsSheet.getColumn(1).width=5; chartsSheet.getColumn(2).width=50; chartsSheet.getColumn(3).width=5;
+            mh(chartsSheet,1,3,1,'📊 Project Charts',DB,GL,14);
+            chartsSheet.getRow(1).height=35;
+            const chartContainer = document.querySelector('.chart-grid');
+            if (chartContainer) {
+                try {
+                    const origBg = chartContainer.style.backgroundColor;
+                    chartContainer.style.backgroundColor = '#ffffff';
+                    const canvasImg = await html2canvas(chartContainer, { scale: 2, backgroundColor: '#ffffff' });
+                    chartContainer.style.backgroundColor = origBg;
+                    const imgData = canvasImg.toDataURL('image/png');
+                    const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                    chartsSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 26 }, editAs: 'oneCell' });
+                } catch(err) {}
+            }
+
+            // 6. Evaluation
+            const evalSheet = workbook.addWorksheet('Evaluation & Recommendations', { views: [{ showGridLines: false }] });
+            evalSheet.getColumn(1).width=5; evalSheet.getColumn(2).width=50; evalSheet.getColumn(3).width=5;
+            mh(evalSheet,1,3,1,'📝 Evaluation & Recommendations',DB,GL,14);
+            evalSheet.getRow(1).height=35;
+            const warningsText = out.warnings && out.warnings.length ? out.warnings.join('\n') : 'No warnings currently.';
+            const sections = [
+                { title: '1. Market Attractiveness Score', content: `${out.marketScore}/10 ${out.marketColor}` },
+                { title: '2. Competitor Analysis', content: `Strength: ${out.compStrengthAvg.toFixed(1)}/10 | Weakness: ${out.compWeaknessAvg.toFixed(1)}/10\n${out.compDesc}` },
+                { title: '3. Warnings', content: warningsText },
+                { title: '4. Recommendations', content: out.marketingContribution>0 ? '• The marketing model is promising.\n• Consider gradually increasing the budget while monitoring ROAS.\n• Work on improving LTV through loyalty programs.' : '• The marketing contribution is negative.\n• Review the cost structure or increase prices.\n• Test more efficient marketing channels.' }
+            ];
+            let itRow=2;
+            sections.forEach((sec,idx)=>{
+                itRow++;
+                evalSheet.getRow(itRow).height=26;
+                evalSheet.mergeCells(itRow,2,itRow,2);
+                const tc3=evalSheet.getCell(itRow,2);
+                tc3.value=sec.title;
+                tc3.font={name:'Arial',bold:true,size:11,color:{argb:GL}};
+                tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?HB:SB}};
+                tc3.alignment={horizontal:'left',vertical:'middle'};
+                tc3.border={bottom:{style:'medium',color:{argb:G}}};
+                itRow++;
+                evalSheet.getRow(itRow).height=Math.max(50, sec.content.split('\n').length*16);
+                evalSheet.mergeCells(itRow,2,itRow,2);
+                const cc=evalSheet.getCell(itRow,2);
+                cc.value=sec.content;
+                cc.font={name:'Arial',size:10,color:{argb:DT}};
+                cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};
+                cc.alignment={horizontal:'left',vertical:'top',wrapText:true};
+                cc.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
+            });
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const now = new Date();
+            const fileName = `Marketing_${d.projectName}_${now.toISOString().slice(0,10)}.xlsx`;
+            saveAs(blob, fileName);
+        } catch(err) { alert('Excel Error: ' + err.message); } finally { hideLoading(); }
+    });
+
+    // ===== Export to PDF =====
+    document.getElementById('exportPdfBtn').addEventListener('click', async function() {
+        if (document.getElementById('resultsSection').style.display === 'none') {
+            alert('Please run the analysis first');
+            return;
+        }
+        try {
+            const cloneSection = document.getElementById('resultsSection').cloneNode(true);
+            const actionBar = cloneSection.querySelector('.action-bar');
+            if (actionBar) actionBar.remove();
+            cloneSection.querySelectorAll('button').forEach(btn => btn.style.display = 'none');
+            cloneSection.style.backgroundColor = '#ffffff';
+            cloneSection.style.padding = '15px';
+            cloneSection.style.borderRadius = '10px';
+            cloneSection.style.direction = 'ltr';
+            cloneSection.style.fontFamily = 'Arial, sans-serif';
+
+            const d = getData();
+            const headerDiv = document.createElement('div');
+            headerDiv.innerHTML = `<div style="text-align:center; border-bottom:3px solid #b8860b; padding-bottom:10px; margin-bottom:15px;"><h2 style="color:#b8860b; font-size:22px;">FAROUK GRUP</h2><p style="font-size:16px; color:#333;">Marketing Study Report: ${d.projectName}</p><p style="font-size:14px; color:#666;">Entity: ${d.companyName} | Date: ${new Date().toLocaleDateString('en-US')}</p></div>`;
+            cloneSection.insertBefore(headerDiv, cloneSection.firstChild);
+            const footerDiv = document.createElement('div');
+            footerDiv.innerHTML = `<div style="text-align:center; margin-top:20px; padding-top:10px; border-top:1px dashed #b8860b; color:#888;">© ${new Date().getFullYear()} FAROUK GRUP</div>`;
+            cloneSection.appendChild(footerDiv);
+
+            cloneSection.style.position = 'absolute';
+            cloneSection.style.left = '-9999px';
+            cloneSection.style.top = '0';
+            document.body.appendChild(cloneSection);
+
+            const canvas = await html2canvas(cloneSection, { scale: 2, backgroundColor: '#ffffff' });
+            const imgData = canvas.toDataURL('image/png');
+            document.body.removeChild(cloneSection);
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+            heightLeft -= pdf.internal.pageSize.getHeight();
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdf.internal.pageSize.getHeight();
+            }
+            pdf.save('Marketing_Report_FAROUK.pdf');
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
+
+    renderCompetitors();
+    renderChannels();
+</script>
+</body>
+</html>

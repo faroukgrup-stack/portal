@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Real Estate Investment Return Calculator | FAROUK GRUP</title>
+<script src="auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas & Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Inter', 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
+            min-height: 100vh;
+        }
+
+        /* ===== Remove all vibration causes ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .btn-sensitivity, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .export-btn, .export-word-btn,
+        .form-group input, .form-group select, .settings-overlay, .settings-card {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== Static background ===== */
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.20;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.10) 0%, transparent 70%);
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.05) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.06) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
+        }
+
+        /* ===== WRAPPER ===== */
+        .calc-wrapper {
+            max-width: 1050px; margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* ===== CARD ===== */
+        .calc-box {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            width: 100%; max-width: 100%;
+        }
+        .calc-box h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+        }
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== Currency row ===== */
+        .currency-row {
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.8rem; background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.2);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
+            width: 100%;
+        }
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
+        .currency-row select, .currency-row input {
+            flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+            font-family: 'Inter', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
+        }
+        .currency-row input { flex: 2 1 200px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* ===== Section titles ===== */
+        .section-title-sm {
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
+            margin: 1.2rem 0 0.8rem 0;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== Form rows ===== */
+        .form-row {
+            display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;
+        }
+        .form-group {
+            flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
+        }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-right: 0.3rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Inter', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+        input[type="range"] {
+            padding: 0; height: 8px; border-radius: 10px;
+            background: rgba(180,133,84,0.2); -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 18px; height: 18px;
+            background: #b48554; border-radius: 50%; cursor: pointer;
+            border: 2px solid white;
+        }
+        .range-value { margin-top: 5px; font-weight: bold; color: #cfa776; }
+
+        /* ===== Calculate button ===== */
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer; margin: 1.5rem 0; font-family: 'Inter', sans-serif;
+        }
+        .btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-calculate:active { transform: scale(0.97); }
+
+        /* ===== Results ===== */
+        .results-section { margin-top: 1.5rem; width: 100%; max-width: 100%; overflow: hidden; }
+        .results-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
+            width: 100%;
+        }
+        .result-card {
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.12);
+            border-radius: 20px; padding: 1rem; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            word-break: break-word;
+        }
+        .result-card i { font-size: 1.6rem; color: #cfa776; margin-bottom: 0.3rem; }
+        .result-card h4 { font-size: 0.85rem; font-weight: 700; color: #aab7d4; margin-bottom: 0.2rem; }
+        .result-card .value { font-size: 1.3rem; font-weight: 900; color: #cfa776; }
+        .result-card .unit { font-size: 0.75rem; color: #aab7d4; }
+        .result-card .status {
+            font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+            display: inline-block; margin-top: 0.2rem;
+        }
+        .status-good { background: #28a745; color: white; }
+        .status-bad { background: #dc3545; color: white; }
+        .status-warning { background: #ffc107; color: #111; }
+
+        /* ===== Tables ===== */
+        .table-container {
+            overflow-x: auto; margin-top: 1rem;
+            border: 1px solid rgba(180,133,84,0.1); border-radius: 20px;
+            background: rgba(22,30,46,0.6); padding: 0.5rem;
+            -webkit-overflow-scrolling: touch;
+            max-height: 400px;
+            width: 100%; max-width: 100%;
+        }
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.85rem;
+            min-width: 400px;
+            word-break: break-word;
+        }
+        th {
+            background: rgba(180,133,84,0.15); color: #cfa776;
+            font-weight: 900; padding: 0.6rem 0.8rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15); white-space: nowrap;
+            position: sticky; top: 0; z-index: 2; background: rgba(22,30,46,0.95);
+        }
+        td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid rgba(180,133,84,0.06);
+            text-align: center; color: #f0f4fa;
+        }
+        tr:last-child td { border-bottom: none; }
+        .positive { color: #4ade80; font-weight: 700; }
+        .negative { color: #f87171; font-weight: 700; }
+
+        /* ===== Charts ===== */
+        .chart-container {
+            margin-top: 1.5rem;
+            background: rgba(22,30,46,0.6);
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid rgba(180,133,84,0.08);
+            height: 280px;
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        .chart-container canvas { width: 100% !important; height: 100% !important; }
+
+        /* ===== Sensitivity buttons ===== */
+        .btn-sensitivity {
+            background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.18);
+            border-radius: 50px; padding: 0.5rem 1.2rem;
+            color: #cfa776; font-weight: 700; cursor: pointer;
+            font-family: 'Inter', sans-serif; font-size: 0.85rem;
+            display: inline-flex; align-items: center; gap: 0.3rem;
+        }
+        .btn-sensitivity:hover { background: rgba(180,133,84,0.25); }
+        .btn-sensitivity.reset { background: rgba(220,53,69,0.15); border-color: #dc3545; color: #f87171; }
+        .btn-sensitivity.reset:hover { background: rgba(220,53,69,0.25); }
+
+        .sens-container {
+            display: flex; flex-wrap: wrap; gap: 0.5rem;
+            justify-content: center; margin: 1rem 0;
+        }
+
+        /* ===== Export buttons ===== */
+        .export-container {
+            display: flex; justify-content: center; gap: 0.8rem;
+            flex-wrap: wrap; margin: 1.5rem 0;
+        }
+        .export-btn, .export-word-btn {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+            padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.9rem; font-family: 'Inter', sans-serif;
+            flex: 1 1 auto; justify-content: center; max-width: 220px;
+        }
+        .export-btn:hover, .export-word-btn:hover { background: rgba(180,133,84,0.25); }
+        .export-btn.excel { background: rgba(40,167,69,0.12); border-color: #28a745; color: #6fbf6f; }
+        .export-btn.excel:hover { background: rgba(40,167,69,0.25); }
+
+        /* ===== Loading overlay ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== Footer ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
+        .calc-display {
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: left;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
+
+        /* ===== Floating buttons ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Inter', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== Messages ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+        .tooltip .tooltiptext { display: none; }
+
+        /* ===== Notes ===== */
+        .note {
+            background: rgba(180,133,84,0.08); padding: 0.6rem 1rem;
+            border-radius: 16px; font-size: 0.85rem; color: #aab7d4;
+            margin-top: 0.5rem; border-left: 3px solid #b48554;
+        }
+
+        /* ===================================================
+           Responsive improvements
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .section-title-sm { font-size: 1.4rem; }
+            .form-group { flex: 1 1 220px; }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value { font-size: 1.5rem; }
+            .result-card h4 { font-size: 0.95rem; }
+            .result-card i { font-size: 1.8rem; }
+            table { font-size: 0.9rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .chart-container { height: 320px; }
+        }
+
+        @media (max-width: 768px) {
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; flex-direction: column; align-items: stretch; }
+            .currency-row label { font-size: 0.8rem; }
+            .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; flex: 1 1 auto; width: 100%; }
+            .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+            .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-cards { grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 0.5rem; }
+            .result-card { padding: 0.6rem 0.4rem; }
+            .result-card i { font-size: 1.2rem; }
+            .result-card h4 { font-size: 0.65rem; }
+            .result-card .value { font-size: 1rem; }
+            .result-card .unit { font-size: 0.6rem; }
+            .chart-container { height: 200px; padding: 0.5rem; }
+            table { font-size: 0.7rem; min-width: 300px; }
+            th, td { padding: 0.3rem 0.4rem; }
+            .export-btn, .export-word-btn { font-size: 0.75rem; padding: 0.4rem 1rem; max-width: 160px; }
+            .modal-content { width: 95%; max-width: 320px; }
+            .calc-btn { padding: 8px 0; font-size: 0.9rem; }
+            .footer-simple { font-size: 0.7rem; padding: 0.6rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .sens-container { flex-direction: column; align-items: stretch; }
+            .btn-sensitivity { justify-content: center; }
+            .table-container { max-height: 250px; }
+            input[type="range"] { width: 100%; }
+        }
+
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+            .results-cards { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+            .chart-container { height: 160px; }
+            table { font-size: 0.6rem; min-width: 200px; }
+            th, td { padding: 0.2rem 0.3rem; }
+        }
+
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+
+        .section-title-sm, .result-card h4, .hero-mini h2 {
+            -webkit-text-fill-color: initial !important;
+            color: #cfa776 !important;
+            background: none !important;
+            background-image: none !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- Export loading screen -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">Generating report...</h3>
+        <p id="loadingMsg">Please wait</p>
+    </div>
+</div>
+
+<section class="hero-mini">
+    <h2>Real Estate Investment Return Calculator</h2>
+    <p>Integrated analysis with NPV, IRR, MIRR, Payback, PI, Cash on Cash, ROI, with charts and sensitivity analysis</p>
+</section>
+
+<div class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-chart-line"></i><span>Real Estate</span></div>
+        <h2><i class="fas fa-chart-line" style="color:#cfa776;margin-right:0.5rem;"></i>Real Estate Investment Analysis</h2>
+
+        <!-- Currency and entity name -->
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> Currency:</label>
+            <select id="currencySelect">
+                <option value="$" selected>US Dollar ($)</option>
+                <option value="€">Euro (€)</option>
+                <option value="₺">Turkish Lira (₺)</option>
+                <option value="ج.م">Egyptian Pound (ج.م)</option>
+                <option value="د.ك">Kuwaiti Dinar (د.ك)</option>
+                <option value="ر.س">Saudi Riyal (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> Entity Name:</label>
+            <input type="text" id="companyName" value="Beneficiary Entity Name" placeholder="Beneficiary entity">
+        </div>
+
+        <!-- Property Data -->
+        <div class="section-title-sm">🏢 Property & Operations Data</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-dollar-sign"></i> Property Value (Initial Cost)</label>
+                <input type="number" id="marketValue" value="5000000" step="1000">
+                <span class="tooltiptext">Purchase price including all costs.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-home"></i> Number of Units</label>
+                <input type="number" id="units" value="1" min="1">
+                <span class="tooltiptext">Number of rental units.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-money-bill"></i> Monthly Rent per Unit</label>
+                <input type="number" id="rent" value="25000" step="100">
+                <span class="tooltiptext">Average monthly rent per unit.</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-tools"></i> Monthly Expenses (Utilities + Maintenance)</label>
+                <input type="number" id="monthlyExpenses" value="0" step="100">
+                <span class="tooltiptext">Monthly operating expenses.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Occupancy Rate</label>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input type="range" id="occupancyRange" min="0" max="100" value="100" step="1" style="flex:3;">
+                    <input type="number" id="occupancy" value="1" step="0.01" min="0" max="1" style="flex:1;">
+                </div>
+                <span class="tooltiptext">Average occupied units percentage.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-landmark"></i> Annual Property Tax Rate (%)</label>
+                <input type="number" id="taxRate" value="3.5" step="0.1">
+                <span class="tooltiptext">Annual tax percentage on assessed value.</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-chart-line"></i> Assessed Value Discount (%)</label>
+                <input type="number" id="assessedDiscount" value="10" step="1">
+                <span class="tooltiptext">Percentage discount applied to market value for tax assessment.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-arrow-up"></i> Annual Rent Increase (%)</label>
+                <input type="number" id="rentIncrease" value="30" step="0.1">
+                <span class="tooltiptext">Expected annual rent increase percentage.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-mountain"></i> Annual Land Appreciation (%)</label>
+                <input type="number" id="landAppreciation" value="5" step="0.1">
+                <span class="tooltiptext">Expected annual property value increase.</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-file-invoice"></i> Purchase Fees & Taxes (One-time)</label>
+                <input type="number" id="purchaseCosts" value="250000" step="1000">
+                <span class="tooltiptext">Registration fees, taxes, broker commissions paid once at purchase.</span>
+            </div>
+        </div>
+
+        <!-- Mortgage Financing -->
+        <div class="section-title-sm">🏦 Mortgage Financing (Optional)</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Loan-to-Value (LTV) %</label>
+                <input type="number" id="ltv" value="0" min="0" max="100" step="1">
+                <span class="tooltiptext">Loan percentage of property value. 0 means all-cash purchase.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Annual Interest Rate (%)</label>
+                <input type="number" id="interestRate" value="5" step="0.1">
+                <span class="tooltiptext">Interest rate on the loan.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-calendar-alt"></i> Loan Term (Years)</label>
+                <input type="number" id="loanTerm" value="20" min="1" max="30">
+                <span class="tooltiptext">Loan repayment period in years.</span>
+            </div>
+        </div>
+
+        <!-- Evaluation Criteria -->
+        <div class="section-title-sm">📈 Evaluation Criteria</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Discount Rate (%)</label>
+                <input type="number" id="discountRate" value="5" step="0.1">
+                <span class="tooltiptext">Rate used to discount future cash flows to present value.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Reinvestment Rate (%)</label>
+                <input type="number" id="reinvestRate" value="43" step="0.1">
+                <span class="tooltiptext">Rate at which positive cash flows can be reinvested.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-calendar"></i> Number of Years</label>
+                <input type="number" id="years" value="20" min="1" max="61">
+                <span class="tooltiptext">Investment period in years (up to 61).</span>
+            </div>
+        </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Return</button>
+
+        <!-- Results -->
+        <div class="results-section" id="resultsSection" style="display:none;">
+            <div class="results-cards" id="kpiCards"></div>
+            <div class="result-card" id="projectRating" style="text-align:center;"></div>
+
+            <div class="section-title-sm">📈 Annual & Cumulative Cash Flows</div>
+            <div class="chart-container"><canvas id="cashChart"></canvas></div>
+
+            <div class="section-title-sm">📊 All Annual Cash Flows</div>
+            <div class="table-container" id="cashFlowTable"></div>
+
+            <div class="section-title-sm">🔍 Sensitivity Analysis</div>
+            <div class="sens-container">
+                <button class="btn-sensitivity" id="sens10">+10% Rent</button>
+                <button class="btn-sensitivity" id="sens-10">-10% Rent</button>
+                <button class="btn-sensitivity" id="sensOcc10">+10% Occupancy</button>
+                <button class="btn-sensitivity" id="sensOcc-10">-10% Occupancy</button>
+                <button class="btn-sensitivity reset" id="resetSens">↺ Reset</button>
+            </div>
+            <div class="table-container" id="sensitivityTable" style="max-height:200px;"></div>
+
+            <div class="export-container">
+                <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Export Word</button>
+                <button class="export-btn excel" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Export Excel</button>
+            </div>
+
+            <div class="section-title-sm">💰 When Do We Break Even?</div>
+            <div class="result-card" id="paybackSummary" style="text-align:left;"></div>
+            <div class="note"><i class="fas fa-info-circle" style="color:#cfa776;"></i> Payback is calculated based on cumulative cash flows including the terminal value (sale at end of period). If financing is used, cash flows are after debt service.</div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem; color:var(--text-muted); text-align:center;">
+            <i class="fas fa-robot" style="color: var(--accent-soft);"></i> Results will appear after clicking Calculate
+        </div>
+    </div>
+</div>
+
+<footer class="footer-simple">All rights reserved © 2026 <span>FAROUK GRUP</span></footer>
+
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+<a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+<!-- Calculator Modal -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <!-- Fixed order: 7 8 9 / 4 5 6 × / 1 2 3 - -->
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: true, offset: 100 });
+
+    // ===== Calculator =====
+    const calcDisplay = document.getElementById('calcDisplay');
+    let currentCalcInput = '';
+
+    function handleCalc(v) {
+        if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+        if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+        if (v === '=') {
+            try {
+                let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
+                calcDisplay.value = r;
+                currentCalcInput = r.toString();
+            } catch (e) { calcDisplay.value = 'Error'; currentCalcInput = ''; }
+            return;
+        }
+        currentCalcInput += v;
+        calcDisplay.value = currentCalcInput;
+    }
+
+    document.querySelectorAll('.calc-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const v = this.dataset.val;
+            if (v !== undefined) handleCalc(v);
+        });
+    });
+
+    const modalEl = document.getElementById('calculatorModal');
+    document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        modalEl.classList.add('active');
+        calcDisplay.value = currentCalcInput;
+    });
+    document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+    modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+    document.addEventListener('keydown', function(e) {
+        if (!modalEl.classList.contains('active')) return;
+        e.preventDefault();
+        const k = e.key;
+        if (k >= '0' && k <= '9') handleCalc(k);
+        else if (k === '.') handleCalc('.');
+        else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+        else if (k === 'Enter' || k === '=') handleCalc('=');
+        else if (k === 'Backspace') handleCalc('⌫');
+        else if (k === 'Escape') modalEl.classList.remove('active');
+        else if (k.toLowerCase() === 'c') handleCalc('C');
+    });
+
+    // ===== Loading functions =====
+    function showLoading(title, msg) {
+        document.getElementById('loadingTitle').textContent = title;
+        document.getElementById('loadingMsg').textContent = msg;
+        document.getElementById('exportLoading').classList.add('show');
+    }
+    function hideLoading() {
+        document.getElementById('exportLoading').classList.remove('show');
+    }
+
+    // ===== Link range slider with occupancy field =====
+    const occupancyRange = document.getElementById('occupancyRange');
+    const occupancyInput = document.getElementById('occupancy');
+    occupancyRange.addEventListener('input', function() {
+        occupancyInput.value = (this.value / 100).toFixed(2);
+    });
+    occupancyInput.addEventListener('input', function() {
+        let val = parseFloat(this.value) || 0;
+        if (val > 1) val = 1;
+        if (val < 0) val = 0;
+        occupancyRange.value = val * 100;
+    });
+
+    // ===== Store original values =====
+    let originalInputs = {};
+
+    function saveOriginalInputs() {
+        originalInputs = {
+            rent: document.getElementById('rent').value,
+            occupancy: document.getElementById('occupancy').value,
+            rentIncrease: document.getElementById('rentIncrease').value,
+            discountRate: document.getElementById('discountRate').value,
+            landAppreciation: document.getElementById('landAppreciation').value,
+            ltv: document.getElementById('ltv').value,
+            interestRate: document.getElementById('interestRate').value,
+            loanTerm: document.getElementById('loanTerm').value
+        };
+    }
+
+    function restoreOriginalInputs() {
+        document.getElementById('rent').value = originalInputs.rent;
+        document.getElementById('occupancy').value = originalInputs.occupancy;
+        document.getElementById('rentIncrease').value = originalInputs.rentIncrease;
+        document.getElementById('discountRate').value = originalInputs.discountRate;
+        document.getElementById('landAppreciation').value = originalInputs.landAppreciation;
+        document.getElementById('ltv').value = originalInputs.ltv;
+        document.getElementById('interestRate').value = originalInputs.interestRate;
+        document.getElementById('loanTerm').value = originalInputs.loanTerm;
+        occupancyRange.value = originalInputs.occupancy * 100;
+        calculateAll();
+    }
+
+    // ===== Main calculation =====
+    let myCashChart;
+
+    function calculateAll() {
+        const currency = document.getElementById('currencySelect').value;
+        const companyName = document.getElementById('companyName').value || 'Beneficiary Entity';
+
+        // Read inputs
+        const marketValue = parseFloat(document.getElementById('marketValue').value) || 0;
+        const units = parseFloat(document.getElementById('units').value) || 1;
+        const rentPerUnit = parseFloat(document.getElementById('rent').value) || 0;
+        const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value) || 0;
+        const occupancy = parseFloat(document.getElementById('occupancy').value) || 1;
+        const taxRatePercent = parseFloat(document.getElementById('taxRate').value) || 0;
+        const assessedDiscountPercent = parseFloat(document.getElementById('assessedDiscount').value) || 0;
+        const rentIncreasePercent = parseFloat(document.getElementById('rentIncrease').value) || 0;
+        const landAppreciationPercent = parseFloat(document.getElementById('landAppreciation').value) || 0;
+        const purchaseCosts = parseFloat(document.getElementById('purchaseCosts').value) || 0;
+        const ltvPercent = parseFloat(document.getElementById('ltv').value) || 0;
+        const interestRatePercent = parseFloat(document.getElementById('interestRate').value) || 0;
+        const loanTerm = parseInt(document.getElementById('loanTerm').value) || 20;
+        const discountRatePercent = parseFloat(document.getElementById('discountRate').value) || 0;
+        const reinvestRatePercent = parseFloat(document.getElementById('reinvestRate').value) || 0;
+        const years = parseInt(document.getElementById('years').value) || 20;
+
+        // Convert percentages
+        const taxRate = taxRatePercent / 100;
+        const assessedDiscount = assessedDiscountPercent / 100;
+        const rentIncrease = rentIncreasePercent / 100;
+        const landAppreciation = landAppreciationPercent / 100;
+        const discountRate = discountRatePercent / 100;
+        const reinvestRate = reinvestRatePercent / 100;
+        const ltv = ltvPercent / 100;
+        const interestRate = interestRatePercent / 100;
+
+        // Total investment
+        const totalInvestment = marketValue + purchaseCosts;
+
+        // Debt service
+        let loanAmount = 0, annualDebtService = 0, equity = totalInvestment;
+        if (ltv > 0) {
+            loanAmount = totalInvestment * ltv;
+            equity = totalInvestment - loanAmount;
+            const monthlyRate = interestRate / 12;
+            const totalPayments = loanTerm * 12;
+            const monthlyPayment = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, totalPayments) / (Math.pow(1 + monthlyRate, totalPayments) - 1);
+            annualDebtService = monthlyPayment * 12;
+        }
+
+        // Assessed value for tax
+        const assessedValue = marketValue * (1 - assessedDiscount);
+
+        // Annual base revenue
+        const annualRentBase = rentPerUnit * units * 12 * occupancy;
+        const annualExpenses = monthlyExpenses * 12 + assessedValue * taxRate;
+        const noiBeforeDebt = annualRentBase - annualExpenses;
+
+        // Cash flows
+        let cashFlows = [-equity];
+        for (let i = 1; i <= years; i++) {
+            const rentThisYear = annualRentBase * Math.pow(1 + rentIncrease, i - 1);
+            const noi = rentThisYear - annualExpenses;
+            const cf = noi - annualDebtService;
+            cashFlows.push(cf);
+        }
+        // Terminal value
+        const terminalValue = marketValue * Math.pow(1 + landAppreciation, years);
+        let remainingLoan = 0;
+        if (loanAmount > 0 && years < loanTerm) {
+            const monthlyRate = interestRate / 12;
+            const totalPayments = loanTerm * 12;
+            const paymentsMade = years * 12;
+            remainingLoan = loanAmount * (Math.pow(1 + monthlyRate, totalPayments) - Math.pow(1 + monthlyRate, paymentsMade)) / (Math.pow(1 + monthlyRate, totalPayments) - 1);
+        }
+        const netTerminalValue = terminalValue - remainingLoan;
+        cashFlows[years] += netTerminalValue;
+
+        // NPV
+        let npv = 0;
+        for (let i = 0; i <= years; i++) {
+            npv += cashFlows[i] / Math.pow(1 + discountRate, i);
+        }
+
+        // IRR
+        function calculateIRR(cf) {
+            let low = -0.99, high = 10;
+            for (let iter = 0; iter < 1000; iter++) {
+                let mid = (low + high) / 2;
+                let npvMid = 0;
+                for (let i = 0; i < cf.length; i++) {
+                    npvMid += cf[i] / Math.pow(1 + mid, i);
+                }
+                if (Math.abs(npvMid) < 1e-6) return mid;
+                if (npvMid > 0) low = mid;
+                else high = mid;
+            }
+            return (low + high) / 2;
+        }
+        const irr = calculateIRR(cashFlows);
+
+        // MIRR
+        function calculateMIRR(cf, financeRate, reinvestRate) {
+            let negPV = 0, posFV = 0;
+            for (let i = 0; i < cf.length; i++) {
+                if (cf[i] < 0) negPV += cf[i] / Math.pow(1 + financeRate, i);
+                else posFV += cf[i] * Math.pow(1 + reinvestRate, cf.length - 1 - i);
+            }
+            if (negPV === 0) return NaN;
+            return Math.pow(-posFV / negPV, 1 / (cf.length - 1)) - 1;
+        }
+        const mirr = calculateMIRR(cashFlows, discountRate, reinvestRate);
+
+        // Payback
+        let cumulative = 0, paybackYear = null, fractional = 0;
+        for (let i = 0; i < cashFlows.length; i++) {
+            cumulative += cashFlows[i];
+            if (cumulative >= 0 && paybackYear === null) {
+                paybackYear = i;
+                let prev = cumulative - cashFlows[i];
+                fractional = -prev / cashFlows[i];
+                break;
+            }
+        }
+        const paybackPeriod = paybackYear !== null ? paybackYear - 1 + fractional : null;
+
+        // PI
+        const pvFuture = cashFlows.slice(1).reduce((acc, val, idx) => acc + val / Math.pow(1 + discountRate, idx + 1), 0);
+        const pi = pvFuture / Math.abs(cashFlows[0]);
+
+        // Cash on Cash
+        const cashOnCash = (cashFlows[1] / Math.abs(cashFlows[0])) * 100;
+
+        // ROI
+        const totalProfit = cumulative - Math.abs(cashFlows[0]);
+        const roi = (totalProfit / Math.abs(cashFlows[0])) * 100;
+
+        // Display results
+        document.getElementById('initialMessage').style.display = 'none';
+        document.getElementById('resultsSection').style.display = 'block';
+
+        document.getElementById('kpiCards').innerHTML = `
+            <div class="result-card"><i class="fas fa-coins"></i><h4>Net Present Value (NPV)</h4><div class="value">${currency} ${npv.toFixed(0)}</div><div class="unit">${npv > 0 ? 'Profitable' : npv < 0 ? 'Losing' : 'Neutral'}</div></div>
+            <div class="result-card"><i class="fas fa-percent"></i><h4>Internal Rate of Return (IRR)</h4><div class="value">${(irr*100).toFixed(2)}%</div><div class="unit">${irr > discountRate ? '> Discount Rate' : irr < discountRate ? '< Discount Rate' : '= Discount Rate'}</div></div>
+            <div class="result-card"><i class="fas fa-chart-pie"></i><h4>Modified IRR (MIRR)</h4><div class="value">${(mirr*100).toFixed(2)}%</div><div class="unit">At ${reinvestRatePercent}% reinvestment</div></div>
+            <div class="result-card"><i class="fas fa-clock"></i><h4>Payback Period</h4><div class="value">${paybackPeriod !== null ? paybackPeriod.toFixed(1) : 'None'}</div><div class="unit">Years</div></div>
+            <div class="result-card"><i class="fas fa-chart-line"></i><h4>Profitability Index (PI)</h4><div class="value">${pi.toFixed(2)}</div><div class="unit">${pi > 1 ? 'Profitable' : pi < 1 ? 'Not Profitable' : 'Neutral'}</div></div>
+            <div class="result-card"><i class="fas fa-hand-holding-usd"></i><h4>Cash on Cash Return</h4><div class="value">${cashOnCash.toFixed(2)}%</div><div class="unit">Year 1</div></div>
+            <div class="result-card"><i class="fas fa-chart-bar"></i><h4>Return on Investment (ROI)</h4><div class="value">${roi.toFixed(2)}%</div><div class="unit">Total</div></div>
+            ${ltv > 0 ? `<div class="result-card"><i class="fas fa-percent"></i><h4>Leverage (LTV)</h4><div class="value">${(ltv*100).toFixed(0)}%</div><div class="unit">Loan: ${currency} ${loanAmount.toFixed(0)}</div></div>` : ''}
+        `;
+
+        // Project rating
+        let score = 0;
+        if (npv > 0) score += 30;
+        if (irr > discountRate) score += 30;
+        if (pi > 1) score += 20;
+        if (paybackPeriod !== null && paybackPeriod < years / 2) score += 20;
+        let ratingText = '', ratingClass = '', ratingIcon = '';
+        if (score >= 80) { ratingText = 'Excellent'; ratingClass = 'status-good'; ratingIcon = '🟢'; }
+        else if (score >= 50) { ratingText = 'Moderate'; ratingClass = 'status-warning'; ratingIcon = '🟡'; }
+        else { ratingText = 'High Risk'; ratingClass = 'status-bad'; ratingIcon = '🔴'; }
+        document.getElementById('projectRating').innerHTML = `
+            <h3><i class="fas fa-star" style="color:var(--accent-soft);"></i> Project Evaluation</h3>
+            <div style="font-size:2rem; font-weight:900;">${score}/100</div>
+            <div class="status ${ratingClass}" style="font-size:1.2rem; margin-top:0.5rem;">${ratingIcon} ${ratingText}</div>
+        `;
+
+        // Cash flow table
+        let tableHtml = '<table><thead><tr><th>Year</th><th>Investor Cash Flow (' + currency + ')</th><th>Cumulative (' + currency + ')</th></tr></thead><tbody>';
+        let cum = 0;
+        for (let i = 0; i <= years; i++) {
+            cum += cashFlows[i];
+            const yearLabel = (i === 0) ? 'Investment' : i;
+            tableHtml += `<tr><td>${yearLabel}</td><td class="${cashFlows[i] < 0 ? 'negative' : 'positive'}">${currency} ${cashFlows[i].toFixed(0)}</td><td class="${cum < 0 ? 'negative' : 'positive'}">${currency} ${cum.toFixed(0)}</td></tr>`;
+        }
+        tableHtml += '</tbody></table>';
+        document.getElementById('cashFlowTable').innerHTML = tableHtml;
+
+        // Payback summary
+        const paybackSummary = document.getElementById('paybackSummary');
+        if (paybackPeriod !== null) {
+            paybackSummary.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                    <span><i class="fas fa-check-circle" style="color:var(--accent-soft);"></i> Break-even achieved after <strong>${paybackPeriod.toFixed(1)} years</strong> of investment.</span>
+                    <span class="value" style="font-size:1.2rem;">💰 Final Cumulative Cash Flow: ${currency} ${cum.toFixed(0)}</span>
+                </div>
+            `;
+        } else {
+            paybackSummary.innerHTML = `<span><i class="fas fa-times-circle" style="color:#f87171;"></i> Capital is not recovered within the evaluation period.</span>`;
+        }
+
+        // Chart
+        const ctx = document.getElementById('cashChart').getContext('2d');
+        if (myCashChart) myCashChart.destroy();
+        const labels = [];
+        const cfData = [];
+        const cumData = [];
+        let cum2 = 0;
+        for (let i = 0; i <= years; i++) {
+            labels.push(i === 0 ? '0' : i.toString());
+            cfData.push(cashFlows[i]);
+            cum2 += cashFlows[i];
+            cumData.push(cum2);
+        }
+        myCashChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Annual Cash Flow', data: cfData, borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', tension: 0.1, yAxisID: 'y' },
+                    { label: 'Cumulative', data: cumData, borderColor: '#b8860b', backgroundColor: 'rgba(184,134,11,0.1)', tension: 0.1, yAxisID: 'y1' }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    y: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'Annual CF', color: '#aab7d4' }, grid: { color: 'rgba(180,133,84,0.1)' }, ticks: { color: '#aab7d4' } },
+                    y1: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Cumulative', color: '#aab7d4' }, grid: { color: 'rgba(180,133,84,0.1)' }, ticks: { color: '#aab7d4' } }
+                },
+                plugins: { legend: { labels: { color: '#f0f4fa' } } }
+            }
+        });
+
+        // Sensitivity table
+        const sensTable = document.getElementById('sensitivityTable');
+        sensTable.innerHTML = `
+            <table>
+                <thead><tr><th>Scenario</th><th>NPV (${currency})</th><th>IRR (%)</th><th>PI</th></tr></thead>
+                <tbody>
+                    <tr><td>Base</td><td>${npv.toFixed(0)}</td><td>${(irr*100).toFixed(2)}</td><td>${pi.toFixed(2)}</td></tr>
+                </tbody>
+            </table>
+        `;
+
+        // Store results for export
+        window.lastRealEstateResults = {
+            inputs: {
+                currency, companyName,
+                marketValue, units, rentPerUnit, monthlyExpenses, occupancy, taxRatePercent,
+                assessedDiscountPercent, rentIncreasePercent, landAppreciationPercent, purchaseCosts,
+                ltvPercent, interestRatePercent, loanTerm, discountRatePercent, reinvestRatePercent, years
+            },
+            outputs: {
+                npv, irr, mirr, paybackPeriod, pi, cashOnCash, roi, score, ratingText, ratingClass,
+                cashFlows, cumulative: cum, terminalValue, loanAmount, equity, annualDebtService,
+                years, discountRate, reinvestRate, ltv, annualRentBase, annualExpenses
+            }
+        };
+    }
+
+    // ===== Sensitivity buttons =====
+    document.getElementById('sens10').addEventListener('click', function() {
+        const rent = document.getElementById('rent');
+        rent.value = (parseFloat(rent.value) * 1.1).toFixed(0);
+        calculateAll();
+    });
+    document.getElementById('sens-10').addEventListener('click', function() {
+        const rent = document.getElementById('rent');
+        rent.value = (parseFloat(rent.value) * 0.9).toFixed(0);
+        calculateAll();
+    });
+    document.getElementById('sensOcc10').addEventListener('click', function() {
+        const occ = document.getElementById('occupancy');
+        occ.value = Math.min(1, (parseFloat(occ.value) + 0.1)).toFixed(2);
+        occupancyRange.value = occ.value * 100;
+        calculateAll();
+    });
+    document.getElementById('sensOcc-10').addEventListener('click', function() {
+        const occ = document.getElementById('occupancy');
+        occ.value = Math.max(0, (parseFloat(occ.value) - 0.1)).toFixed(2);
+        occupancyRange.value = occ.value * 100;
+        calculateAll();
+    });
+    document.getElementById('resetSens').addEventListener('click', function() {
+        restoreOriginalInputs();
+    });
+
+    document.getElementById('calculateBtn').addEventListener('click', function() {
+        saveOriginalInputs();
+        calculateAll();
+    });
+
+    // ================================================================
+    // ========== Export to Word ==========
+    // ================================================================
+    document.getElementById('exportWordBtn').addEventListener('click', async function() {
+        if (document.getElementById('resultsSection').style.display === 'none') {
+            alert('Please run the analysis first.');
+            return;
+        }
+        showLoading('Generating Word report...', 'Collecting data and charts');
+        try {
+            const data = window.lastRealEstateResults;
+            if (!data) { alert('Please run the analysis first.'); hideLoading(); return; }
+            const inp = data.inputs;
+            const out = data.outputs;
+            const currency = inp.currency;
+            const companyName = inp.companyName;
+
+            // Chart image
+            const canvas = document.getElementById('cashChart');
+            canvas.style.backgroundColor = '#ffffff';
+            const imgData = await html2canvas(canvas, { scale: 2, backgroundColor: '#ffffff' });
+            canvas.style.backgroundColor = '';
+            const chartImg = imgData.toDataURL('image/png');
+
+            // KPI cards
+            const kpiCards = document.querySelectorAll('.result-card');
+            let kpiRows = ''; let row = ''; let count = 0;
+            kpiCards.forEach((card, idx) => {
+                const icon = card.querySelector('i') ? card.querySelector('i').outerHTML : '';
+                const title = card.querySelector('h4') ? card.querySelector('h4').innerText : '';
+                const value = card.querySelector('.value') ? card.querySelector('.value').innerText : '';
+                const unit = card.querySelector('.unit') ? card.querySelector('.unit').innerText : '';
+                const status = card.querySelector('.status') ? card.querySelector('.status').outerHTML : '';
+                const cell = `<td style="border:1px solid #b8860b; padding:12px; text-align:center; background:#fefcf6;">${icon}<h4 style="margin:0.5rem 0; color:#666;">${title}</h4><div style="font-size:1.6rem; font-weight:900; color:#b8860b;">${value}</div>${unit ? `<div style="font-size:0.9rem; color:#777;">${unit}</div>` : ''}${status ? status.replace(/class="status/g, 'style="margin-top:0.3rem; padding:0.2rem 0.6rem; border-radius:20px; display:inline-block;') : ''}</td>`;
+                row += cell; count++;
+                if (count % 2 === 0 || idx === kpiCards.length - 1) { kpiRows += `<tr>${row}</tr>`; row = ''; }
+            });
+
+            const ratingHTML = document.getElementById('projectRating').innerHTML;
+            const tableHTML = document.getElementById('cashFlowTable').innerHTML;
+            const paybackHTML = document.getElementById('paybackSummary').innerHTML;
+            const sensHTML = document.getElementById('sensitivityTable').innerHTML;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            const fullHtml = `<!DOCTYPE html>
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head><meta charset='utf-8'><title>Real Estate Report - FAROUK GRUP</title>
+            <style>
+                body{font-family:'Arial',sans-serif;direction:ltr;margin:2rem;background:#fff;color:#333;}
+                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                .cover h1{font-size:32px;color:#b8860b;margin:0;}.cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                th{background:#fefcf6;color:#b8860b;}
+                .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
+            </style></head>
+            <body>
+                <div class="cover">
+                    <h1>FAROUK GRUP</h1>
+                    <h2>Real Estate Investment Report</h2>
+                    <p>Entity: ${companyName} | Date: ${dateStr}</p>
+                    <p>Currency: ${currency}</p>
+                </div>
+                <h2 style="color:#b8860b;">Input Overview</h2>
+                <table>
+                    <tr><th>Property Value</th><td>${currency} ${inp.marketValue}</td><th>Units</th><td>${inp.units}</td></tr>
+                    <tr><th>Monthly Rent/Unit</th><td>${currency} ${inp.rentPerUnit}</td><th>Monthly Expenses</th><td>${currency} ${inp.monthlyExpenses}</td></tr>
+                    <tr><th>Occupancy Rate</th><td>${(inp.occupancy*100).toFixed(0)}%</td><th>Property Tax</th><td>${inp.taxRatePercent}%</td></tr>
+                    <tr><th>Assessed Discount</th><td>${inp.assessedDiscountPercent}%</td><th>Rent Increase</th><td>${inp.rentIncreasePercent}%</td></tr>
+                    <tr><th>Land Appreciation</th><td>${inp.landAppreciationPercent}%</td><th>Purchase Fees</th><td>${currency} ${inp.purchaseCosts}</td></tr>
+                    <tr><th>Discount Rate</th><td>${inp.discountRatePercent}%</td><th>Reinvestment Rate</th><td>${inp.reinvestRatePercent}%</td></tr>
+                    <tr><th>Years</th><td>${inp.years}</td><td></td><td></td></tr>
+                    ${inp.ltvPercent > 0 ? `<tr><th>LTV %</th><td>${inp.ltvPercent}%</td><th>Interest Rate</th><td>${inp.interestRatePercent}%</td></tr><tr><th>Loan Term</th><td>${inp.loanTerm} years</td><td></td><td></td></tr>` : ''}
+                </table>
+                <h2 style="color:#b8860b;">Key Performance Indicators</h2>
+                <table>${kpiRows}</table>
+                <h2 style="color:#b8860b;">Project Evaluation</h2>
+                <div style="background:#fefcf6;padding:15px;border-radius:10px;border-left:4px solid #b8860b;">${ratingHTML}</div>
+                <h2 style="color:#b8860b;">📈 Cash Flow Chart</h2>
+                <div style="text-align:center;"><img src="${chartImg}" class="chart-img" /></div>
+                <h2 style="color:#b8860b;">📊 Annual Cash Flows</h2>
+                ${tableHTML}
+                <h2 style="color:#b8860b;">🔍 Sensitivity Analysis</h2>
+                ${sensHTML}
+                <h2 style="color:#b8860b;">💰 Payback Summary</h2>
+                <div style="background:#fefcf6;padding:15px;border-radius:10px;border-left:4px solid #b8860b;">${paybackHTML}</div>
+                <div class="footer">Generated by FAROUK GRUP © ${now.getFullYear()}</div>
+            </body></html>`;
+
+            const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `RealEstate_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        } catch (err) { alert('Word Error: ' + err.message); } finally { hideLoading(); }
+    });
+
+    // ================================================================
+    // ========== Export to Excel ==========
+    // ================================================================
+    document.getElementById('exportFullExcelBtn').addEventListener('click', async function() {
+        if (!window.lastRealEstateResults) {
+            alert('Please run the analysis first (click "Calculate Return").');
+            return;
+        }
+        showLoading('Generating Excel report...', 'Creating sheets and charts');
+        try {
+            const data = window.lastRealEstateResults;
+            const inp = data.inputs;
+            const out = data.outputs;
+            const currency = inp.currency;
+            const companyName = inp.companyName;
+
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'FAROUK GRUP';
+            const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+            const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA', GB = 'FFFFF3CD';
+            const PT = 'FF155724', NT = 'FF721C24';
+
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+
+            // 1. Cover
+            const cv = workbook.addWorksheet('Cover Page', { views: [{ showGridLines: false }] });
+            [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+            cv.getRow(2).height=80; cv.getRow(4).height=60;
+            cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+            bc.value='FAROUK GRUP\nConsulting & Business';
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true};
+            mh(cv,1,4,4,`Real Estate Investment Report\n${companyName}`,DB,GL,18);
+            const inf=[['📋 Entity',companyName],['📅 Date',new Date().toLocaleDateString('en-US')],['💰 Currency',currency],['📊 NPV',`${currency} ${out.npv.toFixed(0)}`],['📈 IRR',`${(out.irr*100).toFixed(2)}%`]];
+            let ir=6;
+            inf.forEach(([l,v],idx)=>{
+                cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+                const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+                const bg=idx%2===0?AR:'FFFEFCF6';
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                cv.getRow(ir).height=28; ir++;
+            });
+
+            // 2. Inputs
+            const inputsSheet = workbook.addWorksheet('Inputs & Assumptions', { views: [{ showGridLines: false }] });
+            inputsSheet.getColumn(1).width=5; inputsSheet.getColumn(2).width=38; inputsSheet.getColumn(3).width=22; inputsSheet.getColumn(4).width=22; inputsSheet.getColumn(5).width=5;
+            mh(inputsSheet,1,5,1,'📋 Inputs & Assumptions',DB,GL,14);
+            inputsSheet.getRow(1).height=40;
+            mh(inputsSheet,2,4,2,'Project Basic Data',SB,'FFFFFFFF',11);
+            inputsSheet.getRow(2).height=28;
+            const inputFields = [
+                ['Property Value', inp.marketValue, ''],
+                ['Number of Units', inp.units, ''],
+                ['Monthly Rent per Unit', inp.rentPerUnit, ''],
+                ['Monthly Expenses', inp.monthlyExpenses, ''],
+                ['Occupancy Rate', (inp.occupancy*100).toFixed(0), '%'],
+                ['Property Tax', inp.taxRatePercent, '%'],
+                ['Assessed Discount', inp.assessedDiscountPercent, '%'],
+                ['Rent Increase', inp.rentIncreasePercent, '%'],
+                ['Land Appreciation', inp.landAppreciationPercent, '%'],
+                ['Purchase Fees', inp.purchaseCosts, ''],
+                ['LTV %', inp.ltvPercent, '%'],
+                ['Interest Rate', inp.interestRatePercent, '%'],
+                ['Loan Term', inp.loanTerm, 'Years'],
+                ['Discount Rate', inp.discountRatePercent, '%'],
+                ['Reinvestment Rate', inp.reinvestRatePercent, '%'],
+                ['Years', inp.years, '']
+            ];
+            let iRow=3;
+            inputFields.forEach(([label,val,note],idx)=>{
+                inputsSheet.getRow(iRow).height=24;
+                const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+                const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
+                lc.value=label; vc.value=val; nc.value=note;
+                ap(lc,cs(bg,DT,true,'left'));
+                ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?'#,##0':null});
+                ap(nc,cs(bg,'00695C',false,'center'));
+                iRow++;
+            });
+
+            // 3. KPIs
+            const kpiSheet = workbook.addWorksheet('KPIs', { views: [{ showGridLines: false }] });
+            [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
+            mh(kpiSheet,1,6,1,'📊 KPI Dashboard',DB,GL,15);
+            kpiSheet.getRow(1).height=45;
+            mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('en-US')}`,HB,'FFFFFFFF',10);
+            kpiSheet.getRow(2).height=26;
+            const kpis = [
+                { label: 'NPV', value: `${currency} ${out.npv.toFixed(0)}`, good: out.npv>0 },
+                { label: 'IRR', value: `${(out.irr*100).toFixed(2)}%`, good: out.irr>out.discountRate },
+                { label: 'MIRR', value: `${(out.mirr*100).toFixed(2)}%`, good: true },
+                { label: 'Payback', value: out.paybackPeriod!==null?out.paybackPeriod.toFixed(1)+' years':'None', good: out.paybackPeriod!==null&&out.paybackPeriod<inp.years/2 },
+                { label: 'PI', value: out.pi.toFixed(2), good: out.pi>1 },
+                { label: 'Cash on Cash', value: `${out.cashOnCash.toFixed(2)}%`, good: out.cashOnCash>0 }
+            ];
+            let kRow=3;
+            kpis.forEach((k,idx)=>{
+                kpiSheet.getRow(kRow).height=40;
+                kpiSheet.mergeCells(kRow,2,kRow,2); kpiSheet.mergeCells(kRow,3,kRow,3); kpiSheet.mergeCells(kRow,4,kRow,4); kpiSheet.mergeCells(kRow,5,kRow,5);
+                const ic=kpiSheet.getCell(kRow,2); ic.value=`🔹 ${idx+1}`;
+                const lc2=kpiSheet.getCell(kRow,3); lc2.value=k.label;
+                const vc3=kpiSheet.getCell(kRow,4); vc3.value=k.value;
+                const nc2=kpiSheet.getCell(kRow,5); nc2.value='';
+                const bg=k.good?PB:NB, tc=k.good?PT:NT;
+                [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
+                ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
+                lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'left',vertical:'middle'};
+                vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
+                kRow++;
+            });
+            kRow++;
+            kpiSheet.mergeCells(kRow,2,kRow,5);
+            const kFinal=kpiSheet.getCell(kRow,2);
+            kFinal.value=out.npv>0?'✅ Project is financially feasible (NPV positive)':'⚠️ Project is not feasible (NPV negative)';
+            kFinal.font={name:'Arial',bold:true,size:13,color:{argb:out.npv>0?PT:'856404'}};
+            kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:out.npv>0?PB:GB}};
+            kFinal.alignment={horizontal:'center',vertical:'middle'};
+            kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
+            kpiSheet.getRow(kRow).height=40;
+
+            // 4. Cash Flows
+            const cashSheet = workbook.addWorksheet('Cash Flows', { views: [{ showGridLines: false }] });
+            cashSheet.getColumn(1).width=5; cashSheet.getColumn(2).width=15; cashSheet.getColumn(3).width=20; cashSheet.getColumn(4).width=20; cashSheet.getColumn(5).width=5;
+            mh(cashSheet,1,5,1,'📋 Annual Cash Flows',DB,GL,14);
+            cashSheet.getRow(1).height=40;
+            cashSheet.addRow(['Year', `Cash Flow (${currency})`, `Cumulative (${currency})`]);
+            let cum=0;
+            for (let i=0; i<=inp.years; i++) {
+                cum += out.cashFlows[i];
+                cashSheet.addRow([i===0?'Investment':i, out.cashFlows[i], cum]);
+            }
+            cashSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            cashSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+            cashSheet.getColumn(2).numFmt = '#,##0';
+            cashSheet.getColumn(3).numFmt = '#,##0';
+
+            // 5. Sensitivity
+            const sensSheet = workbook.addWorksheet('Sensitivity Analysis', { views: [{ showGridLines: false }] });
+            sensSheet.getColumn(1).width=5; sensSheet.getColumn(2).width=25; sensSheet.getColumn(3).width=22; sensSheet.getColumn(4).width=22; sensSheet.getColumn(5).width=5;
+            mh(sensSheet,1,5,1,'🔍 Sensitivity Analysis (Scenarios)',DB,GL,14);
+            sensSheet.getRow(1).height=40;
+            sensSheet.addRow(['Scenario', `NPV (${currency})`, 'IRR (%)', 'PI']);
+            sensSheet.addRow(['Base', out.npv, (out.irr*100).toFixed(2), out.pi.toFixed(2)]);
+            sensSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            sensSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
+
+            // 6. Charts
+            const chartsSheet = workbook.addWorksheet('Charts', { views: [{ showGridLines: false }] });
+            chartsSheet.getColumn(1).width=5; chartsSheet.getColumn(2).width=50; chartsSheet.getColumn(3).width=5;
+            mh(chartsSheet,1,3,1,'📊 Cash Flow Chart',DB,GL,14);
+            chartsSheet.getRow(1).height=40;
+            const chartCanvas = document.getElementById('cashChart');
+            if (chartCanvas) {
+                try {
+                    const origBg = chartCanvas.style.backgroundColor;
+                    chartCanvas.style.backgroundColor = '#ffffff';
+                    const canvasImg = await html2canvas(chartCanvas, { scale: 2, backgroundColor: '#ffffff' });
+                    chartCanvas.style.backgroundColor = origBg;
+                    const imgData = canvasImg.toDataURL('image/png');
+                    const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                    chartsSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 28 }, editAs: 'oneCell' });
+                } catch(err) {}
+            }
+
+            // 7. Evaluation
+            const evalSheet = workbook.addWorksheet('Evaluation & Recommendations', { views: [{ showGridLines: false }] });
+            evalSheet.getColumn(1).width=5; evalSheet.getColumn(2).width=50; evalSheet.getColumn(3).width=5;
+            mh(evalSheet,1,3,1,'📝 Evaluation & Recommendations',DB,GL,14);
+            evalSheet.getRow(1).height=45;
+            const sections = [
+                { title: '1. Project Evaluation', content: `Score: ${out.score}/100\nGrade: ${out.ratingText}` },
+                { title: '2. Payback Summary', content: out.paybackPeriod!==null ? `Capital recovered within ${out.paybackPeriod.toFixed(1)} years.` : 'Capital not recovered during evaluation period.' },
+                { title: '3. Recommendations', content: out.npv>0 ? '• Project is financially viable, proceed.\n• Monitor occupancy and operating costs.\n• Maintain a contingency margin.' : '• Project is not viable as is.\n• Explore cost reduction or revenue increase.\n• Reassess assumptions (rent, occupancy, financing).' },
+                { title: '4. Disclaimer', content: 'This analysis is based on estimated assumptions. Actual results may vary. Professional financial and real estate advice is recommended.' }
+            ];
+            let itRow=2;
+            sections.forEach((sec,idx)=>{
+                itRow++;
+                evalSheet.getRow(itRow).height=30;
+                evalSheet.mergeCells(itRow,2,itRow,2);
+                const tc3=evalSheet.getCell(itRow,2);
+                tc3.value=sec.title;
+                tc3.font={name:'Arial',bold:true,size:12,color:{argb:GL}};
+                tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?HB:SB}};
+                tc3.alignment={horizontal:'left',vertical:'middle'};
+                tc3.border={bottom:{style:'medium',color:{argb:G}}};
+                itRow++;
+                evalSheet.getRow(itRow).height=Math.max(60, sec.content.split('\n').length*18);
+                evalSheet.mergeCells(itRow,2,itRow,2);
+                const cc=evalSheet.getCell(itRow,2);
+                cc.value=sec.content;
+                cc.font={name:'Arial',size:10,color:{argb:DT}};
+                cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};
+                cc.alignment={horizontal:'left',vertical:'top',wrapText:true};
+                cc.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
+            });
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const now = new Date();
+            const fileName = `RealEstate_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+            saveAs(blob, fileName);
+        } catch(err) { alert('Excel Error: ' + err.message); } finally { hideLoading(); }
+    });
+
+    // ===== Initial setup =====
+    occupancyRange.value = 100;
+    occupancyInput.value = 1;
+</script>
+</body>
+</html>

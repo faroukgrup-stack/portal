@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Advanced Technical Feasibility Study for Restaurants | FAROUK GRUP</title>
+    <!-- Page protection -->
+<script src="auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas & Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; max-width: 100vw; overflow-x: hidden;
+            font-family: 'Inter', 'Tajawal', sans-serif;
+            background: #0b0e17; color: #f0f4fa; line-height: 1.6;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 140px !important;
+            min-height: 100vh;
+        }
+
+        /* ===== Remove all vibration causes ===== */
+        .calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .chart-card, .scenario-card, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .equipment-row,
+        .add-equipment-btn, .remove-equipment, .alert,
+        .export-word-btn, .export-excel-full-btn, .settings-overlay,
+        .settings-card, .form-group input, .form-group select {
+            transform: none !important;
+            -webkit-transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* ===== Static background ===== */
+        .glow-bg {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .glow-bg span {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.20;
+            background: radial-gradient(circle, rgba(180, 133, 84, 0.10) 0%, transparent 70%);
+        }
+        .glow-bg span:nth-child(1) { top: -100px; right: -100px; width: 500px; height: 500px; }
+        .glow-bg span:nth-child(2) { bottom: -150px; left: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(100,150,200,0.05) 0%, transparent 70%); }
+        .glow-bg span:nth-child(3) { top: 30%; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(180,133,84,0.06) 0%, transparent 70%); }
+        .floating-shape { display: none; }
+
+        /* ===== HERO ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white; text-align: center; padding: 3rem 1rem;
+            border-bottom: 4px solid #b8860b; position: relative; z-index: 1;
+        }
+        .hero-mini h2 {
+            font-size: 2.5rem; font-weight: 900; color: #d4b15a;
+            margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .hero-mini p {
+            font-size: 1.2rem; max-width: 700px; margin: 0 auto;
+            opacity: 0.95; padding: 0 0.5rem;
+        }
+
+        /* ===== WRAPPER ===== */
+        .calc-wrapper {
+            max-width: 1050px; margin: 2rem auto; padding: 0 1rem;
+            position: relative; z-index: 2;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* ===== CARD ===== */
+        .calc-box {
+            background: rgba(18,24,36,0.92); border: 2px solid rgba(180,133,84,0.2);
+            border-radius: 30px; padding: 1.5rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            width: 100%; max-width: 100%;
+        }
+        .calc-box h2 {
+            font-size: 1.8rem; font-weight: 900; color: #cfa776;
+            text-align: center; margin-bottom: 1.5rem; padding-top: 0.3rem;
+        }
+        .featured-badge {
+            display: none;
+            position: absolute; top: -10px; left: -10px;
+            background: linear-gradient(135deg, #b48554, #d4b15a);
+            color: #111; width: 90px; height: 90px; border-radius: 50%;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-weight: 900;
+            border: 3px solid white; z-index: 10;
+        }
+        .featured-badge i { font-size: 1.8rem; margin-bottom: 0.2rem; color: #0b0e17; }
+        .featured-badge span { font-size: 0.8rem; text-align: center; color: #0b0e17; }
+
+        /* ===== Currency row ===== */
+        .currency-row {
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 0.8rem; background: rgba(180,133,84,0.12);
+            border: 1px solid rgba(180,133,84,0.2);
+            padding: 0.8rem 1rem; border-radius: 50px; margin-bottom: 1.5rem;
+            width: 100%;
+        }
+        .currency-row label { font-weight: 700; color: #cfa776; font-size: 0.9rem; white-space: nowrap; }
+        .currency-row select, .currency-row input {
+            flex: 1 1 150px; min-width: 100px; padding: 0.5rem 1rem;
+            border: 2px solid rgba(180,133,84,0.25); border-radius: 30px;
+            font-family: 'Inter', sans-serif; font-weight: 700;
+            background: rgba(10,14,23,0.7); color: #f0f4fa; font-size: 0.95rem;
+        }
+        .currency-row input { flex: 2 1 200px; }
+        .currency-row select option { background: #0b0e17; color: #f0f4fa; }
+
+        /* ===== Section titles ===== */
+        .section-title-sm {
+            font-size: 1.3rem; font-weight: 900; color: #cfa776;
+            margin: 1.2rem 0 0.8rem 0;
+            border-bottom: 2px solid rgba(180,133,84,0.15);
+            padding-bottom: 0.3rem; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .section-title-sm i { color: #cfa776; }
+
+        /* ===== Form rows ===== */
+        .form-row {
+            display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;
+        }
+        .form-group {
+            flex: 1 1 200px; min-width: 140px; margin-bottom: 0.6rem;
+        }
+        .form-group label {
+            display: block; font-weight: 700; color: #cfa776;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .form-group label i { margin-right: 0.3rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem 1rem;
+            border: 2px solid rgba(180,133,84,0.2); border-radius: 30px;
+            font-family: 'Inter', sans-serif; font-size: 0.95rem;
+            background: rgba(10,14,23,0.6); color: #f0f4fa;
+            transition: border 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #b48554;
+            box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+        }
+
+        /* ===== Calculate button ===== */
+        .btn-calculate {
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            width: 100%; padding: 1.2rem; border-radius: 50px;
+            background: rgba(180,133,84,0.18);
+            border: 2px solid rgba(180,133,84,0.25);
+            color: #cfa776; font-weight: 900; font-size: 1.2rem;
+            cursor: pointer; margin: 1.5rem 0; font-family: 'Inter', sans-serif;
+        }
+        .btn-calculate:hover { background: rgba(180,133,84,0.35); border-color: #b48554; }
+        .btn-calculate:active { transform: scale(0.97); }
+
+        /* ===== Results ===== */
+        .results-section { margin-top: 1.5rem; width: 100%; max-width: 100%; overflow: hidden; }
+        .results-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
+            width: 100%;
+        }
+        .result-card {
+            background: rgba(22,30,46,0.8); border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 20px; padding: 1rem; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            word-break: break-word;
+        }
+        .result-card i { font-size: 1.6rem; color: #cfa776; margin-bottom: 0.3rem; }
+        .result-card h4 { font-size: 0.85rem; font-weight: 700; color: #aab7d4; margin-bottom: 0.2rem; }
+        .result-card .value { font-size: 1.3rem; font-weight: 900; color: #cfa776; }
+        .result-card .unit { font-size: 0.75rem; color: #aab7d4; }
+        .result-card .status {
+            font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+            display: inline-block; margin-top: 0.2rem;
+        }
+        .status-good { background: #28a745; color: white; }
+        .status-bad { background: #dc3545; color: white; }
+        .status-warning { background: #ffc107; color: #111; }
+
+        /* ===== Tables ===== */
+        .table-container {
+            overflow-x: auto; margin-top: 1rem;
+            border: 1px solid rgba(180,133,84,0.1); border-radius: 20px;
+            background: rgba(22,30,46,0.6); padding: 0.5rem;
+            -webkit-overflow-scrolling: touch;
+            width: 100%; max-width: 100%;
+        }
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.85rem;
+            min-width: 400px;
+            word-break: break-word;
+        }
+        th {
+            background: rgba(180,133,84,0.15); color: #cfa776;
+            font-weight: 900; padding: 0.6rem 0.8rem;
+            border-bottom: 2px solid rgba(180,133,84,0.15); white-space: nowrap;
+        }
+        td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid rgba(180,133,84,0.06);
+            text-align: center; color: #f0f4fa;
+        }
+        tr:last-child td { border-bottom: none; }
+        .positive { color: #4ade80; font-weight: 700; }
+        .negative { color: #f87171; font-weight: 700; }
+
+        /* ===== Charts ===== */
+        .chart-container {
+            margin-top: 1.5rem;
+            background: rgba(22,30,46,0.6);
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid rgba(180,133,84,0.08);
+            height: 280px;
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        .chart-container canvas { width: 100% !important; height: 100% !important; }
+
+        /* ===== Collapsible ===== */
+        .collapsible {
+            background: rgba(180,133,84,0.10); color: #cfa776; cursor: pointer;
+            padding: 0.8rem 1.2rem; width: 100%;
+            border: 1px solid rgba(180,133,84,0.15); text-align: left; outline: none;
+            font-size: 1.1rem; font-weight: 900; border-radius: 30px;
+            margin-top: 0.8rem; display: flex; justify-content: space-between;
+            align-items: center; font-family: 'Inter', sans-serif;
+        }
+        .collapsible:hover { background: rgba(180,133,84,0.20); }
+        .collapsible i.fa-chevron-down { transition: transform 0.2s; }
+        .collapsible.active i.fa-chevron-down { transform: rotate(180deg); }
+        .collapsible-content {
+            padding: 0 0.8rem; max-height: 0; overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(0,0,0,0.08); border-radius: 0 0 16px 16px;
+        }
+        .collapsible-content .form-row { padding-top: 0.5rem; }
+
+        /* ===== Export buttons ===== */
+        .export-container {
+            display: flex; justify-content: center; gap: 0.8rem;
+            flex-wrap: wrap; margin: 1.5rem 0;
+        }
+        .export-word-btn, .export-excel-full-btn {
+            background: rgba(180,133,84,0.10);
+            border: 1px solid rgba(180,133,84,0.15); border-radius: 40px;
+            padding: 0.7rem 1.5rem; color: #cfa776; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.9rem; font-family: 'Inter', sans-serif;
+            flex: 1 1 auto; justify-content: center; max-width: 220px;
+        }
+        .export-word-btn:hover, .export-excel-full-btn:hover { background: rgba(180,133,84,0.25); }
+
+        /* ===== Loading overlay ===== */
+        .export-loading {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            z-index: 9999; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(4px);
+        }
+        .export-loading.show { display: flex; }
+        .export-loading-box {
+            background: rgba(18,24,36,0.95);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 20px;
+            padding: 1.8rem 2rem; text-align: center; max-width: 85vw;
+        }
+        .export-loading-box i {
+            font-size: 2.5rem; color: #cfa776; animation: spin 0.8s linear infinite;
+            display: block; margin-bottom: 0.6rem;
+        }
+        .export-loading-box h3 { color: #cfa776; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .export-loading-box p { color: #aab7d4; font-size: 0.9rem; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== Footer ===== */
+        .footer-simple {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: rgba(10,14,23,0.4); border-top: 1px solid rgba(180,133,84,0.08);
+            color: #aab7d4; font-size: 0.8rem;
+        }
+        .footer-simple span { color: #cfa776; font-weight: 700; }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(18,24,36,0.96);
+            border: 1px solid rgba(180,133,84,0.2); border-radius: 24px;
+            width: 92%; max-width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .modal-header {
+            background: rgba(180,133,84,0.10);
+            border-bottom: 1px solid rgba(180,133,84,0.10);
+            padding: 0.7rem 1.2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h2 { margin: 0; color: #cfa776; font-size: 1rem; font-weight: 900; }
+        .modal-header .close {
+            color: #aab7d4; font-size: 1.6rem; font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .modal-header .close:hover { color: #cfa776; }
+        .modal-body { padding: 1rem; }
+        .calc-display {
+            width: 100%; height: 42px; font-size: 1.2rem; text-align: left;
+            padding: 0 12px; border: 1px solid rgba(180,133,84,0.15);
+            border-radius: 16px; margin-bottom: 12px;
+            background: rgba(10,14,23,0.7); color: #cfa776;
+            font-family: 'Courier New', monospace; direction: ltr;
+        }
+        .calc-buttons {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 5px;
+        }
+        .calc-btn {
+            background: rgba(180,133,84,0.08);
+            border: 1px solid rgba(180,133,84,0.08); border-radius: 14px;
+            padding: 10px 0; font-size: 1rem; font-weight: 700;
+            color: #f0f4fa; cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .calc-btn:hover { background: rgba(180,133,84,0.20); }
+        .calc-btn.operator { color: #cfa776; }
+        .calc-btn.equals {
+            background: rgba(180,133,84,0.25); color: white; grid-column: span 2;
+        }
+        .calc-btn.equals:hover { background: rgba(180,133,84,0.45); }
+
+        /* ===== Floating buttons ===== */
+        .calc-floating-btn, .home-floating-btn {
+            position: fixed !important; top: auto !important; bottom: 25px !important;
+            z-index: 9998 !important; margin: 0 !important;
+            transform: none !important; -webkit-transform: none !important;
+            pointer-events: auto !important; font-family: 'Inter', sans-serif;
+            border: none !important; border-radius: 50px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            display: flex !important; align-items: center !important;
+            justify-content: center !important; gap: 6px !important;
+            padding: 12px 20px !important; font-size: 1rem !important;
+            font-weight: 700 !important;
+        }
+        .calc-floating-btn { left: 20px !important; right: auto !important; background: #b48554 !important; color: #111 !important; }
+        .home-floating-btn { right: 20px !important; left: auto !important; background: #b48554 !important; color: #fff !important; text-decoration: none !important; }
+        .calc-floating-btn:hover, .home-floating-btn:hover { opacity: 0.9 !important; }
+        .calc-floating-btn:active, .home-floating-btn:active { opacity: 0.7 !important; transform: scale(0.95) !important; }
+
+        /* ===== Messages ===== */
+        #initialMessage { margin-top: 0.8rem; color: #aab7d4; text-align: center; font-size: 0.95rem; }
+        #initialMessage i { color: #cfa776; }
+        .tooltip .tooltiptext { display: none; }
+
+        /* ===== Equipment styles ===== */
+        .equipment-row {
+            display: flex; flex-wrap: wrap; gap: 0.4rem;
+            margin-bottom: 0.5rem; align-items: center;
+            background: rgba(10,14,23,0.7); border: 1px solid rgba(180,133,84,0.15);
+            padding: 0.5rem; border-radius: 15px;
+        }
+        .equipment-row input {
+            flex: 1 1 120px; min-width: 70px;
+            background: rgba(10,14,23,0.7); border: 1px solid rgba(180,133,84,0.2);
+            border-radius: 20px; padding: 0.4rem 0.6rem;
+            color: #f0f4fa; font-family: 'Inter', sans-serif; font-size: 0.85rem;
+        }
+        .equipment-row .eq-name { flex: 2 1 140px; }
+        .equipment-row .eq-power { flex: 1 1 80px; }
+        .equipment-row .eq-cost { flex: 1 1 100px; }
+        .equipment-row .eq-space { flex: 1 1 80px; }
+        .remove-equipment {
+            background: #dc3545; color: white; border: none;
+            border-radius: 50%; width: 30px; height: 30px;
+            cursor: pointer; font-weight: bold; font-size: 1.1rem;
+            flex: 0 0 30px;
+        }
+        .remove-equipment:hover { background: #c82333; }
+        .add-equipment-btn {
+            background: #cfa776; color: #111; border: none;
+            border-radius: 30px; padding: 0.6rem 1.2rem;
+            cursor: pointer; margin-top: 0.5rem; font-weight: 700;
+            font-family: 'Inter', sans-serif; font-size: 0.95rem;
+        }
+        .add-equipment-btn:hover { background: #b48554; }
+        .alert { padding: 0.8rem; border-radius: 20px; margin: 0.5rem 0; font-weight: 700; }
+        .alert-danger { background: rgba(220,53,69,0.2); color: #f87171; border: 1px solid #dc3545; }
+        .alert-warning { background: rgba(255,193,7,0.2); color: #fbbf24; border: 1px solid #ffc107; }
+        .alert-success { background: rgba(40,167,69,0.2); color: #4ade80; border: 1px solid #28a745; }
+
+        /* ===================================================
+           Responsive improvements
+           =================================================== */
+        @media (min-width: 1024px) {
+            .featured-badge { display: flex; }
+            .hero-mini h2 { font-size: 2.8rem; }
+            .hero-mini p { font-size: 1.3rem; max-width: 800px; }
+            .calc-box { padding: 2rem 2.5rem; }
+            .calc-box h2 { font-size: 2rem; }
+            .section-title-sm { font-size: 1.4rem; }
+            .form-group { flex: 1 1 220px; }
+            .form-group label { font-size: 1rem; }
+            .form-group input, .form-group select { font-size: 1rem; padding: 0.8rem 1.2rem; }
+            .btn-calculate { font-size: 1.3rem; padding: 1.2rem; }
+            .result-card .value { font-size: 1.5rem; }
+            .result-card h4 { font-size: 0.95rem; }
+            .result-card i { font-size: 1.8rem; }
+            table { font-size: 0.9rem; }
+            .calc-floating-btn, .home-floating-btn { padding: 14px 26px !important; font-size: 1.1rem !important; bottom: 30px !important; }
+            .chart-container { height: 320px; }
+        }
+
+        @media (max-width: 768px) {
+            .hero-mini { padding: 1.8rem 1rem; }
+            .hero-mini h2 { font-size: 1.6rem; }
+            .hero-mini p { font-size: 0.95rem; }
+            .calc-wrapper { margin: 1rem auto; padding: 0 0.6rem; }
+            .calc-box { padding: 0.9rem 0.7rem; border-radius: 20px; }
+            .calc-box h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+            .currency-row { gap: 0.5rem; padding: 0.6rem 0.8rem; flex-direction: column; align-items: stretch; }
+            .currency-row label { font-size: 0.8rem; }
+            .currency-row select, .currency-row input { font-size: 0.8rem; padding: 0.4rem 0.7rem; min-width: 80px; flex: 1 1 auto; width: 100%; }
+            .section-title-sm { font-size: 1rem; margin: 0.8rem 0 0.5rem 0; }
+            .form-group { flex: 1 1 100%; min-width: 100px; margin-bottom: 0.4rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-group input, .form-group select { font-size: 0.8rem; padding: 0.5rem 0.7rem; }
+            .btn-calculate { font-size: 0.95rem; padding: 0.8rem; margin: 1rem 0; }
+            .results-cards { grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.5rem; }
+            .result-card { padding: 0.6rem 0.4rem; }
+            .result-card i { font-size: 1.2rem; }
+            .result-card h4 { font-size: 0.65rem; }
+            .result-card .value { font-size: 1rem; }
+            .result-card .unit { font-size: 0.6rem; }
+            .chart-container { height: 200px; padding: 0.5rem; }
+            table { font-size: 0.7rem; min-width: 300px; }
+            th, td { padding: 0.3rem 0.4rem; }
+            .export-word-btn, .export-excel-full-btn { font-size: 0.75rem; padding: 0.4rem 1rem; max-width: 160px; }
+            .modal-content { width: 95%; max-width: 320px; }
+            .calc-btn { padding: 8px 0; font-size: 0.9rem; }
+            .footer-simple { font-size: 0.7rem; padding: 0.6rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 14px !important; padding: 8px 14px !important; font-size: 0.75rem !important; gap: 4px !important; }
+            .calc-floating-btn i, .home-floating-btn i { font-size: 0.9rem !important; }
+            .featured-badge { display: none !important; }
+            .equipment-row { flex-direction: column; align-items: stretch; }
+            .equipment-row input { flex: 1 1 auto; min-width: 0; }
+            .remove-equipment { align-self: center; width: 36px; height: 36px; }
+        }
+
+        @media (max-width: 400px) {
+            .hero-mini h2 { font-size: 1.2rem; }
+            .hero-mini p { font-size: 0.8rem; }
+            .calc-box h2 { font-size: 1.1rem; }
+            .currency-row { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .currency-row select, .currency-row input { flex: 1 1 auto; width: 100%; }
+            .results-cards { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+            .calc-floating-btn, .home-floating-btn { bottom: 10px !important; padding: 6px 10px !important; font-size: 0.65rem !important; }
+            .chart-container { height: 160px; }
+            table { font-size: 0.6rem; min-width: 200px; }
+            th, td { padding: 0.2rem 0.3rem; }
+        }
+
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(10,14,23,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(180,133,84,0.3); border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <!-- Static background -->
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+
+    <!-- Export loading screen -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">Generating report...</h3>
+            <p id="loadingMsg">Please wait</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero-mini">
+        <h2>Advanced Technical Feasibility Study for Restaurants</h2>
+        <p>Integrated analysis of space, equipment, production capacity, performance indicators, and technical & financial evaluation</p>
+    </section>
+
+    <!-- WRAPPER -->
+    <section class="calc-wrapper">
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-utensils"></i><span>Technical</span></div>
+            <h2><i class="fas fa-utensils" style="color:#cfa776;margin-right:0.5rem;"></i>Project Data</h2>
+
+            <!-- Currency and entity name -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> Currency:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>US Dollar ($)</option>
+                    <option value="€">Euro (€)</option>
+                    <option value="₺">Turkish Lira (₺)</option>
+                    <option value="ج.م">Egyptian Pound (ج.م)</option>
+                    <option value="د.ك">Kuwaiti Dinar (د.ك)</option>
+                    <option value="ر.س">Saudi Riyal (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> Entity Name:</label>
+                <input type="text" id="companyName" value="Beneficiary Entity Name" placeholder="Beneficiary entity">
+            </div>
+
+            <!-- Scope & Specifications -->
+            <div class="section-title-sm">📋 Scope & Specifications</div>
+            <div class="form-row">
+                <div class="form-group tooltip"><label><i class="fas fa-utensils"></i> Kitchen Type</label><select id="kitchenType"><option value="fastfood">Fast Food</option><option value="fine">Fine Dining</option><option value="eastern">Eastern / Oriental</option><option value="italian">Italian</option><option value="grill">Grill / BBQ</option><option value="seafood">Seafood</option><option value="cafe">Café</option></select><span class="tooltiptext">Main kitchen style</span></div>
+                <div class="form-group tooltip"><label><i class="fas fa-chair"></i> Number of Seats</label><input type="number" id="seats" value="50" min="1" step="5"><span class="tooltiptext">Total seating capacity</span></div>
+                <div class="form-group tooltip"><label><i class="fas fa-concierge-bell"></i> Service Model</label><select id="serviceModel"><option value="waiter">Table Service</option><option value="self">Self-Service</option><option value="delivery">Delivery Only</option><option value="mixed">Mixed</option></select><span class="tooltiptext">Service delivery method</span></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group tooltip"><label><i class="fas fa-clock"></i> Daily Operating Hours</label><input type="number" id="hoursOpen" value="12" min="1" max="24"><span class="tooltiptext">Hours open per day</span></div>
+                <div class="form-group tooltip"><label><i class="fas fa-moon"></i> Operating Shifts</label><select id="shifts"><option value="1">Single shift (Lunch)</option><option value="2">Two shifts (Lunch & Dinner)</option><option value="3">Multiple shifts</option></select><span class="tooltiptext">Number of daily operating periods</span></div>
+            </div>
+
+            <!-- Location Analysis -->
+            <div class="section-title-sm">📍 Location Analysis</div>
+            <div class="form-row">
+                <div class="form-group tooltip"><label><i class="fas fa-vector-square"></i> Total Area (m²)</label><input type="number" id="totalArea" value="150" min="20" step="10"><span class="tooltiptext">Total restaurant area</span></div>
+                <div class="form-group tooltip"><label><i class="fas fa-percent"></i> Kitchen Area Ratio (%)</label><input type="number" id="kitchenPercent" value="35" min="20" max="60" step="5"><span class="tooltiptext">Percentage of kitchen area</span></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group tooltip"><label><i class="fas fa-bolt"></i> Electrical Capacity (Amps)</label><input type="number" id="electricalCapacity" value="200" min="50" step="10"><span class="tooltiptext">Site electrical capacity</span></div>
+                <div class="form-group tooltip"><label><i class="fas fa-water"></i> Water Supply</label><select id="waterAvailability"><option value="yes">Yes – Suitable</option><option value="partial">Needs Development</option><option value="no">No – Unsuitable</option></select></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group tooltip"><label><i class="fas fa-wind"></i> Ventilation System</label><select id="ventilation"><option value="yes">Yes – Suitable</option><option value="partial">Needs Development</option><option value="no">No – Unsuitable</option></select></div>
+                <div class="form-group tooltip"><label><i class="fas fa-truck"></i> Delivery Accessibility</label><select id="deliveryAccess"><option value="yes">Yes – Excellent</option><option value="partial">Moderate</option><option value="no">Difficult</option></select></div>
+            </div>
+
+            <!-- Equipment -->
+            <div class="section-title-sm">🔧 Equipment Requirements</div>
+            <div id="equipmentContainer"></div>
+            <button class="add-equipment-btn" id="addEquipmentBtn">➕ Add Equipment</button>
+            <div id="powerAlert" class="alert" style="display:none;"></div>
+
+            <!-- Production Capacity -->
+            <div class="section-title-sm">⚡ Production Capacity & Operational Efficiency</div>
+            <div class="form-row">
+                <div class="form-group tooltip"><label><i class="fas fa-rotate-left"></i> Table Turnover Rate</label><input type="number" id="turnoverRate" value="2" min="0.5" step="0.5"><span class="tooltiptext">Table occupancy turns per peak hour</span></div>
+                <div class="form-group tooltip"><label><i class="fas fa-clock"></i> Peak Hours per Day</label><input type="number" id="peakHours" value="4" min="1" max="12"><span class="tooltiptext">Peak hours per day</span></div>
+                <div class="form-group tooltip"><label><i class="fas fa-percent"></i> Expected Occupancy Rate %</label><input type="number" id="occupancyRate" value="70" min="10" max="100" step="5"><span class="tooltiptext">Expected occupancy percentage</span></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group tooltip"><label><i class="fas fa-hamburger"></i> Average Meal Price</label><input type="number" id="avgMealPrice" value="50" step="5"><span class="tooltiptext">Average meal price per customer</span></div>
+                <div class="form-group tooltip"><label><i class="fas fa-percent"></i> Food Cost (%)</label><input type="number" id="foodCostPercent" value="30" min="10" max="80"><span class="tooltiptext">Food cost percentage of meal price</span></div>
+                <div class="form-group tooltip"><label><i class="fas fa-briefcase"></i> Number of Employees</label><input type="number" id="employeesCount" value="6" min="1" step="1"><span class="tooltiptext">Number of staff</span></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group tooltip"><label><i class="fas fa-user-tie"></i> Average Monthly Salary</label><input type="number" id="avgSalary" value="2000" step="100"><span class="tooltiptext">Average monthly salary per employee</span></div>
+                <div class="form-group tooltip"><label><i class="fas fa-home"></i> Monthly Rent</label><input type="number" id="monthlyRent" value="4000" step="100"><span class="tooltiptext">Monthly rent</span></div>
+                <div class="form-group tooltip"><label><i class="fas fa-tools"></i> Other Operating Expenses</label><input type="number" id="otherOpCost" value="2000" step="100"><span class="tooltiptext">Other monthly expenses</span></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group tooltip"><label><i class="fas fa-calendar-alt"></i> Equipment Life (years)</label><input type="number" id="equipmentLife" value="10" min="1" max="30" step="1"><span class="tooltiptext">Useful life of equipment</span></div>
+            </div>
+
+            <!-- Establishment Costs -->
+            <div class="section-title-sm">💰 Establishment Costs (One-time)</div>
+            <div class="form-row">
+                <div class="form-group tooltip"><label><i class="fas fa-hammer"></i> Fit-out & Construction</label><input type="number" id="constructionCost" value="50000" step="1000"></div>
+                <div class="form-group tooltip"><label><i class="fas fa-file-signature"></i> Licenses & Fees</label><input type="number" id="licensesCost" value="5000" step="500"></div>
+                <div class="form-group tooltip"><label><i class="fas fa-hand-holding-usd"></i> Working Capital (3 months)</label><input type="number" id="workingCapital" value="15000" step="1000"></div>
+            </div>
+
+            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Technical Study</button>
+
+            <!-- Results -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-cards" id="kpiCards"></div>
+                <div id="warnings" class="alert" style="display:none;"></div>
+                <div class="section-title-sm">📊 Financial & Performance Analysis</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+                    <div style="flex: 1; min-width: 280px;"><div class="chart-container"><canvas id="financeChart"></canvas></div></div>
+                    <div style="flex: 1; min-width: 280px;"><div class="chart-container"><canvas id="riskChart"></canvas></div></div>
+                </div>
+                <div id="projectRatingCard" class="result-card" style="background:var(--bg-card);"></div>
+                <div class="export-container">
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Export Word Report</button>
+                    <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Export to Excel</button>
+                </div>
+            </div>
+
+            <div id="initialMessage" style="margin-top:1rem; color:var(--text-muted); text-align:center;">
+                <i class="fas fa-robot" style="color: var(--accent-soft);"></i> Results will appear after clicking Calculate
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-simple">All rights reserved © 2026 <span>FAROUK GRUP</span></footer>
+
+    <button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+    <a href="index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+    <!-- Calculator Modal -->
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="modalClose">&times;</span>
+                <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <!-- Fixed order: 7 8 9 / 4 5 6 × / 1 2 3 - -->
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn" data-val="C">C</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn" data-val="⌫">⌫</button>
+                    <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ===== Calculator =====
+            const calcDisplay = document.getElementById('calcDisplay');
+            let currentCalcInput = '';
+
+            function handleCalc(v) {
+                if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
+                if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
+                if (v === '=') {
+                    try {
+                        let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
+                        calcDisplay.value = r;
+                        currentCalcInput = r.toString();
+                    } catch (e) { calcDisplay.value = 'Error'; currentCalcInput = ''; }
+                    return;
+                }
+                currentCalcInput += v;
+                calcDisplay.value = currentCalcInput;
+            }
+
+            document.querySelectorAll('.calc-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const v = this.dataset.val;
+                    if (v !== undefined) handleCalc(v);
+                });
+            });
+
+            const modalEl = document.getElementById('calculatorModal');
+            document.getElementById('calculatorBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                modalEl.classList.add('active');
+                calcDisplay.value = currentCalcInput;
+            });
+            document.getElementById('modalClose').addEventListener('click', function() { modalEl.classList.remove('active'); });
+            modalEl.addEventListener('click', function(e) { if (e.target === modalEl) modalEl.classList.remove('active'); });
+            document.addEventListener('keydown', function(e) {
+                if (!modalEl.classList.contains('active')) return;
+                e.preventDefault();
+                const k = e.key;
+                if (k >= '0' && k <= '9') handleCalc(k);
+                else if (k === '.') handleCalc('.');
+                else if (k === '+' || k === '-' || k === '*' || k === '/') handleCalc(k);
+                else if (k === 'Enter' || k === '=') handleCalc('=');
+                else if (k === 'Backspace') handleCalc('⌫');
+                else if (k === 'Escape') modalEl.classList.remove('active');
+                else if (k.toLowerCase() === 'c') handleCalc('C');
+            });
+
+            // ===== Equipment Management =====
+            const equipmentContainer = document.getElementById('equipmentContainer');
+
+            function addEquipmentRow(name = '', power = '', cost = '', space = '') {
+                const row = document.createElement('div');
+                row.className = 'equipment-row';
+                row.innerHTML = `
+                    <input type="text" class="eq-name" placeholder="Equipment name" value="${name}">
+                    <input type="number" class="eq-power" placeholder="Power (kW)" value="${power}" step="0.1" min="0">
+                    <input type="number" class="eq-cost" placeholder="Cost" value="${cost}" step="100" min="0">
+                    <input type="number" class="eq-space" placeholder="Space (m²)" value="${space}" step="0.1" min="0">
+                    <button class="remove-equipment" onclick="this.parentElement.remove()">×</button>
+                `;
+                equipmentContainer.appendChild(row);
+            }
+            addEquipmentRow('', '', '', '');
+            addEquipmentRow('', '', '', '');
+
+            document.getElementById('addEquipmentBtn').addEventListener('click', () => addEquipmentRow());
+
+            function getEquipmentData() {
+                const rows = document.querySelectorAll('#equipmentContainer .equipment-row');
+                const equipment = [];
+                rows.forEach(row => {
+                    const name = row.querySelector('.eq-name')?.value || '';
+                    const power = parseFloat(row.querySelector('.eq-power')?.value) || 0;
+                    const cost = parseFloat(row.querySelector('.eq-cost')?.value) || 0;
+                    const space = parseFloat(row.querySelector('.eq-space')?.value) || 0;
+                    if (name) equipment.push({ name, power, cost, space });
+                });
+                return equipment;
+            }
+
+            function calculateEquipmentTotals() {
+                const equipment = getEquipmentData();
+                let totalPower = 0, totalCost = 0, totalSpace = 0;
+                equipment.forEach(eq => { totalPower += eq.power; totalCost += eq.cost; totalSpace += eq.space; });
+                return { totalPower, totalCost, totalSpace };
+            }
+
+            function updatePowerAlert() {
+                const electricalCapacity = parseFloat(document.getElementById('electricalCapacity').value) || 200;
+                const { totalPower } = calculateEquipmentTotals();
+                const requiredAmps = (totalPower * 1000) / 220;
+                const powerAlert = document.getElementById('powerAlert');
+                if (requiredAmps > electricalCapacity) {
+                    powerAlert.style.display = 'block';
+                    powerAlert.className = 'alert alert-danger';
+                    powerAlert.innerHTML = `⚠️ Warning: Total required power (${requiredAmps.toFixed(0)} Amps) exceeds site capacity (${electricalCapacity} Amps).`;
+                } else { powerAlert.style.display = 'none'; }
+            }
+
+            document.getElementById('electricalCapacity').addEventListener('input', updatePowerAlert);
+            equipmentContainer.addEventListener('input', updatePowerAlert);
+
+            // ===== Loading functions =====
+            function showLoading(title, msg) {
+                document.getElementById('loadingTitle').textContent = title;
+                document.getElementById('loadingMsg').textContent = msg;
+                document.getElementById('exportLoading').classList.add('show');
+            }
+
+            function hideLoading() {
+                document.getElementById('exportLoading').classList.remove('show');
+            }
+
+            // ===== Charts =====
+            let financeChart, riskChart;
+
+            // ===== Main Calculation =====
+            function calculateAll() {
+                const currency = document.getElementById('currencySelect').value;
+                const companyName = document.getElementById('companyName').value || 'Beneficiary Entity';
+                const seats = parseFloat(document.getElementById('seats').value) || 50;
+                const hoursOpen = parseFloat(document.getElementById('hoursOpen').value) || 12;
+                const totalArea = parseFloat(document.getElementById('totalArea').value) || 150;
+                const kitchenPercent = parseFloat(document.getElementById('kitchenPercent').value) || 35;
+                const electricalCapacity = parseFloat(document.getElementById('electricalCapacity').value) || 200;
+                const waterAvailabilityText = document.getElementById('waterAvailability').options[document.getElementById('waterAvailability').selectedIndex].text;
+                const ventilationText = document.getElementById('ventilation').options[document.getElementById('ventilation').selectedIndex].text;
+                const deliveryAccessText = document.getElementById('deliveryAccess').options[document.getElementById('deliveryAccess').selectedIndex].text;
+                const { totalPower, totalCost: equipmentCost, totalSpace } = calculateEquipmentTotals();
+                const turnoverRate = parseFloat(document.getElementById('turnoverRate').value) || 2;
+                const peakHours = parseFloat(document.getElementById('peakHours').value) || 4;
+                const occupancyRate = parseFloat(document.getElementById('occupancyRate').value) / 100 || 0.7;
+                const avgMealPrice = parseFloat(document.getElementById('avgMealPrice').value) || 50;
+                const foodCostPercent = parseFloat(document.getElementById('foodCostPercent').value) / 100 || 0.3;
+                const employeesCount = parseFloat(document.getElementById('employeesCount').value) || 6;
+                const avgSalary = parseFloat(document.getElementById('avgSalary').value) || 2000;
+                const monthlyRent = parseFloat(document.getElementById('monthlyRent').value) || 4000;
+                const otherOpCost = parseFloat(document.getElementById('otherOpCost').value) || 2000;
+                const equipmentLife = parseFloat(document.getElementById('equipmentLife').value) || 10;
+                const constructionCost = parseFloat(document.getElementById('constructionCost').value) || 50000;
+                const licensesCost = parseFloat(document.getElementById('licensesCost').value) || 5000;
+                const workingCapital = parseFloat(document.getElementById('workingCapital').value) || 15000;
+
+                const kitchenArea = totalArea * (kitchenPercent / 100);
+                const remainingArea = totalArea - kitchenArea;
+                const diningArea = remainingArea * 0.75;
+                const seatDensity = diningArea / seats;
+                const maxCustomersDaily = seats * turnoverRate;
+                const actualCustomersDaily = maxCustomersDaily * occupancyRate;
+                const monthlyRevenue = actualCustomersDaily * avgMealPrice * 26;
+                const monthlyFoodCost = monthlyRevenue * foodCostPercent;
+                const monthlyLaborCost = employeesCount * avgSalary;
+                const monthlyFixedCosts = monthlyRent + otherOpCost;
+                const totalMonthlyExpenses = monthlyFoodCost + monthlyLaborCost + monthlyFixedCosts;
+                const netProfit = monthlyRevenue - totalMonthlyExpenses;
+                const totalInvestment = constructionCost + licensesCost + equipmentCost + workingCapital;
+                const monthlyDepreciation = equipmentCost / (equipmentLife * 12);
+                const netProfitAfterDepreciation = netProfit - monthlyDepreciation;
+                const accountingProfit = netProfitAfterDepreciation;
+                const contributionPerMeal = avgMealPrice * (1 - foodCostPercent);
+                const breakEvenMeals = (monthlyFixedCosts + monthlyLaborCost) / contributionPerMeal;
+                const breakEvenRevenue = breakEvenMeals * avgMealPrice;
+                const revenuePerSeat = monthlyRevenue / seats;
+                const primeCost = monthlyFoodCost + monthlyLaborCost;
+                const primePercent = (primeCost / monthlyRevenue) * 100;
+                const laborCostPercent = (monthlyLaborCost / monthlyRevenue) * 100;
+                const fixedCostPercent = (monthlyFixedCosts / monthlyRevenue) * 100;
+                const riskRevenue = monthlyRevenue * 0.8;
+                const riskProfit = riskRevenue - (riskRevenue * foodCostPercent) - monthlyLaborCost - monthlyFixedCosts - monthlyDepreciation;
+                const paybackMonths = (accountingProfit > 0) ? totalInvestment / accountingProfit : Infinity;
+
+                const warnings = [];
+                if (seatDensity < 1.2) warnings.push("⚠️ Seats are too many for the space (high density).");
+                if (seats / employeesCount < 8) warnings.push("⚠️ Number of employees is high relative to seats.");
+                if (primePercent > 65) warnings.push("⚠️ Prime Cost is high (>65%).");
+                if (accountingProfit < 0) warnings.push("🔴 Project is loss-making based on current estimates.");
+                if (monthlyFixedCosts < monthlyRevenue * 0.15) warnings.push("⚠️ Fixed costs are very low (<15% of revenue).");
+                if (laborCostPercent < 15) warnings.push("⚠️ Labor cost percentage is very low (<15%).");
+                if (totalInvestment / seats > 5000) warnings.push("💡 High investment per seat, check the viability.");
+
+                // Technical Score
+                let technicalScore = 0;
+                const requiredAmps = (totalPower * 1000) / 220;
+                if (electricalCapacity >= requiredAmps * 1.2) technicalScore += 40;
+                else if (electricalCapacity >= requiredAmps) technicalScore += 30;
+                else if (electricalCapacity >= requiredAmps * 0.8) technicalScore += 15;
+                else technicalScore += 5;
+
+                if (waterAvailabilityText.includes('Suitable')) technicalScore += 15;
+                else if (waterAvailabilityText.includes('Development')) technicalScore += 5;
+
+                if (ventilationText.includes('Suitable')) technicalScore += 15;
+                else if (ventilationText.includes('Development')) technicalScore += 5;
+
+                if (seatDensity >= 1.2 && seatDensity <= 1.8) technicalScore += 15;
+                else if (seatDensity >= 1.0 && seatDensity < 1.2) technicalScore += 8;
+                else if (seatDensity > 1.8 && seatDensity <= 2.2) technicalScore += 8;
+
+                if (totalSpace <= kitchenArea * 0.5) technicalScore += 15;
+                else if (totalSpace <= kitchenArea * 0.7) technicalScore += 8;
+
+                technicalScore = Math.min(technicalScore, 100);
+                let technicalRating = '', technicalColor = '';
+                if (technicalScore >= 85) { technicalRating = '🟢 Excellent'; technicalColor = 'alert-success'; }
+                else if (technicalScore >= 70) { technicalRating = '🟡 Good'; technicalColor = 'alert-warning'; }
+                else if (technicalScore >= 50) { technicalRating = '🟠 Average'; technicalColor = 'alert-warning'; }
+                else { technicalRating = '🔴 Poor'; technicalColor = 'alert-danger'; }
+
+                // Financial Score
+                let financialScore = 0;
+                if (primePercent <= 55) financialScore += 30;
+                else if (primePercent <= 65) financialScore += 20;
+                else if (primePercent <= 75) financialScore += 10;
+
+                if (accountingProfit > 0) {
+                    const profitMargin = accountingProfit / monthlyRevenue;
+                    if (profitMargin >= 0.2) financialScore += 30;
+                    else if (profitMargin >= 0.1) financialScore += 20;
+                    else if (profitMargin >= 0.05) financialScore += 15;
+                    else financialScore += 10;
+                }
+
+                if (accountingProfit > 0 && totalInvestment > 0) {
+                    if (paybackMonths <= 12) financialScore += 20;
+                    else if (paybackMonths <= 24) financialScore += 15;
+                    else if (paybackMonths <= 36) financialScore += 10;
+                    else financialScore += 5;
+                } else if (accountingProfit <= 0) {
+                    financialScore = Math.max(0, financialScore - 10);
+                }
+
+                const maxMonthlyMeals = maxCustomersDaily * 26;
+                if (breakEvenMeals <= maxMonthlyMeals * 0.5) financialScore += 20;
+                else if (breakEvenMeals <= maxMonthlyMeals * 0.7) financialScore += 15;
+                else if (breakEvenMeals <= maxMonthlyMeals * 0.9) financialScore += 10;
+                else if (breakEvenMeals <= maxMonthlyMeals) financialScore += 5;
+
+                financialScore = Math.min(financialScore, 100);
+                let financialRating = '', financialColor = '';
+                if (financialScore >= 85) { financialRating = '🟢 Excellent'; financialColor = 'alert-success'; }
+                else if (financialScore >= 70) { financialRating = '🟡 Good'; financialColor = 'alert-warning'; }
+                else if (financialScore >= 50) { financialRating = '🟠 Average'; financialColor = 'alert-warning'; }
+                else { financialRating = '🔴 Poor'; financialColor = 'alert-danger'; }
+
+                // Display results
+                document.getElementById('initialMessage').style.display = 'none';
+                document.getElementById('resultsSection').style.display = 'block';
+
+                document.getElementById('kpiCards').innerHTML = `
+                    <div class="result-card"><i class="fas fa-dollar-sign"></i><h4>Monthly Revenue</h4><div class="value">${currency}${Math.round(monthlyRevenue)}</div></div>
+                    <div class="result-card"><i class="fas fa-file-invoice"></i><h4>Net Profit (after depreciation)</h4><div class="value">${currency}${Math.round(accountingProfit)}</div><div class="status ${accountingProfit > 0 ? 'status-good' : 'status-bad'}">${accountingProfit > 0 ? 'Profitable' : 'Losing'}</div></div>
+                    <div class="result-card"><i class="fas fa-chart-line"></i><h4>Break-even Revenue</h4><div class="value">${currency}${Math.round(breakEvenRevenue)}</div></div>
+                    <div class="result-card"><i class="fas fa-hand-holding-usd"></i><h4>Payback Period</h4><div class="value">${paybackMonths === Infinity ? '∞' : paybackMonths.toFixed(1)}</div><div class="unit">Months</div></div>
+                `;
+
+                if (warnings.length > 0) {
+                    document.getElementById('warnings').style.display = 'block';
+                    document.getElementById('warnings').innerHTML = `<strong>⚠️ Warnings:</strong><br>${warnings.join('<br>')}`;
+                    document.getElementById('warnings').className = 'alert alert-warning';
+                } else {
+                    document.getElementById('warnings').style.display = 'none';
+                }
+
+                document.getElementById('projectRatingCard').innerHTML = `
+                    <h3><i class="fas fa-star"></i> Project Evaluation</h3>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;"><h4>Technical Rating</h4><div class="alert ${technicalColor}" style="font-size:1.2rem;">${technicalRating}</div><p>Technical Score: ${technicalScore}/100</p></div>
+                        <div style="flex: 1; min-width: 200px;"><h4>Financial Rating</h4><div class="alert ${financialColor}" style="font-size:1.2rem;">${financialRating}</div><p>Financial Score: ${financialScore}/100</p></div>
+                    </div>
+                `;
+
+                if (financeChart) financeChart.destroy();
+                const ctx1 = document.getElementById('financeChart').getContext('2d');
+                financeChart = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Revenue', 'Food Cost', 'Salaries', 'Fixed Costs', 'Net Profit'],
+                        datasets: [{ label: `Value (${currency})`, data: [monthlyRevenue, monthlyFoodCost, monthlyLaborCost, monthlyFixedCosts, accountingProfit], backgroundColor: ['#28a745', '#ffc107', '#17a2b8', '#fd7e14', '#b8860b'] }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                if (riskChart) riskChart.destroy();
+                const ctx2 = document.getElementById('riskChart').getContext('2d');
+                riskChart = new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Normal', '20% Decline'],
+                        datasets: [{ label: `Net Profit (${currency})`, data: [accountingProfit, riskProfit], backgroundColor: ['#28a745', '#dc3545'] }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                // Store results for export
+                window.lastResults = {
+                    currency, companyName, seats, hoursOpen, totalArea, kitchenPercent, electricalCapacity,
+                    waterAvailabilityText, ventilationText, deliveryAccessText, equipment: getEquipmentData(),
+                    totalPower, equipmentCost, totalSpace, turnoverRate, peakHours, occupancyRate,
+                    avgMealPrice, foodCostPercent, employeesCount, avgSalary, monthlyRent, otherOpCost,
+                    equipmentLife, constructionCost, licensesCost, workingCapital,
+                    kitchenArea, diningArea, seatDensity, maxCustomersDaily, actualCustomersDaily,
+                    monthlyRevenue, monthlyFoodCost, monthlyLaborCost, monthlyFixedCosts,
+                    totalMonthlyExpenses, netProfit, totalInvestment, monthlyDepreciation,
+                    netProfitAfterDepreciation, accountingProfit, contributionPerMeal,
+                    breakEvenMeals, breakEvenRevenue, revenuePerSeat, primeCost, primePercent,
+                    laborCostPercent, fixedCostPercent, riskRevenue, riskProfit, paybackMonths,
+                    warnings, technicalScore, technicalRating, technicalColor,
+                    financialScore, financialRating, financialColor
+                };
+            }
+
+            document.getElementById('calculateBtn').addEventListener('click', calculateAll);
+
+            // ================================================================
+            // ========== Export to Word (Professional) ==========
+            // ================================================================
+            async function exportToWord() {
+                if (document.getElementById('resultsSection').style.display === 'none') {
+                    alert('Please run the analysis first.');
+                    return;
+                }
+                showLoading('Generating professional Word report...', 'Collecting data and charts');
+                try {
+                    const currency = document.getElementById('currencySelect').value;
+                    const companyName = document.getElementById('companyName').value || 'Beneficiary Entity';
+                    const res = window.lastResults;
+                    if (!res) { alert('Please run the analysis first.'); hideLoading(); return; }
+
+                    // Capture charts
+                    const chart1 = document.getElementById('financeChart');
+                    const chart2 = document.getElementById('riskChart');
+                    const [canvas1, canvas2] = await Promise.all([
+                        html2canvas(chart1, { scale: 2, backgroundColor: '#ffffff' }),
+                        html2canvas(chart2, { scale: 2, backgroundColor: '#ffffff' })
+                    ]);
+                    const img1 = canvas1.toDataURL('image/png');
+                    const img2 = canvas2.toDataURL('image/png');
+
+                    // Build input table
+                    const kitchenType = document.getElementById('kitchenType').options[document.getElementById('kitchenType').selectedIndex].text;
+                    const serviceModel = document.getElementById('serviceModel').options[document.getElementById('serviceModel').selectedIndex].text;
+                    const shifts = document.getElementById('shifts').options[document.getElementById('shifts').selectedIndex].text;
+                    const water = document.getElementById('waterAvailability').options[document.getElementById('waterAvailability').selectedIndex].text;
+                    const ventilation = document.getElementById('ventilation').options[document.getElementById('ventilation').selectedIndex].text;
+                    const delivery = document.getElementById('deliveryAccess').options[document.getElementById('deliveryAccess').selectedIndex].text;
+
+                    // Equipment table
+                    let equipHTML = '';
+                    res.equipment.forEach(eq => {
+                        if (eq.name) equipHTML += `<tr><td>${eq.name}</td><td>${eq.power} kW</td><td>${currency} ${eq.cost}</td><td>${eq.space} m²</td></tr>`;
+                    });
+
+                    // KPI cards
+                    const kpiCards = document.querySelectorAll('.result-card');
+                    let kpiRows = ''; let row = ''; let count = 0;
+                    kpiCards.forEach((card, index) => {
+                        const icon = card.querySelector('i') ? card.querySelector('i').outerHTML : '';
+                        const title = card.querySelector('h4') ? card.querySelector('h4').innerText : '';
+                        const value = card.querySelector('.value') ? card.querySelector('.value').innerText : '';
+                        const unit = card.querySelector('.unit') ? card.querySelector('.unit').innerText : '';
+                        const status = card.querySelector('.status') ? card.querySelector('.status').outerHTML : '';
+                        const cell = `<td style="border:1px solid #b8860b; padding:12px; text-align:center; background:#fefcf6;">${icon}<h4 style="margin:0.5rem 0; color:#666;">${title}</h4><div style="font-size:1.6rem; font-weight:900; color:#b8860b;">${value}</div>${unit ? `<div style="font-size:0.9rem; color:#777;">${unit}</div>` : ''}${status ? status.replace(/class="status/g, 'style="margin-top:0.3rem; padding:0.2rem 0.6rem; border-radius:20px; display:inline-block;') : ''}</td>`;
+                        row += cell; count++;
+                        if (count % 2 === 0 || index === kpiCards.length - 1) { kpiRows += `<tr>${row}</tr>`; row = ''; }
+                    });
+
+                    const ratingHTML = document.getElementById('projectRatingCard').innerHTML;
+                    const warningsHTML = document.getElementById('warnings').innerHTML;
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                    const fullHtml = `<!DOCTYPE html>
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                    <head><meta charset='utf-8'><title>Technical Feasibility Report - FAROUK GRUP</title>
+                    <style>
+                        body{font-family:'Arial',sans-serif;direction:ltr;margin:2rem;background:#fff;color:#333;}
+                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
+                        .cover h1{font-size:32px;color:#b8860b;margin:0;}.cover h2{font-size:24px;color:#b48554;margin:5px 0;}
+                        table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
+                        th{background:#fefcf6;color:#b8860b;}
+                        .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
+                        .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
+                    </style></head>
+                    <body>
+                        <div class="cover">
+                            <h1>FAROUK GRUP</h1>
+                            <h2>Advanced Technical Feasibility Study for Restaurants</h2>
+                            <p>Entity: ${companyName} | Date: ${dateStr}</p>
+                            <p>Currency: ${currency}</p>
+                        </div>
+                        <h2 style="color:#b8860b;">Input Data</h2>
+                        <table>
+                            <tr><th>Kitchen Type</th><td>${kitchenType}</td><th>Seats</th><td>${res.seats}</td></tr>
+                            <tr><th>Service Model</th><td>${serviceModel}</td><th>Operating Hours</th><td>${res.hoursOpen} hrs/day</td></tr>
+                            <tr><th>Shifts</th><td>${shifts}</td><th>Total Area</th><td>${res.totalArea} m²</td></tr>
+                            <tr><th>Kitchen %</th><td>${res.kitchenPercent}%</td><th>Electrical Capacity</th><td>${res.electricalCapacity} Amps</td></tr>
+                            <tr><th>Water</th><td>${water}</td><th>Ventilation</th><td>${ventilation}</td></tr>
+                            <tr><th>Delivery Accessibility</th><td>${delivery}</td><th></th><td></td></tr>
+                        </table>
+                        <h3 style="color:#b8860b;">Equipment</h3>
+                        <table><thead><tr><th>Equipment</th><th>Power (kW)</th><th>Cost</th><th>Space (m²)</th></tr></thead><tbody>${equipHTML}</tbody></table>
+                        <h2 style="color:#b8860b;">Key Performance Indicators</h2>
+                        <table>${kpiRows}</table>
+                        ${warningsHTML ? `<div style="background:#fff3cd;padding:15px;border-radius:10px;border-left:4px solid #ffc107;margin:20px 0;">${warningsHTML}</div>` : ''}
+                        <h2 style="color:#b8860b;">📈 Charts</h2>
+                        <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;">
+                            <div style="flex:1;min-width:300px;"><h3>Financial Performance</h3><img src="${img1}" class="chart-img"/></div>
+                            <div style="flex:1;min-width:300px;"><h3>Risk Analysis</h3><img src="${img2}" class="chart-img"/></div>
+                        </div>
+                        <h2 style="color:#b8860b;">💡 Evaluation & Recommendations</h2>
+                        <div style="background:#fefcf6;padding:15px;border-radius:10px;border-left:4px solid #b8860b;">${ratingHTML}</div>
+                        <div class="footer">Generated by FAROUK GRUP © ${now.getFullYear()}</div>
+                    </body></html>`;
+
+                    const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `Technical_Feasibility_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                } catch (error) {
+                    console.error(error);
+                    alert('Error generating Word report');
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ================================================================
+            // ========== Export to Excel (Professional) ==========
+            // ================================================================
+            async function exportToFullExcel() {
+                if (!window.lastResults) {
+                    alert('Please run the analysis first (click "Calculate Technical Study").');
+                    return;
+                }
+                showLoading('Generating professional Excel report...', 'Creating sheets and charts');
+                try {
+                    const res = window.lastResults;
+                    const currency = res.currency;
+                    const companyName = res.companyName;
+
+                    const workbook = new ExcelJS.Workbook();
+                    workbook.creator = 'FAROUK GRUP';
+                    const G = 'FFB48554', GL = 'FFCFA776', DB = 'FF0B0E17', HB = 'FF1A2035', SB = 'FF243050';
+                    const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA', GB = 'FFFFF3CD';
+                    const PT = 'FF155724', NT = 'FF721C24';
+
+                    function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+                    function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+                    function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
+                    function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+
+                    // 1. Cover
+                    const cv = workbook.addWorksheet('Cover Page', { views: [{ showGridLines: false }] });
+                    [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
+                    cv.getRow(2).height=80; cv.getRow(4).height=60;
+                    cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
+                    bc.value='FAROUK GRUP\nConsulting & Business';
+                    bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true};
+                    mh(cv,1,4,4,`Technical Feasibility Study for Restaurants\n${companyName}`,DB,GL,18);
+                    const inf=[['📋 Entity',companyName],['📅 Date',new Date().toLocaleDateString('en-US')],['💰 Currency',currency],['📊 Net Profit',`${currency} ${res.accountingProfit.toFixed(0)}`],['📈 Payback',res.paybackMonths===Infinity?'Undefined':`${res.paybackMonths.toFixed(1)} months`]];
+                    let ir=6;
+                    inf.forEach(([l,v],idx)=>{
+                        cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
+                        const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
+                        const bg=idx%2===0?AR:'FFFEFCF6';
+                        ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                        ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                        cv.getRow(ir).height=28; ir++;
+                    });
+
+                    // 2. Inputs
+                    const inputsSheet = workbook.addWorksheet('Inputs & Assumptions', { views: [{ showGridLines: false }] });
+                    inputsSheet.getColumn(1).width=5; inputsSheet.getColumn(2).width=38; inputsSheet.getColumn(3).width=22; inputsSheet.getColumn(4).width=22; inputsSheet.getColumn(5).width=5;
+                    mh(inputsSheet,1,5,1,'📋 Inputs & Assumptions',DB,GL,14);
+                    inputsSheet.getRow(1).height=40;
+                    mh(inputsSheet,2,4,2,'Project Basic Data',SB,'FFFFFFFF',11);
+                    inputsSheet.getRow(2).height=28;
+                    const inputFields = [
+                        ['Kitchen Type', document.getElementById('kitchenType').options[document.getElementById('kitchenType').selectedIndex].text, ''],
+                        ['Seats', res.seats, ''],
+                        ['Service Model', document.getElementById('serviceModel').options[document.getElementById('serviceModel').selectedIndex].text, ''],
+                        ['Daily Operating Hours', res.hoursOpen, 'hrs'],
+                        ['Shifts', document.getElementById('shifts').options[document.getElementById('shifts').selectedIndex].text, ''],
+                        ['Total Area', res.totalArea, 'm²'],
+                        ['Kitchen Area %', res.kitchenPercent, '%'],
+                        ['Electrical Capacity', res.electricalCapacity, 'Amps'],
+                        ['Water Supply', res.waterAvailabilityText, ''],
+                        ['Ventilation', res.ventilationText, ''],
+                        ['Delivery Accessibility', res.deliveryAccessText, ''],
+                        ['Equipment Count', res.equipment.length, ''],
+                        ['Total Equipment Power', res.totalPower, 'kW'],
+                        ['Total Equipment Cost', `${currency} ${res.equipmentCost.toFixed(0)}`, ''],
+                        ['Equipment Space', res.totalSpace, 'm²'],
+                        ['Table Turnover Rate', res.turnoverRate, ''],
+                        ['Peak Hours', res.peakHours, ''],
+                        ['Occupancy Rate', res.occupancyRate*100, '%'],
+                        ['Avg Meal Price', `${currency} ${res.avgMealPrice}`, ''],
+                        ['Food Cost %', res.foodCostPercent*100, '%'],
+                        ['Employees', res.employeesCount, ''],
+                        ['Avg Salary', `${currency} ${res.avgSalary}`, ''],
+                        ['Monthly Rent', `${currency} ${res.monthlyRent}`, ''],
+                        ['Other OPEX', `${currency} ${res.otherOpCost}`, ''],
+                        ['Equipment Life', res.equipmentLife, 'years'],
+                        ['Fit-out Cost', `${currency} ${res.constructionCost}`, ''],
+                        ['Licenses', `${currency} ${res.licensesCost}`, ''],
+                        ['Working Capital', `${currency} ${res.workingCapital}`, '']
+                    ];
+                    let iRow=3;
+                    inputFields.forEach(([label,val,note],idx)=>{
+                        inputsSheet.getRow(iRow).height=24;
+                        const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+                        const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
+                        lc.value=label; vc.value=val; nc.value=note;
+                        ap(lc,cs(bg,DT,true,'left'));
+                        ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?'#,##0':null});
+                        ap(nc,cs(bg,'00695C',false,'center'));
+                        iRow++;
+                    });
+
+                    // 3. KPIs
+                    const kpiSheet = workbook.addWorksheet('KPIs', { views: [{ showGridLines: false }] });
+                    [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
+                    mh(kpiSheet,1,6,1,'📊 KPI Dashboard',DB,GL,15);
+                    kpiSheet.getRow(1).height=45;
+                    mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('en-US')}`,HB,'FFFFFFFF',10);
+                    kpiSheet.getRow(2).height=26;
+                    const kpis = [
+                        { label: 'Monthly Revenue', value: `${currency} ${Math.round(res.monthlyRevenue)}`, good: true },
+                        { label: 'Net Profit', value: `${currency} ${Math.round(res.accountingProfit)}`, good: res.accountingProfit>0 },
+                        { label: 'Break-even Revenue', value: `${currency} ${Math.round(res.breakEvenRevenue)}`, good: true },
+                        { label: 'Payback Period', value: res.paybackMonths===Infinity?'Undefined':`${res.paybackMonths.toFixed(1)} months`, good: res.paybackMonths<24 },
+                        { label: 'Prime Cost', value: `${res.primePercent.toFixed(1)}%`, good: res.primePercent<65 },
+                        { label: 'Profit Margin', value: `${((res.accountingProfit/res.monthlyRevenue)*100).toFixed(1)}%`, good: res.accountingProfit>0 }
+                    ];
+                    let kRow=3;
+                    kpis.forEach((k,idx)=>{
+                        kpiSheet.getRow(kRow).height=40;
+                        kpiSheet.mergeCells(kRow,2,kRow,2); kpiSheet.mergeCells(kRow,3,kRow,3); kpiSheet.mergeCells(kRow,4,kRow,4); kpiSheet.mergeCells(kRow,5,kRow,5);
+                        const ic=kpiSheet.getCell(kRow,2); ic.value=`🔹 ${idx+1}`;
+                        const lc2=kpiSheet.getCell(kRow,3); lc2.value=k.label;
+                        const vc3=kpiSheet.getCell(kRow,4); vc3.value=k.value;
+                        const nc2=kpiSheet.getCell(kRow,5); nc2.value='';
+                        const bg=k.good?PB:NB, tc=k.good?PT:NT;
+                        [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
+                        ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
+                        lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'left',vertical:'middle'};
+                        vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
+                        kRow++;
+                    });
+                    kRow++;
+                    kpiSheet.mergeCells(kRow,2,kRow,5);
+                    const kFinal=kpiSheet.getCell(kRow,2);
+                    kFinal.value=res.accountingProfit>0?'✅ Project is feasible (positive profit)':'⚠️ Project is not feasible (loss)';
+                    kFinal.font={name:'Arial',bold:true,size:13,color:{argb:res.accountingProfit>0?PT:'856404'}};
+                    kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:res.accountingProfit>0?PB:GB}};
+                    kFinal.alignment={horizontal:'center',vertical:'middle'};
+                    kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
+                    kpiSheet.getRow(kRow).height=40;
+
+                    // 4. Summary
+                    const summarySheet = workbook.addWorksheet('Financial Summary', { views: [{ showGridLines: false }] });
+                    summarySheet.getColumn(1).width=5; summarySheet.getColumn(2).width=35; summarySheet.getColumn(3).width=25; summarySheet.getColumn(4).width=25; summarySheet.getColumn(5).width=5;
+                    mh(summarySheet,1,5,1,'📋 Financial & Technical Summary',DB,GL,14);
+                    summarySheet.getRow(1).height=40;
+                    const summData = [
+                        ['Total Investment', `${currency} ${res.totalInvestment.toFixed(0)}`, '', ''],
+                        ['Monthly Revenue', `${currency} ${res.monthlyRevenue.toFixed(0)}`, 'Technical Rating', `${res.technicalScore}/100 (${res.technicalRating})`],
+                        ['Total Monthly Costs', `${currency} ${res.totalMonthlyExpenses.toFixed(0)}`, 'Financial Rating', `${res.financialScore}/100 (${res.financialRating})`],
+                        ['Net Profit', `${currency} ${res.accountingProfit.toFixed(0)}`, 'Break-even Revenue', `${currency} ${res.breakEvenRevenue.toFixed(0)}`],
+                        ['Payback Period', res.paybackMonths===Infinity?'Undefined':`${res.paybackMonths.toFixed(1)} months`, 'Margin of Safety', `${((res.monthlyRevenue - res.breakEvenRevenue) / res.monthlyRevenue * 100).toFixed(1)}%`]
+                    ];
+                    let sRow=2;
+                    summData.forEach(([l1,v1,l2,v2],idx)=>{
+                        summarySheet.getRow(sRow).height=30;
+                        const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
+                        const c1=summarySheet.getCell(sRow,2); c1.value=l1; ap(c1,cs(bg,DT,true,'left'));
+                        const c2=summarySheet.getCell(sRow,3); c2.value=v1; ap(c2,{...cs(bg,'0000FF',false,'center'),numFmt:typeof v1==='number'?'#,##0':null});
+                        if(l2){ const c3=summarySheet.getCell(sRow,4); c3.value=l2; ap(c3,cs(bg,DT,true,'left'));
+                        const c4=summarySheet.getCell(sRow,5); c4.value=v2; ap(c4,cs(bg,'00695C',false,'center')); }
+                        sRow++;
+                    });
+
+                    // 5. Charts
+                    const chartsSheet = workbook.addWorksheet('Charts', { views: [{ showGridLines: false }] });
+                    chartsSheet.getColumn(1).width=5; chartsSheet.getColumn(2).width=50; chartsSheet.getColumn(3).width=5;
+                    mh(chartsSheet,1,3,1,'📊 Project Charts',DB,GL,14);
+                    chartsSheet.getRow(1).height=40;
+                    const chartContainer = document.querySelectorAll('.chart-container');
+                    if (chartContainer.length) {
+                        try {
+                            const parent = chartContainer[0].parentElement;
+                            const origBg = parent.style.backgroundColor;
+                            parent.style.backgroundColor = '#ffffff';
+                            const canvasImg = await html2canvas(parent, { scale: 2, backgroundColor: '#ffffff' });
+                            parent.style.backgroundColor = origBg;
+                            const imgData = canvasImg.toDataURL('image/png');
+                            const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
+                            chartsSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2, row: 28 }, editAs: 'oneCell' });
+                        } catch (err) {}
+                    }
+
+                    // 6. Evaluation
+                    const evalSheet = workbook.addWorksheet('Evaluation & Recommendations', { views: [{ showGridLines: false }] });
+                    evalSheet.getColumn(1).width=5; evalSheet.getColumn(2).width=50; evalSheet.getColumn(3).width=5;
+                    mh(evalSheet,1,3,1,'📝 Evaluation & Recommendations',DB,GL,14);
+                    evalSheet.getRow(1).height=45;
+                    const warningsText = res.warnings && res.warnings.length ? res.warnings.join('\n') : 'No warnings currently.';
+                    const sections = [
+                        { title: '1. Technical & Financial Assessment', content: `Technical Score: ${res.technicalScore}/100 (${res.technicalRating})\nFinancial Score: ${res.financialScore}/100 (${res.financialRating})` },
+                        { title: '2. Warnings', content: warningsText },
+                        { title: '3. Recommendations', content: res.accountingProfit>0 ? '• Project is technically and financially viable.\n• Monitor Prime Cost to maintain profitability.\n• Ensure working capital is available.' : '• Project is not viable as is.\n• Explore cost reduction or revenue increase.\n• Reassess assumptions (occupancy, prices, costs).' },
+                        { title: '4. Disclaimer', content: 'This analysis is based on estimated assumptions. Actual results may vary. Professional financial and technical advice is recommended.' }
+                    ];
+                    let itRow=2;
+                    sections.forEach((sec,idx)=>{
+                        itRow++;
+                        evalSheet.getRow(itRow).height=30;
+                        evalSheet.mergeCells(itRow,2,itRow,2);
+                        const tc3=evalSheet.getCell(itRow,2);
+                        tc3.value=sec.title;
+                        tc3.font={name:'Arial',bold:true,size:12,color:{argb:GL}};
+                        tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?HB:SB}};
+                        tc3.alignment={horizontal:'left',vertical:'middle'};
+                        tc3.border={bottom:{style:'medium',color:{argb:G}}};
+                        itRow++;
+                        evalSheet.getRow(itRow).height=Math.max(60, sec.content.split('\n').length*18);
+                        evalSheet.mergeCells(itRow,2,itRow,2);
+                        const cc=evalSheet.getCell(itRow,2);
+                        cc.value=sec.content;
+                        cc.font={name:'Arial',size:10,color:{argb:DT}};
+                        cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};
+                        cc.alignment={horizontal:'left',vertical:'top',wrapText:true};
+                        cc.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
+                    });
+
+                    const buffer = await workbook.xlsx.writeBuffer();
+                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    const now = new Date();
+                    const fileName = `Technical_Feasibility_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+                    saveAs(blob, fileName);
+                } catch(err) {
+                    console.error(err);
+                    alert('Excel Error: ' + err.message);
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+            document.getElementById('exportFullExcelBtn').addEventListener('click', exportToFullExcel);
+
+            // Initial power alert
+            updatePowerAlert();
+
+        })();
+    </script>
+</body>
+</html>
