@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="htmlTag">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>التسجيل أو تجديد الاشتراك | المنصة الشاملة - FAROUK GRUP</title>
+    <title id="metaTitle">التسجيل أو تجديد الاشتراك | المنصة الشاملة - FAROUK GRUP</title>
     <meta name="description" content="اشتراك جديد أو تجديد اشتراكك في المنصة الشاملة من مجموعة فاروق.">
     <meta name="robots" content="noindex, follow">
 
@@ -15,7 +15,6 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
-        /* ===== نفس أنماط الصفحة السابقة مع إزالة الاسم من التجديد ===== */
         :root {
             --gold: #b8860b;
             --gold-light: #d4b15a;
@@ -79,6 +78,97 @@
             0%, 100% { transform: translate(0,0) scale(1); }
             33% { transform: translate(30px, -25px) scale(1.08); }
             66% { transform: translate(-20px, 20px) scale(0.94); }
+        }
+
+        /* ===== شاشة اختيار اللغة ===== */
+        .lang-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(6, 9, 15, 0.95);
+            backdrop-filter: blur(15px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+            transition: opacity 0.4s ease;
+        }
+        .lang-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .lang-box {
+            background: rgba(15, 20, 30, 0.9);
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            border-radius: 30px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+            position: relative;
+        }
+        .lang-box h2 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.8rem;
+            color: var(--gold-light);
+            margin-bottom: 0.5rem;
+        }
+        .lang-box p {
+            color: #bcc4d0;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+        .lang-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .lang-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 50px;
+            border: 1px solid rgba(184, 134, 11, 0.4);
+            background: rgba(184, 134, 11, 0.1);
+            color: var(--gold-light);
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .lang-btn:hover {
+            background: rgba(184, 134, 11, 0.3);
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(184, 134, 11, 0.3);
+        }
+
+        /* زر تغيير اللغة العلوي السريع */
+        .lang-switcher-top {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            z-index: 10;
+            background: rgba(18, 24, 36, 0.75);
+            backdrop-filter: blur(12px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 1px solid rgba(184, 134, 11, 0.25);
+            color: var(--gold-light);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.35s ease;
+            font-family: 'Tajawal', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .lang-switcher-top:hover {
+            background: rgba(184, 134, 11, 0.2);
+            border-color: var(--gold);
+            color: #fff;
         }
 
         .mini-nav {
@@ -295,7 +385,7 @@
             font-weight: 700;
         }
 
-        /* ===== أنماط المودالات (بدون حقل الاسم في التجديد) ===== */
+        /* ===== أنماط المودالات ===== */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -356,7 +446,7 @@
         }
         .field-group {
             margin-bottom: 1.2rem;
-            text-align: right;
+            text-align: start; /* يتغير ديناميكياً مع الاتجاه */
         }
         .field-group label {
             display: block;
@@ -385,12 +475,12 @@
         .password-group {
             position: relative;
         }
-        .password-group input {
-            padding-left: 45px;
-        }
+        /* اتجاه زر إظهار كلمة المرور حسب اللغة */
+        html[dir="rtl"] .toggle-pass-modal { left: 10px; right: auto; }
+        html[dir="ltr"] .toggle-pass-modal { right: 10px; left: auto; }
+
         .toggle-pass-modal {
             position: absolute;
-            left: 10px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
@@ -435,7 +525,7 @@
         .strength-text {
             font-size: 0.7rem;
             margin-top: 2px;
-            text-align: left;
+            text-align: start;
             color: #8895a7;
             min-height: 1.2em;
         }
@@ -529,19 +619,32 @@
             .mini-nav { top: 10px; right: 10px; }
             .mini-nav .logo-sm { font-size: 0.8rem; padding: 6px 12px; }
             .mini-nav .logo-sm img { height: 22px; }
-        }
-        @media (max-width: 380px) {
-            .sub-title { font-size: 1.5rem; }
-            .sub-card { padding: 1.6rem 1rem; }
+            .lang-switcher-top { top: 10px; left: 10px; font-size: 0.8rem; padding: 6px 12px; }
         }
     </style>
 </head>
 <body>
 
+    <!-- ===== شاشة اختيار اللغة عند فتح الصفحة لأول مرة ===== -->
+    <div class="lang-overlay" id="langSelectionModal">
+        <div class="lang-box">
+            <h2>اللغة language </h2>
+            <div class="lang-buttons">
+                <button class="lang-btn" onclick="setLanguage('ar')">العربية</button>
+                <button class="lang-btn" onclick="setLanguage('en')">English</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- زر تبديل اللغة العلوي السريع -->
+    <button class="lang-switcher-top" id="langSwitcherBtn" onclick="toggleLanguage()">
+        <i class="fas fa-globe"></i> <span id="langSwitcherText">English</span>
+    </button>
+
     <div class="mini-nav" data-aos="fade-down" data-aos-duration="700">
         <a href="https://www.farouk-grup.com/" target="_blank" class="logo-sm">
             <img src="https://lh3.googleusercontent.com/d/1e6u-DPTinDJl_Q9wW3QvGgzFbXO_2sXa" alt="FAROUK GRUP LOGO">
-            <span>مجموعة فاروق للإستشارات والأعمال</span>
+            <span id="companyNameText">مجموعة فاروق للإستشارات والأعمال</span>
         </a>
     </div>
 
@@ -550,45 +653,45 @@
             <i class="fas fa-layer-group"></i>
         </div>
 
-        <h1 class="sub-title">المنصة الشاملة</h1>
-        <p class="sub-desc">اختر أحد الخيارين للبدء</p>
+        <h1 class="sub-title" id="mainTitleText">المنصة الشاملة</h1>
+        <p class="sub-desc" id="mainDescText">اختر أحد الخيارين للبدء</p>
 
         <div class="action-buttons">
             <button class="action-btn primary" id="openRegisterModalBtn">
-                <i class="fas fa-user-plus"></i> اشتراك جديد
+                <i class="fas fa-user-plus"></i> <span id="btnRegText">اشتراك جديد</span>
             </button>
             <button class="action-btn renew" id="openRenewModalBtn">
-                <i class="fas fa-sync-alt"></i> تجديد الاشتراك
+                <i class="fas fa-sync-alt"></i> <span id="btnRenewText">تجديد الاشتراك</span>
             </button>
         </div>
 
         <div class="divider"></div>
 
-        <div class="login-alt">
-            لديك حساب بالفعل؟ <a href="index.html" target="_blank">تسجيل الدخول</a>
+        <div class="login-alt" id="loginAltText">
+            لديك حساب بالفعل؟ <a href="index.html" target="_blank" id="loginLinkText">تسجيل الدخول</a>
         </div>
     </div>
 
-    <div class="mini-footer">
+    <div class="mini-footer" id="footerText">
         جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span> &mdash; إسطنبول، تركيا
     </div>
 
     <!-- ===== مودال اشتراك جديد ===== -->
     <div class="modal-overlay" id="registerModal">
         <div class="modal-box">
-            <h3><i class="fas fa-user-plus"></i> اشتراك جديد</h3>
+            <h3 id="regModalTitle"><i class="fas fa-user-plus"></i> اشتراك جديد</h3>
             <form id="registerForm">
                 <div class="field-group">
-                    <label>الاسم الكامل (اختياري)</label>
+                    <label id="labelRegName">الاسم الكامل (اختياري)</label>
                     <input type="text" id="regFullName" placeholder="الاسم الكامل">
                 </div>
                 <div class="field-group">
-                    <label>البريد الإلكتروني</label>
+                    <label id="labelRegEmail">البريد الإلكتروني</label>
                     <input type="email" id="regEmail" placeholder="example@gmail.com" required inputmode="email" autocomplete="email">
-                    <div class="domain-hint"><i class="fas fa-shield-alt"></i> نطاقات مسموحة: gmail.com, yahoo.com, outlook.com ...</div>
+                    <div class="domain-hint" id="hintRegDomains"><i class="fas fa-shield-alt"></i> نطاقات مسموحة: gmail.com, yahoo.com, outlook.com ...</div>
                 </div>
                 <div class="field-group password-group">
-                    <label>كلمة المرور</label>
+                    <label id="labelRegPass">كلمة المرور</label>
                     <input type="password" id="regPassword" placeholder="كلمة المرور (6 أحرف على الأقل)" required minlength="6" autocomplete="new-password">
                     <button type="button" class="toggle-pass-modal" id="toggleRegPass" tabindex="-1" aria-label="إظهار كلمة المرور">
                         <i class="fas fa-eye" id="regEyeIcon"></i>
@@ -597,45 +700,45 @@
                     <div class="strength-text" id="regStrengthText"></div>
                 </div>
                 <button type="submit" class="btn-modal" id="regSubmitBtn">
-                    <i class="fas fa-check-circle"></i> إنشاء الحساب
+                    <i class="fas fa-check-circle"></i> <span id="btnRegSubmitText">إنشاء الحساب</span>
                 </button>
             </form>
             <div id="regMsgBox" class="msg-box"></div>
             <div style="text-align:center; margin-top:12px;">
-                <button class="btn-close" onclick="closeModals()"><i class="fas fa-times"></i> إلغاء</button>
+                <button class="btn-close" onclick="closeModals()"><i class="fas fa-times"></i> <span id="btnCloseReg">إلغاء</span></button>
             </div>
         </div>
     </div>
 
-    <!-- ===== مودال تجديد الاشتراك (بدون حقل الاسم الكامل) ===== -->
+    <!-- ===== مودال تجديد الاشتراك ===== -->
     <div class="modal-overlay" id="renewModal">
         <div class="modal-box">
-            <h3><i class="fas fa-sync-alt"></i> تجديد الاشتراك</h3>
+            <h3 id="renewModalTitle"><i class="fas fa-sync-alt"></i> تجديد الاشتراك</h3>
             <form id="renewForm">
                 <div class="field-group">
-                    <label>معرّف العملية (رقم الدفع)</label>
+                    <label id="labelRenewTx">معرّف العملية (رقم الدفع)</label>
                     <input type="text" id="renewTxId" placeholder="أدخل 8 أرقام على الأقل" required minlength="8">
-                    <div class="tx-id-hint"><i class="fas fa-info-circle"></i> يجب أن يكون 8 أرقام أو أكثر</div>
+                    <div class="tx-id-hint" id="hintRenewTx"><i class="fas fa-info-circle"></i> يجب أن يكون 8 أرقام أو أكثر</div>
                 </div>
                 <div class="field-group">
-                    <label>البريد الإلكتروني</label>
+                    <label id="labelRenewEmail">البريد الإلكتروني</label>
                     <input type="email" id="renewEmail" placeholder="بريدك المسجل" required inputmode="email" autocomplete="email">
-                    <div class="domain-hint"><i class="fas fa-shield-alt"></i> نطاقات مسموحة: gmail.com, yahoo.com, outlook.com ...</div>
+                    <div class="domain-hint" id="hintRenewDomains"><i class="fas fa-shield-alt"></i> نطاقات مسموحة: gmail.com, yahoo.com, outlook.com ...</div>
                 </div>
                 <div class="field-group password-group">
-                    <label>كلمة المرور</label>
+                    <label id="labelRenewPass">كلمة المرور</label>
                     <input type="password" id="renewPassword" placeholder="كلمة المرور" required autocomplete="current-password">
                     <button type="button" class="toggle-pass-modal" id="toggleRenewPass" tabindex="-1" aria-label="إظهار كلمة المرور">
                         <i class="fas fa-eye" id="renewEyeIcon"></i>
                     </button>
                 </div>
                 <button type="submit" class="btn-modal" id="renewSubmitBtn">
-                    <i class="fas fa-sync-alt"></i> تجديد الاشتراك
+                    <i class="fas fa-sync-alt"></i> <span id="btnRenewSubmitText">تجديد الاشتراك</span>
                 </button>
             </form>
             <div id="renewMsgBox" class="msg-box"></div>
             <div style="text-align:center; margin-top:12px;">
-                <button class="btn-close" onclick="closeModals()"><i class="fas fa-times"></i> إلغاء</button>
+                <button class="btn-close" onclick="closeModals()"><i class="fas fa-times"></i> <span id="btnCloseRenew">إلغاء</span></button>
             </div>
         </div>
     </div>
@@ -644,17 +747,145 @@
     <script>
         AOS.init({ duration: 700, once: true, offset: 50 });
 
-        // ===== رابط السيرفر  =====
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzPFb6DfaOU-OMW1THliE5Gf-atnTET0sb0mE4hPccpYhDwM-q9InioDpkN_DfIYQyC/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbywsH3-7IghfhpRAkKWCmzlsJeSb6Ba0-ut3vd8Z_Qkn4G1vJICJ2pYI6FeeGVfRp2Y/exec';
 
-        // ===== النطاقات المسموحة =====
         const ALLOWED_DOMAINS = [
             'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'live.com',
             'icloud.com', 'proton.me', 'protonmail.com', 'zoho.com', 'mail.com',
             'aol.com', 'yandex.com', 'msn.com', 'me.com', 'mac.com'
         ];
 
-        // ===== دوال فتح وإغلاق المودالات =====
+        // قاموس الترجمات الكامل
+        const translations = {
+            ar: {
+                dir: 'rtl',
+                langSwitchLabel: 'English',
+                metaTitle: 'التسجيل أو تجديد الاشتراك | المنصة الشاملة - FAROUK GRUP',
+                companyName: 'مجموعة فاروق للإستشارات والأعمال',
+                mainTitle: 'المنصة الشاملة',
+                mainDesc: 'اختر أحد الخيارين للبدء',
+                btnReg: 'اشتراك جديد',
+                btnRenew: 'تجديد الاشتراك',
+                loginAlt: 'لديك حساب بالفعل؟ <a href="index.html" target="_blank">تسجيل الدخول</a>',
+                footer: 'جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span> &mdash; إسطنبول، تركيا',
+                
+                regModalTitle: 'اشتراك جديد',
+                labelRegName: 'الاسم الكامل (اختياري)',
+                placeholderRegName: 'الاسم الكامل',
+                labelRegEmail: 'البريد الإلكتروني',
+                hintRegDomains: 'نطاقات مسموحة: gmail.com, yahoo.com, outlook.com ...',
+                labelRegPass: 'كلمة المرور',
+                placeholderRegPass: 'كلمة المرور (6 أحرف على الأقل)',
+                btnRegSubmit: 'إنشاء الحساب',
+                btnCloseReg: 'إلغاء',
+                strengthWeak: 'ضعيفة – أضف أحرفاً كبيرة وأرقاماً ورموزاً',
+                strengthMedium: 'متوسطة – كلمة مرور مقبولة',
+                strengthStrong: 'قوية – كلمة مرور ممتازة',
+
+                renewModalTitle: 'تجديد الاشتراك',
+                labelRenewTx: 'معرّف العملية (رقم الدفع)',
+                placeholderRenewTx: 'أدخل 8 أرقام على الأقل',
+                hintRenewTx: 'يجب أن يكون 8 أرقام أو أكثر',
+                labelRenewEmail: 'البريد الإلكتروني',
+                placeholderRenewEmail: 'بريدك المسجل',
+                hintRenewDomains: 'نطاقات مسموحة: gmail.com, yahoo.com, outlook.com ...',
+                labelRenewPass: 'كلمة المرور',
+                placeholderRenewPass: 'كلمة المرور',
+                btnRenewSubmit: 'تجديد الاشتراك',
+                btnCloseRenew: 'إلغاء'
+            },
+            en: {
+                dir: 'ltr',
+                langSwitchLabel: 'العربية',
+                metaTitle: 'Registration or Renewal | Comprehensive Platform - FAROUK GRUP',
+                companyName: 'Farouk Group for Consulting & Business',
+                mainTitle: 'Comprehensive Platform',
+                mainDesc: 'Choose one of the options to get started',
+                btnReg: 'New Subscription',
+                btnRenew: 'Renew Subscription',
+                loginAlt: 'Already have an account? <a href="index.html" target="_blank">Log In</a>',
+                footer: 'All Rights Reserved © 2026 <span>FAROUK GRUP</span> &mdash; Istanbul, Turkey',
+                
+                regModalTitle: 'New Subscription',
+                labelRegName: 'Full Name (Optional)',
+                placeholderRegName: 'Full Name',
+                labelRegEmail: 'Email Address',
+                hintRegDomains: 'Allowed domains: gmail.com, yahoo.com, outlook.com ...',
+                labelRegPass: 'Password',
+                placeholderRegPass: 'Password (at least 6 characters)',
+                btnRegSubmit: 'Create Account',
+                btnCloseReg: 'Cancel',
+                strengthWeak: 'Weak – Add uppercase letters, numbers & symbols',
+                strengthMedium: 'Medium – Acceptable password',
+                strengthStrong: 'Strong – Excellent password',
+
+                renewModalTitle: 'Renew Subscription',
+                labelRenewTx: 'Transaction ID (Payment Number)',
+                placeholderRenewTx: 'Enter at least 8 digits',
+                hintRenewTx: 'Must be 8 digits or more',
+                labelRenewEmail: 'Email Address',
+                placeholderRenewEmail: 'Your registered email',
+                hintRenewDomains: 'Allowed domains: gmail.com, yahoo.com, outlook.com ...',
+                labelRenewPass: 'Password',
+                placeholderRenewPass: 'Password',
+                btnRenewSubmit: 'Renew Subscription',
+                btnCloseRenew: 'Cancel'
+            }
+        };
+
+        let currentLang = 'ar';
+
+        // دالة تعيين اللغة وتطبيقها
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+
+            document.getElementById('htmlTag').setAttribute('lang', lang);
+            document.getElementById('htmlTag').setAttribute('dir', t.dir);
+            document.getElementById('langSwitcherText').textContent = t.langSwitchLabel;
+            document.getElementById('metaTitle').textContent = t.metaTitle;
+            document.getElementById('companyNameText').textContent = t.companyName;
+            document.getElementById('mainTitleText').textContent = t.mainTitle;
+            document.getElementById('mainDescText').textContent = t.mainDesc;
+            document.getElementById('btnRegText').textContent = t.btnReg;
+            document.getElementById('btnRenewText').textContent = t.btnRenew;
+            document.getElementById('loginAltText').innerHTML = t.loginAlt;
+            document.getElementById('footerText').innerHTML = t.footer;
+
+            // المودالات
+            document.getElementById('regModalTitle').innerHTML = `<i class="fas fa-user-plus"></i> ${t.regModalTitle}`;
+            document.getElementById('labelRegName').textContent = t.labelRegName;
+            document.getElementById('regFullName').placeholder = t.placeholderRegName;
+            document.getElementById('labelRegEmail').textContent = t.labelRegEmail;
+            document.getElementById('hintRegDomains').innerHTML = `<i class="fas fa-shield-alt"></i> ${t.hintRegDomains}`;
+            document.getElementById('labelRegPass').textContent = t.labelRegPass;
+            document.getElementById('regPassword').placeholder = t.placeholderRegPass;
+            document.getElementById('btnRegSubmitText').textContent = t.btnRegSubmit;
+            document.getElementById('btnCloseReg').textContent = t.btnCloseReg;
+
+            document.getElementById('renewModalTitle').innerHTML = `<i class="fas fa-sync-alt"></i> ${t.renewModalTitle}`;
+            document.getElementById('labelRenewTx').textContent = t.labelRenewTx;
+            document.getElementById('renewTxId').placeholder = t.placeholderRenewTx;
+            document.getElementById('hintRenewTx').innerHTML = `<i class="fas fa-info-circle"></i> ${t.hintRenewTx}`;
+            document.getElementById('labelRenewEmail').textContent = t.labelRenewEmail;
+            document.getElementById('renewEmail').placeholder = t.placeholderRenewEmail;
+            document.getElementById('hintRenewDomains').innerHTML = `<i class="fas fa-shield-alt"></i> ${t.hintRenewDomains}`;
+            document.getElementById('labelRenewPass').textContent = t.labelRenewPass;
+            document.getElementById('renewPassword').placeholder = t.placeholderRenewPass;
+            document.getElementById('btnRenewSubmitText').textContent = t.btnRenewSubmit;
+            document.getElementById('btnCloseRenew').textContent = t.btnCloseRenew;
+
+            // إخفاء شاشة الاختيار الأولية
+            document.getElementById('langSelectionModal').classList.add('hidden');
+        }
+
+        // دالة التبديل السريع من الزر العلوي
+        function toggleLanguage() {
+            const newLang = currentLang === 'ar' ? 'en' : 'ar';
+            setLanguage(newLang);
+        }
+
+        // دوال المودالات والأمان
         function openRegisterModal() {
             document.getElementById('registerModal').classList.add('active');
             document.getElementById('regFullName').value = '';
@@ -668,7 +899,6 @@
             document.getElementById('regEyeIcon').className = 'fas fa-eye';
             document.getElementById('regPassword').type = 'password';
             document.getElementById('regSubmitBtn').disabled = false;
-            document.getElementById('regSubmitBtn').innerHTML = '<i class="fas fa-check-circle"></i> إنشاء الحساب';
         }
 
         function openRenewModal() {
@@ -681,25 +911,21 @@
             document.getElementById('renewEyeIcon').className = 'fas fa-eye';
             document.getElementById('renewPassword').type = 'password';
             document.getElementById('renewSubmitBtn').disabled = false;
-            document.getElementById('renewSubmitBtn').innerHTML = '<i class="fas fa-sync-alt"></i> تجديد الاشتراك';
         }
 
         function closeModals() {
             document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active'));
         }
 
-        // ربط الأزرار
         document.getElementById('openRegisterModalBtn').addEventListener('click', openRegisterModal);
         document.getElementById('openRenewModalBtn').addEventListener('click', openRenewModal);
 
-        // إغلاق المودال عند الضغط على الخلفية
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', function(e) {
                 if (e.target === this) closeModals();
             });
         });
 
-        // ===== إظهار/إخفاء كلمة المرور =====
         document.getElementById('toggleRegPass').addEventListener('click', function() {
             const field = document.getElementById('regPassword');
             const icon = document.getElementById('regEyeIcon');
@@ -716,7 +942,6 @@
             icon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
         });
 
-        // ===== مؤشر قوة كلمة المرور =====
         document.getElementById('regPassword').addEventListener('input', function() {
             const val = this.value;
             const bar = document.getElementById('regStrengthBar');
@@ -731,12 +956,13 @@
             if (/[a-z]/.test(val)) score++;
             if (/[0-9]/.test(val)) score++;
             if (/[^A-Za-z0-9]/.test(val)) score++;
-            if (score <= 2) { bar.classList.add('strength-weak'); txt.textContent = 'ضعيفة – أضف أحرفاً كبيرة وأرقاماً ورموزاً'; txt.style.color = '#ef4444'; }
-            else if (score <= 4) { bar.classList.add('strength-medium'); txt.textContent = 'متوسطة – كلمة مرور مقبولة'; txt.style.color = '#f59e0b'; }
-            else { bar.classList.add('strength-strong'); txt.textContent = 'قوية – كلمة مرور ممتازة'; txt.style.color = '#10b981'; }
+            
+            const t = translations[currentLang];
+            if (score <= 2) { bar.classList.add('strength-weak'); txt.textContent = t.strengthWeak; txt.style.color = '#ef4444'; }
+            else if (score <= 4) { bar.classList.add('strength-medium'); txt.textContent = t.strengthMedium; txt.style.color = '#f59e0b'; }
+            else { bar.classList.add('strength-strong'); txt.textContent = t.strengthStrong; txt.style.color = '#10b981'; }
         });
 
-        // ===== دوال مساعدة =====
         function validateEmail(email) {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
@@ -745,10 +971,10 @@
             return parts.length === 2 ? parts[1].toLowerCase().trim() : '';
         }
 
-        // ===== دالة عامة لإرسال الطلب (نفس طريقة الكود القديم) =====
         async function sendYearlyRequest(formData, btn, msgBox, successCallback) {
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري التفعيل...';
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> ' + (currentLang === 'ar' ? 'جاري التفعيل...' : 'Activating...');
             msgBox.style.display = 'none';
             msgBox.className = 'msg-box';
 
@@ -763,29 +989,30 @@
                 msgBox.style.display = 'block';
                 if (data.status === 'success') {
                     msgBox.className = 'msg-box success';
+                    const loginText = currentLang === 'ar' ? 'اذهب إلى تسجيل الدخول' : 'Go to Login';
                     msgBox.innerHTML = `<i class="fas fa-check-circle"></i> ${data.message}<br>
-                        <a href="${data.loginUrl || 'index.html'}" target="_blank" class="login-link">اذهب إلى تسجيل الدخول</a>`;
+                        <a href="${data.loginUrl || 'index.html'}" target="_blank" class="login-link">${loginText}</a>`;
                     if (successCallback) successCallback();
                 } else if (data.status === 'exists') {
                     msgBox.className = 'msg-box exists';
+                    const renewText = currentLang === 'ar' ? 'اضغط هنا لتجديد الاشتراك' : 'Click here to renew subscription';
                     msgBox.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${data.message}<br>
-                        <a href="${data.renewLink || '#'}" target="_blank" class="renew-link">اضغط هنا لتجديد الاشتراك</a>`;
+                        <a href="${data.renewLink || '#'}" target="_blank" class="renew-link">${renewText}</a>`;
                 } else {
                     msgBox.className = 'msg-box error';
-                    msgBox.textContent = '❌ ' + (data.message || 'حدث خطأ غير معروف');
+                    msgBox.textContent = '❌ ' + (data.message || 'Error occurred');
                 }
             } catch (error) {
                 msgBox.style.display = 'block';
                 msgBox.className = 'msg-box error';
-                msgBox.textContent = '❌ تعذر الاتصال بالسيرفر. تأكد من اتصالك وحاول مجدداً.';
+                msgBox.textContent = currentLang === 'ar' ? '❌ تعذر الاتصال بالسيرفر. تأكد من اتصالك وحاول مجدداً.' : '❌ Server connection failed. Check your connection.';
                 console.error('Fetch error:', error);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = btn.dataset.originalText || 'تفعيل الاشتراك';
+                btn.innerHTML = originalHTML;
             }
         }
 
-        // ===== نموذج التسجيل =====
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const msgBox = document.getElementById('regMsgBox');
@@ -799,20 +1026,20 @@
             if (!validateEmail(email)) {
                 msgBox.style.display = 'block';
                 msgBox.className = 'msg-box error';
-                msgBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> الرجاء إدخال بريد إلكتروني صحيح';
+                msgBox.innerHTML = currentLang === 'ar' ? '<i class="fas fa-exclamation-circle"></i> الرجاء إدخال بريد إلكتروني صحيح' : '<i class="fas fa-exclamation-circle"></i> Please enter a valid email';
                 return;
             }
             const domain = getEmailDomain(email);
             if (!domain || !ALLOWED_DOMAINS.includes(domain)) {
                 msgBox.style.display = 'block';
                 msgBox.className = 'msg-box error';
-                msgBox.innerHTML = '<i class="fas fa-ban"></i> نطاق البريد غير مسموح. استخدم Gmail أو Yahoo أو Outlook إلخ.';
+                msgBox.innerHTML = currentLang === 'ar' ? '<i class="fas fa-ban"></i> نطاق البريد غير مسموح.' : '<i class="fas fa-ban"></i> Email domain not allowed.';
                 return;
             }
             if (password.length < 6) {
                 msgBox.style.display = 'block';
                 msgBox.className = 'msg-box error';
-                msgBox.innerHTML = '<i class="fas fa-lock"></i> كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                msgBox.innerHTML = currentLang === 'ar' ? '<i class="fas fa-lock"></i> كلمة المرور يجب أن تكون 6 أحرف على الأقل' : '<i class="fas fa-lock"></i> Password must be at least 6 characters';
                 return;
             }
 
@@ -822,9 +1049,7 @@
             formData.append('username', email);
             formData.append('password', password);
 
-            const btn = document.getElementById('regSubmitBtn');
-            btn.dataset.originalText = 'إنشاء الحساب';
-            sendYearlyRequest(formData, btn, msgBox, function() {
+            sendYearlyRequest(formData, document.getElementById('regSubmitBtn'), msgBox, function() {
                 document.getElementById('registerForm').reset();
                 document.getElementById('regStrengthBar').className = 'password-strength-bar';
                 document.getElementById('regStrengthBar').style.width = '0%';
@@ -832,7 +1057,6 @@
             });
         });
 
-        // ===== نموذج التجديد (بدون حقل الاسم) =====
         document.getElementById('renewForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const msgBox = document.getElementById('renewMsgBox');
@@ -843,23 +1067,22 @@
             const email = document.getElementById('renewEmail').value.trim();
             const password = document.getElementById('renewPassword').value;
 
-            // التحقق من معرّف العملية (8 أرقام على الأقل)
             if (txId.length < 8 || !/^\d+$/.test(txId)) {
                 msgBox.style.display = 'block';
                 msgBox.className = 'msg-box error';
-                msgBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> معرّف العملية يجب أن يكون 8 أرقام على الأقل';
+                msgBox.innerHTML = currentLang === 'ar' ? '<i class="fas fa-exclamation-circle"></i> معرّف العملية يجب أن يكون 8 أرقام على الأقل' : '<i class="fas fa-exclamation-circle"></i> Transaction ID must be at least 8 digits';
                 return;
             }
             if (!validateEmail(email)) {
                 msgBox.style.display = 'block';
                 msgBox.className = 'msg-box error';
-                msgBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> الرجاء إدخال بريد إلكتروني صحيح';
+                msgBox.innerHTML = currentLang === 'ar' ? '<i class="fas fa-exclamation-circle"></i> الرجاء إدخال بريد إلكتروني صحيح' : '<i class="fas fa-exclamation-circle"></i> Please enter a valid email';
                 return;
             }
             if (password.length < 6) {
                 msgBox.style.display = 'block';
                 msgBox.className = 'msg-box error';
-                msgBox.innerHTML = '<i class="fas fa-lock"></i> كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                msgBox.innerHTML = currentLang === 'ar' ? '<i class="fas fa-lock"></i> كلمة المرور يجب أن تكون 6 أحرف على الأقل' : '<i class="fas fa-lock"></i> Password must be at least 6 characters';
                 return;
             }
 
@@ -867,11 +1090,8 @@
             formData.append('action', 'yearRegister');
             formData.append('username', email);
             formData.append('password', password);
-            // لا نرسل fullName لأن السيرفر قد يتعامل معه اختيارياً، وسيتم تجاهله في حالة التجديد
 
-            const btn = document.getElementById('renewSubmitBtn');
-            btn.dataset.originalText = 'تجديد الاشتراك';
-            sendYearlyRequest(formData, btn, msgBox, function() {
+            sendYearlyRequest(formData, document.getElementById('renewSubmitBtn'), msgBox, function() {
                 document.getElementById('renewForm').reset();
             });
         });
