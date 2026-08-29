@@ -725,7 +725,8 @@
             </div>
             <button class="login-btn" id="loginBtn" data-i18n="loginBtn"><i class="fas fa-sign-in-alt"></i> دخول</button>
             <a href="https://wa.me/905550196682" target="_blank" class="whatsapp-link" data-i18n="forgotPass"><i class="fab fa-whatsapp"></i> نسيت كلمة المرور؟ اضغط هنا</a>
-            <a href="https://portal.farouk-grup.com/finance-hub" target="_blank" class="whatsapp-link" data-i18n="subscribe"><i class="fas fa-star"></i> للإشتراك بالمنصة؟ اضغط هنا</a>
+            <!-- رابط الإشتراك مع id لتغييره حسب اللغة -->
+            <a id="subscribeLink" href="https://portal.farouk-grup.com/finance-hub" target="_blank" class="whatsapp-link" data-i18n="subscribe"><i class="fas fa-star"></i> للإشتراك بالمنصة؟ اضغط هنا</a>
             <div class="error-msg" id="errorMsg"></div>
         </div>
     </div>
@@ -1153,9 +1154,32 @@
             const savedName = localStorage.getItem('userName') || t('userLabel');
             const savedDays = localStorage.getItem('daysLeft') || '?';
             document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')} ${savedDays} ${t('day')})`;
+            // تحديث رابط الإشتراك حسب اللغة
+            const subscribeLink = document.getElementById('subscribeLink');
+            if (subscribeLink) {
+                subscribeLink.href = lang === 'en' ? 'https://portal.farouk-grup.com/finance-huben' : 'https://portal.farouk-grup.com/finance-hub';
+            }
+            // تحديث روابط guide و survey
+            const guideLink = document.getElementById('guideLink');
+            const surveyLink = document.getElementById('surveyLink');
+            if (guideLink) {
+                guideLink.href = lang === 'en' ? 'guideen.html' : 'guide.html';
+            }
+            if (surveyLink) {
+                surveyLink.href = lang === 'en' ? 'surveyen.html' : 'survey.html';
+            }
             // إعادة رسم الأدوات مع الترجمة الجديدة
             renderTools();
         }
+
+        // استدعاء التحديث عند تغيير اللغة من الإعدادات أو أزرار اللغة
+        document.querySelectorAll('.lang-toggle').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const lang = this.dataset.lang;
+                applyLanguage(lang);
+                errorMsg.textContent = '';
+            });
+        });
 
         // ============================================================
         // إظهار/إخفاء كلمة المرور
@@ -1771,39 +1795,6 @@
             document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')} ${savedDays} ${t('day')})`;
             settingsOverlay.classList.remove('show');
         });
-
-        document.querySelectorAll('.lang-toggle').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const lang = this.dataset.lang;
-                applyLanguage(lang);
-                errorMsg.textContent = '';
-            });
-        });
-// ============================================================
-// ربط روابط guide و survey حسب اللغة
-// ============================================================
-function updateGuideAndSurveyLinks() {
-    const guideLink = document.getElementById('guideLink');
-    const surveyLink = document.getElementById('surveyLink');
-    if (guideLink) {
-        guideLink.href = currentLang === 'en' ? 'guideen.html' : 'guide.html';
-    }
-    if (surveyLink) {
-        surveyLink.href = currentLang === 'en' ? 'surveyen.html' : 'survey.html';
-    }
-}
-
-// استدعاء الدالة عند تغيير اللغة
-const originalApply = applyLanguage;
-applyLanguage = function(lang) {
-    originalApply(lang);
-    updateGuideAndSurveyLinks();
-};
-
-// استدعاء عند التحميل أيضاً
-window.addEventListener('load', function() {
-    updateGuideAndSurveyLinks();
-});
 
         // ============================================================
         // تغيير كلمة المرور - مع التحقق من البريد الحالي
