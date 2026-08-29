@@ -736,7 +736,7 @@
             <i class="fas fa-exclamation-triangle" style="font-size:2.5rem; color:#fbbf24; margin-bottom:0.5rem;"></i>
             <h2 id="sessionExpiredTitle" data-i18n="sessionExpiredTitle">⚠️ انتهت صلاحية الجلسة</h2>
             <p id="sessionExpiredMsg" data-i18n="sessionExpiredMsg">انتهت مدة الجلسة (24 ساعة). الرجاء تسجيل الدخول مجدداً.</p>
-            <a href="https://alfan.link/faroukazem?digital=r89RJK" target="_blank" class="renew-link" id="renewLinkBtn" style="display:none;" data-i18n="renewSubscription">
+            <a href="https://alfan.link/faroukazem?digital=DkPhgz" target="_blank" class="renew-link" id="renewLinkBtn" style="display:none;" data-i18n="renewSubscription">
                 <i class="fas fa-sync-alt"></i> تجديد الإشتراك
             </a>
             <button class="relogin-btn" id="reloginBtn" data-i18n="backToLogin">
@@ -809,7 +809,7 @@
             <div class="dashboard-panel">
                 <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.8rem;">
                     <div class="panel-header" style="border-bottom:none; padding-bottom:0; margin-bottom:0; flex:1;"><i class="fas fa-briefcase"></i> <span data-i18n="toolsTitle">مجموعة الأدوات</span></div>
-                    <a href="guide.html" target="_blank" class="btn-guide"><i class="fas fa-book-open"></i> <span data-i18n="guide">دليل الاستخدام</span></a>
+                    <a href="#" id="guideLink" target="_blank" class="btn-guide"><i class="fas fa-book-open"></i> <span data-i18n="guide">دليل الاستخدام</span></a>
                 </div>
                 <div id="toolsContainer"></div>
             </div>
@@ -891,8 +891,8 @@
             <div class="quick-links-title"><i class="fas fa-link"></i> <span data-i18n="quickLinks">الوصول السريع لمنصات المجموعة (الإصدار 5.4)</span></div>
             <div class="links-row">
                 <a href="https://www.farouk-grup.com/" target="_blank" class="link-btn" data-i18n="officialSite">الموقع الرسمي</a>
-                <a href="https://alfan.link/faroukazem?digital=r89RJK" target="_blank" class="link-btn" data-i18n="renew">تجديد الإشتراك</a>
-                <a href="survey.html" target="_blank" class="link-btn" data-i18n="rate">★ تقييم المنصة</a>
+                <a href="https://alfan.link/faroukazem?digital=DkPhgz" target="_blank" class="link-btn" data-i18n="renew">تجديد الإشتراك</a>
+                <a href="#" id="surveyLink" target="_blank" class="link-btn" data-i18n="rate">★ تقييم المنصة</a>
                 <a href="mailto:faroukgrup@gmail.com" class="link-btn"><i class="fas fa-envelope"></i> <span data-i18n="email">البريد</span></a>
             </div>
         </div>
@@ -1292,7 +1292,7 @@
                     startSessionTimer();
                     loadAllData();
                 } else if (result.status === 'expired') {
-                    errorMsg.innerHTML = t('errorExpired') + ' <a href="https://alfan.link/faroukazem?digital=r89RJK" target="_blank" style="color:#cfa776;">' + (currentLang === 'ar' ? 'من هنا' : 'here') + '</a>';
+                    errorMsg.innerHTML = t('errorExpired') + ' <a href="https://alfan.link/faroukazem?digital=DkPhgz" target="_blank" style="color:#cfa776;">' + (currentLang === 'ar' ? 'من هنا' : 'here') + '</a>';
                 } else {
                     errorMsg.innerHTML = t('errorInvalid');
                 }
@@ -1779,6 +1779,31 @@
                 errorMsg.textContent = '';
             });
         });
+// ============================================================
+// ربط روابط guide و survey حسب اللغة
+// ============================================================
+function updateGuideAndSurveyLinks() {
+    const guideLink = document.getElementById('guideLink');
+    const surveyLink = document.getElementById('surveyLink');
+    if (guideLink) {
+        guideLink.href = currentLang === 'en' ? 'guideen.html' : 'guide.html';
+    }
+    if (surveyLink) {
+        surveyLink.href = currentLang === 'en' ? 'surveyen.html' : 'survey.html';
+    }
+}
+
+// استدعاء الدالة عند تغيير اللغة
+const originalApply = applyLanguage;
+applyLanguage = function(lang) {
+    originalApply(lang);
+    updateGuideAndSurveyLinks();
+};
+
+// استدعاء عند التحميل أيضاً
+window.addEventListener('load', function() {
+    updateGuideAndSurveyLinks();
+});
 
         // ============================================================
         // تغيير كلمة المرور - مع التحقق من البريد الحالي
