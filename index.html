@@ -27,6 +27,7 @@
             display: flex;
             flex-direction: column;
         }
+
         /* ===== إزالة كل ما يسبب الاهتزاز ===== */
         .glow-bg, .glow-bg span, .login-card, .dashboard-panel, .tool-card,
         .btn-primary, .btn-outline, .btn-guide, .link-btn, .calc-btn,
@@ -41,6 +42,7 @@
             animation: none !important;
             transition: none !important;
         }
+
         /* ===== خلفية ثابتة ===== */
         .glow-bg {
             position: fixed; width: 100%; height: 100%; top: 0; left: 0;
@@ -897,10 +899,11 @@
 
     <script>
         // ============================================================
-        // 1. الترجمة (i18n)
+        // 1. الترجمة (i18n) — شامل أسماء الأدوات والفئات
         // ============================================================
         const translations = {
             ar: {
+                // عام
                 appName: "مجموعة فاروق للإستشارات والأعمال",
                 loginTitle: "دخول المصرح لهم",
                 loginSub: "مجموعة فاروق للاستشارات والأعمال",
@@ -938,7 +941,7 @@
                 addAppointment: "إضافة للجدول",
                 exportCSV: "تصدير CSV",
                 googleCalendar: "تقويم جوجل",
-                quickLinks: "الوصول السريع لمنصات المجموعة (الإصدار 5.3)",
+                quickLinks: "الوصول السريع لمنصات المجموعة (الإصدار 5.4)",
                 officialSite: "الموقع الرسمي",
                 renew: "تجديد الإشتراك",
                 rate: "★ تقييم المنصة",
@@ -966,8 +969,48 @@
                 changePassSuccess: "✅ تم تغيير كلمة المرور بنجاح",
                 changePassError: "❌ فشل تغيير كلمة المرور: ",
                 changePassMismatch: "❌ كلمة المرور الجديدة وتأكيدها غير متطابقين",
+
+                // فئات الأدوات
+                "cat_جدوى": "دراسات الجدوى والاستثمار",
+                "cat_مالي": "التحليل المالي والمحاسبي",
+                "cat_تكاليف": "التكاليف ونقطة التعادل",
+                "cat_مخاطر": "إدارة المخاطر والجودة",
+                "cat_اداري": "الأدوات الإدارية والموارد البشرية",
+
+                // أسماء الأدوات
+                "tool_feasibility": "دراسة جدوى مالية شاملة",
+                "tool_tech_feasibility": "دراسة الجدوى الفنية للمطاعم",
+                "tool_marketing": "دراسة الجدوى التسويقية",
+                "tool_realestate": "حساب العائد على الاستثمار العقاري",
+                "tool_roi": "حاسبة العائد على الاستثمار (ROI)",
+                "tool_restaurant_eval": "حاسبة تقييم المطاعم",
+                "tool_software_eval": "تقييم الشركات البرمجية",
+                "tool_npv_irr": "تحليل الاستثمار (NPV/IRR)",
+                "tool_cashflow": "حاسبة التدفق النقدي",
+                "tool_cashgap": "حاسبة الفجوة النقدية",
+                "tool_ratios": "النسب المالية الشاملة",
+                "tool_forecast": "التنبؤ المالي المتقدم",
+                "tool_wacc": "حاسبة معدل الخصم (WACC)",
+                "tool_scenario": "تحليل السيناريوهات",
+                "tool_loan": "حاسبة جدولة القروض",
+                "tool_breakeven": "حاسبة نقطة التعادل",
+                "tool_multibreak": "نقطة التعادل متعددة المنتجات",
+                "tool_menu_eng": "هندسة قوائم الطعام",
+                "tool_cac": "تكلفة الإستحواذ على العميل",
+                "tool_labor": "حاسبة تكلفة العمالة",
+                "tool_risk": "محاكاة المخاطر",
+                "tool_haccp": "تحليل المخاطر (HACCP)",
+                "tool_sop": "إجراءات التشغيل القياسية (SOP)",
+                "tool_employee": "تقييم الموظفين",
+                "tool_manager": "مقياس تقييم الإداري",
+                "tool_skills": "تقييم المعارف والمهارات",
+                "tool_content": "توليد المحتوى (تجريبي)",
+                "tool_admin_calc": "آلة حاسبة إدارية",
+                "remaining": "متبقي",
+                "day": "يوم",
             },
             en: {
+                // General
                 appName: "Farouk Group for Consultations and Business",
                 loginTitle: "Authorized Access",
                 loginSub: "Farouk Group for Consultations and Business",
@@ -1005,7 +1048,7 @@
                 addAppointment: "Add to schedule",
                 exportCSV: "Export CSV",
                 googleCalendar: "Google Calendar",
-                quickLinks: "Quick access to group platforms (version 5.3)",
+                quickLinks: "Quick access to group platforms (version 5.4)",
                 officialSite: "Official Website",
                 renew: "Renew Subscription",
                 rate: "★ Rate the platform",
@@ -1033,6 +1076,45 @@
                 changePassSuccess: "✅ Password changed successfully",
                 changePassError: "❌ Failed to change password: ",
                 changePassMismatch: "❌ New password and confirmation do not match",
+
+                // Tool categories
+                "cat_جدوى": "Feasibility & Investment Studies",
+                "cat_مالي": "Financial & Accounting Analysis",
+                "cat_تكاليف": "Costs & Break-even",
+                "cat_مخاطر": "Risk & Quality Management",
+                "cat_اداري": "Administrative & HR Tools",
+
+                // Tool names
+                "tool_feasibility": "Comprehensive Financial Feasibility Study",
+                "tool_tech_feasibility": "Technical Feasibility Study for Restaurants",
+                "tool_marketing": "Marketing Feasibility Study",
+                "tool_realestate": "Real Estate Investment Return Calculator",
+                "tool_roi": "ROI Calculator",
+                "tool_restaurant_eval": "Restaurant Evaluation Calculator",
+                "tool_software_eval": "Software Company Evaluation",
+                "tool_npv_irr": "Investment Analysis (NPV/IRR)",
+                "tool_cashflow": "Cash Flow Calculator",
+                "tool_cashgap": "Cash Gap Calculator",
+                "tool_ratios": "Comprehensive Financial Ratios",
+                "tool_forecast": "Advanced Financial Forecasting",
+                "tool_wacc": "WACC Calculator",
+                "tool_scenario": "Scenario Analysis",
+                "tool_loan": "Loan Amortization Calculator",
+                "tool_breakeven": "Break-even Calculator",
+                "tool_multibreak": "Multi-product Break-even",
+                "tool_menu_eng": "Menu Engineering",
+                "tool_cac": "Customer Acquisition Cost",
+                "tool_labor": "Labor Cost Calculator",
+                "tool_risk": "Risk Simulation",
+                "tool_haccp": "Risk Analysis (HACCP)",
+                "tool_sop": "Standard Operating Procedures (SOP)",
+                "tool_employee": "Employee Evaluation",
+                "tool_manager": "Manager Assessment Scale",
+                "tool_skills": "Knowledge & Skills Assessment",
+                "tool_content": "Content Generator (Experimental)",
+                "tool_admin_calc": "Administrative Calculator",
+                "remaining": "remaining",
+                "day": "day",
             }
         };
 
@@ -1045,10 +1127,9 @@
         function applyLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('appLanguage', lang);
-            // تحديث اتجاه الصفحة
             document.documentElement.lang = lang;
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            // تحديث جميع العناصر التي تحمل data-i18n
+            // تحديث النصوص العامة
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 el.textContent = t(key);
@@ -1057,18 +1138,16 @@
                 const key = el.getAttribute('data-i18n-placeholder');
                 el.placeholder = t(key);
             });
-            // تحديث خيارات الـ select
             document.querySelectorAll('#languageSelect option').forEach(opt => {
                 const key = opt.getAttribute('data-i18n');
                 if (key) opt.textContent = t(key);
             });
-            // تحديث العناوين الديناميكية مثل رسائل الخطأ يمكن تحديثها عند الحاجة
-            // تحديث أدوات القائمة (tools) سيتم إعادة رسمها في renderTools
-            renderTools();
             // تحديث اسم المستخدم
             const savedName = localStorage.getItem('userName') || t('userLabel');
             const savedDays = localStorage.getItem('daysLeft') || '?';
-            document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')||'متبقي'} ${savedDays} ${t('day')||'يوم'})`;
+            document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')} ${savedDays} ${t('day')})`;
+            // إعادة رسم الأدوات مع الترجمة الجديدة
+            renderTools();
         }
 
         // ============================================================
@@ -1195,7 +1274,7 @@
                     localStorage.setItem('loginTimestamp', Date.now().toString());
 
                     const savedName = result.name || t('userLabel');
-                    document.getElementById('userNameDisplay').textContent = `${savedName} (${currentLang === 'ar' ? 'متبقي' : 'remaining'} ${result.daysLeft} ${currentLang === 'ar' ? 'يوم' : 'day'})`;
+                    document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')} ${result.daysLeft} ${t('day')})`;
 
                     loginOverlay.classList.remove('show');
                     sessionExpiredOverlay.classList.remove('show');
@@ -1239,7 +1318,7 @@
 
             const savedName = localStorage.getItem('userName') || t('userLabel');
             const savedDays = localStorage.getItem('daysLeft') || '?';
-            document.getElementById('userNameDisplay').textContent = `${savedName} (${currentLang === 'ar' ? 'متبقي' : 'remaining'} ${savedDays} ${currentLang === 'ar' ? 'يوم' : 'day'})`;
+            document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')} ${savedDays} ${t('day')})`;
 
             startSessionTimer();
             loadAllData();
@@ -1260,7 +1339,7 @@
                 } else if (result.status === 'success') {
                     localStorage.setItem('daysLeft', result.daysLeft);
                     const savedName = localStorage.getItem('userName') || t('userLabel');
-                    document.getElementById('userNameDisplay').textContent = `${savedName} (${currentLang === 'ar' ? 'متبقي' : 'remaining'} ${result.daysLeft} ${currentLang === 'ar' ? 'يوم' : 'day'})`;
+                    document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')} ${result.daysLeft} ${t('day')})`;
                 }
             } catch (e) {
                 // نستمر بالجلسة المحلية
@@ -1327,7 +1406,7 @@
         }
 
         // ============================================================
-        // الحاسبة
+        // الحاسبة (تم إصلاح ترتيب الأزرار في الواجهة الرئيسية أيضاً)
         // ============================================================
         let calcInput = '0',
             calcPrev = '',
@@ -1567,62 +1646,60 @@
         }
 
         // ============================================================
-        // الأدوات (مع دعم اللغة في أسماء الملفات)
+        // الأدوات (مع دعم اللغة في أسماء الملفات والترجمة)
         // ============================================================
         const toolCategories = [{
-            nameKey: "دراسات الجدوى والاستثمار",
+            nameKey: "cat_جدوى",
             icon: "fa-chart-pie",
             tools: [
-                { nameKey: "دراسة جدوى مالية شاملة", icon: "fa-chart-pie", file: "tool1.html" },
-                { nameKey: "دراسة الجدوى الفنية للمطاعم", icon: "fa-gear", file: "tool3.html" },
-                { nameKey: "دراسة الجدوى التسويقية", icon: "fa-chart-simple", file: "tool4.html" },
-                { nameKey: "حساب العائد على الاستثمار العقاري", icon: "fa-building", file: "tool5.html" },
-                { nameKey: "حاسبة العائد على الاستثمار (ROI)", icon: "fa-chart-line", file: "tool11.html" },
-                { nameKey: "حاسبة تقييم المطاعم", icon: "fa-ranking-star", file: "tool30.html" },
-                { nameKey: "تقييم الشركات البرمجية", icon: "fa-laptop-code", file: "tool27.html" },
-                { nameKey: "تحليل الاستثمار (NPV/IRR)", icon: "fa-wave-square", file: "tool26.html" }
+                { nameKey: "tool_feasibility", icon: "fa-chart-pie", file: "tool1.html" },
+                { nameKey: "tool_tech_feasibility", icon: "fa-gear", file: "tool3.html" },
+                { nameKey: "tool_marketing", icon: "fa-chart-simple", file: "tool4.html" },
+                { nameKey: "tool_realestate", icon: "fa-building", file: "tool5.html" },
+                { nameKey: "tool_roi", icon: "fa-chart-line", file: "tool11.html" },
+                { nameKey: "tool_restaurant_eval", icon: "fa-ranking-star", file: "tool30.html" },
+                { nameKey: "tool_software_eval", icon: "fa-laptop-code", file: "tool27.html" },
+                { nameKey: "tool_npv_irr", icon: "fa-wave-square", file: "tool26.html" }
             ]
         }, {
-            nameKey: "التحليل المالي والمحاسبي",
+            nameKey: "cat_مالي",
             icon: "fa-coins",
             tools: [
-                { nameKey: "حاسبة التدفق النقدي", icon: "fa-coins", file: "tool8.html" },
-                { nameKey: "حاسبة الفجوة النقدية", icon: "fas fa-money-bill-wave", file: "tool25.html" },
-                { nameKey: "النسب المالية الشاملة", icon: "fa-percentage", file: "tool18.html" },
-                { nameKey: "التنبؤ المالي المتقدم", icon: "fa-arrow-trend-up", file: "tool19.html" },
-                { nameKey: "حاسبة الإهلاك", icon: "fa-chart-simple", file: "tool9.html" },
-                { nameKey: "حاسبة معدل الخصم (WACC)", icon: "fa-scale-balanced", file: "tool10.html" },
-                { nameKey: "تحليل السيناريوهات", icon: "fas fa-lightbulb", file: "tool28.html" },
-                { nameKey: "حاسبة جدولة القروض", icon: "fa-hand-holding-usd", file: "tool12.html" }
+                { nameKey: "tool_cashflow", icon: "fa-coins", file: "tool8.html" },
+                { nameKey: "tool_cashgap", icon: "fas fa-money-bill-wave", file: "tool25.html" },
+                { nameKey: "tool_ratios", icon: "fa-percentage", file: "tool18.html" },
+                { nameKey: "tool_forecast", icon: "fa-arrow-trend-up", file: "tool19.html" },
+                { nameKey: "tool_wacc", icon: "fa-scale-balanced", file: "tool10.html" },
+                { nameKey: "tool_scenario", icon: "fas fa-lightbulb", file: "tool28.html" },
+                { nameKey: "tool_loan", icon: "fa-hand-holding-usd", file: "tool12.html" }
             ]
         }, {
-            nameKey: "التكاليف ونقطة التعادل",
+            nameKey: "cat_تكاليف",
             icon: "fa-calculator",
             tools: [
-                { nameKey: "حساب التكاليف للمطاعم", icon: "fa-utensils", file: "tool2.html" },
-                { nameKey: "حاسبة نقطة التعادل", icon: "fa-chart-line", file: "tool7.html" },
-                { nameKey: "نقطة التعادل متعددة المنتجات", icon: "fa-chart-line", file: "tool17.html" },
-                { nameKey: "هندسة قوائم الطعام", icon: "fa-object-group", file: "tool22.html" },
-                { nameKey: "تكلفة الإستحواذ على العميل", icon: "fas fa-users", file: "tool23.html" },
-                { nameKey: "حاسبة تكلفة العمالة", icon: "fa-users", file: "tool13.html" }
+                { nameKey: "tool_breakeven", icon: "fa-chart-line", file: "tool7.html" },
+                { nameKey: "tool_multibreak", icon: "fa-chart-line", file: "tool17.html" },
+                { nameKey: "tool_menu_eng", icon: "fa-object-group", file: "tool22.html" },
+                { nameKey: "tool_cac", icon: "fas fa-users", file: "tool23.html" },
+                { nameKey: "tool_labor", icon: "fa-users", file: "tool13.html" }
             ]
         }, {
-            nameKey: "إدارة المخاطر والجودة",
+            nameKey: "cat_مخاطر",
             icon: "fa-shield",
             tools: [
-                { nameKey: "محاكاة المخاطر", icon: "fa-wave-square", file: "tool6.html" },
-                { nameKey: "تحليل المخاطر (HACCP)", icon: "fa-exclamation-triangle", file: "tool14.html" },
-                { nameKey: "إجراءات التشغيل القياسية (SOP)", icon: "fa-clipboard-list", file: "tool15.html" }
+                { nameKey: "tool_risk", icon: "fa-wave-square", file: "tool6.html" },
+                { nameKey: "tool_haccp", icon: "fa-exclamation-triangle", file: "tool14.html" },
+                { nameKey: "tool_sop", icon: "fa-clipboard-list", file: "tool15.html" }
             ]
         }, {
-            nameKey: "الأدوات الإدارية والموارد البشرية",
+            nameKey: "cat_اداري",
             icon: "fa-user-tie",
             tools: [
-                { nameKey: "تقييم الموظفين", icon: "fa-user-check", file: "tool20.html" },
-                { nameKey: "مقياس تقييم الإداري", icon: "fa-user-check", file: "tool21.html" },
-                { nameKey: "تقييم المعارف والمهارات", icon: "fa-award", file: "tool29.html" },
-                { nameKey: "توليد المحتوى (تجريبي)", icon: "fas fa-robot", file: "tool24.html" },
-                { nameKey: "آلة حاسبة إدارية", icon: "fa-calculator", file: "tool16.html" }
+                { nameKey: "tool_employee", icon: "fa-user-check", file: "tool20.html" },
+                { nameKey: "tool_manager", icon: "fa-user-check", file: "tool21.html" },
+                { nameKey: "tool_skills", icon: "fa-award", file: "tool29.html" },
+                { nameKey: "tool_content", icon: "fas fa-robot", file: "tool24.html" },
+                { nameKey: "tool_admin_calc", icon: "fa-calculator", file: "tool16.html" }
             ]
         }];
 
@@ -1635,9 +1712,7 @@
                 catDiv.className = 'tools-category';
                 const titleDiv = document.createElement('div');
                 titleDiv.className = 'category-title';
-                // ترجمة اسم الفئة (نفترض أن الترجمة موجودة في كائن الترجمات)
-                const catName = translations[lang] && translations[lang][cat.nameKey] ? translations[lang][cat.nameKey] :
-                    cat.nameKey;
+                const catName = t(cat.nameKey);
                 titleDiv.innerHTML = `<i class="fas ${cat.icon}"></i> ${catName}`;
                 catDiv.appendChild(titleDiv);
                 const grid = document.createElement('div');
@@ -1645,15 +1720,12 @@
                 cat.tools.forEach(function(tool) {
                     const card = document.createElement('div');
                     card.className = 'tool-card';
-                    // تحديد اسم الملف مع اللاحقة حسب اللغة
                     let filePath = tool.file;
                     if (lang === 'en') {
-                        // إضافة 'en' قبل .html، مثلاً tool1.html -> tool1en.html
                         filePath = filePath.replace(/\.html$/, 'en.html');
                     }
                     card.onclick = function() { location.href = filePath; };
-                    const toolName = translations[lang] && translations[lang][tool.nameKey] ? translations[lang][tool
-                        .nameKey] : tool.nameKey;
+                    const toolName = t(tool.nameKey);
                     card.innerHTML = `<i class="fas ${tool.icon}"></i><h4>${toolName}</h4>`;
                     grid.appendChild(card);
                 });
@@ -1673,7 +1745,6 @@
 
         settingsBtn.addEventListener('click', function() {
             settingsOverlay.classList.add('show');
-            // تعيين القيمة الحالية في الـ select
             languageSelect.value = currentLang;
         });
 
@@ -1681,25 +1752,19 @@
             settingsOverlay.classList.remove('show');
         });
 
-        // تطبيق اللغة من الإعدادات
         applyLanguageBtn.addEventListener('click', function() {
             const newLang = languageSelect.value;
             applyLanguage(newLang);
-            // إعادة تعيين بعض العناصر الديناميكية
             const savedName = localStorage.getItem('userName') || t('userLabel');
             const savedDays = localStorage.getItem('daysLeft') || '?';
-            document.getElementById('userNameDisplay').textContent = `${savedName} (${currentLang === 'ar' ? 'متبقي' : 'remaining'} ${savedDays} ${currentLang === 'ar' ? 'يوم' : 'day'})`;
-            // تحديث شاشة الدخول إذا كانت ظاهرة (نادراً)
+            document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')} ${savedDays} ${t('day')})`;
             settingsOverlay.classList.remove('show');
         });
 
-        // أزرار تبديل اللغة في شاشة الدخول
         document.querySelectorAll('.lang-toggle').forEach(btn => {
             btn.addEventListener('click', function() {
                 const lang = this.dataset.lang;
                 applyLanguage(lang);
-                // تحديث نصوص شاشة الدخول (تم بالفعل عن طريق data-i18n)
-                // تحديث الرسائل
                 errorMsg.textContent = '';
             });
         });
@@ -1751,7 +1816,6 @@
                 if (result.status === 'success') {
                     changePassMsg.style.color = '#4ade80';
                     changePassMsg.textContent = t('changePassSuccess');
-                    // مسح الحقول
                     changeEmail.value = '';
                     changeCurrentPass.value = '';
                     changeNewPass.value = '';
@@ -1780,7 +1844,7 @@
         }
 
         // ============================================================
-        // PWA: شريط تثبيت التطبيق (يظهر تلقائياً)
+        // PWA: شريط تثبيت التطبيق
         // ============================================================
         let deferredPrompt;
         const installBanner = document.getElementById('installBanner');
@@ -1827,15 +1891,6 @@
                 installBanner.style.display = 'none';
             }
         }, 5000);
-
-        // ============================================================
-        // إضافة دالة ترجمة إضافية للاستخدام في الكود
-        // ============================================================
-        // إضافة بعض الترجمات الناقصة
-        translations.ar['remaining'] = 'متبقي';
-        translations.ar['day'] = 'يوم';
-        translations.en['remaining'] = 'remaining';
-        translations.en['day'] = 'day';
     </script>
 </body>
 </html>
