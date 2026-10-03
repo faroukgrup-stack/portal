@@ -1,6 +1,6 @@
 /**
  * auth-check.js — مجموعة فاروق للاستشارات والأعمال
- * الإصدار 5.4 — مطابق للتوكن الحقيقي من السيرفر
+ * الإصدار 5.5 — مطابق للتوكن الحقيقي من السيرفر + حماية أدوات المطور
  * صيغة التوكن: btoa(SECRET_KEY + "|" + email + "|" + expiryDate)
  */
 (function () {
@@ -98,5 +98,52 @@
     });
 
     console.log("✅ Access granted |", userName, "| أيام متبقية:", daysLeft ?? "غير محدد");
+
+})();
+
+
+/* ============================================================
+   🛡️ كود الحماية من أدوات المطور (DevTools Protection)
+   يعمل تلقائياً على جميع الأدوات التي تستدعي هذا الملف
+   ============================================================ */
+(function () {
+    "use strict";
+
+    // منع F12 واختصارات أدوات المطور وعرض المصدر
+    document.addEventListener('keydown', function (e) {
+
+        // F12
+        if (e.key === 'F12' || e.keyCode === 123) {
+            e.preventDefault();
+            alert('تم تعطيل زر F12!');
+            return false;
+        }
+
+        // Ctrl + Shift + I / J / C
+        if (e.ctrlKey && e.shiftKey &&
+            (e.key === 'I' || e.key === 'i' ||
+             e.key === 'J' || e.key === 'j' ||
+             e.key === 'C' || e.key === 'c')) {
+            e.preventDefault();
+            alert('تم تعطيل أدوات المطور!');
+            return false;
+        }
+
+        // Ctrl + U (عرض المصدر)
+        if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+            e.preventDefault();
+            alert('تم تعطيل عرض المصدر!');
+            return false;
+        }
+
+    }, true); // استخدام true لضمان الاعتراض قبل أي معالج آخر
+
+    // منع النقر بزر الماوس الأيمن (Context Menu)
+    document.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+        return false;
+    }, true);
+
+    console.log("🛡️ DevTools protection activated");
 
 })();
