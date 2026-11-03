@@ -1,0 +1,113 @@
+/*
+ * =====================================================================
+ * css/tools-overrides-en.css — التعديلات العامة لأدوات النسخة الإنجليزية
+ * =====================================================================
+ * يُحمَّل أخيراً (بعد tools-common-en وملف الأداة) فتفوز كلمته دائماً.
+ * مطابق لمنطق النسخة العربية (tools-overrides.css).
+ */
+
+
+:root {
+    /* ═══ لوحة الألوان الموحدة — عدّل هنا لتغيير هوية المنصة كاملة ═══ */
+    --gold: #cfa776;
+    --gold-deep: #b48554;
+    --gold-bright: #d4b15a;
+    --bg: #0b0e17;
+    --bg-2: #121824;
+    --text: #f0f4fa;
+    --text-muted: #b8c5dc;   /* مفتّح عن السابق لتحسين تباين النصوص الصغيرة */
+    --danger: #dc3545;
+    --danger-soft: #f87171;
+    --success: #28a745;
+    --warning: #ffc107;
+    /* ═══ مقياس الانحناء الموحد (4 قيم فقط) ═══ */
+    --radius-xs: 4px;
+    --radius-sm: 10px;
+    --radius-md: 20px;
+    --radius-lg: 30px;
+    --radius-xl: 40px;
+}
+
+/* ===== تصغير الصفحة كاملة (نفس مقاس النسخة العربية) ===== */
+html {
+    font-size: 13.5px !important;
+}
+
+/* الحاوية أضيق + توسيط إجباري في منتصف الصفحة */
+.calc-container,
+.main-content {
+    max-width: 1000px;
+    margin-inline: auto;
+}
+.main-content {
+    justify-content: center !important;
+}
+
+/* تقليل حشوة البطاقات الرئيسية */
+.calc-box,
+.result-card,
+.chart-card {
+    padding: 1rem 1.2rem;
+}
+
+/* ===== عنوان الأداة (مصغّر) ===== */
+.hero-mini {
+    padding: 1.1rem 1rem;
+}
+.hero-mini h2 {
+    font-size: 1.4rem !important;
+    font-weight: 800;
+    margin-bottom: 0.3rem;
+}
+.hero-mini p {
+    font-size: 0.88rem !important;
+}
+@media (max-width: 768px) {
+    .hero-mini h2 { font-size: 1.1rem !important; }
+    .hero-mini p  { font-size: 0.78rem !important; }
+}
+
+/* ===== سهولة اللمس على الجوال ===== */
+.btn,
+.calc-btn,
+.btn-number,
+.btn-operator,
+.btn-action,
+.btn-memory,
+.btn-calc,
+.btn-add,
+.btn-export {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+@media (max-width: 768px) {
+    .btn,
+    .calc-btn,
+    .btn-number,
+    .btn-operator,
+    .btn-action,
+    .btn-memory,
+    .btn-calc,
+    .btn-add,
+    .btn-export {
+        min-height: 48px !important;
+        min-width: 48px !important;
+        font-size: 1.05rem !important;
+        padding: 0.55rem 0.4rem !important;
+    }
+    .buttons-grid,
+    .calc-buttons,
+    .keypad {
+        gap: 0.5rem !important;
+    }
+}
+
+/* ===== حلقة تركيز واضحة (وصولية) ===== */
+button:focus-visible,
+select:focus-visible,
+a:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--gold) !important;
+    outline-offset: 2px !important;
+}
