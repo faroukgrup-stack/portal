@@ -158,7 +158,7 @@ function showLoginScreen() {
 }
 
 // ============================================================
-// تسجيل الدخول — مع تشخيص مفصل
+// تسجيل الدخول (مع دعم frozen)
 // ============================================================
 async function attemptLogin() {
     const user = usernameInput.value.trim();
@@ -183,17 +183,7 @@ async function attemptLogin() {
         formData.append('username', user);
         formData.append('password', pass);
         const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
-
-        const text = await response.text();
-
-        let result;
-        try {
-            result = JSON.parse(text);
-        } catch (parseErr) {
-            errorMsg.innerHTML = '❌ الرد مش JSON (Status: ' + response.status + '):<br><small style="direction:ltr;font-size:11px;word-break:break-all;display:block;max-height:80px;overflow:auto;">' 
-                + text.substring(0, 250) + '</small>';
-            return;
-        }
+        const result = await response.json();
 
         if (result.status === 'success') {
             localStorage.setItem('userToken', result.token);
@@ -216,10 +206,10 @@ async function attemptLogin() {
         } else if (result.status === 'frozen') {
             errorMsg.innerHTML = '❌ تم تجميد الحساب، يرجى مراجعة الإدارة.';
         } else {
-            errorMsg.innerHTML = t('errorInvalid') + (result.message ? '<br><small>' + result.message + '</small>' : '');
+            errorMsg.innerHTML = t('errorInvalid');
         }
     } catch (error) {
-        errorMsg.innerHTML = t('errorNetwork') + '<br><small style="direction:ltr;font-size:11px;">' + (error.message || error) + '</small>';
+        errorMsg.innerHTML = t('errorNetwork');
     } finally {
         loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> ' + t('loginBtn');
         loginBtn.disabled = false;
@@ -264,6 +254,8 @@ async function validateWithServerInBackground(token) {
         const result = await resp.json();
         if (result.status === 'expired') {
             forceLogout(t('errorExpired'), true);
+        } else if (result.status === 'frozen') {
+            forceLogout('تم تجميد الحساب، يرجى مراجعة الإدارة.', false);
         } else if (result.status === 'success') {
             localStorage.setItem('daysLeft', result.daysLeft);
             const savedName = localStorage.getItem('userName') || t('userLabel');
