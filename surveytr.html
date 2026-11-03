@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Hızlı Anket | FAROUK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/pages/surveytr.css">
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <div class="logo-star">★</div>
+            <h1>Görüşünüz <span class="gold">Bizim İçin Değerli</span></h1>
+            <div class="sub">⚡ 1 dakika</div>
+        </div>
+
+        <form id="feedbackForm"
+        action="https://script.google.com/macros/s/AKfycbwh-Ir-9pkTmEIw5Mi88TY6eCgK8n1mdVP3H_jvX7bGeqIRqTXXHhh0NNKE4X1Nc1aQ/exec"
+        method="POST"
+        target="hidden_iframe"
+        novalidate>
+
+        <input type="hidden" name="التقييم_العام" id="hidden_avg">
+        <input type="hidden" name="تصنيف_العميل" id="hidden_status">
+
+        <!-- İsim (isteğe bağlı) -->
+        <div class="section">
+            <div class="section-title">İletişim Bilgileri (İsteğe bağlı)</div>
+            <div class="input-field">
+                <label>👤 Adınız</label>
+                <input type="text" name="الاسم" placeholder="Adınızı girin (isteğe bağlı)">
+            </div>
+        </div>
+
+        <!-- Yıldızlı Değerlendirme Soruları -->
+        <div class="section">
+            <div class="section-title">Deneyiminizi Değerlendirin</div>
+
+            <div class="question" data-slug="تجربة المستخدم">
+                <p>1. Site tasarımı hakkındaki izleniminiz</p>
+                <div class="stars-row" data-name="تجربة المستخدم">
+                    <span class="rating-value-tag">?</span>
+                </div>
+            </div>
+
+            <div class="question" data-slug="سهولة التعامل مع الأدوات">
+                <p>2. Araçları kullanma kolaylığı</p>
+                <div class="stars-row" data-name="سهولة التعامل مع الأدوات">
+                    <span class="rating-value-tag">?</span>
+                </div>
+            </div>
+
+            <div class="question" data-slug="السرعة">
+                <p>3. Site yükleme hızı</p>
+                <div class="stars-row" data-name="السرعة">
+                    <span class="rating-value-tag">?</span>
+                </div>
+            </div>
+
+            <div class="question" data-slug="مريحة">
+                <p>4. Mobil cihazda site deneyimi</p>
+                <div class="stars-row" data-name="مريحة">
+                    <span class="rating-value-tag">?</span>
+                </div>
+            </div>
+
+            <div class="question" data-slug="دقيقة">
+                <p>5. Hesaplayıcı sonuçlarının doğruluğu</p>
+                <div class="stars-row" data-name="دقيقة">
+                    <span class="rating-value-tag">?</span>
+                </div>
+            </div>
+
+            <div class="question" data-slug="المصطلحات">
+                <p>6. Terimlerin (ROI, P&L) açıklama netliği</p>
+                <div class="stars-row" data-name="المصطلحات">
+                    <span class="rating-value-tag">?</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ek Sorular -->
+        <div class="section">
+            <div class="section-title">Hızlı Sorular</div>
+
+            <div class="question">
+                <p>Siteyi "uygulama" olarak kurdunuz mu?</p>
+                <div class="options">
+                    <label class="option-btn"><input type="radio" name="تثبيت_التطبيق" value="نعم"><span>Evet</span></label>
+                    <label class="option-btn"><input type="radio" name="تثبيت_التطبيق" value="لا"><span>Hayır</span></label>
+                    <label class="option-btn"><input type="radio" name="تثبيت_التطبيق" value="لم يظهر"><span>Görmedim</span></label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>Kurduysanız, simge net görünüyor mu?</p>
+                <div class="options">
+                    <label class="option-btn"><input type="radio" name="الايقونة" value="نعم"><span>Evet</span></label>
+                    <label class="option-btn"><input type="radio" name="الايقونة" value="لا"><span>Hayır</span></label>
+                    <label class="option-btn"><input type="radio" name="الايقونة" value="لم اثبت"><span>Kurmadım</span></label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>Bu araçları kullanmanızı meslektaşlarınıza tavsiye eder misiniz?</p>
+                <div class="options">
+                    <label class="option-btn"><input type="radio" name="نصيحة" value="نعم"><span>Evet 👍</span></label>
+                    <label class="option-btn"><input type="radio" name="نصيحة" value="لا"><span>Hayır</span></label>
+                    <label class="option-btn"><input type="radio" name="نصيحة" value="ربما"><span>Belki 🤔</span></label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>Açıklayıcı video dersler eklenmesini tercih eder misiniz?</p>
+                <div class="options">
+                    <label class="option-btn"><input type="radio" name="دروس" value="نعم"><span>Evet</span></label>
+                    <label class="option-btn"><input type="radio" name="دروس" value="لا"><span>Hayır</span></label>
+                </div>
+            </div>
+
+            <div class="input-field">
+                <label>✍️ Ek öneriler</label>
+                <textarea name="الاقتراحات" rows="2" placeholder="Notlarınızı veya önerilerinizi buraya yazın..."></textarea>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">📨 Değerlendirmeyi Gönder</button>
+    </form>
+
+    <iframe name="hidden_iframe" style="display:none;"></iframe>
+
+    <div id="thankYouArea">
+        <div class="check-icon">✓</div>
+        <h2>Çok teşekkürler!</h2>
+        <p>Değerlendirmeniz başarıyla alındı 🌟</p>
+    </div>
+</div>
+
+<script src="js/pages/surveytr.js" defer></script>
+</body>
+</html>

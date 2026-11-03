@@ -1,10 +1,22 @@
 // 1. تغيير رقم الإصدار هنا في كل مرة تعدل فيها الموقع (v1, v2, v3...)
-const CACHE_NAME = 'fg-store-v5.4'; 
+const CACHE_NAME = 'fg-store-v8'; 
 
 const ASSETS = [
   '/',
   '/index.html',
-  // أضف هنا أي ملفات CSS أو صور أساسية تريدها أن تعمل بدون إنترنت
+  '/css/index.css',
+  '/css/tools-common.css',
+  '/css/tools-common-en.css',
+  '/css/tools-common-tr.css',
+  '/css/tools-overrides-tr.css',
+  '/css/tools-overrides-en.css',
+  '/css/tools-overrides.css',
+  '/js/i18n.js',
+  '/js/app.js',
+  '/js/auth-check.js',
+  '/manifest.json',
+  '/icon.png',
+  // أضف هنا أي ملفات CSS أو JS أو صور إضافية تريدها أن تعمل بدون إنترنت
 ];
 
 // مرحلة التثبيت: تحميل الملفات للكاش

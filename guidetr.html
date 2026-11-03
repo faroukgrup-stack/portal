@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Kullanıcı Kılavuzu – Kapsamlı Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/pages/guidetr.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Geri dön butonu -->
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Ana Sayfaya Dön</a>
+
+        <!-- Başlık -->
+        <header>
+            <h1><i class="fas fa-book-open"></i> Kapsamlı Kullanıcı Kılavuzu</h1>
+            <p>Herhangi bir aracı arayın veya aşağıdaki araçlara göz atın</p>
+        </header>
+
+        <!-- Arama -->
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Araç adıyla ara..." autofocus>
+        </div>
+
+        <!-- Sonuç yok mesajı -->
+        <div id="noResults" class="no-results">
+            <i class="fas fa-exclamation-circle"></i> Aramayla eşleşen araç bulunamadı
+        </div>
+
+        <!-- Araç listesi -->
+        <div class="tools-grid" id="toolsContainer"></div>
+
+        <!-- Footer -->
+        <footer>© 2026 <span>FAROUK GRUP</span> · Tüm hakları saklıdır</footer>
+    </div>
+
+    <script src="js/pages/guidetr.js" defer></script>
+</body>
+</html>
