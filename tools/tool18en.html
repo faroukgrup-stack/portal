@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Comprehensive Financial Ratios Calculator | FAROUK GRUP</title>
+<!-- Page protection -->
+<script src="../js/auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools/tool18en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- Export loading screen -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">Generating report...</h3>
+        <p id="loadingMsg">Please wait</p>
+    </div>
+</div>
+
+<section class="hero-mini">
+    <h2>📊 Comprehensive Financial Ratios Calculator</h2>
+    <p>Liquidity, profitability, solvency, and activity analysis with smart recommendations</p>
+</section>
+
+<div class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-chart-pie"></i><span>Ratios</span></div>
+        <h2><i class="fas fa-chart-line" style="color:#cfa776;margin-left:0.5rem;"></i>Core Financial Data</h2>
+
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> Currency:</label>
+            <select id="currencySelect">
+                <option value="$" selected>USD ($)</option>
+                <option value="€">EUR (€)</option>
+                <option value="₺">TRY (₺)</option>
+                <option value="ج.م">EGP (ج.م)</option>
+                <option value="د.ك">KWD (د.ك)</option>
+                <option value="ر.س">SAR (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> Entity Name:</label>
+            <input type="text" id="companyName" value="Beneficiary Entity" placeholder="Beneficiary entity">
+        </div>
+
+        <div class="grid-2">
+            <!-- Balance Sheet -->
+            <div>
+                <div class="section-title-sm">🏦 Balance Sheet (Annual Values)</div>
+                <div class="form-group tooltip"><label>Cash & Equivalents</label><input type="number" id="cash" placeholder="e.g. 100000"><span class="tooltiptext">Cash balance and current deposits.</span></div>
+                <div class="form-group tooltip"><label>Inventory</label><input type="number" id="inventory" placeholder="e.g. 200000"><span class="tooltiptext">Inventory value (goods, raw materials).</span></div>
+                <div class="form-group tooltip"><label>Other Current Assets</label><input type="number" id="otherCurrentAssets" placeholder="e.g. 100000"><span class="tooltiptext">Accounts receivable, short-term investments, etc.</span></div>
+                <div class="form-group tooltip"><label>Fixed Assets</label><input type="number" id="fixedAssets" placeholder="e.g. 500000"><span class="tooltiptext">Buildings, machinery, equipment.</span></div>
+                <div class="form-group tooltip"><label>Current Liabilities</label><input type="number" id="currentLiabilities" placeholder="e.g. 300000"><span class="tooltiptext">Debts due within one year.</span></div>
+                <div class="form-group tooltip"><label>Long-Term Liabilities</label><input type="number" id="longTermLiabilities" placeholder="e.g. 200000"><span class="tooltiptext">Long-term loans, bonds.</span></div>
+            </div>
+            <!-- Income Statement & Cash Flows -->
+            <div>
+                <div class="section-title-sm">📈 Income Statement & Cash Flows</div>
+                <div class="form-group tooltip"><label>Revenue (Sales)</label><input type="number" id="revenue" placeholder="e.g. 2000000"><span class="tooltiptext">Total sales (cash and credit).</span></div>
+                <div class="form-group tooltip"><label>Cost of Goods Sold</label><input type="number" id="cogs" placeholder="e.g. 1200000"><span class="tooltiptext">Cost of goods sold.</span></div>
+                <div class="form-group tooltip"><label>Operating Expenses</label><input type="number" id="operatingExpenses" placeholder="e.g. 400000"><span class="tooltiptext">Selling, administrative, marketing expenses, etc.</span></div>
+                <div class="form-group tooltip"><label>Interest Expense</label><input type="number" id="interestExpense" placeholder="e.g. 50000"><span class="tooltiptext">Interest on loans.</span></div>
+                <div class="form-group tooltip"><label>Tax Rate (%)</label><input type="number" id="taxRate" placeholder="e.g. 25" value="25"><span class="tooltiptext">Income tax rate (%).</span></div>
+                <div class="form-group tooltip"><label>Credit Sales (Optional)</label><input type="number" id="creditSales" placeholder="Leave blank = Revenue"><span class="tooltiptext">Sales not yet collected. If left blank, equals revenue.</span></div>
+                <div class="form-group tooltip"><label>Accounts Receivable (A/R)</label><input type="number" id="receivables" placeholder="e.g. 150000"><span class="tooltiptext">Amounts due from customers.</span></div>
+                <div class="form-group tooltip"><label>Accounts Payable (A/P)</label><input type="number" id="payables" placeholder="e.g. 100000"><span class="tooltiptext">Amounts due to suppliers.</span></div>
+            </div>
+        </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Financial Ratios</button>
+
+        <div class="results-section" id="resultsSection" style="display:none;">
+            <div class="action-bar">
+                <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> Word</button>
+                <button class="btn-export excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Full Excel</button>
+            </div>
+            <div class="results-grid" id="summaryCards"></div>
+            <div class="table-container" id="ratiosTable"></div>
+            <div class="chart-grid">
+                <div class="chart-container"><canvas id="radarChart"></canvas></div>
+                <div class="chart-container"><canvas id="barsChart"></canvas></div>
+            </div>
+            <div id="recommendations" class="result-card" style="text-align:right;"></div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center;">
+            <i class="fas fa-robot" style="color:var(--accent-soft);"></i> Results will appear after clicking the calculate button
+        </div>
+    </div>
+</div>
+
+<footer class="footer-simple">All rights reserved © 2026 <span>FAROUK GRUP</span></footer>
+
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+<a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+<!-- Calculator modal -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <!-- Row 1: 7 8 9 ÷ -->
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <!-- Row 2: 4 5 6 × -->
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <!-- Row 3: 1 2 3 − -->
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <!-- Row 4: C 0 . + -->
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <!-- Row 5: ⌫ = (span 2) -->
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column: span 2;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="../js/tools/tool18en.js" defer></script>
+</body>
+</html>

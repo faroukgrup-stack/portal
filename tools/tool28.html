@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>تحليل السيناريوهات | FAROUK GRUP</title>
+    <!-- حماية الصفحة -->
+    <script src="../js/auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" <link rel="stylesheet" href="../css/tools-common.css">
+    <link rel="stylesheet" href="../css/tools/tool28.css">
+    <link rel="stylesheet" href="../css/tools-overrides.css">>
+</head>
+<body>
+    <!-- خلفية ثابتة -->
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+
+    <!-- شاشة تحميل التصدير -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">جاري إنشاء التقرير...</h3>
+            <p id="loadingMsg">يرجى الانتظار</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero-mini">
+    
+        <h2>🔮 تحليل السيناريوهات</h2>
+        <p>محاكاة تأثير المتغيرات على أداء المنشأة – ماذا لو تغيرت المبيعات، الرواتب، أو تكاليف المواد الخام؟</p>
+    </section>
+
+    <!-- WRAPPER -->
+    <section class="calc-wrapper">
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-bolt"></i><span>محاكاة</span></div>
+            <h2><i class="fas fa-bolt" style="color:#cfa776;margin-left:0.5rem;"></i>محاكاة السيناريوهات المالية</h2>
+
+            <!-- العملة واسم الجهة -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> العملة:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>دولار ($)</option>
+                    <option value="€">يورو (€)</option>
+                    <option value="₺">ليرة تركية (₺)</option>
+                    <option value="ج.م">جنيه مصري (ج.م)</option>
+                    <option value="د.ك">دينار كويتي (د.ك)</option>
+                    <option value="ر.س">ريال سعودي (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> اسم الجهة:</label>
+                <input type="text" id="companyName" value="الشركة / المنشأة" placeholder="الجهة المستفيدة">
+            </div>
+
+            <!-- البيانات الأساسية -->
+            <div class="section-title-sm">📋 البيانات المالية الأساسية</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-chart-line"></i> الإيرادات الشهرية</label>
+                    <input type="number" id="baseRevenue" value="500000" step="1000">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-users"></i> الرواتب الشهرية</label>
+                    <input type="number" id="baseSalaries" value="150000" step="1000">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-boxes"></i> تكلفة المواد الخام</label>
+                    <input type="number" id="baseMaterials" value="100000" step="1000">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-file-invoice"></i> المصاريف التشغيلية الأخرى</label>
+                    <input type="number" id="baseOtherCosts" value="80000" step="1000">
+                </div>
+            </div>
+
+            <!-- السيناريوهات -->
+            <div class="section-title-sm">⚡ تغييرات السيناريو (القيم المئوية)</div>
+            <div class="scenario-grid">
+                <div class="scenario-card">
+                    <h4><i class="fas fa-chart-simple"></i> المبيعات</h4>
+                    <div class="field-row">
+                        <div class="field">
+                            <label>نسبة التغيير %</label>
+                            <input type="number" id="scenarioRevenue" value="-20" step="1">
+                        </div>
+                    </div>
+                </div>
+                <div class="scenario-card">
+                    <h4><i class="fas fa-users"></i> الرواتب</h4>
+                    <div class="field-row">
+                        <div class="field">
+                            <label>نسبة التغيير %</label>
+                            <input type="number" id="scenarioSalaries" value="15" step="1">
+                        </div>
+                    </div>
+                </div>
+                <div class="scenario-card">
+                    <h4><i class="fas fa-boxes"></i> المواد الخام</h4>
+                    <div class="field-row">
+                        <div class="field">
+                            <label>نسبة التغيير %</label>
+                            <input type="number" id="scenarioMaterials" value="10" step="1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-calculate" id="simulateBtn"><i class="fas fa-play"></i> تشغيل المحاكاة</button>
+
+            <!-- منطقة النتائج -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-cards" id="kpiCards"></div>
+
+                <div class="section-title-sm">📈 الرسوم البيانية</div>
+                <div class="charts-container">
+                    <div class="chart-card"><h3>مقارنة الحالي والسيناريو</h3><div class="chart-container"><canvas id="comparisonChart"></canvas></div></div>
+                    <div class="chart-card"><h3>تأثير السيناريو على الهامش والربح</h3><div class="chart-container"><canvas id="impactChart"></canvas></div></div>
+                </div>
+
+                <div class="section-title-sm">📋 جدول المقارنة التفصيلي</div>
+                <div class="table-container" id="comparisonTable"></div>
+
+                <div class="section-title-sm">💡 التوصيات والتحليل</div>
+                <div class="recommendation-box" id="recommendations"></div>
+
+                <div class="export-container">
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير تقرير كامل (Word)</button>
+                    <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> تصدير إلى Excel شامل</button>
+                </div>
+            </div>
+
+            <div id="initialMessage" style="margin-top:1rem; color:#aab7d4; text-align:center;">
+                <i class="fas fa-robot" style="color:#cfa776;"></i> أدخل البيانات واضغط على زر المحاكاة لعرض النتائج
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-simple">
+        جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
+    </footer>
+
+    <button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> حاسبة</button>
+    <a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> الرئيسية</a>
+
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="modalClose">&times;</span>
+                <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> آلة حاسبة</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn" data-val="C">C</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn" data-val="⌫">⌫</button>
+                    <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/tools/tool28.js" defer></script>
+</body>
+</html>

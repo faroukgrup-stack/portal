@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Real Estate Investment Return Calculator | FAROUK GRUP</title>
+<script src="../js/auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas & Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools/tool5en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- Export loading screen -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">Generating report...</h3>
+        <p id="loadingMsg">Please wait</p>
+    </div>
+</div>
+
+<section class="hero-mini">
+    <h2>Real Estate Investment Return Calculator</h2>
+    <p>Integrated analysis with NPV, IRR, MIRR, Payback, PI, Cash on Cash, ROI, with charts and sensitivity analysis</p>
+</section>
+
+<div class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-chart-line"></i><span>Real Estate</span></div>
+        <h2><i class="fas fa-chart-line" style="color:#cfa776;margin-right:0.5rem;"></i>Real Estate Investment Analysis</h2>
+
+        <!-- Currency and entity name -->
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> Currency:</label>
+            <select id="currencySelect">
+                <option value="$" selected>US Dollar ($)</option>
+                <option value="€">Euro (€)</option>
+                <option value="₺">Turkish Lira (₺)</option>
+                <option value="ج.م">Egyptian Pound (ج.م)</option>
+                <option value="د.ك">Kuwaiti Dinar (د.ك)</option>
+                <option value="ر.س">Saudi Riyal (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> Entity Name:</label>
+            <input type="text" id="companyName" value="Beneficiary Entity Name" placeholder="Beneficiary entity">
+        </div>
+
+        <!-- Property Data -->
+        <div class="section-title-sm">🏢 Property & Operations Data</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-dollar-sign"></i> Property Value (Initial Cost)</label>
+                <input type="number" id="marketValue" value="5000000" step="1000">
+                <span class="tooltiptext">Purchase price including all costs.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-home"></i> Number of Units</label>
+                <input type="number" id="units" value="1" min="1">
+                <span class="tooltiptext">Number of rental units.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-money-bill"></i> Monthly Rent per Unit</label>
+                <input type="number" id="rent" value="25000" step="100">
+                <span class="tooltiptext">Average monthly rent per unit.</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-tools"></i> Monthly Expenses (Utilities + Maintenance)</label>
+                <input type="number" id="monthlyExpenses" value="0" step="100">
+                <span class="tooltiptext">Monthly operating expenses.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Occupancy Rate</label>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input type="range" id="occupancyRange" min="0" max="100" value="100" step="1" style="flex:3;">
+                    <input type="number" id="occupancy" value="1" step="0.01" min="0" max="1" style="flex:1;">
+                </div>
+                <span class="tooltiptext">Average occupied units percentage.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-landmark"></i> Annual Property Tax Rate (%)</label>
+                <input type="number" id="taxRate" value="3.5" step="0.1">
+                <span class="tooltiptext">Annual tax percentage on assessed value.</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-chart-line"></i> Assessed Value Discount (%)</label>
+                <input type="number" id="assessedDiscount" value="10" step="1">
+                <span class="tooltiptext">Percentage discount applied to market value for tax assessment.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-arrow-up"></i> Annual Rent Increase (%)</label>
+                <input type="number" id="rentIncrease" value="30" step="0.1">
+                <span class="tooltiptext">Expected annual rent increase percentage.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-mountain"></i> Annual Land Appreciation (%)</label>
+                <input type="number" id="landAppreciation" value="5" step="0.1">
+                <span class="tooltiptext">Expected annual property value increase.</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-file-invoice"></i> Purchase Fees & Taxes (One-time)</label>
+                <input type="number" id="purchaseCosts" value="250000" step="1000">
+                <span class="tooltiptext">Registration fees, taxes, broker commissions paid once at purchase.</span>
+            </div>
+        </div>
+
+        <!-- Mortgage Financing -->
+        <div class="section-title-sm">🏦 Mortgage Financing (Optional)</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Loan-to-Value (LTV) %</label>
+                <input type="number" id="ltv" value="0" min="0" max="100" step="1">
+                <span class="tooltiptext">Loan percentage of property value. 0 means all-cash purchase.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Annual Interest Rate (%)</label>
+                <input type="number" id="interestRate" value="5" step="0.1">
+                <span class="tooltiptext">Interest rate on the loan.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-calendar-alt"></i> Loan Term (Years)</label>
+                <input type="number" id="loanTerm" value="20" min="1" max="30">
+                <span class="tooltiptext">Loan repayment period in years.</span>
+            </div>
+        </div>
+
+        <!-- Evaluation Criteria -->
+        <div class="section-title-sm">📈 Evaluation Criteria</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Discount Rate (%)</label>
+                <input type="number" id="discountRate" value="5" step="0.1">
+                <span class="tooltiptext">Rate used to discount future cash flows to present value.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Reinvestment Rate (%)</label>
+                <input type="number" id="reinvestRate" value="43" step="0.1">
+                <span class="tooltiptext">Rate at which positive cash flows can be reinvested.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-calendar"></i> Number of Years</label>
+                <input type="number" id="years" value="20" min="1" max="61">
+                <span class="tooltiptext">Investment period in years (up to 61).</span>
+            </div>
+        </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Return</button>
+
+        <!-- Results -->
+        <div class="results-section" id="resultsSection" style="display:none;">
+            <div class="results-cards" id="kpiCards"></div>
+            <div class="result-card" id="projectRating" style="text-align:center;"></div>
+
+            <div class="section-title-sm">📈 Annual & Cumulative Cash Flows</div>
+            <div class="chart-container"><canvas id="cashChart"></canvas></div>
+
+            <div class="section-title-sm">📊 All Annual Cash Flows</div>
+            <div class="table-container" id="cashFlowTable"></div>
+
+            <div class="section-title-sm">🔍 Sensitivity Analysis</div>
+            <div class="sens-container">
+                <button class="btn-sensitivity" id="sens10">+10% Rent</button>
+                <button class="btn-sensitivity" id="sens-10">-10% Rent</button>
+                <button class="btn-sensitivity" id="sensOcc10">+10% Occupancy</button>
+                <button class="btn-sensitivity" id="sensOcc-10">-10% Occupancy</button>
+                <button class="btn-sensitivity reset" id="resetSens">↺ Reset</button>
+            </div>
+            <div class="table-container" id="sensitivityTable" style="max-height:200px;"></div>
+
+            <div class="export-container">
+                <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Export Word</button>
+                <button class="export-btn excel" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Export Excel</button>
+            </div>
+
+            <div class="section-title-sm">💰 When Do We Break Even?</div>
+            <div class="result-card" id="paybackSummary" style="text-align:left;"></div>
+            <div class="note"><i class="fas fa-info-circle" style="color:#cfa776;"></i> Payback is calculated based on cumulative cash flows including the terminal value (sale at end of period). If financing is used, cash flows are after debt service.</div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem; color:var(--text-muted); text-align:center;">
+            <i class="fas fa-robot" style="color: var(--accent-soft);"></i> Results will appear after clicking Calculate
+        </div>
+    </div>
+</div>
+
+<footer class="footer-simple">All rights reserved © 2026 <span>FAROUK GRUP</span></footer>
+
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+<a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+<!-- Calculator Modal -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <!-- Fixed order: 7 8 9 / 4 5 6 × / 1 2 3 - -->
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="../js/tools/tool5en.js" defer></script>
+</body>
+</html>

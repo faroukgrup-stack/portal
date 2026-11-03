@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Investment Analysis (NPV/IRR/Payback) | FAROUK GRUP</title>
+    <!-- Page protection -->
+    <script src="../js/auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools/tool26en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+</head>
+<body>
+    <!-- Fixed background -->
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+
+    <!-- Export loading screen -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">Generating report...</h3>
+            <p id="loadingMsg">Please wait</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero-mini">
+        <h2>📊 Investment Analysis (NPV / IRR / Payback)</h2>
+        <p>Evaluate project feasibility – Net Present Value, Internal Rate of Return, and Payback Period</p>
+    </section>
+
+    <!-- WRAPPER -->
+    <section class="calc-wrapper">
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-chart-pie"></i><span>Invest</span></div>
+            <h2><i class="fas fa-chart-pie" style="color:#cfa776;margin-left:0.5rem;"></i>Project Evaluation</h2>
+
+            <!-- Currency & Entity -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> Currency:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>USD ($)</option>
+                    <option value="€">EUR (€)</option>
+                    <option value="₺">TRY (₺)</option>
+                    <option value="ج.م">EGP (ج.م)</option>
+                    <option value="د.ك">KWD (د.ك)</option>
+                    <option value="ر.س">SAR (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> Entity Name:</label>
+                <input type="text" id="companyName" value="Company / Organization" placeholder="Beneficiary entity">
+            </div>
+
+            <!-- Project Data -->
+            <div class="section-title-sm">📋 Project Data</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-money-bill-wave"></i> Initial Investment</label>
+                    <input type="number" id="initialInvestment" value="500000" step="1000">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percent"></i> Discount Rate (WACC) (%)</label>
+                    <input type="number" id="discountRate" value="12" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt"></i> Project Duration (Years)</label>
+                    <input type="number" id="projectYears" value="5" step="1" min="1">
+                </div>
+            </div>
+
+            <!-- Cashflows -->
+            <div class="section-title-sm">📈 Annual Cashflows</div>
+            <div class="cashflow-container" id="cashflowContainer"></div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem;">
+                <button class="btn-sm" id="addYearBtn"><i class="fas fa-plus"></i> Add Year</button>
+                <button class="btn-sm" id="removeYearBtn"><i class="fas fa-minus"></i> Remove Last Year</button>
+                <button class="btn-sm" id="fillExampleBtn"><i class="fas fa-file-import"></i> Load Example</button>
+            </div>
+
+            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Investment Metrics</button>
+
+            <!-- Results Area -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-cards" id="kpiCards"></div>
+
+                <div class="section-title-sm">📈 Cashflow Chart</div>
+                <div class="chart-container"><canvas id="cashflowChart"></canvas></div>
+
+                <div class="section-title-sm">📋 Cashflow Table</div>
+                <div class="table-container" id="cashflowTable"></div>
+
+                <div class="section-title-sm">💡 Recommendations & Analysis</div>
+                <div class="recommendation-box" id="recommendations"></div>
+
+                <div class="export-container">
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Full Word Report</button>
+                    <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Export to Full Excel</button>
+                </div>
+            </div>
+
+            <div id="initialMessage" style="margin-top:1rem; color:#aab7d4; text-align:center;">
+                <i class="fas fa-robot" style="color:#cfa776;"></i> Results will appear after clicking the calculate button
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-simple">
+        All rights reserved © 2026 <span>FAROUK GRUP</span>
+    </footer>
+
+    <button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+    <a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="modalClose">&times;</span>
+                <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn" data-val="C">C</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn" data-val="⌫">⌫</button>
+                    <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/tools/tool26en.js" defer></script>
+</body>
+</html>

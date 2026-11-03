@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>تقييم الشركات البرمجية الناشئة | FAROUK GRUP</title>
+    <!-- حماية الصفحة -->
+    <script src="../js/auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" <link rel="stylesheet" href="../css/tools-common.css">
+    <link rel="stylesheet" href="../css/tools/tool27.css">
+    <link rel="stylesheet" href="../css/tools-overrides.css">>
+</head>
+<body>
+    <!-- خلفية ثابتة -->
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+
+    <!-- شاشة تحميل التصدير -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">جاري إنشاء التقرير...</h3>
+            <p id="loadingMsg">يرجى الانتظار</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero-mini">
+    
+        <h2>🚀 تقييم الشركات البرمجية الناشئة</h2>
+        <p>نطاق تقييم احترافي مع مؤشرات SaaS متقدمة – مرحلة ما بعد الإيرادات وما قبلها</p>
+    </section>
+
+    <!-- WRAPPER -->
+    <section class="calc-wrapper">
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-chart-pie"></i><span>تقييم</span></div>
+            <h2><i class="fas fa-rocket" style="color:#cfa776;margin-left:0.5rem;"></i>حاسبة تقييم الشركات الناشئة</h2>
+
+            <!-- العملة واسم الشركة -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> العملة:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>دولار ($)</option>
+                    <option value="€">يورو (€)</option>
+                    <option value="₺">ليرة تركية (₺)</option>
+                    <option value="ج.م">جنيه مصري (ج.م)</option>
+                    <option value="د.ك">دينار كويتي (د.ك)</option>
+                    <option value="ر.س">ريال سعودي (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> اسم الشركة:</label>
+                <input type="text" id="companyName" value="شركة برمجيات واعدة" placeholder="اسم الشركة">
+            </div>
+
+            <!-- اختيار المرحلة -->
+            <div class="stage-selector">
+                <button class="stage-btn active" id="stagePostRevenue" onclick="switchStage('post')"><i class="fas fa-chart-line"></i> ما بعد الإيرادات</button>
+                <button class="stage-btn" id="stagePreRevenue" onclick="switchStage('pre')"><i class="fas fa-lightbulb"></i> ما قبل الإيرادات</button>
+            </div>
+
+            <!-- قسم ما بعد الإيرادات -->
+            <div id="postRevenueSection">
+                <div class="section-title-sm">📊 الإيرادات والنمو</div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-sync-alt"></i> الإيراد السنوي المتكرر (ARR)</label>
+                        <input type="number" id="arrInput" value="1000000" step="1000">
+                        <span class="tooltiptext">إجمالي الإيرادات السنوية المتكررة من الاشتراكات والعقود.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-percent"></i> معدل النمو السنوي (%)</label>
+                        <input type="number" id="growthRate" value="50" step="0.1">
+                        <span class="tooltiptext">نسبة نمو الإيرادات سنة بعد سنة (YoY Growth).</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-chart-pie"></i> هامش الربح الإجمالي (%)</label>
+                        <input type="number" id="grossMargin" value="75" step="0.1">
+                        <span class="tooltiptext">(الإيرادات - تكلفة الخدمة) / الإيرادات. البرمجيات القوية تتجاوز 70%.</span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-chart-line"></i> هامش الربح التشغيلي (%)</label>
+                        <input type="number" id="profitMargin" value="-10" step="0.1">
+                        <span class="tooltiptext">يستخدم لحساب قاعدة الـ 40. قد يكون سالباً للشركات الناشئة.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-user-slash"></i> معدل التسرب الشهري (%)</label>
+                        <input type="number" id="churnRate" value="2" step="0.1" min="0">
+                        <span class="tooltiptext">نسبة العملاء الذين يلغون اشتراكاتهم شهرياً. أقل من 2% صحي.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-undo-alt"></i> صافي الاحتفاظ بالإيرادات NRR (%)</label>
+                        <input type="number" id="nrrInput" value="110" step="0.1">
+                        <span class="tooltiptext">نسبة الإيرادات المحتفظ بها من العملاء الحاليين. فوق 110% يعني توسعاً.</span>
+                    </div>
+                </div>
+
+                <div class="section-title-sm">💰 اقتصاديات الوحدة</div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-users"></i> عدد العملاء الحاليين</label>
+                        <input type="number" id="customersCount" value="200" step="1">
+                        <span class="tooltiptext">مطلوب لحساب فترة استرداد تكلفة الاكتساب بدقة.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-user-plus"></i> تكلفة اكتساب العميل CAC</label>
+                        <input type="number" id="cacInput" value="5000" step="100">
+                        <span class="tooltiptext">متوسط التكلفة التسويقية والمبيعاتية لاكتساب عميل جديد.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-user-check"></i> القيمة الدائمة للعميل LTV</label>
+                        <input type="number" id="ltvInput" value="25000" step="100">
+                        <span class="tooltiptext">إجمالي الإيراد المتوقع من العميل طوال فترة تعاقده.</span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-fire"></i> صافي الحرق الشهري</label>
+                        <input type="number" id="netBurnRate" value="40000" step="1000">
+                        <span class="tooltiptext">النقد الخارج صافياً شهرياً (المصاريف - الإيرادات).</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-piggy-bank"></i> النقد المتاح</label>
+                        <input type="number" id="cashOnHand" value="500000" step="10000">
+                        <span class="tooltiptext">إجمالي النقد الموجود في حساب الشركة حالياً.</span>
+                    </div>
+                </div>
+
+                <div class="section-title-sm">🔮 مؤشرات متقدمة (اختيارية للدقة)</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-check"></i> ARR الربع الحالي</label>
+                        <input type="number" id="arrCurrentQ" placeholder="اختياري">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-minus"></i> ARR الربع السابق</label>
+                        <input type="number" id="arrPrevQ" placeholder="اختياري">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-ad"></i> مصاريف مبيعات وتسويق (الربع السابق)</label>
+                        <input type="number" id="salesMarketingPrevQ" placeholder="اختياري">
+                    </div>
+                </div>
+                <div class="note-box" id="magicNumberNote" style="display:none;">
+                    <i class="fas fa-exclamation-triangle"></i> لم تُدخل بيانات ربعية دقيقة. الرقم السحري (Magic Number) المعروض <strong>تقريبي</strong> بناءً على النمو ومعدل الحرق.
+                </div>
+
+                <div class="section-title-sm">🎯 طريقة رأس المال الجريء (VC)</div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-chart-bar"></i> قيمة التخارج المتوقعة</label>
+                        <input type="number" id="exitValue" value="50000000" step="1000000">
+                        <span class="tooltiptext">القيمة السوقية المتوقعة للشركة عند التخارج بعد 5-7 سنوات.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-arrow-up"></i> مضاعف العائد المستهدف ROI</label>
+                        <input type="number" id="roiMultiple" value="10" step="0.5" min="1">
+                        <span class="tooltiptext">عدد المرات التي يتوقع المستثمر مضاعفة استثماره فيها.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-clock"></i> سنوات التخارج</label>
+                        <input type="number" id="exitYears" value="6" step="1" min="3" max="10">
+                        <span class="tooltiptext">عدد السنوات المتوقعة حتى التخارج.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم ما قبل الإيرادات -->
+            <div id="preRevenueSection" style="display:none;">
+                <div class="section-title-sm">🌱 طريقة بيركوس (Berkus Method)</div>
+                <p style="color:#aab7d4;font-size:0.85rem;margin-bottom:1rem;">قدّر قيمة كل عنصر حتى 500,000 دولار. هذه طريقة معتمدة للجولات التأسيسية.</p>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-lightbulb"></i> الفكرة وجودة الحل ($)</label>
+                        <input type="number" id="berkusIdea" value="350000" step="10000" max="500000">
+                        <span class="tooltiptext">مدى ابتكار الفكرة وملاءمتها للسوق.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-code"></i> النموذج الأولي والتقنية ($)</label>
+                        <input type="number" id="berkusPrototype" value="400000" step="10000" max="500000">
+                        <span class="tooltiptext">وجود منتج أولي أو تقنية قابلة للتطوير.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-user-tie"></i> قوة الفريق المؤسس ($)</label>
+                        <input type="number" id="berkusTeam" value="450000" step="10000" max="500000">
+                        <span class="tooltiptext">خبرة المؤسسين وسجلهم الريادي.</span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-handshake"></i> العلاقات الاستراتيجية ($)</label>
+                        <input type="number" id="berkusRelations" value="200000" step="10000" max="500000">
+                        <span class="tooltiptext">الشراكات وقنوات التوزيع والعلاقات مع المستثمرين.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-rocket"></i> التنفيذ والمبيعات الأولية ($)</label>
+                        <input type="number" id="berkusExecution" value="250000" step="10000" max="500000">
+                        <span class="tooltiptext">أي مبيعات أو التزامات من عملاء محتملين.</span>
+                    </div>
+                </div>
+
+                <div class="section-title-sm">🔧 طريقة التكلفة المستبدلة</div>
+                <div class="form-row">
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-dollar-sign"></i> تكلفة إعادة بناء التقنية ($)</label>
+                        <input type="number" id="rebuildCost" value="300000" step="10000">
+                        <span class="tooltiptext">التكلفة التقديرية لتطوير المنتج والتقنية من الصفر.</span>
+                    </div>
+                    <div class="form-group tooltip">
+                        <label><i class="fas fa-shield-alt"></i> علاوة المخاطرة (%)</label>
+                        <input type="number" id="riskPremium" value="25" step="1">
+                        <span class="tooltiptext">نسبة إضافية تعكس مخاطر السوق والمنافسة والتنفيذ.</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> احسب نطاق التقييم</button>
+
+            <!-- منطقة النتائج -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-cards" id="kpiCards"></div>
+
+                <div id="rule40Badge" style="text-align:center;margin:0.5rem 0;"></div>
+
+                <div class="section-title-sm">📊 نطاق التقييم (منخفض / أساسي / مرتفع)</div>
+                <div class="table-container" id="valuationTable"></div>
+
+                <div class="section-title-sm">📈 الرسم البياني للتقييم</div>
+                <div class="chart-container"><canvas id="valuationChart"></canvas></div>
+
+                <div class="section-title-sm">📝 تفسير النتائج</div>
+                <div class="recommendation-box" id="explainSection"></div>
+
+                <div class="note-box" id="additionalNotes"></div>
+
+                <div class="export-container">
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> تصدير تقرير كامل (Word)</button>
+                    <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> تصدير إلى Excel شامل</button>
+                </div>
+            </div>
+
+            <div id="initialMessage" style="margin-top:1rem; color:#aab7d4; text-align:center;">
+                <i class="fas fa-robot" style="color:#cfa776;"></i> أدخل البيانات واضغط على الزر لعرض نطاق التقييم
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-simple">
+        جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span>
+    </footer>
+
+    <button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> حاسبة</button>
+    <a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> الرئيسية</a>
+
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="modalClose">&times;</span>
+                <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> آلة حاسبة</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn" data-val="C">C</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn" data-val="⌫">⌫</button>
+                    <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/tools/tool27.js" defer></script>
+</body>
+</html>

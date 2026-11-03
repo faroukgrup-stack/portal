@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Kapsamlı Restoran Maliyet Hesaplayıcı | FAROUK GRUP</title>
+<!-- Sayfa koruması -->
+<script src="../js/auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js & html2canvas & Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../css/tools-common-tr.css">
+    <link rel="stylesheet" href="../css/tools-common-tr.css">
+    <link rel="stylesheet" href="../css/tools/tool2tr.css">
+    <link rel="stylesheet" href="../css/tools-overrides-tr.css">
+    <link rel="stylesheet" href="../css/tools-overrides-tr.css">
+</head>
+<body>
+    <!-- Sabit arka plan -->
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+
+    <!-- Dışa aktar yükleme ekranı -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">Rapor oluşturuluyor...</h3>
+            <p id="loadingMsg">Lütfen bekleyin</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero-mini">
+        <h2>Kapsamlı Restoran Maliyet Hesaplayıcı</h2>
+        <p>Entegre analiz, konum analizi, Monte Carlo, sağlık göstergeleri ve piyasa değeri</p>
+    </section>
+
+    <!-- WRAPPER -->
+    <section class="calc-wrapper">
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-utensils"></i><span>Restoran</span></div>
+            <h2><i class="fas fa-utensils" style="color:#cfa776;margin-left:0.5rem;"></i>Restoran Maliyet Analizi</h2>
+
+            <!-- Para birimi ve kurum adı -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> Para Birimi:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>Dolar ($)</option>
+                    <option value="€">Euro (€)</option>
+                    <option value="₺">Türk Lirası (₺)</option>
+                    <option value="ج.م">Mısır Lirası (ج.م)</option>
+                    <option value="د.ك">Kuveyt Dinarı (د.ك)</option>
+                    <option value="ر.س">Suudi Riyali (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> Kurum Adı:</label>
+                <input type="text" id="companyName" value="Rapordan yararlanan kurum adı" placeholder="Yararlanıcı kurum">
+            </div>
+
+            <!-- Temel Bilgiler -->
+            <div class="section-title-sm"><i class="fas fa-database"></i> Temel Bilgiler</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-users"></i> Günlük Müşteri Sayısı</label>
+                    <input type="number" id="dailyCustomers" value="50" min="0" step="10">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-receipt"></i> Ortalama Fiş Tutarı</label>
+                    <input type="number" id="avgBill" value="15" min="0" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Çalışma Günü</label>
+                    <input type="number" id="workingDays" value="26" min="1" step="1">
+                </div>
+            </div>
+
+            <!-- Sabit Maliyetler -->
+            <div class="section-title-sm"><i class="fas fa-building"></i> Aylık Sabit Maliyetler</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-building"></i> Kira</label>
+                    <input type="number" id="rent" value="3500" min="0" step="100">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-users"></i> Maaşlar (Net)</label>
+                    <input type="number" id="salaries" value="8000" min="0" step="100">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percent"></i> Çalışan Maliyet Katsayısı</label>
+                    <input type="number" id="employeeBurden" value="35" min="0" max="200" step="5">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-bolt"></i> Faturalar</label>
+                    <input type="number" id="utilities" value="1000" min="0" step="100">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-wifi"></i> İnternet</label>
+                    <input type="number" id="internet" value="200" min="0" step="50">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-broom"></i> Bakım ve Temizlik</label>
+                    <input type="number" id="maintenance" value="300" min="0" step="50">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-ad"></i> Pazarlama</label>
+                    <input type="number" id="marketing" value="500" min="0" step="100">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-boxes"></i> Diğer Giderler</label>
+                    <input type="number" id="otherFixed" value="200" min="0" step="50">
+                </div>
+            </div>
+
+            <!-- Değişken Maliyetler -->
+            <div class="section-title-sm"><i class="fas fa-percent"></i> Değişken Maliyetler (Gelir Yüzdesi)</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-drumstick-bite"></i> Yiyecek Maliyeti %</label>
+                    <input type="number" id="foodCostPct" value="30" min="0" max="100" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-wine-bottle"></i> İçecek Maliyeti %</label>
+                    <input type="number" id="drinkCostPct" value="20" min="0" max="100" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-box"></i> Ambalaj %</label>
+                    <input type="number" id="packagingPct" value="5" min="0" max="100" step="1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-motorcycle"></i> Teslimat Komisyonu %</label>
+                    <input type="number" id="deliveryPct" value="15" min="0" max="100" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percent"></i> Teslimat Satış Oranı %</label>
+                    <input type="number" id="deliverySalesPct" value="30" min="0" max="100" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-trash-alt"></i> İsraf Oranı %</label>
+                    <input type="number" id="wastePct" value="3" min="0" max="20" step="0.5">
+                </div>
+            </div>
+
+            <!-- Vergiler ve Yatırım -->
+            <div class="section-title-sm"><i class="fas fa-coins"></i> Vergiler ve İlk Yatırım</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-percent"></i> KDV Oranı %</label>
+                    <input type="number" id="vatPct" value="20" min="0" max="100" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tools"></i> İlk Yatırım</label>
+                    <input type="number" id="initialInvestment" value="50000" min="0" step="1000">
+                </div>
+            </div>
+
+            <!-- Konum Analizi -->
+            <button type="button" class="collapsible" id="locationCollapse">
+                <span><i class="fas fa-map-marker-alt"></i> Konum Analizi</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="collapsible-content" id="locationContent">
+                <div class="form-row" style="margin-top:0.5rem;">
+                    <div class="form-group">
+                        <label><i class="fas fa-walking"></i> Günlük Yaya Trafiği</label>
+                        <input type="number" id="footTraffic" value="2000" min="0" step="100">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-percent"></i> Giriş Oranı %</label>
+                        <input type="number" id="entryRate" value="5" min="0" max="100" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-percent"></i> Satın Alma Oranı %</label>
+                        <input type="number" id="purchaseRate" value="70" min="0" max="100" step="1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-table"></i> Masa Sayısı</label>
+                        <input type="number" id="tables" value="12" min="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-chair"></i> Masa Başı Sandalye</label>
+                        <input type="number" id="seatsPerTable" value="4" min="1" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-hourglass-half"></i> Oturum Süresi (dk)</label>
+                        <input type="number" id="sessionMinutes" value="60" min="10" step="5">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> Günlük Çalışma Saati</label>
+                        <input type="number" id="hoursOpen" value="14" min="1" step="1">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Maliyet ve Kârı Hesapla</button>
+
+            <!-- Sonuçlar -->
+            <div class="results-section" id="resultsSection" style="display:none;">
+                <div class="results-cards" id="kpiCards"></div>
+
+                <div class="result-card" id="smartAlerts" style="text-align:right;padding:0.8rem;"></div>
+
+                <div class="section-title-sm"><i class="fas fa-chart-pie"></i> Grafik Analizi</div>
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>Maliyet Dağılımı</h3>
+                        <div class="chart-container"><canvas id="costPieChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Başabaş Noktası</h3>
+                        <div class="chart-container"><canvas id="breakevenChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="section-title-sm"><i class="fas fa-list"></i> Aylık Maliyet Detayı</div>
+                <div class="table-container" id="costBreakdownTable"></div>
+
+                <div class="section-title-sm"><i class="fas fa-clock"></i> Yatırım Geri Ödeme Süresi</div>
+                <div class="result-card" id="paybackCard" style="text-align:center;"></div>
+
+                <div class="section-title-sm"><i class="fas fa-chart-simple"></i> Kârlılık Duyarlılık Analizi</div>
+                <div class="table-container" id="sensitivityTable"></div>
+
+                <div class="section-title-sm"><i class="fas fa-heartbeat"></i> Restoran Sağlık Endeksi</div>
+                <div class="result-card" id="healthScoreCard" style="text-align:right;"></div>
+
+                <div class="section-title-sm"><i class="fas fa-tag"></i> Piyasa Değeri Tahmini</div>
+                <div class="form-row" style="align-items:flex-end;">
+                    <div class="form-group" style="flex:2;">
+                        <label><i class="fas fa-times"></i> Sektör Çarpanı</label>
+                        <input type="number" id="valuationMultiple" value="3" min="1" max="10" step="0.5">
+                    </div>
+                    <div class="form-group" style="flex:1;min-width:80px;">
+                        <button class="btn-calculate" id="calcValuationBtn" style="margin:0;padding:0.6rem 1.5rem;font-size:0.9rem;"><i class="fas fa-calculator"></i> Hesapla</button>
+                    </div>
+                </div>
+                <div class="result-card" id="valuationCard" style="text-align:center;"></div>
+
+                <!-- Gelişmiş Analizler -->
+                <button type="button" class="collapsible" id="advancedCollapse">
+                    <span><i class="fas fa-chart-line"></i> Gelişmiş Analizler</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="collapsible-content" id="advancedContent">
+                    <div class="section-title-sm" style="margin-top:0.8rem;"><i class="fas fa-dice"></i> Monte Carlo Simülasyonu (1000)</div>
+                    <div class="result-card" id="monteCarloCard" style="text-align:right;">
+                        <button class="btn-calculate" id="runMonteCarloBtn" style="margin:0 0 0.8rem 0;padding:0.5rem 1.5rem;font-size:0.95rem;width:auto;">Çalıştır</button>
+                        <div id="monteCarloResults"></div>
+                    </div>
+                    <div class="section-title-sm"><i class="fas fa-ban"></i> Operasyonel Kapanış Noktası</div>
+                    <div class="result-card" id="shutdownCard" style="text-align:right;"></div>
+                    <div class="section-title-sm"><i class="fas fa-arrow-up"></i> Operasyonel Kaldıraç</div>
+                    <div class="result-card" id="operatingLeverageCard" style="text-align:right;"></div>
+                    <div class="section-title-sm"><i class="fas fa-shield-alt"></i> Güvenlik Marjı</div>
+                    <div class="result-card" id="marginOfSafetyCard" style="text-align:right;"></div>
+                    <div class="section-title-sm"><i class="fas fa-maximize"></i> Maksimum Kapasite ve Doluluk</div>
+                    <div class="result-card" id="capacityCard" style="text-align:right;"></div>
+                    <div class="section-title-sm"><i class="fas fa-bolt"></i> Operasyonel Verimlilik Göstergeleri</div>
+                    <div class="result-card" id="efficiencyCard" style="text-align:right;"></div>
+                </div>
+
+                <div class="export-container">
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Word</button>
+                    <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Excel</button>
+                </div>
+
+                <div class="section-title-sm"><i class="fas fa-bullseye"></i> Başabaş Noktası</div>
+                <div class="result-card" id="breakevenSummary" style="text-align:center;"></div>
+            </div>
+
+            <div id="initialMessage">
+                <i class="fas fa-robot" style="color:#cfa776;"></i> Sonuçlar "Hesapla" butonuna tıkladıktan sonra görüntülenecektir.
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-simple">
+        Tüm hakları saklıdır © 2026 <span>FAROUK GRUP</span>
+    </footer>
+
+    <!-- Sabit butonlar -->
+    <button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Hesap Makinesi</button>
+    <a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> Ana Sayfa</a>
+
+    <!-- Hesap Makinesi Modal -->
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="modalClose">&times;</span>
+                <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Hesap Makinesi</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn" data-val="C">C</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn" data-val="⌫">⌫</button>
+                    <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/tools/tool2tr.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Multi-Product Break-Even Analysis | FAROUK GRUP</title>
+<!-- Page protection -->
+<script src="../js/auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools/tool17en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- Export loading screen -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">Generating report...</h3>
+        <p id="loadingMsg">Please wait</p>
+    </div>
+</div>
+
+<section class="hero-mini">
+    <h2>📊 Multi-Product Break-Even Analysis</h2>
+    <p>Calculate the break-even point accurately for a diverse menu of dishes and beverages</p>
+</section>
+
+<div class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-balance-scale"></i><span>Break-even</span></div>
+        <h2><i class="fas fa-chart-line" style="color:#cfa776;margin-left:0.5rem;"></i>Profit Mix Analysis</h2>
+
+        <!-- Currency & entity -->
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> Currency:</label>
+            <select id="currencySelect">
+                <option value="$" selected>USD ($)</option>
+                <option value="€">EUR (€)</option>
+                <option value="₺">TRY (₺)</option>
+                <option value="ج.م">EGP (ج.م)</option>
+                <option value="د.ك">KWD (د.ك)</option>
+                <option value="ر.س">SAR (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> Entity Name:</label>
+            <input type="text" id="companyName" value="Beneficiary Entity" placeholder="Beneficiary entity">
+        </div>
+
+        <!-- Products -->
+        <div class="section-title-sm">🍽️ Products (Dishes / Beverages)</div>
+        <div id="productsContainer"></div>
+        <button class="btn-add" id="addProductBtn"><i class="fas fa-plus"></i> Add Product</button>
+
+        <!-- Fixed costs -->
+        <div class="section-title-sm">💰 Fixed Costs</div>
+        <div class="form-group tooltip">
+            <label><i class="fas fa-chart-line"></i> Total Monthly Fixed Costs</label>
+            <input type="number" id="fixedCosts" placeholder="e.g. 20000" value="" min="0">
+            <span class="tooltiptext">Total costs that do not change with sales volume (rent, salaries, utilities, insurance, etc.).</span>
+        </div>
+
+        <!-- Actual sales -->
+        <div class="section-title-sm">📈 Actual Sales (Optional)</div>
+        <div class="form-group tooltip">
+            <label><i class="fas fa-chart-simple"></i> Total Actual Units Sold during the month</label>
+            <input type="number" id="actualTotalUnits" placeholder="e.g. 1500" value="" min="0">
+            <span class="tooltiptext">Total number of units actually sold during the month. Used to calculate margin of safety.</span>
+        </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Break-Even Point</button>
+
+        <!-- Results -->
+        <div class="results-section" id="resultsSection" style="display:none;">
+            <div class="action-bar">
+                <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> Word</button>
+                <button class="btn-export excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Full Excel</button>
+            </div>
+            <div class="results-grid" id="resultsGrid"></div>
+            <div class="table-container" id="productsBreakdown"></div>
+            <div class="chart-grid">
+                <div class="chart-container"><canvas id="cmPieChart"></canvas></div>
+                <div class="chart-container"><canvas id="beUnitsBarChart"></canvas></div>
+            </div>
+            <div class="result-card" id="marginSafety"></div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center;">
+            <i class="fas fa-robot" style="color:var(--accent-soft);"></i> Results will appear after clicking the calculate button
+        </div>
+    </div>
+</div>
+
+<footer class="footer-simple">All rights reserved © 2026 <span>FAROUK GRUP</span></footer>
+
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+<a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+<!-- Calculator modal -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <!-- Row 1: 7 8 9 ÷ -->
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <!-- Row 2: 4 5 6 × -->
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <!-- Row 3: 1 2 3 − -->
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <!-- Row 4: C 0 . + -->
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <!-- Row 5: ⌫ = (span 2) -->
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column: span 2;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="../js/tools/tool17en.js" defer></script>
+</body>
+</html>

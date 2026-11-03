@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>التنبؤ المالي المتقدم | FAROUK GRUP</title>
+<!-- حماية الصفحة -->
+<script src="../js/auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" <link rel="stylesheet" href="../css/tools-common.css">
+    <link rel="stylesheet" href="../css/tools/tool19.css">
+    <link rel="stylesheet" href="../css/tools-overrides.css">>
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">جاري إنشاء التقرير...</h3>
+        <p id="loadingMsg">يرجى الانتظار</p>
+    </div>
+</div>
+
+<section class="hero-mini">
+    
+    <h2>📈 التنبؤ المالي المتقدم</h2>
+    <p>توقعات القوائم المالية، التدفقات النقدية، وتحليل الاستثمار</p>
+</section>
+
+<div class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-chart-line"></i><span>تنبؤ</span></div>
+        <h2><i class="fas fa-chart-line" style="color:#cfa776;margin-left:0.5rem;"></i>بيانات الأساس والافتراضات</h2>
+
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> العملة:</label>
+            <select id="currencySelect">
+                <option value="$" selected>دولار ($)</option>
+                <option value="€">يورو (€)</option>
+                <option value="₺">ليرة تركية (₺)</option>
+                <option value="ج.م">جنيه مصري (ج.م)</option>
+                <option value="د.ك">دينار كويتي (د.ك)</option>
+                <option value="ر.س">ريال سعودي (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> اسم الجهة:</label>
+            <input type="text" id="companyName" value="اسم الجهة المستفيدة من التقرير" placeholder="الجهة المستفيدة">
+        </div>
+
+        <div class="grid-2">
+            <div>
+                <div class="section-title-sm">📊 البيانات التاريخية</div>
+                <div class="form-group tooltip"><label>الإيرادات (سنة الأساس)</label><input type="number" id="baseRevenue" placeholder="مثال: 2000000"><span class="tooltiptext">الإيرادات في آخر سنة متاحة.</span></div>
+                <div class="form-group tooltip"><label>تكلفة المبيعات (% من الإيرادات)</label><input type="number" id="cogsPercent" value="60"><span class="tooltiptext">نسبة تكلفة المبيعات من الإيرادات.</span></div>
+                <div class="form-group tooltip"><label>المصاريف التشغيلية (% من الإيرادات)</label><input type="number" id="opexPercent" value="25"><span class="tooltiptext">نسبة المصاريف التشغيلية من الإيرادات.</span></div>
+                <div class="form-group tooltip"><label>معدل الضريبة (%)</label><input type="number" id="taxRate" value="25"><span class="tooltiptext">نسبة ضريبة الدخل.</span></div>
+                <div class="form-group tooltip"><label>الإهلاك السنوي</label><input type="number" id="depreciation" placeholder="مثال: 50000"><span class="tooltiptext">قيمة الإهلاك السنوي الثابت.</span></div>
+                <div class="form-group tooltip"><label>النفقات الرأسمالية (CAPEX) السنوي</label><input type="number" id="capex" placeholder="مثال: 80000"><span class="tooltiptext">الاستثمارات السنوية في الأصول الثابتة.</span></div>
+                <div class="form-group tooltip"><label>أيام تحصيل المدينين (DSO)</label><input type="number" id="dso" value="45"><span class="tooltiptext">متوسط فترة تحصيل المبيعات الآجلة.</span></div>
+                <div class="form-group tooltip"><label>أيام المخزون (DIO)</label><input type="number" id="dio" value="60"><span class="tooltiptext">متوسط فترة بقاء المخزون.</span></div>
+                <div class="form-group tooltip"><label>أيام سداد الدائنين (DPO)</label><input type="number" id="dpo" value="30"><span class="tooltiptext">متوسط فترة سداد الموردين.</span></div>
+            </div>
+            <div>
+                <div class="section-title-sm">📈 افتراضات النمو والتقييم</div>
+                <div class="form-group tooltip"><label>معدل نمو الإيرادات السنوي (%)</label><input type="number" id="growthRate" value="10"><span class="tooltiptext">نسبة النمو السنوي للإيرادات.</span></div>
+                <div class="form-group tooltip"><label>عدد سنوات التوقع</label><input type="number" id="forecastYears" value="5"><span class="tooltiptext">عدد السنوات المراد توقعها.</span></div>
+                <div class="form-group tooltip"><label>معدل الخصم (WACC) (%)</label><input type="number" id="discountRate" value="10"><span class="tooltiptext">معدل الخصم لحساب صافي القيمة الحالية.</span></div>
+                <div class="form-group tooltip"><label>رأس المال العامل الأولي</label><input type="number" id="initialWC" placeholder="مثال: 200000"><span class="tooltiptext">رأس المال العامل في سنة الأساس.</span></div>
+                <div class="form-group tooltip"><label>الاستثمار الأولي (CAPEX سنة 0)</label><input type="number" id="initialInvestment" placeholder="مثال: 500000"><span class="tooltiptext">الاستثمار الأولي خارج التدفقات التشغيلية.</span></div>
+                <div class="form-group tooltip"><label>معدل النمو الدائم (%)</label><input type="number" id="terminalGrowth" value="3"><span class="tooltiptext">معدل النمو الدائم بعد فترة التوقع.</span></div>
+            </div>
+        </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> تنفيذ التنبؤ المالي</button>
+
+        <div class="results-section" id="resultsSection" style="display:none;">
+            <div class="action-bar">
+                <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> Word</button>
+                <button class="btn-export excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Excel شامل</button>
+            </div>
+            <div class="results-grid" id="kpiCards"></div>
+            <div class="section-title-sm">📋 قائمة الدخل المتوقعة</div>
+            <div class="table-container" id="incomeTable"></div>
+            <div class="section-title-sm">💵 التدفقات النقدية الحرة (FCF)</div>
+            <div class="table-container" id="cashFlowTable"></div>
+            <div class="chart-grid">
+                <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+                <div class="chart-container"><canvas id="fcfChart"></canvas></div>
+            </div>
+            <div id="valuationCard" class="result-card"></div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center;">
+            <i class="fas fa-robot" style="color:var(--accent-soft);"></i> سيتم عرض التنبؤات بعد الضغط على زر الحساب
+        </div>
+    </div>
+</div>
+
+<footer class="footer-simple">جميع الحقوق محفوظة © 2026 <span>FAROUK GRUP</span></footer>
+
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> حاسبة</button>
+<a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> الرئيسية</a>
+
+<!-- نافذة الآلة الحاسبة -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> آلة حاسبة</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="../js/tools/tool19.js" defer></script>
+</body>
+</html>

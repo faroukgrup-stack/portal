@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Advanced HACCP Audit System | FAROUK GRUP</title>
+<!-- Page protection -->
+<script src="../js/auth-check.js"></script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- ExcelJS & FileSaver -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools/tool14en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- Export loading screen -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">Generating report...</h3>
+        <p id="loadingMsg">Please wait</p>
+    </div>
+</div>
+
+<section class="hero-mini">
+    <h2>📋 Advanced HACCP Audit System</h2>
+    <p>Hazard analysis – instant corrective recommendations – professional reports</p>
+</section>
+
+<div class="container">
+    <div class="checklist-card" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-clipboard-check"></i><span>HACCP</span></div>
+        <h2><i class="fas fa-clipboard-check" style="color:#cfa776;margin-right:0.5rem;"></i>Daily Audit Checklist with Risk Analysis</h2>
+
+        <!-- Audit information -->
+        <div class="info-row">
+            <div class="info-item">
+                <label><i class="fas fa-calendar-alt"></i> Date</label>
+                <input type="date" id="checkDate" value="">
+            </div>
+            <div class="info-item">
+                <label><i class="fas fa-user-tie"></i> Inspector Name</label>
+                <input type="text" id="inspectorName" placeholder="Enter name">
+            </div>
+        </div>
+
+        <!-- Signature -->
+        <div class="signature-row">
+            <div class="signature-item">
+                <label><i class="fas fa-pen"></i> Inspector Name (for signature)</label>
+                <input type="text" id="signatureName" placeholder="Full name">
+            </div>
+            <div class="signature-item">
+                <label><i class="fas fa-signature"></i> Signature</label>
+                <input type="text" id="signature" placeholder="Electronic signature">
+            </div>
+        </div>
+
+        <!-- Checklist -->
+        <div id="checklistContainer">
+            <!-- 1. Receiving -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-truck"></i> 1. Receiving</div>
+                <div class="checklist-item" id="item-rec1">
+                    <div class="item-row">
+                        <input type="checkbox" id="rec1" class="haccp-item" data-risk="high" data-id="rec1">
+                        <label for="rec1">Check temperature of chilled (≤ 4°C) and frozen (≤ -18°C) goods</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-rec1" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-rec1" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-rec2">
+                    <div class="item-row">
+                        <input type="checkbox" id="rec2" class="haccp-item" data-risk="medium" data-id="rec2">
+                        <label for="rec2">Verify packaging integrity (no tears, leaks, rust)</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-rec2" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-rec2" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-rec3">
+                    <div class="item-row">
+                        <input type="checkbox" id="rec3" class="haccp-item" data-risk="high" data-id="rec3">
+                        <label for="rec3">Check expiration dates (not expired)</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-rec3" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-rec3" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-rec4">
+                    <div class="item-row">
+                        <input type="checkbox" id="rec4" class="haccp-item" data-risk="medium" data-id="rec4">
+                        <label for="rec4">Health certificates for high-risk products</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-rec4" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-rec4" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-rec5">
+                    <div class="item-row">
+                        <input type="checkbox" id="rec5" class="haccp-item" data-risk="medium" data-id="rec5">
+                        <label for="rec5">Separate raw from ready-to-eat products during transport</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-rec5" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-rec5" class="recommendation-box"></div>
+                </div>
+            </div>
+
+            <!-- 2. Storage -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-warehouse"></i> 2. Storage</div>
+                <div class="checklist-item" id="item-sto1">
+                    <div class="item-row">
+                        <input type="checkbox" id="sto1" class="haccp-item" data-risk="high" data-id="sto1">
+                        <label for="sto1">Refrigerator temperature ≤ 4°C (recorded)</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-sto1" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-sto1" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-sto2">
+                    <div class="item-row">
+                        <input type="checkbox" id="sto2" class="haccp-item" data-risk="high" data-id="sto2">
+                        <label for="sto2">Freezer temperature ≤ -18°C (recorded)</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-sto2" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-sto2" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-sto3">
+                    <div class="item-row">
+                        <input type="checkbox" id="sto3" class="haccp-item" data-risk="medium" data-id="sto3">
+                        <label for="sto3">Store raw items on lower shelves (below cooked items)</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-sto3" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-sto3" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-sto4">
+                    <div class="item-row">
+                        <input type="checkbox" id="sto4" class="haccp-item" data-risk="high" data-id="sto4">
+                        <label for="sto4">Separate chemicals from food products</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-sto4" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-sto4" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-sto5">
+                    <div class="item-row">
+                        <input type="checkbox" id="sto5" class="haccp-item" data-risk="medium" data-id="sto5">
+                        <label for="sto5">Clean refrigerators and freezers – no ice buildup</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-sto5" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-sto5" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-sto6">
+                    <div class="item-row">
+                        <input type="checkbox" id="sto6" class="haccp-item" data-risk="medium" data-id="sto6">
+                        <label for="sto6">Organize stock by expiration date (FIFO)</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-sto6" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-sto6" class="recommendation-box"></div>
+                </div>
+            </div>
+
+            <!-- 3. Preparation -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-kitchen-set"></i> 3. Preparation</div>
+                <div class="checklist-item" id="item-prep1">
+                    <div class="item-row">
+                        <input type="checkbox" id="prep1" class="haccp-item" data-risk="high" data-id="prep1">
+                        <label for="prep1">Wash hands before starting and after handling raw products</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-prep1" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-prep1" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-prep2">
+                    <div class="item-row">
+                        <input type="checkbox" id="prep2" class="haccp-item" data-risk="high" data-id="prep2">
+                        <label for="prep2">Use separate cutting boards for raw meat, poultry, and vegetables</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-prep2" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-prep2" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-prep3">
+                    <div class="item-row">
+                        <input type="checkbox" id="prep3" class="haccp-item" data-risk="high" data-id="prep3">
+                        <label for="prep3">Sanitize tools and surfaces after handling raw products</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-prep3" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-prep3" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-prep4">
+                    <div class="item-row">
+                        <input type="checkbox" id="prep4" class="haccp-item" data-risk="high" data-id="prep4">
+                        <label for="prep4">Do not leave perishables outside refrigeration for more than 2 hours</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-prep4" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-prep4" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-prep5">
+                    <div class="item-row">
+                        <input type="checkbox" id="prep5" class="haccp-item" data-risk="high" data-id="prep5">
+                        <label for="prep5">Thaw frozen food in the refrigerator or microwave</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-prep5" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-prep5" class="recommendation-box"></div>
+                </div>
+            </div>
+
+            <!-- 4. Cooking -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-fire"></i> 4. Cooking & Reheating</div>
+                <div class="checklist-item" id="item-cook1">
+                    <div class="item-row">
+                        <input type="checkbox" id="cook1" class="haccp-item" data-risk="high" data-id="cook1">
+                        <label for="cook1">Poultry internal temperature reaches 74°C (165°F)</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-cook1" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-cook1" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-cook2">
+                    <div class="item-row">
+                        <input type="checkbox" id="cook2" class="haccp-item" data-risk="high" data-id="cook2">
+                        <label for="cook2">Ground meat internal temperature reaches 71°C (160°F)</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-cook2" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-cook2" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-cook3">
+                    <div class="item-row">
+                        <input type="checkbox" id="cook3" class="haccp-item" data-risk="high" data-id="cook3">
+                        <label for="cook3">Fish internal temperature reaches 63°C (145°F)</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-cook3" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-cook3" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-cook4">
+                    <div class="item-row">
+                        <input type="checkbox" id="cook4" class="haccp-item" data-risk="high" data-id="cook4">
+                        <label for="cook4">Reheat stored foods to 74°C within 2 hours</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-cook4" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-cook4" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-cook5">
+                    <div class="item-row">
+                        <input type="checkbox" id="cook5" class="haccp-item" data-risk="medium" data-id="cook5">
+                        <label for="cook5">Record cooking temperatures in the log</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-cook5" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-cook5" class="recommendation-box"></div>
+                </div>
+            </div>
+
+            <!-- 5. Cooling -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-snowflake"></i> 5. Rapid Cooling</div>
+                <div class="checklist-item" id="item-cool1">
+                    <div class="item-row">
+                        <input type="checkbox" id="cool1" class="haccp-item" data-risk="high" data-id="cool1">
+                        <label for="cool1">Cool hot food from 60°C to 20°C within 2 hours</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-cool1" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-cool1" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-cool2">
+                    <div class="item-row">
+                        <input type="checkbox" id="cool2" class="haccp-item" data-risk="high" data-id="cool2">
+                        <label for="cool2">Then from 20°C to 4°C within an additional 4 hours</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-cool2" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-cool2" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-cool3">
+                    <div class="item-row">
+                        <input type="checkbox" id="cool3" class="haccp-item" data-risk="medium" data-id="cool3">
+                        <label for="cool3">Use shallow containers for rapid cooling</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-cool3" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-cool3" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-cool4">
+                    <div class="item-row">
+                        <input type="checkbox" id="cool4" class="haccp-item" data-risk="medium" data-id="cool4">
+                        <label for="cool4">Cover food after complete cooling</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-cool4" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-cool4" class="recommendation-box"></div>
+                </div>
+            </div>
+
+            <!-- 6. Personal Hygiene -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-user-shield"></i> 6. Personal Hygiene</div>
+                <div class="checklist-item" id="item-per1">
+                    <div class="item-row">
+                        <input type="checkbox" id="per1" class="haccp-item" data-risk="medium" data-id="per1">
+                        <label for="per1">Wear clean work uniform (chef coat, apron)</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-per1" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-per1" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-per2">
+                    <div class="item-row">
+                        <input type="checkbox" id="per2" class="haccp-item" data-risk="medium" data-id="per2">
+                        <label for="per2">Cover hair (net or cap)</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-per2" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-per2" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-per3">
+                    <div class="item-row">
+                        <input type="checkbox" id="per3" class="haccp-item" data-risk="low" data-id="per3">
+                        <label for="per3">No jewelry or watches</label>
+                        <span class="risk-badge risk-low">Low Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-per3" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-per3" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-per4">
+                    <div class="item-row">
+                        <input type="checkbox" id="per4" class="haccp-item" data-risk="low" data-id="per4">
+                        <label for="per4">Trim nails and no nail polish</label>
+                        <span class="risk-badge risk-low">Low Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-per4" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-per4" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-per5">
+                    <div class="item-row">
+                        <input type="checkbox" id="per5" class="haccp-item" data-risk="high" data-id="per5">
+                        <label for="per5">Do not work while sick (diarrhea, vomiting, skin infections)</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-per5" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-per5" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-per6">
+                    <div class="item-row">
+                        <input type="checkbox" id="per6" class="haccp-item" data-risk="high" data-id="per6">
+                        <label for="per6">Wash hands after using the restroom, smoking, eating, or touching waste</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-per6" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-per6" class="recommendation-box"></div>
+                </div>
+            </div>
+
+            <!-- 7. Cleaning & Sanitation -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-broom"></i> 7. Cleaning & Sanitation</div>
+                <div class="checklist-item" id="item-clean1">
+                    <div class="item-row">
+                        <input type="checkbox" id="clean1" class="haccp-item" data-risk="high" data-id="clean1">
+                        <label for="clean1">Clean and sanitize all work surfaces after each use</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-clean1" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-clean1" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-clean2">
+                    <div class="item-row">
+                        <input type="checkbox" id="clean2" class="haccp-item" data-risk="high" data-id="clean2">
+                        <label for="clean2">Wash and sanitize sinks and handwashing stations</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-clean2" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-clean2" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-clean3">
+                    <div class="item-row">
+                        <input type="checkbox" id="clean3" class="haccp-item" data-risk="medium" data-id="clean3">
+                        <label for="clean3">Clean floors and walls from food debris</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-clean3" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-clean3" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-clean4">
+                    <div class="item-row">
+                        <input type="checkbox" id="clean4" class="haccp-item" data-risk="high" data-id="clean4">
+                        <label for="clean4">Use approved sanitizers with correct concentration</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-clean4" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-clean4" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-clean5">
+                    <div class="item-row">
+                        <input type="checkbox" id="clean5" class="haccp-item" data-risk="medium" data-id="clean5">
+                        <label for="clean5">Cleaning schedule posted and signed</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-clean5" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-clean5" class="recommendation-box"></div>
+                </div>
+            </div>
+
+            <!-- 8. Pest Control -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-bug"></i> 8. Pest Control</div>
+                <div class="checklist-item" id="item-pest1">
+                    <div class="item-row">
+                        <input type="checkbox" id="pest1" class="haccp-item" data-risk="high" data-id="pest1">
+                        <label for="pest1">No insects or rodents in the facility</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-pest1" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-pest1" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-pest2">
+                    <div class="item-row">
+                        <input type="checkbox" id="pest2" class="haccp-item" data-risk="high" data-id="pest2">
+                        <label for="pest2">Seal all gaps and cracks in walls, doors, and windows</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-pest2" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-pest2" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-pest3">
+                    <div class="item-row">
+                        <input type="checkbox" id="pest3" class="haccp-item" data-risk="medium" data-id="pest3">
+                        <label for="pest3">Install light traps or sticky traps where needed</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-pest3" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-pest3" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-pest4">
+                    <div class="item-row">
+                        <input type="checkbox" id="pest4" class="haccp-item" data-risk="high" data-id="pest4">
+                        <label for="pest4">Contract with a licensed pest control company</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-pest4" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-pest4" class="recommendation-box"></div>
+                </div>
+            </div>
+
+            <!-- 9. Documentation -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-file-alt"></i> 9. Documentation</div>
+                <div class="checklist-item" id="item-doc1">
+                    <div class="item-row">
+                        <input type="checkbox" id="doc1" class="haccp-item" data-risk="high" data-id="doc1">
+                        <label for="doc1">Record refrigerator and freezer temperatures daily</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-doc1" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-doc1" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-doc2">
+                    <div class="item-row">
+                        <input type="checkbox" id="doc2" class="haccp-item" data-risk="high" data-id="doc2">
+                        <label for="doc2">Record cooking and cooling temperatures</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-doc2" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-doc2" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-doc3">
+                    <div class="item-row">
+                        <input type="checkbox" id="doc3" class="haccp-item" data-risk="medium" data-id="doc3">
+                        <label for="doc3">Keep receiving records for at least 6 months</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-doc3" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-doc3" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-doc4">
+                    <div class="item-row">
+                        <input type="checkbox" id="doc4" class="haccp-item" data-risk="medium" data-id="doc4">
+                        <label for="doc4">Manager signs all records daily</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-doc4" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-doc4" class="recommendation-box"></div>
+                </div>
+            </div>
+
+            <!-- 10. Training -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-chalkboard-teacher"></i> 10. Training</div>
+                <div class="checklist-item" id="item-tr1">
+                    <div class="item-row">
+                        <input type="checkbox" id="tr1" class="haccp-item" data-risk="high" data-id="tr1">
+                        <label for="tr1">All staff have food safety training</label>
+                        <span class="risk-badge risk-high">High Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-tr1" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-tr1" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-tr2">
+                    <div class="item-row">
+                        <input type="checkbox" id="tr2" class="haccp-item" data-risk="medium" data-id="tr2">
+                        <label for="tr2">Clear instructions posted (handwashing, temperatures)</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-tr2" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-tr2" class="recommendation-box"></div>
+                </div>
+                <div class="checklist-item" id="item-tr3">
+                    <div class="item-row">
+                        <input type="checkbox" id="tr3" class="haccp-item" data-risk="medium" data-id="tr3">
+                        <label for="tr3">Regular reminders to staff on safety procedures</label>
+                        <span class="risk-badge risk-medium">Medium Risk</span>
+                    </div>
+                    <div class="notes-field"><textarea id="note-tr3" placeholder="Notes"></textarea></div>
+                    <div id="recommendation-tr3" class="recommendation-box"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result area -->
+        <div class="result-area" id="resultArea">
+            <div>
+                <span class="score" id="scoreDisplay">0%</span>
+                <span class="evaluation" id="evaluationText"></span>
+            </div>
+            <div id="overallRiskDisplay" class="overall-risk"></div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="btn-group">
+            <button class="btn-primary" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Results & Recommendations</button>
+        </div>
+
+        <!-- Export buttons -->
+        <div class="export-container">
+            <button class="export-btn excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Export to Excel</button>
+            <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Export Word</button>
+        </div>
+
+        <div id="initialMessage" style="margin-top:0.5rem;color:var(--text-muted);text-align:center;font-size:0.9rem;">
+            <i class="fas fa-robot" style="color:var(--accent-soft);"></i> Click "Calculate Results" then use the export buttons
+        </div>
+    </div>
+</div>
+
+<footer class="footer-simple">All rights reserved © 2026 <span>FAROUK GRUP</span></footer>
+
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+<a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+<!-- Calculator Modal with fixed button order -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <!-- Fixed order: 7 8 9 / 4 5 6 × / 1 2 3 - -->
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="../js/tools/tool14en.js" defer></script>
+</body>
+</html>

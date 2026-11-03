@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Advanced Cash Flow Calculator | FAROUK GRUP</title>
+<!-- Page protection -->
+<script src="../js/auth-check.js"></script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- AOS Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- ExcelJS & FileSaver -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools/tool8en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- Export loading screen -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">Generating report...</h3>
+        <p id="loadingMsg">Please wait</p>
+    </div>
+</div>
+
+<section class="hero-mini">
+    <h2>Advanced Cash Flow Calculator</h2>
+    <p>Comprehensive analysis of operating and free cash flows with multiple period options and future projections</p>
+</section>
+
+<div class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-coins"></i><span>FCF</span></div>
+        <h2><i class="fas fa-coins" style="color:#cfa776;margin-right:0.5rem;"></i>Cash Flow Analysis</h2>
+
+        <!-- Currency and entity name -->
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> Currency:</label>
+            <select id="currencySelect">
+                <option value="$" selected>US Dollar ($)</option>
+                <option value="€">Euro (€)</option>
+                <option value="₺">Turkish Lira (₺)</option>
+                <option value="ج.م">Egyptian Pound (ج.م)</option>
+                <option value="د.ك">Kuwaiti Dinar (د.ك)</option>
+                <option value="ر.س">Saudi Riyal (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> Entity Name:</label>
+            <input type="text" id="companyName" value="Beneficiary Entity Name" placeholder="Beneficiary entity">
+        </div>
+
+        <!-- Advanced options: period and flow type -->
+        <div class="advanced-options">
+            <div class="option-item">
+                <label><i class="fas fa-clock"></i> Period:</label>
+                <select id="periodSelect">
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="yearly" selected>Yearly</option>
+                </select>
+            </div>
+            <div class="option-item">
+                <label><i class="fas fa-calculator"></i> Flow Type:</label>
+                <select id="flowTypeSelect">
+                    <option value="operating">Operating Cash Flow (OCF)</option>
+                    <option value="free" selected>Free Cash Flow (FCFF)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Basic inputs -->
+        <div class="section-title-sm">📊 Income Data</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-chart-line"></i> Revenue</label>
+                <input type="number" id="revenue" value="1000000" step="10000">
+                <span class="tooltiptext">Total revenue for the selected period.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-file-alt"></i> Operating Expenses (excl. depreciation)</label>
+                <input type="number" id="opex" value="500000" step="10000">
+                <span class="tooltiptext">Cash operating expenses.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-chart-bar"></i> Depreciation & Amortization</label>
+                <input type="number" id="depreciation" value="50000" step="1000">
+                <span class="tooltiptext">Annual depreciation of fixed assets.</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Tax Rate (%)</label>
+                <input type="number" id="taxRate" value="20" step="1">
+                <span class="tooltiptext">Income tax rate on profits.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-industry"></i> Capital Expenditures (CAPEX)</label>
+                <input type="number" id="capex" value="100000" step="10000">
+                <span class="tooltiptext">Investments in fixed assets. Distributed per period.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-exchange-alt"></i> Change in Working Capital</label>
+                <input type="number" id="wcChange" value="20000" step="1000">
+                <span class="tooltiptext">Change in working capital (positive = cash used).</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-chart-line"></i> Growth Rate per Period (%)</label>
+                <input type="number" id="growthRate" value="5" step="0.5" min="-10" max="30">
+                <span class="tooltiptext">Expected cash flow growth rate for each future period.</span>
+            </div>
+        </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Cash Flow</button>
+
+        <!-- Results -->
+        <div class="results-section" id="resultsSection" style="display:none">
+            <div class="results-cards" id="kpiCards"></div>
+
+            <div class="section-title-sm">📋 Calculation Breakdown</div>
+            <div class="table-container" id="detailsTable"></div>
+
+            <div class="section-title-sm">📈 Cash Flow Forecast for Next 5 Periods</div>
+            <div class="chart-container"><canvas id="fcfChart"></canvas></div>
+
+            <div class="export-container">
+                <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Export Word</button>
+                <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Export Excel</button>
+            </div>
+
+            <div class="section-title-sm">💡 Interpretation</div>
+            <div class="result-card" id="interpretation" style="text-align:left;"></div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center">
+            <i class="fas fa-robot" style="color:var(--accent-soft)"></i> Results will appear after clicking Calculate
+        </div>
+    </div>
+</div>
+
+<footer class="footer-simple">All rights reserved © 2026 <span>FAROUK GRUP</span></footer>
+
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+<a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+<!-- Calculator Modal with fixed button order -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <!-- Fixed order: 7 8 9 / 4 5 6 × / 1 2 3 - -->
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="../js/tools/tool8en.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Comprehensive Restaurant Cost Calculator | FAROUK GRUP</title>
+<!-- Page protection -->
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Chart.js & html2canvas & Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools/tool2en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+</head>
+<body>
+    <!-- Static background -->
+    <div class="glow-bg"><span></span><span></span><span></span></div>
+
+    <!-- Export loading screen -->
+    <div class="export-loading" id="exportLoading">
+        <div class="export-loading-box">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loadingTitle">Generating report...</h3>
+            <p id="loadingMsg">Please wait</p>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero-mini">
+        <h2>Comprehensive Restaurant Cost Calculator</h2>
+        <p>Integrated analysis with location analysis, Monte Carlo simulation, health metrics, and market valuation</p>
+    </section>
+
+    <!-- WRAPPER -->
+    <section class="calc-wrapper">
+        <div class="calc-box">
+            <div class="featured-badge"><i class="fas fa-utensils"></i><span>Restaurant</span></div>
+            <h2><i class="fas fa-utensils" style="color:#cfa776;margin-left:0.5rem;"></i>Restaurant Cost Analysis</h2>
+
+            <!-- Currency and entity name -->
+            <div class="currency-row">
+                <label><i class="fas fa-coins"></i> Currency:</label>
+                <select id="currencySelect">
+                    <option value="$" selected>US Dollar ($)</option>
+                    <option value="€">Euro (€)</option>
+                    <option value="₺">Turkish Lira (₺)</option>
+                    <option value="ج.م">Egyptian Pound (ج.م)</option>
+                    <option value="د.ك">Kuwaiti Dinar (د.ك)</option>
+                    <option value="ر.س">Saudi Riyal (ر.س)</option>
+                </select>
+                <label><i class="fas fa-building"></i> Entity Name:</label>
+                <input type="text" id="companyName" value="Beneficiary Entity Name" placeholder="Beneficiary entity">
+            </div>
+
+            <!-- Basic Information -->
+            <div class="section-title-sm"><i class="fas fa-database"></i> Basic Information</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-users"></i> Daily Customers</label>
+                    <input type="number" id="dailyCustomers" value="50" min="0" step="10">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-receipt"></i> Average Bill</label>
+                    <input type="number" id="avgBill" value="15" min="0" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Working Days</label>
+                    <input type="number" id="workingDays" value="26" min="1" step="1">
+                </div>
+            </div>
+
+            <!-- Fixed Costs -->
+            <div class="section-title-sm"><i class="fas fa-building"></i> Monthly Fixed Costs</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-building"></i> Rent</label>
+                    <input type="number" id="rent" value="3500" min="0" step="100">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-users"></i> Salaries (Net)</label>
+                    <input type="number" id="salaries" value="8000" min="0" step="100">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percent"></i> Employee Burden Factor</label>
+                    <input type="number" id="employeeBurden" value="35" min="0" max="200" step="5">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-bolt"></i> Utilities</label>
+                    <input type="number" id="utilities" value="1000" min="0" step="100">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-wifi"></i> Internet</label>
+                    <input type="number" id="internet" value="200" min="0" step="50">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-broom"></i> Maintenance</label>
+                    <input type="number" id="maintenance" value="300" min="0" step="50">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-ad"></i> Marketing</label>
+                    <input type="number" id="marketing" value="500" min="0" step="100">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-boxes"></i> Other Fixed</label>
+                    <input type="number" id="otherFixed" value="200" min="0" step="50">
+                </div>
+            </div>
+
+            <!-- Variable Costs -->
+            <div class="section-title-sm"><i class="fas fa-percent"></i> Variable Costs (% of Revenue)</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-drumstick-bite"></i> Food Cost %</label>
+                    <input type="number" id="foodCostPct" value="30" min="0" max="100" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-wine-bottle"></i> Drink Cost %</label>
+                    <input type="number" id="drinkCostPct" value="20" min="0" max="100" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-box"></i> Packaging %</label>
+                    <input type="number" id="packagingPct" value="5" min="0" max="100" step="1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-motorcycle"></i> Delivery Commission %</label>
+                    <input type="number" id="deliveryPct" value="15" min="0" max="100" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percent"></i> Delivery Sales %</label>
+                    <input type="number" id="deliverySalesPct" value="30" min="0" max="100" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-trash-alt"></i> Waste %</label>
+                    <input type="number" id="wastePct" value="3" min="0" max="20" step="0.5">
+                </div>
+            </div>
+
+            <!-- Taxes and Investment -->
+            <div class="section-title-sm"><i class="fas fa-coins"></i> Taxes and Initial Investment</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-percent"></i> VAT %</label>
+                    <input type="number" id="vatPct" value="20" min="0" max="100" step="1">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tools"></i> Initial Investment</label>
+                    <input type="number" id="initialInvestment" value="50000" min="0" step="1000">
+                </div>
+            </div>
+
+            <!-- Location Analysis (Collapsible) -->
+            <button type="button" class="collapsible" id="locationCollapse">
+                <span><i class="fas fa-map-marker-alt"></i> Location Analysis</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="collapsible-content" id="locationContent">
+                <div class="form-row" style="margin-top:0.5rem;">
+                    <div class="form-group">
+                        <label><i class="fas fa-walking"></i> Daily Foot Traffic</label>
+                        <input type="number" id="footTraffic" value="2000" min="0" step="100">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-percent"></i> Entry Rate %</label>
+                        <input type="number" id="entryRate" value="5" min="0" max="100" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-percent"></i> Purchase Rate %</label>
+                        <input type="number" id="purchaseRate" value="70" min="0" max="100" step="1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-table"></i> Number of Tables</label>
+                        <input type="number" id="tables" value="12" min="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-chair"></i> Seats per Table</label>
+                        <input type="number" id="seatsPerTable" value="4" min="1" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-hourglass-half"></i> Session Duration (min)</label>
+                        <input type="number" id="sessionMinutes" value="60" min="10" step="5">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> Daily Operating Hours</label>
+                        <input type="number" id="hoursOpen" value="14" min="1" step="1">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Costs & Profits</button>
+
+            <!-- Results -->
+            <div class="results-section" id="resultsSection" style="display:none;">
+                <div class="results-cards" id="kpiCards"></div>
+
+                <div class="result-card" id="smartAlerts" style="text-align:left;padding:0.8rem;"></div>
+
+                <div class="section-title-sm"><i class="fas fa-chart-pie"></i> Chart Analysis</div>
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>Cost Distribution</h3>
+                        <div class="chart-container"><canvas id="costPieChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Break-even Point</h3>
+                        <div class="chart-container"><canvas id="breakevenChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="section-title-sm"><i class="fas fa-list"></i> Monthly Cost Breakdown</div>
+                <div class="table-container" id="costBreakdownTable"></div>
+
+                <div class="section-title-sm"><i class="fas fa-clock"></i> Investment Payback Period</div>
+                <div class="result-card" id="paybackCard" style="text-align:center;"></div>
+
+                <div class="section-title-sm"><i class="fas fa-chart-simple"></i> Profitability Sensitivity Analysis</div>
+                <div class="table-container" id="sensitivityTable"></div>
+
+                <div class="section-title-sm"><i class="fas fa-heartbeat"></i> Restaurant Health Score</div>
+                <div class="result-card" id="healthScoreCard" style="text-align:left;"></div>
+
+                <div class="section-title-sm"><i class="fas fa-tag"></i> Market Value Estimate</div>
+                <div class="form-row" style="align-items:flex-end;">
+                    <div class="form-group" style="flex:2;">
+                        <label><i class="fas fa-times"></i> Sector Multiple</label>
+                        <input type="number" id="valuationMultiple" value="3" min="1" max="10" step="0.5">
+                    </div>
+                    <div class="form-group" style="flex:1;min-width:80px;">
+                        <button class="btn-calculate" id="calcValuationBtn" style="margin:0;padding:0.6rem 1.5rem;font-size:0.9rem;"><i class="fas fa-calculator"></i> Calculate</button>
+                    </div>
+                </div>
+                <div class="result-card" id="valuationCard" style="text-align:center;"></div>
+
+                <!-- Advanced Analytics -->
+                <button type="button" class="collapsible" id="advancedCollapse">
+                    <span><i class="fas fa-chart-line"></i> Advanced Analytics</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="collapsible-content" id="advancedContent">
+                    <div class="section-title-sm" style="margin-top:0.8rem;"><i class="fas fa-dice"></i> Monte Carlo Simulation (1000)</div>
+                    <div class="result-card" id="monteCarloCard" style="text-align:left;">
+                        <button class="btn-calculate" id="runMonteCarloBtn" style="margin:0 0 0.8rem 0;padding:0.5rem 1.5rem;font-size:0.95rem;width:auto;">Run</button>
+                        <div id="monteCarloResults"></div>
+                    </div>
+                    <div class="section-title-sm"><i class="fas fa-ban"></i> Shutdown Point</div>
+                    <div class="result-card" id="shutdownCard" style="text-align:left;"></div>
+                    <div class="section-title-sm"><i class="fas fa-arrow-up"></i> Operating Leverage</div>
+                    <div class="result-card" id="operatingLeverageCard" style="text-align:left;"></div>
+                    <div class="section-title-sm"><i class="fas fa-shield-alt"></i> Margin of Safety</div>
+                    <div class="result-card" id="marginOfSafetyCard" style="text-align:left;"></div>
+                    <div class="section-title-sm"><i class="fas fa-maximize"></i> Max Capacity & Occupancy</div>
+                    <div class="result-card" id="capacityCard" style="text-align:left;"></div>
+                    <div class="section-title-sm"><i class="fas fa-bolt"></i> Operational Efficiency</div>
+                    <div class="result-card" id="efficiencyCard" style="text-align:left;"></div>
+                </div>
+
+                <div class="export-container">
+                    <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Export Word</button>
+                    <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Export Excel</button>
+                </div>
+
+                <div class="section-title-sm"><i class="fas fa-bullseye"></i> Break-even Point</div>
+                <div class="result-card" id="breakevenSummary" style="text-align:center;"></div>
+            </div>
+
+            <div id="initialMessage">
+                <i class="fas fa-robot" style="color:#cfa776;"></i> Results will appear after clicking Calculate
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-simple">
+        All rights reserved © 2026 <span>FAROUK GRUP</span>
+    </footer>
+
+    <!-- Floating buttons -->
+    <button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+    <a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+    <!-- Calculator Modal with fixed button order -->
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="modalClose">&times;</span>
+                <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="calcDisplay" class="calc-display" readonly>
+                <div class="calc-buttons">
+                    <!-- Order fixed: left to right ascending (4 is left, 6 is right) -->
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn" data-val="C">C</button>
+                    <button class="calc-btn" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn" data-val="⌫">⌫</button>
+                    <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/tools/tool2en.js" defer></script>
+</body>
+</html>

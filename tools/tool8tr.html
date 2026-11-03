@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Gelişmiş Nakit Akışı Hesaplayıcı | FAROUK GRUP</title>
+<!-- Sayfa koruması -->
+<script src="../js/auth-check.js"></script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../css/tools-common-tr.css">
+    <link rel="stylesheet" href="../css/tools-common-tr.css">
+    <link rel="stylesheet" href="../css/tools/tool8tr.css">
+    <link rel="stylesheet" href="../css/tools-overrides-tr.css">
+    <link rel="stylesheet" href="../css/tools-overrides-tr.css">
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- Yükleme ekranı -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">Rapor oluşturuluyor...</h3>
+        <p id="loadingMsg">Lütfen bekleyin</p>
+    </div>
+</div>
+
+<section class="hero-mini">
+    <h2>Gelişmiş Nakit Akışı Hesaplayıcı</h2>
+    <p>Faaliyet ve serbest nakit akışı analizi, çoklu dönem seçenekleri ve gelecek tahminleri</p>
+</section>
+
+<div class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-coins"></i><span>Nakit</span></div>
+        <h2><i class="fas fa-coins" style="color:#cfa776;margin-left:0.5rem;"></i>Nakit Akışı Analizi</h2>
+
+        <!-- Para birimi ve kurum adı -->
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> Para Birimi:</label>
+            <select id="currencySelect">
+                <option value="$" selected>Dolar ($)</option>
+                <option value="€">Euro (€)</option>
+                <option value="₺">Türk Lirası (₺)</option>
+                <option value="ج.م">Mısır Lirası (ج.م)</option>
+                <option value="د.ك">Kuveyt Dinarı (د.ك)</option>
+                <option value="ر.س">Suudi Riyali (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> Kurum Adı:</label>
+            <input type="text" id="companyName" value="Rapordan yararlanan kurum adı" placeholder="Yararlanıcı kurum">
+        </div>
+
+        <!-- Gelişmiş seçenekler: dönem ve akış tipi -->
+        <div class="advanced-options">
+            <div class="option-item">
+                <label><i class="fas fa-clock"></i> Dönem:</label>
+                <select id="periodSelect">
+                    <option value="monthly">Aylık</option>
+                    <option value="quarterly">3 Aylık</option>
+                    <option value="yearly" selected>Yıllık</option>
+                </select>
+            </div>
+            <div class="option-item">
+                <label><i class="fas fa-calculator"></i> Akış Tipi:</label>
+                <select id="flowTypeSelect">
+                    <option value="operating">Faaliyet Nakit Akışı (OCF)</option>
+                    <option value="free" selected>Serbest Nakit Akışı (FCFF)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Temel girdiler -->
+        <div class="section-title-sm">📊 Gelir Verileri</div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-chart-line"></i> Gelir</label>
+                <input type="number" id="revenue" value="1000000" step="10000">
+                <span class="tooltiptext">Belirtilen dönem için toplam gelir.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-file-alt"></i> Faaliyet Giderleri (amortisman hariç)</label>
+                <input type="number" id="opex" value="500000" step="10000">
+                <span class="tooltiptext">Nakit faaliyet giderleri.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-chart-bar"></i> Amortisman ve İtfa</label>
+                <input type="number" id="depreciation" value="50000" step="1000">
+                <span class="tooltiptext">Yıllık amortisman gideri.</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Vergi Oranı (%)</label>
+                <input type="number" id="taxRate" value="20" step="1">
+                <span class="tooltiptext">Kurumlar vergisi oranı.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-industry"></i> Sermaye Harcamaları (CAPEX)</label>
+                <input type="number" id="capex" value="100000" step="10000">
+                <span class="tooltiptext">Sabit varlık yatırımları. Döneme bölünür.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-exchange-alt"></i> İşletme Sermayesi Değişimi</label>
+                <input type="number" id="wcChange" value="20000" step="1000">
+                <span class="tooltiptext">İşletme sermayesindeki değişim (pozitif = nakit kullanımı).</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-chart-line"></i> Dönem Başına Büyüme Oranı (%)</label>
+                <input type="number" id="growthRate" value="5" step="0.5" min="-10" max="30">
+                <span class="tooltiptext">Gelecek dönemler için beklenen büyüme oranı.</span>
+            </div>
+        </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Nakit Akışını Hesapla</button>
+
+        <!-- Sonuçlar -->
+        <div class="results-section" id="resultsSection" style="display:none">
+            <div class="results-cards" id="kpiCards"></div>
+
+            <div class="section-title-sm">📋 Hesaplama Detayı</div>
+            <div class="table-container" id="detailsTable"></div>
+
+            <div class="section-title-sm">📈 Gelecek 5 Dönem Nakit Akışı Tahmini</div>
+            <div class="chart-container">
+                <canvas id="fcfChart"></canvas>
+            </div>
+
+            <div class="export-container">
+                <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Word Dışa Aktar</button>
+                <button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Kapsamlı Excel Dışa Aktar</button>
+            </div>
+
+            <div class="section-title-sm">💡 Sonuç Yorumu</div>
+            <div class="result-card" id="interpretation" style="text-align:right;"></div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center">
+            <i class="fas fa-robot" style="color:var(--accent-soft)"></i> Sonuçlar hesaplama butonuna tıklandıktan sonra görüntülenecektir.
+        </div>
+    </div>
+</div>
+
+<footer class="footer-simple">Tüm hakları saklıdır © 2026 <span>FAROUK GRUP</span></footer>
+
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Hesap Makinesi</button>
+<a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> Ana Sayfa</a>
+
+<!-- Hesap Makinesi Modal -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Hesap Makinesi</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="../js/tools/tool8tr.js" defer></script>
+</body>
+</html>

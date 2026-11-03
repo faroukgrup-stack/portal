@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Advanced WACC Calculator | FAROUK GRUP</title>
+<!-- Page protection -->
+<script src="../js/auth-check.js"></script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- ExcelJS & FileSaver -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools/tool10en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- Export loading screen -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">Generating report...</h3>
+        <p id="loadingMsg">Please wait</p>
+    </div>
+</div>
+
+<section class="hero-mini">
+    <h2>📉 Advanced WACC Calculator</h2>
+    <p>Weighted Average Cost of Capital – with CAPM model for cost of equity calculation.</p>
+</section>
+
+<div class="calc-wrapper">
+    <div class="calc-box" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-scale-balanced"></i><span>WACC</span></div>
+        <h2><i class="fas fa-scale-balanced" style="color:#cfa776;margin-right:0.5rem;"></i>Capital Structure Data</h2>
+
+        <!-- Currency and entity name -->
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> Currency:</label>
+            <select id="currencySelect">
+                <option value="$" selected>US Dollar ($)</option>
+                <option value="€">Euro (€)</option>
+                <option value="₺">Turkish Lira (₺)</option>
+                <option value="ج.م">Egyptian Pound (ج.م)</option>
+                <option value="د.ك">Kuwaiti Dinar (د.ك)</option>
+                <option value="ر.س">Saudi Riyal (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> Entity Name:</label>
+            <input type="text" id="companyName" value="Beneficiary Entity Name" placeholder="Beneficiary entity">
+        </div>
+
+        <!-- Inputs -->
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-chart-pie"></i> Equity</label>
+                <input type="number" id="equity" value="1000000" step="10000">
+                <span class="tooltiptext">Market value of shareholders' equity.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Cost of Equity (Re) Method</label>
+                <select id="reMethod">
+                    <option value="manual">Manual Entry</option>
+                    <option value="capm">CAPM</option>
+                </select>
+                <span class="tooltiptext">Choose how to calculate cost of equity.</span>
+            </div>
+        </div>
+
+        <!-- Manual entry field -->
+        <div id="manualReGroup" class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Cost of Equity (Re) (%)</label>
+                <input type="number" id="costEquityManual" value="12" step="0.1">
+                <span class="tooltiptext">Expected return required by shareholders (manual).</span>
+            </div>
+        </div>
+
+        <!-- CAPM fields -->
+        <div id="capmFields" class="capm-fields">
+            <div class="form-row">
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-percent"></i> Risk-Free Rate (Rf) (%)</label>
+                    <input type="number" id="rf" value="3" step="0.1">
+                    <span class="tooltiptext">Return on risk-free assets.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-chart-line"></i> Beta (β)</label>
+                    <input type="number" id="beta" value="1.2" step="0.1">
+                    <span class="tooltiptext">Measure of stock risk relative to the market.</span>
+                </div>
+                <div class="form-group tooltip">
+                    <label><i class="fas fa-percent"></i> Market Risk Premium (Rm - Rf) (%)</label>
+                    <input type="number" id="marketRiskPremium" value="5" step="0.1">
+                    <span class="tooltiptext">Difference between expected market return and risk-free rate.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group tooltip">
+                <label><i class="fas fa-hand-holding-usd"></i> Debt</label>
+                <input type="number" id="debt" value="500000" step="10000">
+                <span class="tooltiptext">Market value of debt.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Cost of Debt (Rd) (%)</label>
+                <input type="number" id="costDebt" value="5" step="0.1">
+                <span class="tooltiptext">Interest rate the company pays on its debt.</span>
+            </div>
+            <div class="form-group tooltip">
+                <label><i class="fas fa-percent"></i> Tax Rate (%)</label>
+                <input type="number" id="taxRate" value="20" step="1">
+                <span class="tooltiptext">Corporate income tax rate.</span>
+            </div>
+        </div>
+
+        <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate WACC</button>
+
+        <!-- Results -->
+        <div class="results-section" id="resultsSection" style="display:none;">
+            <div class="results-cards" id="kpiCards"></div>
+
+            <div class="section-title-sm">📊 Capital Structure</div>
+            <div class="chart-container"><canvas id="capitalChart"></canvas></div>
+
+            <div class="section-title-sm">📊 Calculation Breakdown</div>
+            <div class="table-container" id="detailsTable"></div>
+
+            <div class="section-title-sm">📝 Interpretation</div>
+            <div class="result-card" id="interpretation" style="text-align:left;"></div>
+
+            <div class="export-container">
+                <button class="export-btn excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Export Excel</button>
+                <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Export Word</button>
+            </div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center;">
+            <i class="fas fa-robot" style="color:var(--accent-soft);"></i> Results will appear after clicking Calculate
+        </div>
+    </div>
+</div>
+
+<footer class="footer-simple">All rights reserved © 2026 <span>FAROUK GRUP</span></footer>
+
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+<a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+<!-- Calculator Modal with fixed button order -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <!-- Fixed order: 7 8 9 / 4 5 6 × / 1 2 3 - -->
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="../js/tools/tool10en.js" defer></script>
+</body>
+</html>

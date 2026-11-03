@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Gelişmiş SOP Denetim Sistemi | FAROUK GRUP</title>
+<!-- Sayfa koruması -->
+<script src="../js/auth-check.js"></script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- ExcelJS & FileSaver -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../css/tools-common-tr.css">
+    <link rel="stylesheet" href="../css/tools-common-tr.css">
+    <link rel="stylesheet" href="../css/tools/tool15tr.css">
+    <link rel="stylesheet" href="../css/tools-overrides-tr.css">
+    <link rel="stylesheet" href="../css/tools-overrides-tr.css">
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box"><i class="fas fa-spinner"></i><h3 id="loadingTitle">Rapor oluşturuluyor...</h3><p id="loadingMsg">Lütfen bekleyin</p></div>
+</div>
+
+<section class="hero-mini">
+    <h2>📋 Gelişmiş SOP Denetim Sistemi</h2>
+    <p>Standart Operasyon Prosedürleri - Anında düzeltici öneriler - Profesyonel raporlar</p>
+</section>
+
+<div class="container">
+    <div class="sop-card" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-clipboard-list"></i><span>SOPs</span></div>
+        <h2><i class="fas fa-clipboard-list" style="color:#cfa776;margin-left:0.5rem;"></i>Risk Analizli Günlük Denetim Formu</h2>
+
+        <div class="info-row">
+            <div class="info-item"><label><i class="fas fa-calendar-alt"></i> Tarih</label><input type="date" id="checkDate" value=""></div>
+            <div class="info-item"><label><i class="fas fa-user-tie"></i> Denetçi Adı</label><input type="text" id="inspectorName" placeholder="Adınızı girin"></div>
+        </div>
+        <div class="signature-row">
+            <div class="signature-item"><label><i class="fas fa-pen"></i> Denetçi Adı (İmza için)</label><input type="text" id="signatureName" placeholder="Tam ad"></div>
+            <div class="signature-item"><label><i class="fas fa-signature"></i> İmza</label><input type="text" id="signature" placeholder="Elektronik imza"></div>
+        </div>
+
+        <div id="checklistContainer">
+            <!-- 1. Hammadde Teslim Alma -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-truck"></i> 1. Hammadde Teslim Alma</div>
+                <div class="checklist-item" id="item-sop1_1"><div class="item-row"><input type="checkbox" id="sop1_1" class="sop-item" data-risk="high" data-id="sop1_1"><label for="sop1_1">Soğutulmuş kamyon sıcaklığı (≤ 4°C) ve dondurulmuş (≤ -18°C)</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop1_1" placeholder="Notlar"></textarea></div><div id="recommendation-sop1_1" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop1_2"><div class="item-row"><input type="checkbox" id="sop1_2" class="sop-item" data-risk="medium" data-id="sop1_2"><label for="sop1_2">Ambalaj hasar ve sızıntı kontrolü</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop1_2" placeholder="Notlar"></textarea></div><div id="recommendation-sop1_2" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop1_3"><div class="item-row"><input type="checkbox" id="sop1_3" class="sop-item" data-risk="high" data-id="sop1_3"><label for="sop1_3">Son kullanma tarihleri kontrolü</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop1_3" placeholder="Notlar"></textarea></div><div id="recommendation-sop1_3" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop1_4"><div class="item-row"><input type="checkbox" id="sop1_4" class="sop-item" data-risk="medium" data-id="sop1_4"><label for="sop1_4">Hayvansal ürünler için sağlık sertifikalarının varlığı</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop1_4" placeholder="Notlar"></textarea></div><div id="recommendation-sop1_4" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop1_5"><div class="item-row"><input type="checkbox" id="sop1_5" class="sop-item" data-risk="medium" data-id="sop1_5"><label for="sop1_5">Taşıma sırasında çiğ ve pişmiş ürünlerin ayrılması</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop1_5" placeholder="Notlar"></textarea></div><div id="recommendation-sop1_5" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop1_6"><div class="item-row"><input type="checkbox" id="sop1_6" class="sop-item" data-risk="low" data-id="sop1_6"><label for="sop1_6">Teslim verilerinin kaydedilmesi</label><span class="risk-badge risk-low">Düşük</span></div><div class="notes-field"><textarea id="note-sop1_6" placeholder="Notlar"></textarea></div><div id="recommendation-sop1_6" class="recommendation-box"></div></div>
+            </div>
+            <!-- 2. Depolama -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-warehouse"></i> 2. Depolama</div>
+                <div class="checklist-item" id="item-sop2_1"><div class="item-row"><input type="checkbox" id="sop2_1" class="sop-item" data-risk="medium" data-id="sop2_1"><label for="sop2_1">Kuru depo sıcaklığı 10-21°C, uygun havalandırma</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop2_1" placeholder="Notlar"></textarea></div><div id="recommendation-sop2_1" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop2_2"><div class="item-row"><input type="checkbox" id="sop2_2" class="sop-item" data-risk="low" data-id="sop2_2"><label for="sop2_2">Raflar yerden 15-20 cm yüksekte (temizlik için)</label><span class="risk-badge risk-low">Düşük</span></div><div class="notes-field"><textarea id="note-sop2_2" placeholder="Notlar"></textarea></div><div id="recommendation-sop2_2" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop2_3"><div class="item-row"><input type="checkbox" id="sop2_3" class="sop-item" data-risk="high" data-id="sop2_3"><label for="sop2_3">Soğutucu sıcaklığı günde iki kez kaydediliyor (≤ 4°C)</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop2_3" placeholder="Notlar"></textarea></div><div id="recommendation-sop2_3" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop2_4"><div class="item-row"><input type="checkbox" id="sop2_4" class="sop-item" data-risk="high" data-id="sop2_4"><label for="sop2_4">Dondurucu sıcaklığı günde iki kez kaydediliyor (≤ -18°C)</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop2_4" placeholder="Notlar"></textarea></div><div id="recommendation-sop2_4" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop2_5"><div class="item-row"><input type="checkbox" id="sop2_5" class="sop-item" data-risk="medium" data-id="sop2_5"><label for="sop2_5">Çiğ ürünler pişmiş ürünlerin alt raflarında</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop2_5" placeholder="Notlar"></textarea></div><div id="recommendation-sop2_5" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop2_6"><div class="item-row"><input type="checkbox" id="sop2_6" class="sop-item" data-risk="high" data-id="sop2_6"><label for="sop2_6">Kimyasallar gıda maddelerinden ayrı</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop2_6" placeholder="Notlar"></textarea></div><div id="recommendation-sop2_6" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop2_7"><div class="item-row"><input type="checkbox" id="sop2_7" class="sop-item" data-risk="low" data-id="sop2_7"><label for="sop2_7">FIFO sistemi uygulanıyor</label><span class="risk-badge risk-low">Düşük</span></div><div class="notes-field"><textarea id="note-sop2_7" placeholder="Notlar"></textarea></div><div id="recommendation-sop2_7" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop2_8"><div class="item-row"><input type="checkbox" id="sop2_8" class="sop-item" data-risk="medium" data-id="sop2_8"><label for="sop2_8">Soğutmayı engellemek için aşırı istifleme yok</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop2_8" placeholder="Notlar"></textarea></div><div id="recommendation-sop2_8" class="recommendation-box"></div></div>
+            </div>
+            <!-- 3. Hazırlık ve Ön Hazırlık -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-kitchen-set"></i> 3. Hazırlık ve Ön Hazırlık</div>
+                <div class="checklist-item" id="item-sop3_1"><div class="item-row"><input type="checkbox" id="sop3_1" class="sop-item" data-risk="high" data-id="sop3_1"><label for="sop3_1">Başlamadan önce 20 saniye el yıkama</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop3_1" placeholder="Notlar"></textarea></div><div id="recommendation-sop3_1" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop3_2"><div class="item-row"><input type="checkbox" id="sop3_2" class="sop-item" data-risk="high" data-id="sop3_2"><label for="sop3_2">Et, tavuk, sebze ve balık için ayrı kesme tahtaları</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop3_2" placeholder="Notlar"></textarea></div><div id="recommendation-sop3_2" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop3_3"><div class="item-row"><input type="checkbox" id="sop3_3" class="sop-item" data-risk="high" data-id="sop3_3"><label for="sop3_3">Çiğ ürünler sonrası ekipman dezenfeksiyonu</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop3_3" placeholder="Notlar"></textarea></div><div id="recommendation-sop3_3" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop3_4"><div class="item-row"><input type="checkbox" id="sop3_4" class="sop-item" data-risk="high" data-id="sop3_4"><label for="sop3_4">Bozulabilir ürünler 2 saatten fazla dışarıda değil</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop3_4" placeholder="Notlar"></textarea></div><div id="recommendation-sop3_4" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop3_5"><div class="item-row"><input type="checkbox" id="sop3_5" class="sop-item" data-risk="medium" data-id="sop3_5"><label for="sop3_5">Dondurulmuş ürünler buzdolabında veya mikrodalgada çözülüyor</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop3_5" placeholder="Notlar"></textarea></div><div id="recommendation-sop3_5" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop3_6"><div class="item-row"><input type="checkbox" id="sop3_6" class="sop-item" data-risk="medium" data-id="sop3_6"><label for="sop3_6">Hazırlık sırasında gıdaların kapatılması</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop3_6" placeholder="Notlar"></textarea></div><div id="recommendation-sop3_6" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop3_7"><div class="item-row"><input type="checkbox" id="sop3_7" class="sop-item" data-risk="medium" data-id="sop3_7"><label for="sop3_7">Sebze ve meyvelerin akan su altında yıkanması</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop3_7" placeholder="Notlar"></textarea></div><div id="recommendation-sop3_7" class="recommendation-box"></div></div>
+            </div>
+            <!-- 4. Pişirme ve Yeniden Isıtma -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-fire"></i> 4. Pişirme ve Yeniden Isıtma</div>
+                <div class="checklist-item" id="item-sop4_1"><div class="item-row"><input type="checkbox" id="sop4_1" class="sop-item" data-risk="high" data-id="sop4_1"><label for="sop4_1">Tavuk iç sıcaklığı 74°C</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop4_1" placeholder="Notlar"></textarea></div><div id="recommendation-sop4_1" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop4_2"><div class="item-row"><input type="checkbox" id="sop4_2" class="sop-item" data-risk="high" data-id="sop4_2"><label for="sop4_2">Kıyma iç sıcaklığı 71°C</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop4_2" placeholder="Notlar"></textarea></div><div id="recommendation-sop4_2" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop4_3"><div class="item-row"><input type="checkbox" id="sop4_3" class="sop-item" data-risk="high" data-id="sop4_3"><label for="sop4_3">Balık iç sıcaklığı 63°C</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop4_3" placeholder="Notlar"></textarea></div><div id="recommendation-sop4_3" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop4_4"><div class="item-row"><input type="checkbox" id="sop4_4" class="sop-item" data-risk="high" data-id="sop4_4"><label for="sop4_4">Saklanan gıdalar 2 saat içinde 74°C'ye ısıtılıyor</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop4_4" placeholder="Notlar"></textarea></div><div id="recommendation-sop4_4" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop4_5"><div class="item-row"><input type="checkbox" id="sop4_5" class="sop-item" data-risk="medium" data-id="sop4_5"><label for="sop4_5">Pişirme sıcaklıkları günlük kaydediliyor</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop4_5" placeholder="Notlar"></textarea></div><div id="recommendation-sop4_5" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop4_6"><div class="item-row"><input type="checkbox" id="sop4_6" class="sop-item" data-risk="medium" data-id="sop4_6"><label for="sop4_6">Gıda birden fazla kez ısıtılmıyor</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop4_6" placeholder="Notlar"></textarea></div><div id="recommendation-sop4_6" class="recommendation-box"></div></div>
+            </div>
+            <!-- 5. Sunum ve Servis -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-utensils"></i> 5. Sunum ve Servis</div>
+                <div class="checklist-item" id="item-sop5_1"><div class="item-row"><input type="checkbox" id="sop5_1" class="sop-item" data-risk="high" data-id="sop5_1"><label for="sop5_1">Servis öncesi el yıkama</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop5_1" placeholder="Notlar"></textarea></div><div id="recommendation-sop5_1" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop5_2"><div class="item-row"><input type="checkbox" id="sop5_2" class="sop-item" data-risk="high" data-id="sop5_2"><label for="sop5_2">Temiz ve dezenfekte edilmiş servis kapları</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop5_2" placeholder="Notlar"></textarea></div><div id="recommendation-sop5_2" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop5_3"><div class="item-row"><input type="checkbox" id="sop5_3" class="sop-item" data-risk="high" data-id="sop5_3"><label for="sop5_3">Sıcak gıda sıcaklığı ≥ 60°C</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop5_3" placeholder="Notlar"></textarea></div><div id="recommendation-sop5_3" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop5_4"><div class="item-row"><input type="checkbox" id="sop5_4" class="sop-item" data-risk="high" data-id="sop5_4"><label for="sop5_4">Soğuk gıda sıcaklığı ≤ 4°C</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop5_4" placeholder="Notlar"></textarea></div><div id="recommendation-sop5_4" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop5_5"><div class="item-row"><input type="checkbox" id="sop5_5" class="sop-item" data-risk="medium" data-id="sop5_5"><label for="sop5_5">Servis sırasında elle temas edilmiyor</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop5_5" placeholder="Notlar"></textarea></div><div id="recommendation-sop5_5" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop5_6"><div class="item-row"><input type="checkbox" id="sop5_6" class="sop-item" data-risk="medium" data-id="sop5_6"><label for="sop5_6">Açık büfe sunumlarda gıdalar kapatılıyor</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop5_6" placeholder="Notlar"></textarea></div><div id="recommendation-sop5_6" class="recommendation-box"></div></div>
+            </div>
+            <!-- 6. Soğutma ve Muhafaza -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-snowflake"></i> 6. Soğutma ve Muhafaza</div>
+                <div class="checklist-item" id="item-sop6_1"><div class="item-row"><input type="checkbox" id="sop6_1" class="sop-item" data-risk="high" data-id="sop6_1"><label for="sop6_1">60°C'den 20°C'ye 2 saat içinde soğutma</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop6_1" placeholder="Notlar"></textarea></div><div id="recommendation-sop6_1" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop6_2"><div class="item-row"><input type="checkbox" id="sop6_2" class="sop-item" data-risk="high" data-id="sop6_2"><label for="sop6_2">20°C'den 4°C'ye 4 saat içinde soğutma</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop6_2" placeholder="Notlar"></textarea></div><div id="recommendation-sop6_2" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop6_3"><div class="item-row"><input type="checkbox" id="sop6_3" class="sop-item" data-risk="medium" data-id="sop6_3"><label for="sop6_3">Hızlı soğutma için 10 cm'den derin olmayan kaplar</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop6_3" placeholder="Notlar"></textarea></div><div id="recommendation-sop6_3" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop6_4"><div class="item-row"><input type="checkbox" id="sop6_4" class="sop-item" data-risk="medium" data-id="sop6_4"><label for="sop6_4">Tam soğutma sonrası üretim tarihi etiketi ile kapatma</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop6_4" placeholder="Notlar"></textarea></div><div id="recommendation-sop6_4" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop6_5"><div class="item-row"><input type="checkbox" id="sop6_5" class="sop-item" data-risk="high" data-id="sop6_5"><label for="sop6_5">Sıcak gıdalar doğrudan buzdolabına konulmuyor</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop6_5" placeholder="Notlar"></textarea></div><div id="recommendation-sop6_5" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop6_6"><div class="item-row"><input type="checkbox" id="sop6_6" class="sop-item" data-risk="high" data-id="sop6_6"><label for="sop6_6">Soğutucu sıcaklıkları izleniyor ve kaydediliyor</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop6_6" placeholder="Notlar"></textarea></div><div id="recommendation-sop6_6" class="recommendation-box"></div></div>
+            </div>
+            <!-- 7. Kişisel Hijyen -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-user-shield"></i> 7. Kişisel Hijyen</div>
+                <div class="checklist-item" id="item-sop7_1"><div class="item-row"><input type="checkbox" id="sop7_1" class="sop-item" data-risk="high" data-id="sop7_1"><label for="sop7_1">Temiz üniforma (önlük, bone, şapka)</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop7_1" placeholder="Notlar"></textarea></div><div id="recommendation-sop7_1" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop7_2"><div class="item-row"><input type="checkbox" id="sop7_2" class="sop-item" data-risk="high" data-id="sop7_2"><label for="sop7_2">Saçlar tamamen kapatılmış</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop7_2" placeholder="Notlar"></textarea></div><div id="recommendation-sop7_2" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop7_3"><div class="item-row"><input type="checkbox" id="sop7_3" class="sop-item" data-risk="medium" data-id="sop7_3"><label for="sop7_3">Takı ve saat kullanılmıyor</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop7_3" placeholder="Notlar"></textarea></div><div id="recommendation-sop7_3" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop7_4"><div class="item-row"><input type="checkbox" id="sop7_4" class="sop-item" data-risk="medium" data-id="sop7_4"><label for="sop7_4">Tırnaklar kısa ve ojeli değil</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop7_4" placeholder="Notlar"></textarea></div><div id="recommendation-sop7_4" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop7_5"><div class="item-row"><input type="checkbox" id="sop7_5" class="sop-item" data-risk="high" data-id="sop7_5"><label for="sop7_5">Bulaşıcı hastalık (ishal, kusma) raporlanıyor</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop7_5" placeholder="Notlar"></textarea></div><div id="recommendation-sop7_5" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop7_6"><div class="item-row"><input type="checkbox" id="sop7_6" class="sop-item" data-risk="high" data-id="sop7_6"><label for="sop7_6">Tuvalet, sigara, yemek ve atık sonrası el yıkama</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop7_6" placeholder="Notlar"></textarea></div><div id="recommendation-sop7_6" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop7_7"><div class="item-row"><input type="checkbox" id="sop7_7" class="sop-item" data-risk="medium" data-id="sop7_7"><label for="sop7_7">Alkol bazlı el dezenfektanı mevcut</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop7_7" placeholder="Notlar"></textarea></div><div id="recommendation-sop7_7" class="recommendation-box"></div></div>
+            </div>
+            <!-- 8. Temizlik ve Dezenfeksiyon -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-broom"></i> 8. Temizlik ve Dezenfeksiyon</div>
+                <div class="checklist-item" id="item-sop8_1"><div class="item-row"><input type="checkbox" id="sop8_1" class="sop-item" data-risk="high" data-id="sop8_1"><label for="sop8_1">Her kullanımdan sonra çalışma yüzeyleri temizleniyor</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop8_1" placeholder="Notlar"></textarea></div><div id="recommendation-sop8_1" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop8_2"><div class="item-row"><input type="checkbox" id="sop8_2" class="sop-item" data-risk="high" data-id="sop8_2"><label for="sop8_2">Lavabolar dezenfekte ediliyor</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop8_2" placeholder="Notlar"></textarea></div><div id="recommendation-sop8_2" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop8_3"><div class="item-row"><input type="checkbox" id="sop8_3" class="sop-item" data-risk="medium" data-id="sop8_3"><label for="sop8_3">Zemin ve duvarlar yemek artıklarından temiz</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop8_3" placeholder="Notlar"></textarea></div><div id="recommendation-sop8_3" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop8_4"><div class="item-row"><input type="checkbox" id="sop8_4" class="sop-item" data-risk="high" data-id="sop8_4"><label for="sop8_4">Onaylı dezenfektanlar doğru konsantrasyonda</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop8_4" placeholder="Notlar"></textarea></div><div id="recommendation-sop8_4" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop8_5"><div class="item-row"><input type="checkbox" id="sop8_5" class="sop-item" data-risk="medium" data-id="sop8_5"><label for="sop8_5">Temizlik çizelgesi asılı ve imzalı</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop8_5" placeholder="Notlar"></textarea></div><div id="recommendation-sop8_5" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop8_6"><div class="item-row"><input type="checkbox" id="sop8_6" class="sop-item" data-risk="medium" data-id="sop8_6"><label for="sop8_6">Aspiratörler ve klimalar düzenli temizleniyor</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop8_6" placeholder="Notlar"></textarea></div><div id="recommendation-sop8_6" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop8_7"><div class="item-row"><input type="checkbox" id="sop8_7" class="sop-item" data-risk="high" data-id="sop8_7"><label for="sop8_7">Bulaşıklar ≥ 60°C'de yıkanıyor</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop8_7" placeholder="Notlar"></textarea></div><div id="recommendation-sop8_7" class="recommendation-box"></div></div>
+            </div>
+            <!-- 9. Haşere Kontrolü -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-bug"></i> 9. Haşere Kontrolü</div>
+                <div class="checklist-item" id="item-sop9_1"><div class="item-row"><input type="checkbox" id="sop9_1" class="sop-item" data-risk="high" data-id="sop9_1"><label for="sop9_1">Tesis içinde böcek veya kemirgen yok</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop9_1" placeholder="Notlar"></textarea></div><div id="recommendation-sop9_1" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop9_2"><div class="item-row"><input type="checkbox" id="sop9_2" class="sop-item" data-risk="medium" data-id="sop9_2"><label for="sop9_2">Duvarlardaki ve kapılardaki delikler kapatılmış</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop9_2" placeholder="Notlar"></textarea></div><div id="recommendation-sop9_2" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop9_3"><div class="item-row"><input type="checkbox" id="sop9_3" class="sop-item" data-risk="medium" data-id="sop9_3"><label for="sop9_3">Uygun yerlere tuzaklar takılmış</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop9_3" placeholder="Notlar"></textarea></div><div id="recommendation-sop9_3" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop9_4"><div class="item-row"><input type="checkbox" id="sop9_4" class="sop-item" data-risk="medium" data-id="sop9_4"><label for="sop9_4">Yetkili haşere kontrol şirketi ile sözleşme</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop9_4" placeholder="Notlar"></textarea></div><div id="recommendation-sop9_4" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop9_5"><div class="item-row"><input type="checkbox" id="sop9_5" class="sop-item" data-risk="high" data-id="sop9_5"><label for="sop9_5">Atıklar anında uzaklaştırılıyor ve kapları günlük temizleniyor</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop9_5" placeholder="Notlar"></textarea></div><div id="recommendation-sop9_5" class="recommendation-box"></div></div>
+            </div>
+            <!-- 10. Dokümantasyon ve Eğitim -->
+            <div class="checklist-section">
+                <div class="section-title"><i class="fas fa-file-alt"></i> 10. Dokümantasyon ve Eğitim</div>
+                <div class="checklist-item" id="item-sop10_1"><div class="item-row"><input type="checkbox" id="sop10_1" class="sop-item" data-risk="high" data-id="sop10_1"><label for="sop10_1">Soğutucu sıcaklıkları günlük kaydediliyor</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop10_1" placeholder="Notlar"></textarea></div><div id="recommendation-sop10_1" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop10_2"><div class="item-row"><input type="checkbox" id="sop10_2" class="sop-item" data-risk="high" data-id="sop10_2"><label for="sop10_2">Pişirme ve soğutma sıcaklıkları kaydediliyor</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop10_2" placeholder="Notlar"></textarea></div><div id="recommendation-sop10_2" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop10_3"><div class="item-row"><input type="checkbox" id="sop10_3" class="sop-item" data-risk="medium" data-id="sop10_3"><label for="sop10_3">Teslim kayıtları en az 6 ay saklanıyor</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop10_3" placeholder="Notlar"></textarea></div><div id="recommendation-sop10_3" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop10_4"><div class="item-row"><input type="checkbox" id="sop10_4" class="sop-item" data-risk="low" data-id="sop10_4"><label for="sop10_4">Tüm kayıtlar sorumlu tarafından imzalanıyor</label><span class="risk-badge risk-low">Düşük</span></div><div class="notes-field"><textarea id="note-sop10_4" placeholder="Notlar"></textarea></div><div id="recommendation-sop10_4" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop10_5"><div class="item-row"><input type="checkbox" id="sop10_5" class="sop-item" data-risk="high" data-id="sop10_5"><label for="sop10_5">Tüm çalışanlar gıda güvenliği eğitimi almış</label><span class="risk-badge risk-high">Yüksek</span></div><div class="notes-field"><textarea id="note-sop10_5" placeholder="Notlar"></textarea></div><div id="recommendation-sop10_5" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop10_6"><div class="item-row"><input type="checkbox" id="sop10_6" class="sop-item" data-risk="medium" data-id="sop10_6"><label for="sop10_6">Asılı açık talimatlar (el yıkama, sıcaklıklar)</label><span class="risk-badge risk-medium">Orta</span></div><div class="notes-field"><textarea id="note-sop10_6" placeholder="Notlar"></textarea></div><div id="recommendation-sop10_6" class="recommendation-box"></div></div>
+                <div class="checklist-item" id="item-sop10_7"><div class="item-row"><input type="checkbox" id="sop10_7" class="sop-item" data-risk="low" data-id="sop10_7"><label for="sop10_7">Düzenli güvenlik toplantıları yapılıyor</label><span class="risk-badge risk-low">Düşük</span></div><div class="notes-field"><textarea id="note-sop10_7" placeholder="Notlar"></textarea></div><div id="recommendation-sop10_7" class="recommendation-box"></div></div>
+            </div>
+        </div>
+
+        <div class="result-area" id="resultArea">
+            <div><span class="score" id="scoreDisplay">0%</span><span class="evaluation" id="evaluationText"></span></div>
+            <div id="overallRiskDisplay" class="overall-risk"></div>
+        </div>
+        <div class="btn-group"><button class="btn-primary" id="calculateBtn"><i class="fas fa-calculator"></i> Sonucu Hesapla</button></div>
+        <div class="export-container">
+            <button class="export-btn excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Kapsamlı Excel Dışa Aktar</button>
+            <button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Word Dışa Aktar</button>
+        </div>
+        <div id="initialMessage"><i class="fas fa-robot" style="color:var(--accent-soft);"></i> "Sonucu Hesapla"ya tıklayın, ardından dışa aktar butonlarını kullanın.</div>
+    </div>
+</div>
+
+<footer class="footer-simple">Tüm hakları saklıdır © 2026 <span>FAROUK GRUP</span></footer>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Hesap Makinesi</button>
+<a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> Ana Sayfa</a>
+
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><span class="close" id="modalClose">&times;</span><h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Hesap Makinesi</h2></div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <button class="calc-btn" data-val="7">7</button><button class="calc-btn" data-val="8">8</button><button class="calc-btn" data-val="9">9</button><button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="4">4</button><button class="calc-btn" data-val="5">5</button><button class="calc-btn" data-val="6">6</button><button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="1">1</button><button class="calc-btn" data-val="2">2</button><button class="calc-btn" data-val="3">3</button><button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button><button class="calc-btn" data-val="0">0</button><button class="calc-btn" data-val=".">.</button><button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button><button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="../js/tools/tool15tr.js" defer></script>
+</body>
+</html>

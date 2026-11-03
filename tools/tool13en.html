@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Optimal Labor Cost Calculator | FAROUK GRUP</title>
+<script src="../js/auth-check.js"></script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- ExcelJS & FileSaver -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools-common-en.css">
+    <link rel="stylesheet" href="../css/tools/tool13en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+    <link rel="stylesheet" href="../css/tools-overrides-en.css">
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- Export loading screen -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">Generating report...</h3>
+        <p id="loadingMsg">Please wait</p>
+    </div>
+</div>
+
+<section class="hero-mini">
+    <h2>💰 Optimal Labor Cost Calculator</h2>
+    <p>Advanced analysis of labor costs, productivity, and operational efficiency</p>
+</section>
+
+<div class="container">
+    <div class="calculator-card" data-aos="fade-up">
+        <div class="featured-badge"><i class="fas fa-users"></i><span>Labor</span></div>
+        <h2><i class="fas fa-users" style="color:#cfa776;margin-right:0.5rem;"></i>Project & Shifts Data</h2>
+
+        <!-- Currency and entity name -->
+        <div class="currency-row">
+            <label><i class="fas fa-coins"></i> Currency:</label>
+            <select id="currencySelect">
+                <option value="$" selected>US Dollar ($)</option>
+                <option value="€">Euro (€)</option>
+                <option value="₺">Turkish Lira (₺)</option>
+                <option value="ج.م">Egyptian Pound (ج.م)</option>
+                <option value="د.ك">Kuwaiti Dinar (د.ك)</option>
+                <option value="ر.س">Saudi Riyal (ر.س)</option>
+            </select>
+            <label><i class="fas fa-building"></i> Entity Name:</label>
+            <input type="text" id="companyName" value="Beneficiary Entity Name" placeholder="Beneficiary entity">
+        </div>
+
+        <!-- Basic inputs -->
+        <div class="section-title-sm">📊 Basic Data</div>
+        <div class="input-section">
+            <div>
+                <div class="form-group">
+                    <label><i class="fas fa-chart-line"></i> Target Monthly Sales</label>
+                    <input type="number" id="monthlySales" value="50000" step="1000" min="0">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-receipt"></i> Average Bill per Customer</label>
+                    <input type="number" id="avgBill" value="25" step="1" min="0">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Average Monthly Wage per Employee</label>
+                    <input type="number" id="avgMonthlyWage" value="2500" step="100" min="0">
+                </div>
+            </div>
+            <div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-week"></i> Working Days per Week</label>
+                    <input type="number" id="workingDays" value="6" min="1" max="7">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percent"></i> Target Labor Cost (%)</label>
+                    <input type="number" id="targetLaborPercent" value="25" step="1" min="0" max="100">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-moon"></i> Number of Daily Shifts</label>
+                    <select id="numShifts">
+                        <option value="1">Single Shift</option>
+                        <option value="2" selected>Two Shifts</option>
+                        <option value="3">Three Shifts</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shifts section -->
+        <div class="section-title-sm">🕒 Shift Details</div>
+        <div class="shifts-section">
+            <div class="shifts-header">
+                <h3><i class="fas fa-clock"></i> Shifts</h3>
+                <button class="btn-add" id="addShiftBtn"><i class="fas fa-plus"></i> Add Shift</button>
+            </div>
+            <div id="shiftsContainer"></div>
+            <p class="hint"><i class="fas fa-info-circle"></i> Enter the number of employees and hours per shift.</p>
+        </div>
+
+        <div class="section-title-sm">📋 Additional Settings</div>
+        <div class="form-group" style="max-width:350px;">
+            <label><i class="fas fa-umbrella-beach"></i> Weekly Leave Distribution</label>
+            <select id="vacationDistribution">
+                <option value="same">All employees on the same leave day</option>
+                <option value="staggered" selected>Staggered leaves (to ensure coverage)</option>
+            </select>
+        </div>
+
+        <button class="btn-primary" id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Optimal Cost</button>
+
+        <!-- Results -->
+        <div class="results-section" id="resultsSection" style="display:none;">
+            <div class="action-bar">
+                <button class="btn-export excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Export to Excel</button>
+                <button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> Export Word</button>
+            </div>
+
+            <div class="results-grid" id="resultsGrid"></div>
+            <div id="evaluationAlert"></div>
+            <div class="suggestion-box" id="suggestions"></div>
+            <div class="chart-container"><canvas id="laborChart"></canvas></div>
+        </div>
+
+        <div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center;">
+            <i class="fas fa-robot" style="color:var(--accent-soft);"></i> Results will appear after clicking Calculate
+        </div>
+    </div>
+</div>
+
+<footer class="footer-simple">All rights reserved © 2026 <span>FAROUK GRUP</span></footer>
+
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> Calculator</button>
+<a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> Home</a>
+
+<!-- Calculator Modal with fixed button order -->
+<div id="calculatorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="modalClose">&times;</span>
+            <h2><i class="fas fa-calculator" style="color:#cfa776;"></i> Calculator</h2>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="calcDisplay" class="calc-display" readonly>
+            <div class="calc-buttons">
+                <!-- Fixed order: 7 8 9 / 4 5 6 × / 1 2 3 - -->
+                <button class="calc-btn" data-val="7">7</button>
+                <button class="calc-btn" data-val="8">8</button>
+                <button class="calc-btn" data-val="9">9</button>
+                <button class="calc-btn operator" data-val="/">÷</button>
+                <button class="calc-btn" data-val="4">4</button>
+                <button class="calc-btn" data-val="5">5</button>
+                <button class="calc-btn" data-val="6">6</button>
+                <button class="calc-btn operator" data-val="*">×</button>
+                <button class="calc-btn" data-val="1">1</button>
+                <button class="calc-btn" data-val="2">2</button>
+                <button class="calc-btn" data-val="3">3</button>
+                <button class="calc-btn operator" data-val="-">-</button>
+                <button class="calc-btn" data-val="C">C</button>
+                <button class="calc-btn" data-val="0">0</button>
+                <button class="calc-btn" data-val=".">.</button>
+                <button class="calc-btn operator" data-val="+">+</button>
+                <button class="calc-btn" data-val="⌫">⌫</button>
+                <button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="../js/tools/tool13en.js" defer></script>
+</body>
+</html>

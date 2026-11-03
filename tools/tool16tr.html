@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Finansal ve Danışmanlık Hesap Makinesi | FAROUK GRUP</title>
+<!-- Sayfa koruması -->
+<script src="../js/auth-check.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- ExcelJS & FileSaver -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="../css/tools-common-tr.css">
+    <link rel="stylesheet" href="../css/tools-common-tr.css">
+    <link rel="stylesheet" href="../css/tools/tool16tr.css">
+    <link rel="stylesheet" href="../css/tools-overrides-tr.css">
+    <link rel="stylesheet" href="../css/tools-overrides-tr.css">
+</head>
+<body>
+<!-- Sabit arka plan -->
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<!-- Yükleme ekranı -->
+<div class="export-loading" id="exportLoading">
+    <div class="export-loading-box">
+        <i class="fas fa-spinner"></i>
+        <h3 id="loadingTitle">Rapor oluşturuluyor...</h3>
+        <p id="loadingMsg">Lütfen bekleyin</p>
+    </div>
+</div>
+
+<!-- HERO -->
+<section class="hero-mini">
+    <h2>🧮 Finansal ve Danışmanlık Hesap Makinesi</h2>
+    <p>Gelişmiş hesaplamalar, finansal işlevler ve tüm işlemlerin kapsamlı geçmişi</p>
+</section>
+
+<!-- Başlık çubuğu -->
+<div class="header-bar">
+    <div class="datetime">
+        <div><i class="fas fa-calendar-alt"></i> <span id="currentDate"></span></div>
+        <div><i class="fas fa-clock"></i> <span id="currentTime"></span></div>
+    </div>
+    <div class="header-title"><i class="fas fa-calculator"></i> FAROUK GRUP Danışmanlık ve İşletme</div>
+</div>
+
+<!-- Ana içerik -->
+<div class="main-content">
+    <div class="calc-container">
+        <!-- Hesap makinesi -->
+        <div class="calculator">
+            <div class="calculator-header">
+                <h2><i class="fas fa-calculator"></i> Danışmanlık Hesap Makinesi</h2>
+            </div>
+            <div class="error-message" id="errorMessage"></div>
+            <div class="screen-container">
+                <div class="history-display" id="historyDisplay"></div>
+                <div class="main-display" id="display">0</div>
+            </div>
+            <div class="buttons-grid">
+                <button class="btn btn-memory" onclick="handleMemory('MC')">MC</button>
+                <button class="btn btn-memory" onclick="handleMemory('MR')">MR</button>
+                <button class="btn btn-memory" onclick="handleMemory('M+')">M+</button>
+                <button class="btn btn-memory" onclick="handleMemory('M-')">M-</button>
+                <button class="btn btn-action" onclick="clearEntry()">CE</button>
+
+                <button class="btn btn-number" onclick="appendToDisplay('7')">7</button>
+                <button class="btn btn-number" onclick="appendToDisplay('8')">8</button>
+                <button class="btn btn-number" onclick="appendToDisplay('9')">9</button>
+                <button class="btn btn-operator" onclick="setOperator('/')">÷</button>
+                <button class="btn btn-action" onclick="clearDisplay()">C</button>
+
+                <button class="btn btn-number" onclick="appendToDisplay('4')">4</button>
+                <button class="btn btn-number" onclick="appendToDisplay('5')">5</button>
+                <button class="btn btn-number" onclick="appendToDisplay('6')">6</button>
+                <button class="btn btn-operator" onclick="setOperator('*')">×</button>
+                <button class="btn" onclick="backspace()"><i class="fas fa-backspace"></i></button>
+
+                <button class="btn btn-number" onclick="appendToDisplay('1')">1</button>
+                <button class="btn btn-number" onclick="appendToDisplay('2')">2</button>
+                <button class="btn btn-number" onclick="appendToDisplay('3')">3</button>
+                <button class="btn btn-operator" onclick="setOperator('-')">-</button>
+                <button class="btn" onclick="calculateSquareRoot()">√</button>
+
+                <button class="btn" onclick="toggleSign()">±</button>
+                <button class="btn btn-number" onclick="appendToDisplay('.')">.</button>
+                <button class="btn btn-number" onclick="appendToDisplay('0')">0</button>
+                <button class="btn btn-operator" onclick="setOperator('+')">+</button>
+                <button class="btn" onclick="calculatePercent()">%</button>
+
+                <button class="btn btn-finance" onclick="applyTax()">KDV</button>
+                <button class="btn btn-finance" onclick="applyDiscount()">İndirim</button>
+                <button class="btn btn-finance" onclick="calculateROI()">ROI</button>
+                <button class="btn btn-finance" onclick="calculateSimpleInterest()">Faiz</button>
+                <button class="btn" onclick="power()">xʸ</button>
+
+                <button class="btn btn-equals" onclick="calculateResult()">=</button>
+                <button class="btn" onclick="calculateReciprocal()">1/x</button>
+                <button class="btn" onclick="log10()">log</button>
+                <button class="btn" onclick="factorial()">n!</button>
+            </div>
+        </div>
+
+        <!-- Geçmiş paneli -->
+        <div class="history-panel">
+            <div class="history-header">
+                <h3><i class="fas fa-table"></i> İşlem Geçmişi</h3>
+                <div class="history-controls">
+                    <select id="filterSelect" class="filter-select" onchange="filterHistory()">
+                        <option value="all">Tüm İşlemler</option>
+                        <option value="+">Toplama (+)</option>
+                        <option value="-">Çıkarma (-)</option>
+                        <option value="*">Çarpma (×)</option>
+                        <option value="/">Bölme (÷)</option>
+                        <option value="مالية">Finansal / Gelişmiş</option>
+                    </select>
+                    <button class="btn-export" onclick="exportHistory()"><i class="fas fa-download"></i> CSV</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="history-table">
+                    <thead>
+                        <tr><th style="width:12%;">Tür</th><th style="width:43%;">İşlem</th><th style="width:25%;">Sonuç</th><th style="width:20%;text-align:center;">Eylem</th></tr>
+                    </thead>
+                    <tbody id="historyTableBody"></tbody>
+                </table>
+            </div>
+            <button class="btn-clear-all" onclick="clearHistory()"><i class="fas fa-trash-alt"></i> Geçmişi Tamamen Sil</button>
+            <div class="export-bar">
+                <button class="btn-export-excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Kapsamlı Excel</button>
+                <button class="btn-export-word" id="exportWordBtn"><i class="fas fa-file-word"></i> Word</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer-simple">
+    Tüm hakları saklıdır © 2026 <span>FAROUK GRUP</span>
+</footer>
+
+<!-- Sabit butonlar -->
+<a href="../index.html" class="home-floating-btn"><i class="fas fa-home"></i> Ana Sayfa</a>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="../js/tools/tool16tr.js" defer></script>
+</body>
+</html>
