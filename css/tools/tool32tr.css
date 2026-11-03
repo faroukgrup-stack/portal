@@ -1,0 +1,56 @@
+/* مكونات خاصة بالأداة tool32en */
+
+
+:root {
+    /* ═══ لوحة الألوان الموحدة — عدّل هنا لتغيير هوية المنصة كاملة ═══ */
+    --gold: #cfa776;
+    --gold-deep: #b48554;
+    --gold-bright: #d4b15a;
+    --bg: #0b0e17;
+    --bg-2: #121824;
+    --text: #f0f4fa;
+    --text-muted: #b8c5dc;   /* مفتّح عن السابق لتحسين تباين النصوص الصغيرة */
+    --danger: #dc3545;
+    --danger-soft: #f87171;
+    --success: #28a745;
+    --warning: #ffc107;
+    /* ═══ مقياس الانحناء الموحد (4 قيم فقط) ═══ */
+    --radius-xs: 4px;
+    --radius-sm: 10px;
+    --radius-md: 20px;
+    --radius-lg: 30px;
+    --radius-xl: 40px;
+}
+
+.calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .chart-card, .hero-mini, .currency-row, .featured-badge,
+        .glow-bg, .calc-floating-btn, .home-floating-btn, .form-group input,
+        .form-group select {
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+}
+.result-card.highlight-gold {
+    border-color: var(--gold-deep);
+    background: linear-gradient(135deg, rgba(180,133,84,0.15), rgba(212,177,90,0.08));
+}
+.result-card.highlight-red {
+    border-color: var(--danger);
+    background: linear-gradient(135deg, rgba(220,53,69,0.12), rgba(220,53,69,0.04));
+}
+.result-card.highlight-green {
+    border-color: var(--success);
+    background: linear-gradient(135deg, rgba(40,167,69,0.12), rgba(40,167,69,0.04));
+}
+.result-card.highlight-red i {
+    color: var(--danger-soft);
+}
+.result-card.highlight-green i {
+    color: #4ade80;
+}
+.result-card.highlight-red .value {
+    color: var(--danger-soft);
+}
+.result-card.highlight-green .value {
+    color: #4ade80;
+}

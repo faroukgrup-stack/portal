@@ -1,0 +1,66 @@
+/* مكونات خاصة بالأداة tool2tr */
+
+
+:root {
+    /* ═══ لوحة الألوان الموحدة — عدّل هنا لتغيير هوية المنصة كاملة ═══ */
+    --gold: #cfa776;
+    --gold-deep: #b48554;
+    --gold-bright: #d4b15a;
+    --bg: #0b0e17;
+    --bg-2: #121824;
+    --text: #f0f4fa;
+    --text-muted: #b8c5dc;   /* مفتّح عن السابق لتحسين تباين النصوص الصغيرة */
+    --danger: #dc3545;
+    --danger-soft: #f87171;
+    --success: #28a745;
+    --warning: #ffc107;
+    /* ═══ مقياس الانحناء الموحد (4 قيم فقط) ═══ */
+    --radius-xs: 4px;
+    --radius-sm: 10px;
+    --radius-md: 20px;
+    --radius-lg: 30px;
+    --radius-xl: 40px;
+}
+
+.calc-box,
+        .result-card,
+        .chart-container,
+        canvas,
+        .table-container,
+        .btn-calculate,
+        .chart-card,
+        .scenario-card,
+        .collapsible,
+        .hero-mini,
+        .currency-row {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+}
+@media (min-width: 1024px) {
+    .featured-badge i {
+    font-size: 1.8rem;
+    margin-bottom: 0.2rem;
+    color: var(--bg);
+}
+}
+@media (min-width: 1024px) {
+    .featured-badge span {
+    font-size: 0.8rem;
+    text-align: center;
+    color: var(--bg);
+}
+}
+@media (min-width: 1024px) {
+    .collapsible {
+    font-size: 1.2rem;
+    padding: 1rem 1.5rem;
+}
+}
+@media (max-width: 768px) {
+    .tooltip .tooltiptext {
+    display: none !important;
+}
+}

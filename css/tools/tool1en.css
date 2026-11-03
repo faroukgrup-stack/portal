@@ -1,0 +1,84 @@
+/* مكونات خاصة بالأداة tool1en */
+
+
+:root {
+    /* ═══ لوحة الألوان الموحدة — عدّل هنا لتغيير هوية المنصة كاملة ═══ */
+    --gold: #cfa776;
+    --gold-deep: #b48554;
+    --gold-bright: #d4b15a;
+    --bg: #0b0e17;
+    --bg-2: #121824;
+    --text: #f0f4fa;
+    --text-muted: #b8c5dc;   /* مفتّح عن السابق لتحسين تباين النصوص الصغيرة */
+    --danger: #dc3545;
+    --danger-soft: #f87171;
+    --success: #28a745;
+    --warning: #ffc107;
+    /* ═══ مقياس الانحناء الموحد (4 قيم فقط) ═══ */
+    --radius-xs: 4px;
+    --radius-sm: 10px;
+    --radius-md: 20px;
+    --radius-lg: 30px;
+    --radius-xl: 40px;
+}
+
+.glow-bg, .glow-bg span, .login-card, .dashboard-panel, .tool-card,
+        .btn-primary, .btn-outline, .btn-guide, .link-btn, .calc-btn,
+        .todo-item, .appointment-item, .header-bar, .quick-links-panel,
+        .login-btn, .logout-btn, .renew-link, .relogin-btn,
+        .session-expired-card, .service-block, .calc-box, .result-card,
+        .chart-container, canvas, .table-container, .btn-calculate,
+        .chart-card, .scenario-card, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .export-word-btn,
+        .export-excel-full-btn, .settings-overlay, .settings-card {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    animation: none !important;
+    transition: none !important;
+}
+.scenario-card.pessimistic {
+    border-color: var(--danger);
+}
+.scenario-card.expected {
+    border-color: var(--warning);
+}
+.scenario-card.optimistic {
+    border-color: var(--success);
+}
+.scenario-card .value {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--gold);
+}
+.scenario-card .label {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+@media (min-width: 1024px) {
+    .collapsible {
+    font-size: 1.2rem;
+    padding: 1rem 1.5rem;
+}
+}
+@media (min-width: 1024px) {
+    .scenario-card {
+    flex: 1 1 200px;
+    max-width: 300px;
+}
+}
+@media (max-width: 768px) {
+    .scenario-card {
+    flex: 1 1 140px;
+    max-width: 200px;
+}
+}
+@media (max-width: 400px) {
+    .scenario-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+}
+}

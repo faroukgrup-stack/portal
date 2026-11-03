@@ -1,0 +1,58 @@
+/* مكونات خاصة بالأداة tool5en */
+
+
+:root {
+    /* ═══ لوحة الألوان الموحدة — عدّل هنا لتغيير هوية المنصة كاملة ═══ */
+    --gold: #cfa776;
+    --gold-deep: #b48554;
+    --gold-bright: #d4b15a;
+    --bg: #0b0e17;
+    --bg-2: #121824;
+    --text: #f0f4fa;
+    --text-muted: #b8c5dc;   /* مفتّح عن السابق لتحسين تباين النصوص الصغيرة */
+    --danger: #dc3545;
+    --danger-soft: #f87171;
+    --success: #28a745;
+    --warning: #ffc107;
+    /* ═══ مقياس الانحناء الموحد (4 قيم فقط) ═══ */
+    --radius-xs: 4px;
+    --radius-sm: 10px;
+    --radius-md: 20px;
+    --radius-lg: 30px;
+    --radius-xl: 40px;
+}
+
+.calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .btn-sensitivity, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .export-btn, .export-word-btn,
+        .form-group input, .form-group select, .settings-overlay, .settings-card {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    animation: none !important;
+    transition: none !important;
+}
+input[type="range"] {
+    padding: 0;
+    height: 8px;
+    border-radius: var(--radius-sm);
+    background: rgba(180,133,84,0.2);
+    -webkit-appearance: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--gold-deep);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+}
+@media (max-width: 768px) {
+    input[type="range"] {
+    width: 100%;
+}
+}

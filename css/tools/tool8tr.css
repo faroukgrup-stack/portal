@@ -1,0 +1,37 @@
+/* مكونات خاصة بالأداة tool8tr */
+
+
+:root {
+    /* ═══ لوحة الألوان الموحدة — عدّل هنا لتغيير هوية المنصة كاملة ═══ */
+    --gold: #cfa776;
+    --gold-deep: #b48554;
+    --gold-bright: #d4b15a;
+    --bg: #0b0e17;
+    --bg-2: #121824;
+    --text: #f0f4fa;
+    --text-muted: #b8c5dc;   /* مفتّح عن السابق لتحسين تباين النصوص الصغيرة */
+    --danger: #dc3545;
+    --danger-soft: #f87171;
+    --success: #28a745;
+    --warning: #ffc107;
+    /* ═══ مقياس الانحناء الموحد (4 قيم فقط) ═══ */
+    --radius-xs: 4px;
+    --radius-sm: 10px;
+    --radius-md: 20px;
+    --radius-lg: 30px;
+    --radius-xl: 40px;
+}
+
+.calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .collapsible, .hero-mini, .currency-row, .featured-badge,
+        .glow-bg, .floating-shape, .calc-floating-btn, .home-floating-btn,
+        .export-word-btn, .export-excel-full-btn, .form-group input, .form-group select,
+        .option-item select, .advanced-options, .bar-chart, .bar {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    animation: none !important;
+    transition: none !important;
+}

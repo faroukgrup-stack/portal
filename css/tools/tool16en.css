@@ -1,0 +1,110 @@
+/* مكونات خاصة بالأداة tool16en */
+
+
+:root {
+    /* ═══ لوحة الألوان الموحدة — عدّل هنا لتغيير هوية المنصة كاملة ═══ */
+    --gold: #cfa776;
+    --gold-deep: #b48554;
+    --gold-bright: #d4b15a;
+    --bg: #0b0e17;
+    --bg-2: #121824;
+    --text: #f0f4fa;
+    --text-muted: #b8c5dc;   /* مفتّح عن السابق لتحسين تباين النصوص الصغيرة */
+    --danger: #dc3545;
+    --danger-soft: #f87171;
+    --success: #28a745;
+    --warning: #ffc107;
+    /* ═══ مقياس الانحناء الموحد (4 قيم فقط) ═══ */
+    --radius-xs: 4px;
+    --radius-sm: 10px;
+    --radius-md: 20px;
+    --radius-lg: 30px;
+    --radius-xl: 40px;
+}
+
+.calculator, .history-panel, .header-bar, .result-card,
+        .btn, .btn-export, .btn-calc, .calc-container, .screen-container,
+        .buttons-grid, .table-container, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .btn-export-excel,
+        .btn-export-word, .export-loading {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    animation: none !important;
+    transition: none !important;
+}
+.calculator {
+    flex: 0 0 340px;
+    background: rgba(18,24,36,0.92);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(180,133,84,0.15);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    box-shadow: 0 15px 35px -10px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+}
+.btn {
+    background: rgba(180,133,84,0.08);
+    border: 1px solid rgba(180,133,84,0.12);
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    padding: 0.4rem 0;
+}
+.btn:hover {
+    background: rgba(180,133,84,0.2);
+    border-color: var(--gold-deep);
+    color: #fff;
+}
+.btn:active {
+    transform: scale(0.95);
+}
+.badge {
+    display: inline-block;
+    padding: 0.15rem 0.4rem;
+    border-radius: var(--radius-xs);
+    font-size: 0.65rem;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+}
+@media (min-width: 1024px) {
+    .btn {
+    font-size: 0.95rem;
+    padding: 0.5rem 0;
+}
+}
+@media (max-width: 768px) {
+    .calculator {
+    flex: none;
+    width: 100%;
+    max-width: 400px;
+    padding: 0.8rem;
+}
+}
+@media (max-width: 768px) {
+    .btn {
+    font-size: 0.75rem;
+    padding: 0.35rem 0;
+}
+}
+@media (max-width: 400px) {
+    .calculator {
+    padding: 0.5rem;
+}
+}
+@media (max-width: 400px) {
+    .btn {
+    font-size: 0.65rem;
+    padding: 0.25rem 0;
+}
+}

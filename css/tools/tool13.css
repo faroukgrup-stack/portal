@@ -1,0 +1,90 @@
+/* مكوّنات خاصة بأداة tool13 فقط — الباقي موحّد في tools-common.css */
+
+
+:root {
+    /* ═══ لوحة الألوان الموحدة — عدّل هنا لتغيير هوية المنصة كاملة ═══ */
+    --gold: #cfa776;
+    --gold-deep: #b48554;
+    --gold-bright: #d4b15a;
+    --bg: #0b0e17;
+    --bg-2: #121824;
+    --text: #f0f4fa;
+    --text-muted: #b8c5dc;   /* مفتّح عن السابق لتحسين تباين النصوص الصغيرة */
+    --danger: #dc3545;
+    --danger-soft: #f87171;
+    --success: #28a745;
+    --warning: #ffc107;
+    /* ═══ مقياس الانحناء الموحد (4 قيم فقط) ═══ */
+    --radius-xs: 4px;
+    --radius-sm: 10px;
+    --radius-md: 20px;
+    --radius-lg: 30px;
+    --radius-xl: 40px;
+}
+
+.calculator-card, .result-card, .chart-container, canvas,
+        .btn-primary, .btn-add, .btn-export, .currency-row,
+        .calc-floating-btn, .home-floating-btn, .shift-row,
+        .remove-shift, .suggestion-box, .alert, .results-grid,
+        .featured-badge, .glow-bg, .floating-shape,
+        .form-group input, .form-group select {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    animation: none !important;
+    transition: none !important;
+}
+.btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    width: 100%;
+    padding: 1.2rem;
+    border-radius: var(--radius-xl);
+    background: rgba(180,133,84,0.18);
+    border: 2px solid rgba(180,133,84,0.25);
+    color: var(--gold);
+    font-weight: 900;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin: 1.5rem 0;
+    font-family: 'Tajawal', sans-serif;
+}
+.btn-primary:hover {
+    background: rgba(180,133,84,0.35);
+    border-color: var(--gold-deep);
+}
+.btn-primary:active {
+    transform: scale(0.97);
+}
+.suggestion-box ul, .suggestion-box p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding-right: 1.2rem;
+}
+@media (min-width: 1024px) {
+    .calculator-card {
+    padding: 2rem 2.5rem;
+}
+}
+@media (min-width: 1024px) {
+    .calculator-card h2 {
+    font-size: 2rem;
+}
+}
+@media (min-width: 1024px) {
+    .btn-primary {
+    font-size: 1.3rem;
+    padding: 1.2rem;
+}
+}
+@media (max-width: 768px) {
+    .btn-primary {
+    font-size: 0.95rem;
+    padding: 0.8rem;
+    margin: 1rem 0;
+}
+}

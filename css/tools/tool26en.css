@@ -1,0 +1,80 @@
+/* مكونات خاصة بالأداة tool26en */
+
+
+:root {
+    /* ═══ لوحة الألوان الموحدة — عدّل هنا لتغيير هوية المنصة كاملة ═══ */
+    --gold: #cfa776;
+    --gold-deep: #b48554;
+    --gold-bright: #d4b15a;
+    --bg: #0b0e17;
+    --bg-2: #121824;
+    --text: #f0f4fa;
+    --text-muted: #b8c5dc;   /* مفتّح عن السابق لتحسين تباين النصوص الصغيرة */
+    --danger: #dc3545;
+    --danger-soft: #f87171;
+    --success: #28a745;
+    --warning: #ffc107;
+    /* ═══ مقياس الانحناء الموحد (4 قيم فقط) ═══ */
+    --radius-xs: 4px;
+    --radius-sm: 10px;
+    --radius-md: 20px;
+    --radius-lg: 30px;
+    --radius-xl: 40px;
+}
+
+.calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .chart-card, .scenario-card, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    animation: none !important;
+    transition: none !important;
+}
+.cashflow-row .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1;
+    min-width: 80px;
+}
+.cashflow-row .field label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+.cashflow-row .field input {
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    background: rgba(10,14,23,0.7);
+    border: 1px solid rgba(180,133,84,0.2);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    font-size: 0.85rem;
+}
+.cashflow-row .field input:focus {
+    outline: none;
+    border-color: var(--gold-deep);
+    box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+}
+.btn-sm.danger {
+    background: rgba(220,53,69,0.15);
+    color: var(--danger-soft);
+    border-color: rgba(220,53,69,0.3);
+}
+.btn-sm.danger:hover {
+    background: rgba(220,53,69,0.3);
+    color: #fff;
+}
+@media (min-width: 1024px) {
+    .cashflow-row .field {
+    min-width: 120px;
+}
+}
+@media (max-width: 768px) {
+    .cashflow-row .field {
+    min-width: 100%;
+}
+}

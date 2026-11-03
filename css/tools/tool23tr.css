@@ -1,0 +1,108 @@
+/* مكونات خاصة بالأداة tool23tr */
+
+
+:root {
+    /* ═══ لوحة الألوان الموحدة — عدّل هنا لتغيير هوية المنصة كاملة ═══ */
+    --gold: #cfa776;
+    --gold-deep: #b48554;
+    --gold-bright: #d4b15a;
+    --bg: #0b0e17;
+    --bg-2: #121824;
+    --text: #f0f4fa;
+    --text-muted: #b8c5dc;   /* مفتّح عن السابق لتحسين تباين النصوص الصغيرة */
+    --danger: #dc3545;
+    --danger-soft: #f87171;
+    --success: #28a745;
+    --warning: #ffc107;
+    /* ═══ مقياس الانحناء الموحد (4 قيم فقط) ═══ */
+    --radius-xs: 4px;
+    --radius-sm: 10px;
+    --radius-md: 20px;
+    --radius-lg: 30px;
+    --radius-xl: 40px;
+}
+
+.calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .summary-card, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    animation: none !important;
+    transition: none !important;
+}
+.result-card, .summary-card {
+    background: rgba(22,30,46,0.8);
+    border: 1px solid rgba(180,133,84,0.15);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.result-card i, .summary-card i {
+    font-size: 1.6rem;
+    color: var(--gold);
+    margin-bottom: 0.3rem;
+}
+.result-card h4, .summary-card .label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 0.2rem;
+}
+.result-card .value, .summary-card .number {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--gold);
+}
+.result-card .status, .badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-md);
+    display: inline-block;
+    margin-top: 0.2rem;
+}
+.badge-excellent, .status-good {
+    background: var(--success);
+    color: white;
+}
+.badge-fair, .status-warning {
+    background: var(--warning);
+    color: #111;
+}
+.badge-poor, .status-bad {
+    background: var(--danger);
+    color: white;
+}
+.recommendation-box p {
+    color: var(--text);
+    line-height: 1.7;
+}
+@media (min-width: 1024px) {
+    .result-card .value, .summary-card .number {
+    font-size: 1.5rem;
+}
+}
+@media (min-width: 1024px) {
+    .result-card h4, .summary-card .label {
+    font-size: 0.95rem;
+}
+}
+@media (max-width: 768px) {
+    .result-card, .summary-card {
+    padding: 0.6rem 0.4rem;
+}
+}
+@media (max-width: 768px) {
+    .result-card h4, .summary-card .label {
+    font-size: 0.65rem;
+}
+}
+@media (max-width: 768px) {
+    .result-card .value, .summary-card .number {
+    font-size: 1rem;
+}
+}

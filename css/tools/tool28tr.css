@@ -1,0 +1,94 @@
+/* مكونات خاصة بالأداة tool28tr */
+
+
+:root {
+    /* ═══ لوحة الألوان الموحدة — عدّل هنا لتغيير هوية المنصة كاملة ═══ */
+    --gold: #cfa776;
+    --gold-deep: #b48554;
+    --gold-bright: #d4b15a;
+    --bg: #0b0e17;
+    --bg-2: #121824;
+    --text: #f0f4fa;
+    --text-muted: #b8c5dc;   /* مفتّح عن السابق لتحسين تباين النصوص الصغيرة */
+    --danger: #dc3545;
+    --danger-soft: #f87171;
+    --success: #28a745;
+    --warning: #ffc107;
+    /* ═══ مقياس الانحناء الموحد (4 قيم فقط) ═══ */
+    --radius-xs: 4px;
+    --radius-sm: 10px;
+    --radius-md: 20px;
+    --radius-lg: 30px;
+    --radius-xl: 40px;
+}
+
+.calc-box, .result-card, .chart-container, canvas, .table-container,
+        .btn-calculate, .chart-card, .scenario-card, .collapsible, .hero-mini,
+        .currency-row, .featured-badge, .glow-bg, .floating-shape,
+        .calc-floating-btn, .home-floating-btn, .scenario-grid,
+        .base-data-grid, .results-comparison, .summary-table,
+        .export-word-btn, .export-excel-full-btn {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    animation: none !important;
+    transition: none !important;
+}
+.scenario-card h4 i {
+    color: var(--gold);
+    margin-left: 0.3rem;
+}
+.scenario-card .field-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.scenario-card .field-row .field {
+    flex: 1;
+    min-width: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.scenario-card .field-row .field label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.scenario-card .field-row .field input {
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    background: rgba(10,14,23,0.7);
+    border: 1px solid rgba(180,133,84,0.2);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    font-size: 0.9rem;
+}
+.scenario-card .field-row .field input:focus {
+    outline: none;
+    border-color: var(--gold-deep);
+    box-shadow: 0 0 0 3px rgba(180,133,84,0.15);
+}
+.result-card .change {
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-top: 0.2rem;
+}
+.highlight {
+    background: rgba(180,133,84,0.08);
+    font-weight: 700;
+    color: var(--gold);
+}
+@media (max-width: 768px) {
+    .scenario-card .field-row {
+    flex-direction: column;
+}
+}
+@media (max-width: 768px) {
+    .scenario-card .field-row .field {
+    min-width: 100%;
+}
+}
