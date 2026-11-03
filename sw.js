@@ -1,5 +1,5 @@
-// 1. تغيير رقم الإصدار هنا في كل مرة تعدل فيها الموقع (v1, v2, v3...)
-const CACHE_NAME = 'fg-store-v8'; 
+// 1. غيّر رقم الإصدار في كل مرة تعدل الموقع
+const CACHE_NAME = 'fg-store-v6';
 
 const ASSETS = [
   '/',
@@ -16,44 +16,46 @@ const ASSETS = [
   '/js/auth-check.js',
   '/manifest.json',
   '/icon.png',
-  // أضف هنا أي ملفات CSS أو JS أو صور إضافية تريدها أن تعمل بدون إنترنت
 ];
 
-// مرحلة التثبيت: تحميل الملفات للكاش
+// التثبيت
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('Installing new cache version...');
-      return cache.addAll(ASSETS);
-    }).then(() => {
-      // إجبار الـ Service Worker الجديد على التنشيط فوراً دون انتظار إغلاق المتصفح
-      return self.skipWaiting();
-    })
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(ASSETS))
+      .then(() => self.skipWaiting())
   );
 });
 
-// مرحلة التنشيط: حذف الكاش القديم تماماً (هذا هو الحل لمشكلتك)
+// التنشيط + حذف الكاش القديم
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
           if (cache !== CACHE_NAME) {
-            console.log('Deleting old cache:', cache);
             return caches.delete(cache);
           }
         })
       );
-    }).then(() => {
-      // إجبار جميع الصفحات المفتوحة على التحكم بواسطة الـ SW الجديد فوراً
-      return self.clients.claim();
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
-// استراتيجية الاستجابة: حاول جلب الملف من الإنترنت أولاً، إذا فشل (أوفلاين) خذه من الكاش
-// هذه الاستراتيجية (Network First) هي الأفضل لموقع استشارات بمعادلات متغيرة
+// الاستجابة
 self.addEventListener('fetch', (e) => {
+  const url = new URL(e.request.url);
+
+  // ✅ مهم جداً: لا تتدخل أبداً في طلبات الـ API (Worker أو Google Script)
+  if (
+    url.hostname.includes('workers.dev') ||
+    url.hostname.includes('script.google.com') ||
+    e.request.method !== 'GET'
+  ) {
+    return; // اترك المتصفح يتعامل مع الطلب مباشرة
+  }
+
+  // باقي الملفات: Network First
   e.respondWith(
     fetch(e.request).catch(() => {
       return caches.match(e.request);
