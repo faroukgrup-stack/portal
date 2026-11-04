@@ -45,7 +45,7 @@ const translations = {
         "addAppointment": "إضافة للجدول",
         "exportCSV": "تصدير CSV",
         "googleCalendar": "تقويم جوجل",
-        "quickLinks": "الوصول السريع لمنصات المجموعة (الإصدار 5.4)",
+        "quickLinks": "الوصول السريع لمنصات المجموعة (الإصدار6.0)",
         "officialSite": "الموقع الرسمي",
         "renew": "تجديد الإشتراك",
         "rate": "★ تقييم المنصة",
