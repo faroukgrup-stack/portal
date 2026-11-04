@@ -1,5 +1,5 @@
 // 1. غيّر رقم الإصدار في كل مرة تعدل الموقع
-const CACHE_NAME = 'fg-store-v6';
+const CACHE_NAME = 'fg-store-v6.1';
 
 const ASSETS = [
   '/',
