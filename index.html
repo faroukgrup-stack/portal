@@ -79,9 +79,19 @@
                     <button class="btn-primary" id="applyLanguageBtn"><i class="fas fa-check"></i> <span data-i18n="apply">تطبيق</span></button>
                 </div>
             </div>
-            <!-- تغيير كلمة المرور -->
+            <!-- تغيير كلمة المرور: زر يفتح نافذة منبثقة -->
             <div class="settings-group">
-                <label data-i18n="changePassword">تغيير كلمة المرور</label>
+                <button class="btn-primary" id="openChangePassBtn" style="width:100%;"><i class="fas fa-key"></i> <span data-i18n="changePassword">تغيير كلمة المرور</span></button>
+            </div>
+            <button class="btn-outline close-settings" id="closeSettingsBtn"><i class="fas fa-times"></i> <span data-i18n="close">إغلاق</span></button>
+        </div>
+    </div>
+
+    <!-- نافذة تغيير كلمة المرور -->
+    <div class="settings-overlay" id="changePassOverlay" style="z-index:2600;">
+        <div class="settings-card">
+            <h2><i class="fas fa-key"></i> <span data-i18n="changePassword">تغيير كلمة المرور</span></h2>
+            <div class="settings-group">
                 <div style="display:flex; flex-direction:column; gap:0.5rem;">
                     <input type="email" id="changeEmail" placeholder="البريد الإلكتروني" data-i18n-placeholder="emailPlaceholder" style="padding:0.5rem 0.8rem; background:rgba(10,14,23,0.8); border:2px solid rgba(180,133,84,0.2); border-radius:30px; color:#f0f4fa; outline:none;">
                     <input type="password" id="changeCurrentPass" placeholder="كلمة المرور الحالية" data-i18n-placeholder="currentPassword" style="padding:0.5rem 0.8rem; background:rgba(10,14,23,0.8); border:2px solid rgba(180,133,84,0.2); border-radius:30px; color:#f0f4fa; outline:none;">
@@ -91,7 +101,7 @@
                     <div id="changePassMsg" style="color:#f87171; font-size:0.85rem; margin-top:0.3rem;"></div>
                 </div>
             </div>
-            <button class="btn-outline close-settings" id="closeSettingsBtn"><i class="fas fa-times"></i> <span data-i18n="close">إغلاق</span></button>
+            <button class="btn-outline close-settings" id="closeChangePassBtn"><i class="fas fa-times"></i> <span data-i18n="close">إغلاق</span></button>
         </div>
     </div>
 
