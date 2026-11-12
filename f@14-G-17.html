@@ -534,10 +534,14 @@
     </div>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/fg-config.js"></script>
     <script>
         AOS.init({ duration: 700, once: true, offset: 50 });
 
-        const API_URL = 'https://farouk-api-proxy.faroukgrup.workers.dev/';
+        // التسجيل/التجديد عبر Supabase Edge Function "register" (بديل Google Apps Script)
+        const FGC = window.FG_CONFIG || {};
+        const sbReg = window.supabase.createClient(FGC.SUPABASE_URL, FGC.SUPABASE_ANON_KEY, { auth: { persistSession: false } });
 
         const ALLOWED_DOMAINS = [
             'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'live.com',
@@ -819,12 +823,9 @@
             msgBox.className = 'msg-box';
 
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: formData,
-                    mode: 'cors'
-                });
-                const data = await response.json();
+                const r = await sbReg.functions.invoke('register', { body: Object.assign({ mode: 'year', lang: currentLang }, formData) });
+                if (r.error && !r.data) throw r.error;
+                const data = r.data || {};
 
                 msgBox.style.display = 'block';
                 if (data.status === 'success') {
@@ -880,11 +881,7 @@
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('action', 'yearRegister');
-            formData.append('fullName', fullName);
-            formData.append('username', email);
-            formData.append('password', password);
+            const formData = { fullName: fullName, email: email, password: password };
 
             sendYearlyRequest(formData, document.getElementById('regSubmitBtn'), msgBox, function() {
                 document.getElementById('registerForm').reset();
@@ -922,10 +919,7 @@
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('action', 'yearRegister');
-            formData.append('username', email);
-            formData.append('password', password);
+            const formData = { email: email, password: password, txId: txId };
 
             sendYearlyRequest(formData, document.getElementById('renewSubmitBtn'), msgBox, function() {
                 document.getElementById('renewForm').reset();

@@ -16,9 +16,6 @@
         </div>
 
         <form id="feedbackForm"
-        action="https://script.google.com/macros/s/AKfycbwh-Ir-9pkTmEIw5Mi88TY6eCgK8n1mdVP3H_jvX7bGeqIRqTXXHhh0NNKE4X1Nc1aQ/exec"
-        method="POST"
-        target="hidden_iframe"
         novalidate>
 
         <input type="hidden" name="التقييم_العام" id="hidden_avg">
@@ -128,8 +125,6 @@
         <button type="submit" class="submit-btn">📨 إرسال التقييم</button>
     </form>
 
-    <iframe name="hidden_iframe" style="display:none;"></iframe>
-
     <div id="thankYouArea">
         <div class="check-icon">✓</div>
         <h2>شكراً جزيلاً!</h2>
@@ -137,6 +132,9 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/fg-config.js"></script>
+<script src="js/pages/survey-submit.js"></script>
 <script src="js/pages/survey.js" defer></script>
 </body>
 </html>
