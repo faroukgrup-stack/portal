@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">نظام تدقيق HACCP المتقدم | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool14" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+<div class="export-loading-box">
+<i class="fas fa-spinner"></i>
+<h3 data-i18n="h2" id="loadingTitle">جاري إنشاء التقرير...</h3>
+<p data-i18n="h3" id="loadingMsg">يرجى الانتظار</p>
+</div>
+</div>
+<section class="hero-mini">
+<h2 data-i18n="h4">📋 نظام تدقيق HACCP المتقدم</h2>
+<p data-i18n="h5">تحليل المخاطر - توصيات تصحيحية فورية - تقارير احترافية</p>
+</section>
+<div class="container">
+<div class="checklist-card" data-aos="fade-up">
+<div class="featured-badge"><i class="fas fa-clipboard-check"></i><span>HACCP</span></div>
+<h2><i class="fas fa-clipboard-check" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h6">نموذج التدقيق اليومي مع تحليل المخاطر</fg-t></h2>
+<!-- معلومات التدقيق -->
+<div class="info-row">
+<div class="info-item">
+<label><i class="fas fa-calendar-alt"></i> <fg-t data-i18n="h7">التاريخ</fg-t></label>
+<input id="checkDate" type="date" value=""/>
+</div>
+<div class="info-item">
+<label><i class="fas fa-user-tie"></i> <fg-t data-i18n="h8">اسم المسؤول</fg-t></label>
+<input data-i18n-attr="placeholder:h9" id="inspectorName" placeholder="أدخل الاسم" type="text"/>
+</div>
+</div>
+<!-- التوقيع -->
+<div class="signature-row">
+<div class="signature-item">
+<label><i class="fas fa-pen"></i> <fg-t data-i18n="h10">اسم المسؤول (للتوقيع)</fg-t></label>
+<input data-i18n-attr="placeholder:h11" id="signatureName" placeholder="الاسم كاملاً" type="text"/>
+</div>
+<div class="signature-item">
+<label><i class="fas fa-signature"></i> <fg-t data-i18n="h12">التوقيع</fg-t></label>
+<input data-i18n-attr="placeholder:h13" id="signature" placeholder="التوقيع الإلكتروني" type="text"/>
+</div>
+</div>
+<!-- قائمة التدقيق -->
+<div id="checklistContainer">
+<!-- 1. الاستلام -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-truck"></i> <fg-t data-i18n="h14">1. مرحلة الاستلام</fg-t></div>
+<div class="checklist-item" id="item-rec1">
+<div class="item-row">
+<input class="haccp-item" data-id="rec1" data-risk="high" id="rec1" type="checkbox"/>
+<label data-i18n="h15" for="rec1">فحص درجة حرارة المواد المبردة (≤ 4°C) والمجمدة (≤ -18°C)</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-rec1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-rec1"></div>
+</div>
+<div class="checklist-item" id="item-rec2">
+<div class="item-row">
+<input class="haccp-item" data-id="rec2" data-risk="medium" id="rec2" type="checkbox"/>
+<label data-i18n="h18" for="rec2">التحقق من سلامة العبوات (لا تمزق، لا تسريب، لا صدأ)</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-rec2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-rec2"></div>
+</div>
+<div class="checklist-item" id="item-rec3">
+<div class="item-row">
+<input class="haccp-item" data-id="rec3" data-risk="high" id="rec3" type="checkbox"/>
+<label data-i18n="h20" for="rec3">التأكد من تواريخ الصلاحية (غير منتهية)</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-rec3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-rec3"></div>
+</div>
+<div class="checklist-item" id="item-rec4">
+<div class="item-row">
+<input class="haccp-item" data-id="rec4" data-risk="medium" id="rec4" type="checkbox"/>
+<label data-i18n="h21" for="rec4">وجود شهادات صحية للمواد عالية الخطورة</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-rec4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-rec4"></div>
+</div>
+<div class="checklist-item" id="item-rec5">
+<div class="item-row">
+<input class="haccp-item" data-id="rec5" data-risk="medium" id="rec5" type="checkbox"/>
+<label data-i18n="h22" for="rec5">فصل المواد النيئة عن الجاهزة أثناء النقل</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-rec5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-rec5"></div>
+</div>
+</div>
+<!-- 2. التخزين -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-warehouse"></i> <fg-t data-i18n="h23">2. التخزين</fg-t></div>
+<div class="checklist-item" id="item-sto1">
+<div class="item-row">
+<input class="haccp-item" data-id="sto1" data-risk="high" id="sto1" type="checkbox"/>
+<label data-i18n="h24" for="sto1">درجة حرارة الثلاجات ≤ 4°C (مسجلة)</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sto1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sto1"></div>
+</div>
+<div class="checklist-item" id="item-sto2">
+<div class="item-row">
+<input class="haccp-item" data-id="sto2" data-risk="high" id="sto2" type="checkbox"/>
+<label data-i18n="h25" for="sto2">درجة حرارة المجمدات ≤ -18°C (مسجلة)</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sto2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sto2"></div>
+</div>
+<div class="checklist-item" id="item-sto3">
+<div class="item-row">
+<input class="haccp-item" data-id="sto3" data-risk="medium" id="sto3" type="checkbox"/>
+<label data-i18n="h26" for="sto3">تخزين المواد النيئة في الرفوف السفلية (أسفل المطبوخة)</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sto3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sto3"></div>
+</div>
+<div class="checklist-item" id="item-sto4">
+<div class="item-row">
+<input class="haccp-item" data-id="sto4" data-risk="high" id="sto4" type="checkbox"/>
+<label data-i18n="h27" for="sto4">فصل المواد الكيميائية عن المواد الغذائية</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sto4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sto4"></div>
+</div>
+<div class="checklist-item" id="item-sto5">
+<div class="item-row">
+<input class="haccp-item" data-id="sto5" data-risk="medium" id="sto5" type="checkbox"/>
+<label data-i18n="h28" for="sto5">تنظيف الثلاجات والمجمدات وعدم وجود تراكمات ثلج</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sto5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sto5"></div>
+</div>
+<div class="checklist-item" id="item-sto6">
+<div class="item-row">
+<input class="haccp-item" data-id="sto6" data-risk="medium" id="sto6" type="checkbox"/>
+<label data-i18n="h29" for="sto6">ترتيب المواد حسب تاريخ الصلاحية (FIFO)</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sto6" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sto6"></div>
+</div>
+</div>
+<!-- 3. التحضير -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-kitchen-set"></i> <fg-t data-i18n="h30">3. التحضير</fg-t></div>
+<div class="checklist-item" id="item-prep1">
+<div class="item-row">
+<input class="haccp-item" data-id="prep1" data-risk="high" id="prep1" type="checkbox"/>
+<label data-i18n="h31" for="prep1">غسل اليدين قبل البدء وبعد التعامل مع المواد النيئة</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-prep1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-prep1"></div>
+</div>
+<div class="checklist-item" id="item-prep2">
+<div class="item-row">
+<input class="haccp-item" data-id="prep2" data-risk="high" id="prep2" type="checkbox"/>
+<label data-i18n="h32" for="prep2">استخدام ألواح تقطيع منفصلة للحوم النيئة والدواجن والخضار</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-prep2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-prep2"></div>
+</div>
+<div class="checklist-item" id="item-prep3">
+<div class="item-row">
+<input class="haccp-item" data-id="prep3" data-risk="high" id="prep3" type="checkbox"/>
+<label data-i18n="h33" for="prep3">تعقيم الأدوات والأسطح بعد تحضير المواد النيئة</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-prep3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-prep3"></div>
+</div>
+<div class="checklist-item" id="item-prep4">
+<div class="item-row">
+<input class="haccp-item" data-id="prep4" data-risk="high" id="prep4" type="checkbox"/>
+<label data-i18n="h34" for="prep4">عدم ترك المواد القابلة للتلف خارج التبريد لأكثر من ساعتين</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-prep4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-prep4"></div>
+</div>
+<div class="checklist-item" id="item-prep5">
+<div class="item-row">
+<input class="haccp-item" data-id="prep5" data-risk="high" id="prep5" type="checkbox"/>
+<label data-i18n="h35" for="prep5">إذابة الأغذية المجمدة في الثلاجة أو الميكروويف</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-prep5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-prep5"></div>
+</div>
+</div>
+<!-- 4. الطهي -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-fire"></i> <fg-t data-i18n="h36">4. الطهي وإعادة التسخين</fg-t></div>
+<div class="checklist-item" id="item-cook1">
+<div class="item-row">
+<input class="haccp-item" data-id="cook1" data-risk="high" id="cook1" type="checkbox"/>
+<label data-i18n="h37" for="cook1">وصول درجة حرارة قلب الدواجن إلى 74°C</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-cook1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-cook1"></div>
+</div>
+<div class="checklist-item" id="item-cook2">
+<div class="item-row">
+<input class="haccp-item" data-id="cook2" data-risk="high" id="cook2" type="checkbox"/>
+<label data-i18n="h38" for="cook2">وصول درجة حرارة اللحوم المفرومة إلى 71°C</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-cook2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-cook2"></div>
+</div>
+<div class="checklist-item" id="item-cook3">
+<div class="item-row">
+<input class="haccp-item" data-id="cook3" data-risk="high" id="cook3" type="checkbox"/>
+<label data-i18n="h39" for="cook3">وصول درجة حرارة الأسماك إلى 63°C</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-cook3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-cook3"></div>
+</div>
+<div class="checklist-item" id="item-cook4">
+<div class="item-row">
+<input class="haccp-item" data-id="cook4" data-risk="high" id="cook4" type="checkbox"/>
+<label data-i18n="h40" for="cook4">إعادة تسخين الأطعمة المحفوظة إلى 74°C خلال ساعتين</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-cook4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-cook4"></div>
+</div>
+<div class="checklist-item" id="item-cook5">
+<div class="item-row">
+<input class="haccp-item" data-id="cook5" data-risk="medium" id="cook5" type="checkbox"/>
+<label data-i18n="h41" for="cook5">تسجيل درجات حرارة الطهي في السجل</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-cook5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-cook5"></div>
+</div>
+</div>
+<!-- 5. التبريد -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-snowflake"></i> <fg-t data-i18n="h42">5. التبريد السريع</fg-t></div>
+<div class="checklist-item" id="item-cool1">
+<div class="item-row">
+<input class="haccp-item" data-id="cool1" data-risk="high" id="cool1" type="checkbox"/>
+<label data-i18n="h43" for="cool1">تبريد الأطعمة الساخنة من 60°C إلى 20°C خلال ساعتين</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-cool1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-cool1"></div>
+</div>
+<div class="checklist-item" id="item-cool2">
+<div class="item-row">
+<input class="haccp-item" data-id="cool2" data-risk="high" id="cool2" type="checkbox"/>
+<label data-i18n="h44" for="cool2">ثم من 20°C إلى 4°C خلال 4 ساعات إضافية</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-cool2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-cool2"></div>
+</div>
+<div class="checklist-item" id="item-cool3">
+<div class="item-row">
+<input class="haccp-item" data-id="cool3" data-risk="medium" id="cool3" type="checkbox"/>
+<label data-i18n="h45" for="cool3">استخدام أوعية ضحلة للتبريد السريع</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-cool3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-cool3"></div>
+</div>
+<div class="checklist-item" id="item-cool4">
+<div class="item-row">
+<input class="haccp-item" data-id="cool4" data-risk="medium" id="cool4" type="checkbox"/>
+<label data-i18n="h46" for="cool4">تغطية الأطعمة بعد التبريد الكامل</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-cool4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-cool4"></div>
+</div>
+</div>
+<!-- 6. النظافة الشخصية -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-user-shield"></i> <fg-t data-i18n="h47">6. النظافة الشخصية</fg-t></div>
+<div class="checklist-item" id="item-per1">
+<div class="item-row">
+<input class="haccp-item" data-id="per1" data-risk="medium" id="per1" type="checkbox"/>
+<label data-i18n="h48" for="per1">ارتداء زي العمل النظيف (شيفون، مئزر)</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-per1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-per1"></div>
+</div>
+<div class="checklist-item" id="item-per2">
+<div class="item-row">
+<input class="haccp-item" data-id="per2" data-risk="medium" id="per2" type="checkbox"/>
+<label data-i18n="h49" for="per2">تغطية الشعر (شبكة أو قبعة)</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-per2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-per2"></div>
+</div>
+<div class="checklist-item" id="item-per3">
+<div class="item-row">
+<input class="haccp-item" data-id="per3" data-risk="low" id="per3" type="checkbox"/>
+<label data-i18n="h50" for="per3">عدم ارتداء المجوهرات أو الساعات</label>
+<span class="risk-badge risk-low" data-i18n="h51">خطر منخفض</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-per3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-per3"></div>
+</div>
+<div class="checklist-item" id="item-per4">
+<div class="item-row">
+<input class="haccp-item" data-id="per4" data-risk="low" id="per4" type="checkbox"/>
+<label data-i18n="h52" for="per4">تقليم الأظافر وعدم وضع طلاء أظافر</label>
+<span class="risk-badge risk-low" data-i18n="h51">خطر منخفض</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-per4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-per4"></div>
+</div>
+<div class="checklist-item" id="item-per5">
+<div class="item-row">
+<input class="haccp-item" data-id="per5" data-risk="high" id="per5" type="checkbox"/>
+<label data-i18n="h53" for="per5">عدم العمل أثناء المرض (إسهال، قيء، التهابات جلدية)</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-per5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-per5"></div>
+</div>
+<div class="checklist-item" id="item-per6">
+<div class="item-row">
+<input class="haccp-item" data-id="per6" data-risk="high" id="per6" type="checkbox"/>
+<label data-i18n="h54" for="per6">غسل اليدين بعد استخدام الحمام، التدخين، الأكل، لمس النفايات</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-per6" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-per6"></div>
+</div>
+</div>
+<!-- 7. التنظيف والتعقيم -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-broom"></i> <fg-t data-i18n="h55">7. التنظيف والتعقيم</fg-t></div>
+<div class="checklist-item" id="item-clean1">
+<div class="item-row">
+<input class="haccp-item" data-id="clean1" data-risk="high" id="clean1" type="checkbox"/>
+<label data-i18n="h56" for="clean1">تنظيف وتعقيم جميع أسطح العمل بعد كل استخدام</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-clean1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-clean1"></div>
+</div>
+<div class="checklist-item" id="item-clean2">
+<div class="item-row">
+<input class="haccp-item" data-id="clean2" data-risk="high" id="clean2" type="checkbox"/>
+<label data-i18n="h57" for="clean2">غسل وتعقيم الأحواض وأماكن غسل اليدين</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-clean2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-clean2"></div>
+</div>
+<div class="checklist-item" id="item-clean3">
+<div class="item-row">
+<input class="haccp-item" data-id="clean3" data-risk="medium" id="clean3" type="checkbox"/>
+<label data-i18n="h58" for="clean3">تنظيف الأرضيات والجدران من بقايا الطعام</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-clean3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-clean3"></div>
+</div>
+<div class="checklist-item" id="item-clean4">
+<div class="item-row">
+<input class="haccp-item" data-id="clean4" data-risk="high" id="clean4" type="checkbox"/>
+<label data-i18n="h59" for="clean4">استخدام مواد معقمة معتمدة وبالتركيز الصحيح</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-clean4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-clean4"></div>
+</div>
+<div class="checklist-item" id="item-clean5">
+<div class="item-row">
+<input class="haccp-item" data-id="clean5" data-risk="medium" id="clean5" type="checkbox"/>
+<label data-i18n="h60" for="clean5">جدول تنظيف معلّق ويتم التوقيع عليه</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-clean5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-clean5"></div>
+</div>
+</div>
+<!-- 8. مكافحة الآفات -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-bug"></i> <fg-t data-i18n="h61">8. مكافحة الآفات</fg-t></div>
+<div class="checklist-item" id="item-pest1">
+<div class="item-row">
+<input class="haccp-item" data-id="pest1" data-risk="high" id="pest1" type="checkbox"/>
+<label data-i18n="h62" for="pest1">عدم وجود حشرات أو قوارض في المنشأة</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-pest1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-pest1"></div>
+</div>
+<div class="checklist-item" id="item-pest2">
+<div class="item-row">
+<input class="haccp-item" data-id="pest2" data-risk="high" id="pest2" type="checkbox"/>
+<label data-i18n="h63" for="pest2">سد جميع الفتحات والشقوق في الجدران والأبواب</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-pest2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-pest2"></div>
+</div>
+<div class="checklist-item" id="item-pest3">
+<div class="item-row">
+<input class="haccp-item" data-id="pest3" data-risk="medium" id="pest3" type="checkbox"/>
+<label data-i18n="h64" for="pest3">تركيب مصائد ضوئية أو لاصقة (حسب الحاجة)</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-pest3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-pest3"></div>
+</div>
+<div class="checklist-item" id="item-pest4">
+<div class="item-row">
+<input class="haccp-item" data-id="pest4" data-risk="high" id="pest4" type="checkbox"/>
+<label data-i18n="h65" for="pest4">وجود عقد مع شركة مكافحة آفات معتمدة</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-pest4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-pest4"></div>
+</div>
+</div>
+<!-- 9. التوثيق -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-file-alt"></i> <fg-t data-i18n="h66">9. التوثيق</fg-t></div>
+<div class="checklist-item" id="item-doc1">
+<div class="item-row">
+<input class="haccp-item" data-id="doc1" data-risk="high" id="doc1" type="checkbox"/>
+<label data-i18n="h67" for="doc1">تسجيل درجات حرارة الثلاجات والمجمدات يومياً</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-doc1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-doc1"></div>
+</div>
+<div class="checklist-item" id="item-doc2">
+<div class="item-row">
+<input class="haccp-item" data-id="doc2" data-risk="high" id="doc2" type="checkbox"/>
+<label data-i18n="h68" for="doc2">تسجيل درجات حرارة الطهي والتبريد</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-doc2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-doc2"></div>
+</div>
+<div class="checklist-item" id="item-doc3">
+<div class="item-row">
+<input class="haccp-item" data-id="doc3" data-risk="medium" id="doc3" type="checkbox"/>
+<label data-i18n="h69" for="doc3">الاحتفاظ بسجلات الاستلام لمدة لا تقل عن 6 أشهر</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-doc3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-doc3"></div>
+</div>
+<div class="checklist-item" id="item-doc4">
+<div class="item-row">
+<input class="haccp-item" data-id="doc4" data-risk="medium" id="doc4" type="checkbox"/>
+<label data-i18n="h70" for="doc4">توقيع المسؤول على جميع السجلات يومياً</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-doc4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-doc4"></div>
+</div>
+</div>
+<!-- 10. التدريب -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-chalkboard-teacher"></i> <fg-t data-i18n="h71">10. التدريب</fg-t></div>
+<div class="checklist-item" id="item-tr1">
+<div class="item-row">
+<input class="haccp-item" data-id="tr1" data-risk="high" id="tr1" type="checkbox"/>
+<label data-i18n="h72" for="tr1">جميع العاملين حاصلون على تدريب في سلامة الغذاء</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-tr1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-tr1"></div>
+</div>
+<div class="checklist-item" id="item-tr2">
+<div class="item-row">
+<input class="haccp-item" data-id="tr2" data-risk="medium" id="tr2" type="checkbox"/>
+<label data-i18n="h73" for="tr2">وجود تعليمات واضحة معلقة (غسل اليدين، درجات الحرارة)</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-tr2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-tr2"></div>
+</div>
+<div class="checklist-item" id="item-tr3">
+<div class="item-row">
+<input class="haccp-item" data-id="tr3" data-risk="medium" id="tr3" type="checkbox"/>
+<label data-i18n="h74" for="tr3">تذكير العاملين بإجراءات السلامة بشكل دوري</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-tr3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-tr3"></div>
+</div>
+</div>
+</div>
+<!-- نتيجة التقييم -->
+<div class="result-area" id="resultArea">
+<div>
+<span class="score" id="scoreDisplay">0%</span>
+<span class="evaluation" id="evaluationText"></span>
+</div>
+<div class="overall-risk" id="overallRiskDisplay"></div>
+</div>
+<!-- الأزرار -->
+<div class="btn-group">
+<button class="btn-primary" id="calculateBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h75">احسب النتيجة والتوصيات</fg-t></button>
+</div>
+<!-- أزرار التصدير -->
+<div class="export-container">
+<button class="export-btn excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> <fg-t data-i18n="h76">تصدير Excel شامل</fg-t></button>
+<button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> <fg-t data-i18n="h77">تصدير Word</fg-t></button>
+</div>
+<div id="initialMessage" style="margin-top:0.5rem;color:var(--text-muted);text-align:center;font-size:0.9rem;">
+<i class="fas fa-robot" style="color:var(--accent-soft);"></i> <fg-t data-i18n="h78">اضغط "احسب النتيجة" ثم استخدم أزرار التصدير</fg-t>
+        </div>
+</div>
+</div>
+<footer class="footer-simple"><fg-t data-i18n="h79">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span></footer>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h80">حاسبة</fg-t></button>
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h81">الرئيسية</fg-t></a>
+<!-- نافذة الآلة الحاسبة -->
+<div class="modal" id="calculatorModal">
+<div class="modal-content">
+<div class="modal-header">
+<span class="close" id="modalClose">×</span>
+<h2><i class="fas fa-calculator" style="color:#cfa776;"></i> <fg-t data-i18n="h82">آلة حاسبة</fg-t></h2>
+</div>
+<div class="modal-body">
+<input class="calc-display" id="calcDisplay" readonly="" type="text"/>
+<div class="calc-buttons">
+<button class="calc-btn" data-val="9">9</button>
+<button class="calc-btn" data-val="8">8</button>
+<button class="calc-btn" data-val="7">7</button>
+<button class="calc-btn operator" data-val="/">÷</button>
+<button class="calc-btn" data-val="6">6</button>
+<button class="calc-btn" data-val="5">5</button>
+<button class="calc-btn" data-val="4">4</button>
+<button class="calc-btn operator" data-val="*">×</button>
+<button class="calc-btn" data-val="3">3</button>
+<button class="calc-btn" data-val="2">2</button>
+<button class="calc-btn" data-val="1">1</button>
+<button class="calc-btn operator" data-val="-">-</button>
+<button class="calc-btn" data-val="C">C</button>
+<button class="calc-btn" data-val="0">0</button>
+<button class="calc-btn" data-val=".">.</button>
+<button class="calc-btn operator" data-val="+">+</button>
+<button class="calc-btn" data-val="⌫">⌫</button>
+<button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+</div>
+</div>
+</div>
+</div>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+</body>
+</html>

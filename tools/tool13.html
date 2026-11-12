@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">حاسبة تكلفة العمالة المثالية | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool13" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+<div class="export-loading-box">
+<i class="fas fa-spinner"></i>
+<h3 data-i18n="h2" id="loadingTitle">جاري إنشاء التقرير...</h3>
+<p data-i18n="h3" id="loadingMsg">يرجى الانتظار</p>
+</div>
+</div>
+<section class="hero-mini">
+<h2 data-i18n="h4">💰 حاسبة تكلفة العمالة المثالية</h2>
+<p data-i18n="h5">تحليل متقدم لتكاليف العمالة، الإنتاجية، والكفاءة التشغيلية</p>
+</section>
+<div class="container">
+<div class="calculator-card" data-aos="fade-up">
+<div class="featured-badge"><i class="fas fa-users"></i><span data-i18n="h6">عمالة</span></div>
+<h2><i class="fas fa-users" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h7">بيانات المشروع والورديات</fg-t></h2>
+<!-- العملة واسم الجهة -->
+<div class="currency-row">
+<label><i class="fas fa-coins"></i> <fg-t data-i18n="h8">العملة:</fg-t></label>
+<select id="currencySelect">
+<option data-i18n="h9" selected="" value="$">دولار ($)</option>
+<option data-i18n="h10" value="€">يورو (€)</option>
+<option data-i18n="h11" value="₺">ليرة تركية (₺)</option>
+<option data-i18n="h12" value="ج.م">جنيه مصري (ج.م)</option>
+<option data-i18n="h13" value="د.ك">دينار كويتي (د.ك)</option>
+<option data-i18n="h14" value="ر.س">ريال سعودي (ر.س)</option>
+</select>
+<label><i class="fas fa-building"></i> <fg-t data-i18n="h15">اسم الجهة:</fg-t></label>
+<input data-i18n-attr="placeholder:h16;value:h17" id="companyName" placeholder="الجهة المستفيدة" type="text" value="اسم الجهة المستفيدة من التقرير"/>
+</div>
+<!-- المدخلات الأساسية -->
+<div class="section-title-sm" data-i18n="h18">📊 البيانات الأساسية</div>
+<div class="input-section">
+<div>
+<div class="form-group">
+<label><i class="fas fa-chart-line"></i> <fg-t data-i18n="h19">المبيعات الشهرية المستهدفة</fg-t></label>
+<input id="monthlySales" min="0" step="1000" type="number" value="50000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-receipt"></i> <fg-t data-i18n="h20">متوسط الفاتورة للعميل</fg-t></label>
+<input id="avgBill" min="0" step="1" type="number" value="25"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-clock"></i> <fg-t data-i18n="h21">متوسط الأجر الشهري للموظف</fg-t></label>
+<input id="avgMonthlyWage" min="0" step="100" type="number" value="2500"/>
+</div>
+</div>
+<div>
+<div class="form-group">
+<label><i class="fas fa-calendar-week"></i> <fg-t data-i18n="h22">أيام العمل في الأسبوع</fg-t></label>
+<input id="workingDays" max="7" min="1" type="number" value="6"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h23">نسبة العمالة المستهدفة (%)</fg-t></label>
+<input id="targetLaborPercent" max="100" min="0" step="1" type="number" value="25"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-moon"></i> <fg-t data-i18n="h24">عدد الورديات اليومية</fg-t></label>
+<select id="numShifts">
+<option data-i18n="h25" value="1">وردية واحدة</option>
+<option data-i18n="h26" selected="" value="2">ورديتان</option>
+<option data-i18n="h27" value="3">ثلاث ورديات</option>
+</select>
+</div>
+</div>
+</div>
+<!-- قسم الورديات -->
+<div class="section-title-sm" data-i18n="h28">🕒 تفاصيل الورديات</div>
+<div class="shifts-section">
+<div class="shifts-header">
+<h3><i class="fas fa-clock"></i> <fg-t data-i18n="h29">الورديات</fg-t></h3>
+<button class="btn-add" id="addShiftBtn"><i class="fas fa-plus"></i> <fg-t data-i18n="h30">إضافة وردية</fg-t></button>
+</div>
+<div id="shiftsContainer"></div>
+<p class="hint"><i class="fas fa-info-circle"></i> <fg-t data-i18n="h31">أدخل عدد الموظفين في كل وردية وساعات الوردية.</fg-t></p>
+</div>
+<div class="section-title-sm" data-i18n="h32">📋 إعدادات إضافية</div>
+<div class="form-group" style="max-width:350px;">
+<label><i class="fas fa-umbrella-beach"></i> <fg-t data-i18n="h33">توزيع العطل الأسبوعية</fg-t></label>
+<select id="vacationDistribution">
+<option data-i18n="h34" value="same">جميع الموظفين نفس العطلة</option>
+<option data-i18n="h35" selected="" value="staggered">إجازات متداخلة (لضمان التغطية)</option>
+</select>
+</div>
+<button class="btn-primary" id="calculateBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h36">احسب التكلفة المثالية</fg-t></button>
+<!-- النتائج -->
+<div class="results-section" id="resultsSection" style="display:none;">
+<div class="action-bar">
+<button class="btn-export excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> <fg-t data-i18n="h37">تصدير Excel شامل</fg-t></button>
+<button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> <fg-t data-i18n="h38">تصدير Word</fg-t></button>
+</div>
+<div class="results-grid" id="resultsGrid"></div>
+<div id="evaluationAlert"></div>
+<div class="suggestion-box" id="suggestions"></div>
+<div class="chart-container"><canvas id="laborChart"></canvas></div>
+</div>
+<div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center;">
+<i class="fas fa-robot" style="color:var(--accent-soft);"></i> <fg-t data-i18n="h39">سيتم عرض النتائج بعد الضغط على زر الحساب</fg-t>
+        </div>
+</div>
+</div>
+<footer class="footer-simple"><fg-t data-i18n="h40">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span></footer>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h41">حاسبة</fg-t></button>
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h42">الرئيسية</fg-t></a>
+<!-- نافذة الآلة الحاسبة -->
+<div class="modal" id="calculatorModal">
+<div class="modal-content">
+<div class="modal-header">
+<span class="close" id="modalClose">×</span>
+<h2><i class="fas fa-calculator" style="color:#cfa776;"></i> <fg-t data-i18n="h43">آلة حاسبة</fg-t></h2>
+</div>
+<div class="modal-body">
+<input class="calc-display" id="calcDisplay" readonly="" type="text"/>
+<div class="calc-buttons">
+<button class="calc-btn" data-val="9">9</button>
+<button class="calc-btn" data-val="8">8</button>
+<button class="calc-btn" data-val="7">7</button>
+<button class="calc-btn operator" data-val="/">÷</button>
+<button class="calc-btn" data-val="6">6</button>
+<button class="calc-btn" data-val="5">5</button>
+<button class="calc-btn" data-val="4">4</button>
+<button class="calc-btn operator" data-val="*">×</button>
+<button class="calc-btn" data-val="3">3</button>
+<button class="calc-btn" data-val="2">2</button>
+<button class="calc-btn" data-val="1">1</button>
+<button class="calc-btn operator" data-val="-">-</button>
+<button class="calc-btn" data-val="C">C</button>
+<button class="calc-btn" data-val="0">0</button>
+<button class="calc-btn" data-val=".">.</button>
+<button class="calc-btn operator" data-val="+">+</button>
+<button class="calc-btn" data-val="⌫">⌫</button>
+<button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+</div>
+</div>
+</div>
+</div>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+</body>
+</html>

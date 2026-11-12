@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">تحليل المخاطر المتقدم | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool6" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+<div class="export-loading-box">
+<i class="fas fa-spinner"></i>
+<h3 data-i18n="h2" id="loadingTitle">جاري إنشاء التقرير...</h3>
+<p data-i18n="h3" id="loadingMsg">يرجى الانتظار</p>
+</div>
+</div>
+<section class="hero-mini">
+<h2 data-i18n="h4">محاكاة المخاطر المتقدمة (Monte Carlo)</h2>
+<p data-i18n="h5">اختر نوع التحليل: حساسية تقليدية أو محاكاة احتمالية بآلاف السيناريوهات</p>
+</section>
+<div class="calc-wrapper">
+<div class="calc-box" data-aos="fade-up">
+<div class="featured-badge"><i class="fas fa-chart-line"></i><span data-i18n="h6">مونت كارلو</span></div>
+<h2><i class="fas fa-chart-line" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h7">تحليل المخاطر الاحتمالي</fg-t></h2>
+<!-- العملة واسم الجهة -->
+<div class="currency-row">
+<label><i class="fas fa-coins"></i> <fg-t data-i18n="h8">العملة:</fg-t></label>
+<select id="currencySelect">
+<option data-i18n="h9" selected="" value="$">دولار ($)</option>
+<option data-i18n="h10" value="€">يورو (€)</option>
+<option data-i18n="h11" value="₺">ليرة تركية (₺)</option>
+<option data-i18n="h12" value="ج.م">جنيه مصري (ج.م)</option>
+<option data-i18n="h13" value="د.ك">دينار كويتي (د.ك)</option>
+<option data-i18n="h14" value="ر.س">ريال سعودي (ر.س)</option>
+</select>
+<label><i class="fas fa-building"></i> <fg-t data-i18n="h15">اسم الجهة:</fg-t></label>
+<input data-i18n-attr="placeholder:h16;value:h17" id="companyName" placeholder="الجهة المستفيدة" type="text" value="اسم الجهة المستفيدة من التقرير"/>
+</div>
+<!-- خيارات نوع التحليل -->
+<div class="analysis-type">
+<div class="analysis-option active" id="optSensitivity" onclick="setAnalysisType('sensitivity')"><i class="fas fa-table"></i> <fg-t data-i18n="h18">تحليل حساسية (Two-Way)</fg-t></div>
+<div class="analysis-option" id="optMonteCarlo" onclick="setAnalysisType('montecarlo')"><i class="fas fa-random"></i> <fg-t data-i18n="h19">محاكاة مونت كارلو</fg-t></div>
+</div>
+<!-- الحالة الأساسية -->
+<div class="section-title-sm" data-i18n="h20">📈 الحالة الأساسية (Base Case)</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-coins"></i> <fg-t data-i18n="h21">الاستثمار الأولي</fg-t></label><input id="initialInvestment" step="1000" type="number" value="545200"/><span class="tooltiptext" data-i18n="h22">التكلفة الأولية للمشروع.</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-chart-line"></i> <fg-t data-i18n="h23">الإيرادات السنوية (السنة الأولى)</fg-t></label><input id="annualRevenue" step="10000" type="number" value="2640000"/><span class="tooltiptext" data-i18n="h24">الإيرادات المتوقعة في السنة الأولى.</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-file-alt"></i> <fg-t data-i18n="h25">التكاليف السنوية (السنة الأولى)</fg-t></label><input id="annualCosts" step="10000" type="number" value="2851200"/><span class="tooltiptext" data-i18n="h26">التكاليف التشغيلية في السنة الأولى.</span></div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-chart-line"></i> <fg-t data-i18n="h27">الإهلاك السنوي</fg-t></label><input id="depreciation" step="1000" type="number" value="18750"/><span class="tooltiptext" data-i18n="h28">قيمة الإهلاك السنوي (ثابتة).</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-arrow-up"></i> <fg-t data-i18n="h29">نمو الإيرادات السنوي (%)</fg-t></label><input id="growthRevenue" step="0.1" type="number" value="10"/><span class="tooltiptext" data-i18n="h30">معدل النمو السنوي للإيرادات.</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-arrow-down"></i> <fg-t data-i18n="h31">نمو التكاليف السنوي (%)</fg-t></label><input id="growthCosts" step="0.1" type="number" value="5"/><span class="tooltiptext" data-i18n="h32">معدل النمو السنوي للتكاليف.</span></div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-percent"></i> <fg-t data-i18n="h33">معدل الخصم (%)</fg-t></label><input id="discountRate" step="0.1" type="number" value="10"/><span class="tooltiptext" data-i18n="h34">معدل العائد المطلوب (WACC).</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-percent"></i> <fg-t data-i18n="h35">معدل الضريبة (%)</fg-t></label><input id="taxRate" step="1" type="number" value="25"/><span class="tooltiptext" data-i18n="h36">نسبة ضريبة الدخل.</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-calendar-alt"></i> <fg-t data-i18n="h37">عدد السنوات</fg-t></label><input id="years" max="30" min="1" type="number" value="8"/><span class="tooltiptext" data-i18n="h38">مدة المشروع بالسنوات.</span></div>
+</div>
+<!-- مدخلات الحساسية -->
+<div id="sensitivityInputs">
+<div class="section-title-sm" data-i18n="h39">⚡ متغيرات الحساسية</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-arrow-up"></i> <fg-t data-i18n="h40">التغير في الإيرادات (%)</fg-t></label><input id="revChange" step="1" type="number" value="10"/><span class="tooltiptext" data-i18n="h41">نسبة التغيير.</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-arrow-down"></i> <fg-t data-i18n="h42">التغير في التكاليف (%)</fg-t></label><input id="costChange" step="1" type="number" value="10"/><span class="tooltiptext" data-i18n="h43">نسبة التغيير في التكاليف.</span></div>
+</div>
+</div>
+<!-- مدخلات مونت كارلو -->
+<div class="hidden-section" id="monteCarloInputs">
+<div class="section-title-sm" data-i18n="h44">🎲 معاملات محاكاة مونت كارلو</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-chart-line"></i> <fg-t data-i18n="h45">تقلب الإيرادات (σ%)</fg-t></label><input id="revVolatility" step="1" type="number" value="15"/><span class="tooltiptext" data-i18n="h46">الانحراف المعياري للإيرادات.</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-chart-line"></i> <fg-t data-i18n="h47">تقلب التكاليف (σ%)</fg-t></label><input id="costVolatility" step="1" type="number" value="10"/><span class="tooltiptext" data-i18n="h48">الانحراف المعياري للتكاليف.</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-dice"></i> <fg-t data-i18n="h49">عدد التكرارات</fg-t></label><input id="numSimulations" max="20000" min="1000" step="1000" type="number" value="5000"/><span class="tooltiptext" data-i18n="h50">عدد السيناريوهات العشوائية.</span></div>
+</div>
+</div>
+<button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h51">تشغيل التحليل</fg-t></button>
+<!-- النتائج -->
+<div class="results-section" id="resultsSection" style="display:none">
+<div class="results-cards" id="kpiCards"></div>
+<div id="sensitivityResults">
+<div class="section-title-sm" data-i18n="h52">📊 مصفوفة الحساسية ثنائية الاتجاه (NPV)</div>
+<div class="table-container" id="sensitivityTable"></div>
+</div>
+<div class="hidden-section" id="monteCarloResults">
+<div class="section-title-sm" data-i18n="h53">📈 التوزيع الاحتمالي لـ NPV</div>
+<div class="chart-container"><canvas id="npvHistogram"></canvas></div>
+<div class="section-title-sm" data-i18n="h54">📊 إحصائيات المخاطر</div>
+<div class="table-container" id="monteCarloStats"></div>
+</div>
+<div class="export-container">
+<button class="export-btn excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> <fg-t data-i18n="h55">تصدير Excel شامل</fg-t></button>
+<button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> <fg-t data-i18n="h56">تصدير Word</fg-t></button>
+</div>
+<div class="section-title-sm" data-i18n="h57">📝 تفسير النتائج</div>
+<div class="result-card" id="interpretation" style="text-align:right"></div>
+</div>
+<div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center">
+<i class="fas fa-robot" style="color:var(--accent-soft)"></i> <fg-t data-i18n="h58">سيتم عرض النتائج بعد الضغط على زر التحليل</fg-t>
+        </div>
+</div>
+</div>
+<footer class="footer-simple"><fg-t data-i18n="h59">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span></footer>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h60">حاسبة</fg-t></button>
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h61">الرئيسية</fg-t></a>
+<!-- نافذة الآلة الحاسبة -->
+<div class="modal" id="calculatorModal">
+<div class="modal-content">
+<div class="modal-header">
+<span class="close" id="modalClose">×</span>
+<h2><i class="fas fa-calculator" style="color:#cfa776;"></i> <fg-t data-i18n="h62">آلة حاسبة</fg-t></h2>
+</div>
+<div class="modal-body">
+<input class="calc-display" id="calcDisplay" readonly="" type="text"/>
+<div class="calc-buttons">
+<button class="calc-btn" data-val="9">9</button>
+<button class="calc-btn" data-val="8">8</button>
+<button class="calc-btn" data-val="7">7</button>
+<button class="calc-btn operator" data-val="/">÷</button>
+<button class="calc-btn" data-val="6">6</button>
+<button class="calc-btn" data-val="5">5</button>
+<button class="calc-btn" data-val="4">4</button>
+<button class="calc-btn operator" data-val="*">×</button>
+<button class="calc-btn" data-val="3">3</button>
+<button class="calc-btn" data-val="2">2</button>
+<button class="calc-btn" data-val="1">1</button>
+<button class="calc-btn operator" data-val="-">-</button>
+<button class="calc-btn" data-val="C">C</button>
+<button class="calc-btn" data-val="0">0</button>
+<button class="calc-btn" data-val=".">.</button>
+<button class="calc-btn operator" data-val="+">+</button>
+<button class="calc-btn" data-val="⌫">⌫</button>
+<button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+</div>
+</div>
+</div>
+</div>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+</body>
+</html>

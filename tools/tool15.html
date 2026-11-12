@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">نظام تدقيق SOPs المتقدم | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool15" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+<div class="export-loading-box">
+<i class="fas fa-spinner"></i>
+<h3 data-i18n="h2" id="loadingTitle">جاري إنشاء التقرير...</h3>
+<p data-i18n="h3" id="loadingMsg">يرجى الانتظار</p>
+</div>
+</div>
+<section class="hero-mini">
+<h2 data-i18n="h4">📋 إجراءات التشغيل القياسية SOPs</h2>
+<p data-i18n="h5">ضمان أن كل مهمة (إدارية، تشغيلية، أو خدمية) - توصيات تصحيحية فورية - تقارير احترافية</p>
+</section>
+<div class="container">
+<div class="sop-card" data-aos="fade-up">
+<div class="featured-badge"><i class="fas fa-clipboard-list"></i><span>SOPs</span></div>
+<h2><i class="fas fa-clipboard-list" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h6">نموذج التدقيق اليومي مع تحليل المخاطر</fg-t></h2>
+<!-- معلومات التدقيق -->
+<div class="info-row">
+<div class="info-item">
+<label><i class="fas fa-calendar-alt"></i> <fg-t data-i18n="h7">التاريخ</fg-t></label>
+<input id="checkDate" type="date" value=""/>
+</div>
+<div class="info-item">
+<label><i class="fas fa-user-tie"></i> <fg-t data-i18n="h8">اسم المسؤول</fg-t></label>
+<input data-i18n-attr="placeholder:h9" id="inspectorName" placeholder="أدخل الاسم" type="text"/>
+</div>
+</div>
+<!-- التوقيع -->
+<div class="signature-row">
+<div class="signature-item">
+<label><i class="fas fa-pen"></i> <fg-t data-i18n="h10">اسم المسؤول (للتوقيع)</fg-t></label>
+<input data-i18n-attr="placeholder:h11" id="signatureName" placeholder="الاسم كاملاً" type="text"/>
+</div>
+<div class="signature-item">
+<label><i class="fas fa-signature"></i> <fg-t data-i18n="h12">التوقيع</fg-t></label>
+<input data-i18n-attr="placeholder:h13" id="signature" placeholder="التوقيع الإلكتروني" type="text"/>
+</div>
+</div>
+<!-- قائمة التدقيق -->
+<div id="checklistContainer">
+<!-- 1. استلام المواد الخام -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-truck"></i> <fg-t data-i18n="h14">1. استلام المواد الخام</fg-t></div>
+<div class="checklist-item" id="item-sop1_1">
+<div class="item-row">
+<input class="sop-item" data-id="sop1_1" data-risk="high" id="sop1_1" type="checkbox"/>
+<label data-i18n="h15" for="sop1_1">فحص درجة حرارة الشاحنات المبردة (≤ 4°C) والمجمدة (≤ -18°C)</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop1_1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop1_1"></div>
+</div>
+<div class="checklist-item" id="item-sop1_2">
+<div class="item-row">
+<input class="sop-item" data-id="sop1_2" data-risk="medium" id="sop1_2" type="checkbox"/>
+<label data-i18n="h18" for="sop1_2">التحقق من سلامة العبوات وعدم وجود تلف أو تسرب</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop1_2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop1_2"></div>
+</div>
+<div class="checklist-item" id="item-sop1_3">
+<div class="item-row">
+<input class="sop-item" data-id="sop1_3" data-risk="high" id="sop1_3" type="checkbox"/>
+<label data-i18n="h20" for="sop1_3">مراجعة تواريخ الصلاحية والتأكد من صلاحيتها</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop1_3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop1_3"></div>
+</div>
+<div class="checklist-item" id="item-sop1_4">
+<div class="item-row">
+<input class="sop-item" data-id="sop1_4" data-risk="medium" id="sop1_4" type="checkbox"/>
+<label data-i18n="h21" for="sop1_4">وجود الشهادات الصحية للمنتجات الحيوانية</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop1_4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop1_4"></div>
+</div>
+<div class="checklist-item" id="item-sop1_5">
+<div class="item-row">
+<input class="sop-item" data-id="sop1_5" data-risk="medium" id="sop1_5" type="checkbox"/>
+<label data-i18n="h22" for="sop1_5">فصل المواد النيئة عن الجاهزة أثناء النقل</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop1_5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop1_5"></div>
+</div>
+<div class="checklist-item" id="item-sop1_6">
+<div class="item-row">
+<input class="sop-item" data-id="sop1_6" data-risk="low" id="sop1_6" type="checkbox"/>
+<label data-i18n="h23" for="sop1_6">تسجيل بيانات الاستلام في السجل المخصص</label>
+<span class="risk-badge risk-low" data-i18n="h24">خطر منخفض</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop1_6" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop1_6"></div>
+</div>
+</div>
+<!-- 2. التخزين -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-warehouse"></i> <fg-t data-i18n="h25">2. التخزين</fg-t></div>
+<div class="checklist-item" id="item-sop2_1">
+<div class="item-row">
+<input class="sop-item" data-id="sop2_1" data-risk="medium" id="sop2_1" type="checkbox"/>
+<label data-i18n="h26" for="sop2_1">درجة حرارة المخازن الجافة بين 10-21°C مع تهوية مناسبة</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop2_1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop2_1"></div>
+</div>
+<div class="checklist-item" id="item-sop2_2">
+<div class="item-row">
+<input class="sop-item" data-id="sop2_2" data-risk="low" id="sop2_2" type="checkbox"/>
+<label data-i18n="h27" for="sop2_2">الرفوف مرتفعة عن الأرض (15-20 سم) لتسهيل التنظيف</label>
+<span class="risk-badge risk-low" data-i18n="h24">خطر منخفض</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop2_2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop2_2"></div>
+</div>
+<div class="checklist-item" id="item-sop2_3">
+<div class="item-row">
+<input class="sop-item" data-id="sop2_3" data-risk="high" id="sop2_3" type="checkbox"/>
+<label data-i18n="h28" for="sop2_3">تسجيل درجة حرارة الثلاجات (≤ 4°C) مرتين يومياً</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop2_3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop2_3"></div>
+</div>
+<div class="checklist-item" id="item-sop2_4">
+<div class="item-row">
+<input class="sop-item" data-id="sop2_4" data-risk="high" id="sop2_4" type="checkbox"/>
+<label data-i18n="h29" for="sop2_4">تسجيل درجة حرارة المجمدات (≤ -18°C) مرتين يومياً</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop2_4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop2_4"></div>
+</div>
+<div class="checklist-item" id="item-sop2_5">
+<div class="item-row">
+<input class="sop-item" data-id="sop2_5" data-risk="medium" id="sop2_5" type="checkbox"/>
+<label data-i18n="h30" for="sop2_5">تخزين المواد النيئة في الرفوف السفلية</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop2_5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop2_5"></div>
+</div>
+<div class="checklist-item" id="item-sop2_6">
+<div class="item-row">
+<input class="sop-item" data-id="sop2_6" data-risk="high" id="sop2_6" type="checkbox"/>
+<label data-i18n="h31" for="sop2_6">فصل المواد الكيميائية عن المواد الغذائية</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop2_6" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop2_6"></div>
+</div>
+<div class="checklist-item" id="item-sop2_7">
+<div class="item-row">
+<input class="sop-item" data-id="sop2_7" data-risk="low" id="sop2_7" type="checkbox"/>
+<label data-i18n="h32" for="sop2_7">تطبيق نظام FIFO (الأول وارداً أول صادراً)</label>
+<span class="risk-badge risk-low" data-i18n="h24">خطر منخفض</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop2_7" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop2_7"></div>
+</div>
+<div class="checklist-item" id="item-sop2_8">
+<div class="item-row">
+<input class="sop-item" data-id="sop2_8" data-risk="medium" id="sop2_8" type="checkbox"/>
+<label data-i18n="h33" for="sop2_8">عدم تكديس المواد لمنع انسداد التبريد</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop2_8" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop2_8"></div>
+</div>
+</div>
+<!-- 3. التحضير والتجهيز -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-kitchen-set"></i> <fg-t data-i18n="h34">3. التحضير والتجهيز</fg-t></div>
+<div class="checklist-item" id="item-sop3_1">
+<div class="item-row">
+<input class="sop-item" data-id="sop3_1" data-risk="high" id="sop3_1" type="checkbox"/>
+<label data-i18n="h35" for="sop3_1">غسل اليدين بالماء والصابون لمدة 20 ثانية قبل البدء</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop3_1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop3_1"></div>
+</div>
+<div class="checklist-item" id="item-sop3_2">
+<div class="item-row">
+<input class="sop-item" data-id="sop3_2" data-risk="high" id="sop3_2" type="checkbox"/>
+<label data-i18n="h36" for="sop3_2">استخدام ألواح تقطيع منفصلة للحوم، دواجن، خضار، وأسماك</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop3_2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop3_2"></div>
+</div>
+<div class="checklist-item" id="item-sop3_3">
+<div class="item-row">
+<input class="sop-item" data-id="sop3_3" data-risk="high" id="sop3_3" type="checkbox"/>
+<label data-i18n="h37" for="sop3_3">تعقيم الأدوات والأسطح بعد تحضير المواد النيئة</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop3_3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop3_3"></div>
+</div>
+<div class="checklist-item" id="item-sop3_4">
+<div class="item-row">
+<input class="sop-item" data-id="sop3_4" data-risk="high" id="sop3_4" type="checkbox"/>
+<label data-i18n="h38" for="sop3_4">عدم ترك المواد القابلة للتلف خارج التبريد لأكثر من ساعتين</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop3_4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop3_4"></div>
+</div>
+<div class="checklist-item" id="item-sop3_5">
+<div class="item-row">
+<input class="sop-item" data-id="sop3_5" data-risk="medium" id="sop3_5" type="checkbox"/>
+<label data-i18n="h39" for="sop3_5">إذابة الأغذية المجمدة في الثلاجة أو الميكروويف فقط</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop3_5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop3_5"></div>
+</div>
+<div class="checklist-item" id="item-sop3_6">
+<div class="item-row">
+<input class="sop-item" data-id="sop3_6" data-risk="medium" id="sop3_6" type="checkbox"/>
+<label data-i18n="h40" for="sop3_6">تغطية الأغذية أثناء التحضير لحمايتها من التلوث</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop3_6" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop3_6"></div>
+</div>
+<div class="checklist-item" id="item-sop3_7">
+<div class="item-row">
+<input class="sop-item" data-id="sop3_7" data-risk="medium" id="sop3_7" type="checkbox"/>
+<label data-i18n="h41" for="sop3_7">غسل الخضروات والفواكه جيداً بالماء الجاري</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop3_7" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop3_7"></div>
+</div>
+</div>
+<!-- 4. الطهي وإعادة التسخين -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-fire"></i> <fg-t data-i18n="h42">4. الطهي وإعادة التسخين</fg-t></div>
+<div class="checklist-item" id="item-sop4_1">
+<div class="item-row">
+<input class="sop-item" data-id="sop4_1" data-risk="high" id="sop4_1" type="checkbox"/>
+<label data-i18n="h43" for="sop4_1">وصول درجة حرارة قلب الدواجن إلى 74°C</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop4_1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop4_1"></div>
+</div>
+<div class="checklist-item" id="item-sop4_2">
+<div class="item-row">
+<input class="sop-item" data-id="sop4_2" data-risk="high" id="sop4_2" type="checkbox"/>
+<label data-i18n="h44" for="sop4_2">وصول درجة حرارة اللحوم المفرومة إلى 71°C</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop4_2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop4_2"></div>
+</div>
+<div class="checklist-item" id="item-sop4_3">
+<div class="item-row">
+<input class="sop-item" data-id="sop4_3" data-risk="high" id="sop4_3" type="checkbox"/>
+<label data-i18n="h45" for="sop4_3">وصول درجة حرارة الأسماك واللحوم الكاملة إلى 63°C</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop4_3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop4_3"></div>
+</div>
+<div class="checklist-item" id="item-sop4_4">
+<div class="item-row">
+<input class="sop-item" data-id="sop4_4" data-risk="high" id="sop4_4" type="checkbox"/>
+<label data-i18n="h46" for="sop4_4">إعادة تسخين الأطعمة المحفوظة إلى 74°C خلال ساعتين</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop4_4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop4_4"></div>
+</div>
+<div class="checklist-item" id="item-sop4_5">
+<div class="item-row">
+<input class="sop-item" data-id="sop4_5" data-risk="medium" id="sop4_5" type="checkbox"/>
+<label data-i18n="h47" for="sop4_5">تسجيل درجات حرارة الطهي في السجل اليومي</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop4_5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop4_5"></div>
+</div>
+<div class="checklist-item" id="item-sop4_6">
+<div class="item-row">
+<input class="sop-item" data-id="sop4_6" data-risk="medium" id="sop4_6" type="checkbox"/>
+<label data-i18n="h48" for="sop4_6">عدم إعادة تسخين الطعام أكثر من مرة واحدة</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop4_6" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop4_6"></div>
+</div>
+</div>
+<!-- 5. التقديم والخدمة -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-utensils"></i> <fg-t data-i18n="h49">5. التقديم والخدمة</fg-t></div>
+<div class="checklist-item" id="item-sop5_1">
+<div class="item-row">
+<input class="sop-item" data-id="sop5_1" data-risk="high" id="sop5_1" type="checkbox"/>
+<label data-i18n="h50" for="sop5_1">غسل اليدين قبل تجهيز أطباق التقديم</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop5_1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop5_1"></div>
+</div>
+<div class="checklist-item" id="item-sop5_2">
+<div class="item-row">
+<input class="sop-item" data-id="sop5_2" data-risk="high" id="sop5_2" type="checkbox"/>
+<label data-i18n="h51" for="sop5_2">استخدام أواني نظيفة ومعقمة لكل طبق</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop5_2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop5_2"></div>
+</div>
+<div class="checklist-item" id="item-sop5_3">
+<div class="item-row">
+<input class="sop-item" data-id="sop5_3" data-risk="high" id="sop5_3" type="checkbox"/>
+<label data-i18n="h52" for="sop5_3">الحفاظ على درجة حرارة الأطعمة الساخنة (≥ 60°C) أثناء التقديم</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop5_3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop5_3"></div>
+</div>
+<div class="checklist-item" id="item-sop5_4">
+<div class="item-row">
+<input class="sop-item" data-id="sop5_4" data-risk="high" id="sop5_4" type="checkbox"/>
+<label data-i18n="h53" for="sop5_4">الحفاظ على درجة حرارة الأطعمة الباردة (≤ 4°C) أثناء التقديم</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop5_4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop5_4"></div>
+</div>
+<div class="checklist-item" id="item-sop5_5">
+<div class="item-row">
+<input class="sop-item" data-id="sop5_5" data-risk="medium" id="sop5_5" type="checkbox"/>
+<label data-i18n="h54" for="sop5_5">عدم لمس الأجزاء الصالحة للأكل باليد مباشرة</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop5_5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop5_5"></div>
+</div>
+<div class="checklist-item" id="item-sop5_6">
+<div class="item-row">
+<input class="sop-item" data-id="sop5_6" data-risk="medium" id="sop5_6" type="checkbox"/>
+<label data-i18n="h55" for="sop5_6">تغطية الأطعمة المعروضة في البوفيه المفتوح</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop5_6" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop5_6"></div>
+</div>
+</div>
+<!-- 6. التبريد وحفظ الأغذية -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-snowflake"></i> <fg-t data-i18n="h56">6. التبريد وحفظ الأغذية</fg-t></div>
+<div class="checklist-item" id="item-sop6_1">
+<div class="item-row">
+<input class="sop-item" data-id="sop6_1" data-risk="high" id="sop6_1" type="checkbox"/>
+<label data-i18n="h57" for="sop6_1">تبريد الأطعمة الساخنة من 60°C إلى 20°C خلال ساعتين</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop6_1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop6_1"></div>
+</div>
+<div class="checklist-item" id="item-sop6_2">
+<div class="item-row">
+<input class="sop-item" data-id="sop6_2" data-risk="high" id="sop6_2" type="checkbox"/>
+<label data-i18n="h58" for="sop6_2">ثم من 20°C إلى 4°C خلال 4 ساعات إضافية</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop6_2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop6_2"></div>
+</div>
+<div class="checklist-item" id="item-sop6_3">
+<div class="item-row">
+<input class="sop-item" data-id="sop6_3" data-risk="medium" id="sop6_3" type="checkbox"/>
+<label data-i18n="h59" for="sop6_3">استخدام أوعية ضحلة للتبريد السريع (لا يزيد عمقها عن 10 سم)</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop6_3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop6_3"></div>
+</div>
+<div class="checklist-item" id="item-sop6_4">
+<div class="item-row">
+<input class="sop-item" data-id="sop6_4" data-risk="medium" id="sop6_4" type="checkbox"/>
+<label data-i18n="h60" for="sop6_4">تغطية الأطعمة بعد التبريد الكامل مع وضع تاريخ التصنيع</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop6_4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop6_4"></div>
+</div>
+<div class="checklist-item" id="item-sop6_5">
+<div class="item-row">
+<input class="sop-item" data-id="sop6_5" data-risk="high" id="sop6_5" type="checkbox"/>
+<label data-i18n="h61" for="sop6_5">عدم تخزين الأطعمة الساخنة مباشرة في الثلاجة</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop6_5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop6_5"></div>
+</div>
+<div class="checklist-item" id="item-sop6_6">
+<div class="item-row">
+<input class="sop-item" data-id="sop6_6" data-risk="high" id="sop6_6" type="checkbox"/>
+<label data-i18n="h62" for="sop6_6">مراقبة درجات حرارة الثلاجات والمجمدات وتسجيلها</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop6_6" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop6_6"></div>
+</div>
+</div>
+<!-- 7. النظافة الشخصية -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-user-shield"></i> <fg-t data-i18n="h63">7. النظافة الشخصية</fg-t></div>
+<div class="checklist-item" id="item-sop7_1">
+<div class="item-row">
+<input class="sop-item" data-id="sop7_1" data-risk="high" id="sop7_1" type="checkbox"/>
+<label data-i18n="h64" for="sop7_1">ارتداء الزي الرسمي النظيف (شيفون، مئزر، قبعة)</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop7_1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop7_1"></div>
+</div>
+<div class="checklist-item" id="item-sop7_2">
+<div class="item-row">
+<input class="sop-item" data-id="sop7_2" data-risk="high" id="sop7_2" type="checkbox"/>
+<label data-i18n="h65" for="sop7_2">تغطية الشعر بالكامل (شبكة أو قبعة)</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop7_2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop7_2"></div>
+</div>
+<div class="checklist-item" id="item-sop7_3">
+<div class="item-row">
+<input class="sop-item" data-id="sop7_3" data-risk="medium" id="sop7_3" type="checkbox"/>
+<label data-i18n="h66" for="sop7_3">عدم ارتداء المجوهرات أو الساعات أثناء العمل</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop7_3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop7_3"></div>
+</div>
+<div class="checklist-item" id="item-sop7_4">
+<div class="item-row">
+<input class="sop-item" data-id="sop7_4" data-risk="medium" id="sop7_4" type="checkbox"/>
+<label data-i18n="h67" for="sop7_4">تقليم الأظافر وعدم وضع طلاء أظافر</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop7_4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop7_4"></div>
+</div>
+<div class="checklist-item" id="item-sop7_5">
+<div class="item-row">
+<input class="sop-item" data-id="sop7_5" data-risk="high" id="sop7_5" type="checkbox"/>
+<label data-i18n="h68" for="sop7_5">الإبلاغ عن الأمراض المعدية (إسهال، قيء، التهابات جلدية)</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop7_5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop7_5"></div>
+</div>
+<div class="checklist-item" id="item-sop7_6">
+<div class="item-row">
+<input class="sop-item" data-id="sop7_6" data-risk="high" id="sop7_6" type="checkbox"/>
+<label data-i18n="h69" for="sop7_6">غسل اليدين بعد استخدام الحمام، التدخين، الأكل، لمس النفايات</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop7_6" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop7_6"></div>
+</div>
+<div class="checklist-item" id="item-sop7_7">
+<div class="item-row">
+<input class="sop-item" data-id="sop7_7" data-risk="medium" id="sop7_7" type="checkbox"/>
+<label data-i18n="h70" for="sop7_7">وجود معقم كحولي في متناول اليدين</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop7_7" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop7_7"></div>
+</div>
+</div>
+<!-- 8. التنظيف والتعقيم -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-broom"></i> <fg-t data-i18n="h71">8. التنظيف والتعقيم</fg-t></div>
+<div class="checklist-item" id="item-sop8_1">
+<div class="item-row">
+<input class="sop-item" data-id="sop8_1" data-risk="high" id="sop8_1" type="checkbox"/>
+<label data-i18n="h72" for="sop8_1">تنظيف وتعقيم أسطح العمل بعد كل استخدام</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop8_1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop8_1"></div>
+</div>
+<div class="checklist-item" id="item-sop8_2">
+<div class="item-row">
+<input class="sop-item" data-id="sop8_2" data-risk="high" id="sop8_2" type="checkbox"/>
+<label data-i18n="h73" for="sop8_2">غسل وتعقيم الأحواض وأماكن غسل اليدين</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop8_2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop8_2"></div>
+</div>
+<div class="checklist-item" id="item-sop8_3">
+<div class="item-row">
+<input class="sop-item" data-id="sop8_3" data-risk="medium" id="sop8_3" type="checkbox"/>
+<label data-i18n="h74" for="sop8_3">تنظيف الأرضيات والجدران من بقايا الطعام فوراً</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop8_3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop8_3"></div>
+</div>
+<div class="checklist-item" id="item-sop8_4">
+<div class="item-row">
+<input class="sop-item" data-id="sop8_4" data-risk="high" id="sop8_4" type="checkbox"/>
+<label data-i18n="h75" for="sop8_4">استخدام مواد معقمة معتمدة وبالتركيز الصحيح</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop8_4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop8_4"></div>
+</div>
+<div class="checklist-item" id="item-sop8_5">
+<div class="item-row">
+<input class="sop-item" data-id="sop8_5" data-risk="medium" id="sop8_5" type="checkbox"/>
+<label data-i18n="h76" for="sop8_5">جدول تنظيف معلّق ويتم التوقيع عليه يومياً</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop8_5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop8_5"></div>
+</div>
+<div class="checklist-item" id="item-sop8_6">
+<div class="item-row">
+<input class="sop-item" data-id="sop8_6" data-risk="medium" id="sop8_6" type="checkbox"/>
+<label data-i18n="h77" for="sop8_6">تنظيف مراوح الشفط والمكيفات بشكل دوري</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop8_6" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop8_6"></div>
+</div>
+<div class="checklist-item" id="item-sop8_7">
+<div class="item-row">
+<input class="sop-item" data-id="sop8_7" data-risk="high" id="sop8_7" type="checkbox"/>
+<label data-i18n="h78" for="sop8_7">غسل الأواني والمعدات في غسالة أطباق بدرجة حرارة لا تقل عن 60°C</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop8_7" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop8_7"></div>
+</div>
+</div>
+<!-- 9. مكافحة الآفات -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-bug"></i> <fg-t data-i18n="h79">9. مكافحة الآفات</fg-t></div>
+<div class="checklist-item" id="item-sop9_1">
+<div class="item-row">
+<input class="sop-item" data-id="sop9_1" data-risk="high" id="sop9_1" type="checkbox"/>
+<label data-i18n="h80" for="sop9_1">عدم وجود حشرات أو قوارض في المنشأة</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop9_1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop9_1"></div>
+</div>
+<div class="checklist-item" id="item-sop9_2">
+<div class="item-row">
+<input class="sop-item" data-id="sop9_2" data-risk="medium" id="sop9_2" type="checkbox"/>
+<label data-i18n="h81" for="sop9_2">سد جميع الفتحات والشقوق في الجدران والأبواب والنوافذ</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop9_2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop9_2"></div>
+</div>
+<div class="checklist-item" id="item-sop9_3">
+<div class="item-row">
+<input class="sop-item" data-id="sop9_3" data-risk="medium" id="sop9_3" type="checkbox"/>
+<label data-i18n="h82" for="sop9_3">تركيب مصائد ضوئية أو لاصقة في الأماكن المناسبة</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop9_3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop9_3"></div>
+</div>
+<div class="checklist-item" id="item-sop9_4">
+<div class="item-row">
+<input class="sop-item" data-id="sop9_4" data-risk="medium" id="sop9_4" type="checkbox"/>
+<label data-i18n="h83" for="sop9_4">وجود عقد مع شركة مكافحة آفات معتمدة</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop9_4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop9_4"></div>
+</div>
+<div class="checklist-item" id="item-sop9_5">
+<div class="item-row">
+<input class="sop-item" data-id="sop9_5" data-risk="high" id="sop9_5" type="checkbox"/>
+<label data-i18n="h84" for="sop9_5">التخلص الفوري من النفايات وتنظيف الحاويات يومياً</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop9_5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop9_5"></div>
+</div>
+</div>
+<!-- 10. التوثيق والتدريب -->
+<div class="checklist-section">
+<div class="section-title"><i class="fas fa-file-alt"></i> <fg-t data-i18n="h85">10. التوثيق والتدريب</fg-t></div>
+<div class="checklist-item" id="item-sop10_1">
+<div class="item-row">
+<input class="sop-item" data-id="sop10_1" data-risk="high" id="sop10_1" type="checkbox"/>
+<label data-i18n="h86" for="sop10_1">تسجيل درجات حرارة الثلاجات والمجمدات يومياً</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop10_1" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop10_1"></div>
+</div>
+<div class="checklist-item" id="item-sop10_2">
+<div class="item-row">
+<input class="sop-item" data-id="sop10_2" data-risk="high" id="sop10_2" type="checkbox"/>
+<label data-i18n="h87" for="sop10_2">تسجيل درجات حرارة الطهي والتبريد في السجلات</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop10_2" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop10_2"></div>
+</div>
+<div class="checklist-item" id="item-sop10_3">
+<div class="item-row">
+<input class="sop-item" data-id="sop10_3" data-risk="medium" id="sop10_3" type="checkbox"/>
+<label data-i18n="h88" for="sop10_3">الاحتفاظ بسجلات الاستلام لمدة لا تقل عن 6 أشهر</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop10_3" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop10_3"></div>
+</div>
+<div class="checklist-item" id="item-sop10_4">
+<div class="item-row">
+<input class="sop-item" data-id="sop10_4" data-risk="low" id="sop10_4" type="checkbox"/>
+<label data-i18n="h89" for="sop10_4">توقيع المسؤول على جميع السجلات يومياً</label>
+<span class="risk-badge risk-low" data-i18n="h24">خطر منخفض</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop10_4" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop10_4"></div>
+</div>
+<div class="checklist-item" id="item-sop10_5">
+<div class="item-row">
+<input class="sop-item" data-id="sop10_5" data-risk="high" id="sop10_5" type="checkbox"/>
+<label data-i18n="h90" for="sop10_5">جميع العاملين حاصلون على تدريب في سلامة الغذاء</label>
+<span class="risk-badge risk-high" data-i18n="h16">خطر مرتفع</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop10_5" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop10_5"></div>
+</div>
+<div class="checklist-item" id="item-sop10_6">
+<div class="item-row">
+<input class="sop-item" data-id="sop10_6" data-risk="medium" id="sop10_6" type="checkbox"/>
+<label data-i18n="h91" for="sop10_6">وجود تعليمات واضحة معلقة (غسل اليدين، درجات الحرارة)</label>
+<span class="risk-badge risk-medium" data-i18n="h19">خطر متوسط</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop10_6" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop10_6"></div>
+</div>
+<div class="checklist-item" id="item-sop10_7">
+<div class="item-row">
+<input class="sop-item" data-id="sop10_7" data-risk="low" id="sop10_7" type="checkbox"/>
+<label data-i18n="h92" for="sop10_7">عقد اجتماعات دورية للتذكير بإجراءات السلامة</label>
+<span class="risk-badge risk-low" data-i18n="h24">خطر منخفض</span>
+</div>
+<div class="notes-field"><textarea data-i18n-attr="placeholder:h17" id="note-sop10_7" placeholder="ملاحظات"></textarea></div>
+<div class="recommendation-box" id="recommendation-sop10_7"></div>
+</div>
+</div>
+</div>
+<!-- نتيجة التقييم -->
+<div class="result-area" id="resultArea">
+<div>
+<span class="score" id="scoreDisplay">0%</span>
+<span class="evaluation" id="evaluationText"></span>
+</div>
+<div class="overall-risk" id="overallRiskDisplay"></div>
+</div>
+<!-- الأزرار -->
+<div class="btn-group">
+<button class="btn-primary" id="calculateBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h93">احسب النتيجة والتوصيات</fg-t></button>
+</div>
+<!-- أزرار التصدير -->
+<div class="export-container">
+<button class="export-btn excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> <fg-t data-i18n="h94">تصدير Excel شامل</fg-t></button>
+<button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> <fg-t data-i18n="h95">تصدير Word</fg-t></button>
+</div>
+<div id="initialMessage" style="margin-top:0.5rem;color:var(--text-muted);text-align:center;font-size:0.9rem;">
+<i class="fas fa-robot" style="color:var(--accent-soft);"></i> <fg-t data-i18n="h96">اضغط "احسب النتيجة" ثم استخدم أزرار التصدير</fg-t>
+        </div>
+</div>
+</div>
+<footer class="footer-simple"><fg-t data-i18n="h97">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span></footer>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h98">حاسبة</fg-t></button>
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h99">الرئيسية</fg-t></a>
+<!-- نافذة الآلة الحاسبة -->
+<div class="modal" id="calculatorModal">
+<div class="modal-content">
+<div class="modal-header">
+<span class="close" id="modalClose">×</span>
+<h2><i class="fas fa-calculator" style="color:#cfa776;"></i> <fg-t data-i18n="h100">آلة حاسبة</fg-t></h2>
+</div>
+<div class="modal-body">
+<input class="calc-display" id="calcDisplay" readonly="" type="text"/>
+<div class="calc-buttons">
+<button class="calc-btn" data-val="9">9</button>
+<button class="calc-btn" data-val="8">8</button>
+<button class="calc-btn" data-val="7">7</button>
+<button class="calc-btn operator" data-val="/">÷</button>
+<button class="calc-btn" data-val="6">6</button>
+<button class="calc-btn" data-val="5">5</button>
+<button class="calc-btn" data-val="4">4</button>
+<button class="calc-btn operator" data-val="*">×</button>
+<button class="calc-btn" data-val="3">3</button>
+<button class="calc-btn" data-val="2">2</button>
+<button class="calc-btn" data-val="1">1</button>
+<button class="calc-btn operator" data-val="-">-</button>
+<button class="calc-btn" data-val="C">C</button>
+<button class="calc-btn" data-val="0">0</button>
+<button class="calc-btn" data-val=".">.</button>
+<button class="calc-btn operator" data-val="+">+</button>
+<button class="calc-btn" data-val="⌫">⌫</button>
+<button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+</div>
+</div>
+</div>
+</div>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">حاسبة العائد على الاستثمار العقاري | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool5" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+<div class="export-loading-box">
+<i class="fas fa-spinner"></i>
+<h3 data-i18n="h2" id="loadingTitle">جاري إنشاء التقرير...</h3>
+<p data-i18n="h3" id="loadingMsg">يرجى الانتظار</p>
+</div>
+</div>
+<section class="hero-mini">
+<h2 data-i18n="h4">حاسبة العائد على الاستثمار العقاري</h2>
+<p data-i18n="h5">تحليل متكامل مع NPV، IRR، MIRR، فترة الاسترداد، PI، Cash on Cash، ROI، مع رسوم بيانية وتحليل حساسية</p>
+</section>
+<div class="calc-wrapper">
+<div class="calc-box" data-aos="fade-up">
+<div class="featured-badge"><i class="fas fa-chart-line"></i><span data-i18n="h6">عقاري</span></div>
+<h2><i class="fas fa-chart-line" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h7">تحليل الاستثمار العقاري</fg-t></h2>
+<!-- العملة واسم الجهة -->
+<div class="currency-row">
+<label><i class="fas fa-coins"></i> <fg-t data-i18n="h8">العملة:</fg-t></label>
+<select id="currencySelect">
+<option data-i18n="h9" selected="" value="$">دولار ($)</option>
+<option data-i18n="h10" value="€">يورو (€)</option>
+<option data-i18n="h11" value="₺">ليرة تركية (₺)</option>
+<option data-i18n="h12" value="ج.م">جنيه مصري (ج.م)</option>
+<option data-i18n="h13" value="د.ك">دينار كويتي (د.ك)</option>
+<option data-i18n="h14" value="ر.س">ريال سعودي (ر.س)</option>
+</select>
+<label><i class="fas fa-building"></i> <fg-t data-i18n="h15">اسم الجهة:</fg-t></label>
+<input data-i18n-attr="placeholder:h16;value:h17" id="companyName" placeholder="الجهة المستفيدة" type="text" value="اسم الجهة المستفيدة من التقرير"/>
+</div>
+<!-- بيانات العقار -->
+<div class="section-title-sm" data-i18n="h18">🏢 بيانات العقار والتشغيل</div>
+<div class="form-row">
+<div class="form-group tooltip">
+<label><i class="fas fa-dollar-sign"></i> <fg-t data-i18n="h19">قيمة العقار (التكلفة الأولية)</fg-t></label>
+<input id="marketValue" step="1000" type="number" value="5000000"/>
+<span class="tooltiptext" data-i18n="h20">سعر شراء العقار شاملاً جميع التكاليف.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-home"></i> <fg-t data-i18n="h21">عدد الوحدات</fg-t></label>
+<input id="units" min="1" type="number" value="1"/>
+<span class="tooltiptext" data-i18n="h22">عدد الوحدات المؤجرة.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-money-bill"></i> <fg-t data-i18n="h23">الإيجار الشهري للوحدة</fg-t></label>
+<input id="rent" step="100" type="number" value="25000"/>
+<span class="tooltiptext" data-i18n="h24">متوسط الإيجار الشهري لكل وحدة.</span>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip">
+<label><i class="fas fa-tools"></i> <fg-t data-i18n="h25">المصاريف الشهرية (مرافق + صيانة)</fg-t></label>
+<input id="monthlyExpenses" step="100" type="number" value="0"/>
+<span class="tooltiptext" data-i18n="h26">المصاريف التشغيلية الشهرية.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h27">نسبة الإشغال</fg-t></label>
+<div style="display:flex; align-items:center; gap:8px;">
+<input id="occupancyRange" max="100" min="0" step="1" style="flex:3;" type="range" value="100"/>
+<input id="occupancy" max="1" min="0" step="0.01" style="flex:1;" type="number" value="1"/>
+</div>
+<span class="tooltiptext" data-i18n="h28">متوسط نسبة الوحدات المؤجرة.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-landmark"></i> <fg-t data-i18n="h29">معدل الضريبة العقارية السنوي (%)</fg-t></label>
+<input id="taxRate" step="0.1" type="number" value="3.5"/>
+<span class="tooltiptext" data-i18n="h30">نسبة الضريبة على القيمة المقدرة للعقار سنوياً.</span>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip">
+<label><i class="fas fa-chart-line"></i> <fg-t data-i18n="h31">خصم التقييم (Assessed Value Discount) (%)</fg-t></label>
+<input id="assessedDiscount" step="1" type="number" value="10"/>
+<span class="tooltiptext" data-i18n="h32">النسبة التي يتم بها خصم القيمة السوقية لتحديد القيمة الخاضعة للضريبة.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-arrow-up"></i> <fg-t data-i18n="h33">معدل الزيادة السنوية للإيجار (%)</fg-t></label>
+<input id="rentIncrease" step="0.1" type="number" value="30"/>
+<span class="tooltiptext" data-i18n="h34">النسبة المتوقعة لزيادة الإيجار كل سنة.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-mountain"></i> <fg-t data-i18n="h35">ارتفاع قيمة الأرض السنوي (%)</fg-t></label>
+<input id="landAppreciation" step="0.1" type="number" value="5"/>
+<span class="tooltiptext" data-i18n="h36">النسبة المتوقعة لزيادة قيمة العقار سنوياً.</span>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip">
+<label><i class="fas fa-file-invoice"></i> <fg-t data-i18n="h37">رسوم شراء وضرائب (مرة واحدة)</fg-t></label>
+<input id="purchaseCosts" step="1000" type="number" value="250000"/>
+<span class="tooltiptext" data-i18n="h38">رسوم التسجيل، الضرائب، عمولات الوساطة التي تدفع مرة واحدة عند الشراء.</span>
+</div>
+</div>
+<!-- التمويل العقاري -->
+<div class="section-title-sm" data-i18n="h39">🏦 التمويل العقاري (اختياري)</div>
+<div class="form-row">
+<div class="form-group tooltip">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h40">نسبة القرض (LTV) %</fg-t></label>
+<input id="ltv" max="100" min="0" step="1" type="number" value="0"/>
+<span class="tooltiptext" data-i18n="h41">نسبة القرض من قيمة العقار. 0 يعني شراء نقدي.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h42">سعر الفائدة السنوي (%)</fg-t></label>
+<input id="interestRate" step="0.1" type="number" value="5"/>
+<span class="tooltiptext" data-i18n="h43">سعر الفائدة على القرض.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-calendar-alt"></i> <fg-t data-i18n="h44">مدة القرض (بالسنوات)</fg-t></label>
+<input id="loanTerm" max="30" min="1" type="number" value="20"/>
+<span class="tooltiptext" data-i18n="h45">مدة سداد القرض بالسنوات.</span>
+</div>
+</div>
+<!-- معايير التقييم -->
+<div class="section-title-sm" data-i18n="h46">📈 معايير التقييم</div>
+<div class="form-row">
+<div class="form-group tooltip">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h47">معدل الخصم (Discount Rate) (%)</fg-t></label>
+<input id="discountRate" step="0.1" type="number" value="5"/>
+<span class="tooltiptext" data-i18n="h48">النسبة المستخدمة لتحويل الأموال المستقبلية إلى قيمتها الحالية.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h49">معدل إعادة الاستثمار (Reinvestment Rate) (%)</fg-t></label>
+<input id="reinvestRate" step="0.1" type="number" value="43"/>
+<span class="tooltiptext" data-i18n="h50">المعدل الذي يمكن إعادة استثمار التدفقات النقدية الموجبة به.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-calendar"></i> <fg-t data-i18n="h51">عدد السنوات</fg-t></label>
+<input id="years" max="61" min="1" type="number" value="20"/>
+<span class="tooltiptext" data-i18n="h52">مدة الاستثمار بالسنوات (حتى 61 سنة).</span>
+</div>
+</div>
+<button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h53">احسب العائد</fg-t></button>
+<!-- النتائج -->
+<div class="results-section" id="resultsSection" style="display:none;">
+<div class="results-cards" id="kpiCards"></div>
+<div class="result-card" id="projectRating" style="text-align:center;"></div>
+<div class="section-title-sm" data-i18n="h54">📈 التدفقات النقدية السنوية والتراكمية</div>
+<div class="chart-container"><canvas id="cashChart"></canvas></div>
+<div class="section-title-sm" data-i18n="h55">📊 جميع التدفقات النقدية السنوية</div>
+<div class="table-container" id="cashFlowTable"></div>
+<div class="section-title-sm" data-i18n="h56">🔍 تحليل الحساسية</div>
+<div class="sens-container">
+<button class="btn-sensitivity" data-i18n="h57" id="sens10">+10% إيجار</button>
+<button class="btn-sensitivity" data-i18n="h58" id="sens-10">-10% إيجار</button>
+<button class="btn-sensitivity" data-i18n="h59" id="sensOcc10">+10% إشغال</button>
+<button class="btn-sensitivity" data-i18n="h60" id="sensOcc-10">-10% إشغال</button>
+<button class="btn-sensitivity reset" data-i18n="h61" id="resetSens">↺ إعادة تعيين</button>
+</div>
+<div class="table-container" id="sensitivityTable" style="max-height:200px;"></div>
+<div class="export-container">
+<button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> <fg-t data-i18n="h62">تصدير Word</fg-t></button>
+<button class="export-btn excel" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> <fg-t data-i18n="h63">تصدير Excel شامل</fg-t></button>
+</div>
+<div class="section-title-sm" data-i18n="h64">💰 متى نحقق الربح؟</div>
+<div class="result-card" id="paybackSummary" style="text-align:right;"></div>
+<div class="note"><i class="fas fa-info-circle" style="color:#cfa776;"></i> <fg-t data-i18n="h65">فترة الاسترداد تحسب بناءً على التدفقات التراكمية التي تشمل القيمة النهائية للعقار (البيع في نهاية المدة). إذا كنت تستخدم تمويلاً، التدفقات بعد خدمة الدين.</fg-t></div>
+</div>
+<div id="initialMessage" style="margin-top:1rem; color:var(--text-muted); text-align:center;">
+<i class="fas fa-robot" style="color: var(--accent-soft);"></i> <fg-t data-i18n="h66">سيتم عرض النتائج بعد الضغط على زر الحساب</fg-t>
+        </div>
+</div>
+</div>
+<footer class="footer-simple"><fg-t data-i18n="h67">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span></footer>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h68">حاسبة</fg-t></button>
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h69">الرئيسية</fg-t></a>
+<!-- نافذة الآلة الحاسبة -->
+<div class="modal" id="calculatorModal">
+<div class="modal-content">
+<div class="modal-header">
+<span class="close" id="modalClose">×</span>
+<h2><i class="fas fa-calculator" style="color:#cfa776;"></i> <fg-t data-i18n="h70">آلة حاسبة</fg-t></h2>
+</div>
+<div class="modal-body">
+<input class="calc-display" id="calcDisplay" readonly="" type="text"/>
+<div class="calc-buttons">
+<button class="calc-btn" data-val="9">9</button>
+<button class="calc-btn" data-val="8">8</button>
+<button class="calc-btn" data-val="7">7</button>
+<button class="calc-btn operator" data-val="/">÷</button>
+<button class="calc-btn" data-val="6">6</button>
+<button class="calc-btn" data-val="5">5</button>
+<button class="calc-btn" data-val="4">4</button>
+<button class="calc-btn operator" data-val="*">×</button>
+<button class="calc-btn" data-val="3">3</button>
+<button class="calc-btn" data-val="2">2</button>
+<button class="calc-btn" data-val="1">1</button>
+<button class="calc-btn operator" data-val="-">-</button>
+<button class="calc-btn" data-val="C">C</button>
+<button class="calc-btn" data-val="0">0</button>
+<button class="calc-btn" data-val=".">.</button>
+<button class="calc-btn operator" data-val="+">+</button>
+<button class="calc-btn" data-val="⌫">⌫</button>
+<button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+</div>
+</div>
+</div>
+</div>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">التنبؤ النقدي لـ 13 أسبوعاً | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool31" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+&gt;
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<div class="export-loading" id="exportLoading">
+<div class="export-loading-box">
+<i class="fas fa-spinner"></i>
+<h3 data-i18n="h2" id="loadingTitle">جاري إنشاء التقرير...</h3>
+<p data-i18n="h3" id="loadingMsg">يرجى الانتظار</p>
+</div>
+</div>
+<section class="hero-mini">
+<h2 data-i18n="h4">📅 التنبؤ النقدي لـ 13 أسبوعاً</h2>
+<p data-i18n="h5">أداة تشغيلية لكشف فجوات السيولة مبكراً، وجدولة المدفوعات، وإدارة النقد قصير الأجل</p>
+</section>
+<div class="calc-wrapper">
+<div class="calc-box" data-aos="fade-up">
+<div class="featured-badge"><i class="fas fa-money-bill-trend-up"></i><span data-i18n="h6">نقدي</span></div>
+<h2><i class="fas fa-money-bill-trend-up" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h7">التنبؤ النقدي المتداول (Rolling Forecast)</fg-t></h2>
+<!-- العملة واسم الجهة -->
+<div class="currency-row">
+<label><i class="fas fa-coins"></i> <fg-t data-i18n="h8">العملة:</fg-t></label>
+<select id="currencySelect">
+<option data-i18n="h9" selected="" value="$">دولار ($)</option>
+<option data-i18n="h10" value="€">يورو (€)</option>
+<option data-i18n="h11" value="₺">ليرة تركية (₺)</option>
+<option data-i18n="h12" value="ج.م">جنيه مصري (ج.م)</option>
+<option data-i18n="h13" value="د.ك">دينار كويتي (د.ك)</option>
+<option data-i18n="h14" value="ر.س">ريال سعودي (ر.س)</option>
+</select>
+<label><i class="fas fa-building"></i> <fg-t data-i18n="h15">اسم الجهة:</fg-t></label>
+<input data-i18n-attr="placeholder:h16;value:h17" id="companyName" placeholder="الجهة المستفيدة" type="text" value="اسم الجهة المستفيدة من التقرير"/>
+</div>
+<!-- الرصيد الافتتاحي -->
+<div class="section-title-sm" data-i18n="h18">💰 الرصيد النقدي الافتتاحي والحد الأدنى</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-wallet"></i> <fg-t data-i18n="h19">رصيد النقدية في بداية الأسبوع الأول</fg-t></label>
+<input id="openingCash" min="0" step="1000" type="number" value="100000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-shield-alt"></i> <fg-t data-i18n="h20">الحد الأدنى الآمن للنقدية (احتياطي)</fg-t></label>
+<input id="minCash" min="0" step="1000" type="number" value="20000"/>
+</div>
+</div>
+<!-- المقبوضات الأسبوعية -->
+<div class="section-title-sm" data-i18n="h21">📥 المقبوضات النقدية الأسبوعية (Cash Inflows)</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-money-bill-wave"></i> <fg-t data-i18n="h22">المبيعات النقدية الأسبوعية</fg-t></label>
+<input id="cashSales" min="0" step="1000" type="number" value="30000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-credit-card"></i> <fg-t data-i18n="h23">مبيعات الشبكة/الفيزا الأسبوعية</fg-t></label>
+<input id="cardSales" min="0" step="1000" type="number" value="20000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-file-invoice-dollar"></i> <fg-t data-i18n="h24">تحصيل الفواتير الآجلة الأسبوعي</fg-t></label>
+<input id="arCollection" min="0" step="1000" type="number" value="15000"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-arrow-trend-up"></i> <fg-t data-i18n="h25">نمو المقبوضات الأسبوعي (%)</fg-t></label>
+<input id="inflowGrowth" step="0.1" type="number" value="0"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-money-bill-transfer"></i> <fg-t data-i18n="h26">تحويلات أخرى أسبوعية</fg-t></label>
+<input id="otherInflows" min="0" step="1000" type="number" value="0"/>
+</div>
+</div>
+<!-- المدفوعات الأسبوعية -->
+<div class="section-title-sm" data-i18n="h27">📤 المدفوعات النقدية الأسبوعية (Cash Outflows)</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-boxes"></i> <fg-t data-i18n="h28">سداد الموردين (COGS) الأسبوعي</fg-t></label>
+<input id="supplierPay" min="0" step="1000" type="number" value="18000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-users"></i> <fg-t data-i18n="h29">رواتب العمالة والموظفين الأسبوعية</fg-t></label>
+<input id="weeklySalaries" min="0" step="1000" type="number" value="15000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-store"></i> <fg-t data-i18n="h30">الإيجار الأسبوعي</fg-t></label>
+<input id="weeklyRent" min="0" step="500" type="number" value="5000"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-bolt"></i> <fg-t data-i18n="h31">الفواتير (كهرباء/ماء/إنترنت) أسبوعي</fg-t></label>
+<input id="weeklyUtilities" min="0" step="500" type="number" value="2000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-landmark"></i> <fg-t data-i18n="h32">الضرائب الأسبوعية</fg-t></label>
+<input id="weeklyTaxes" min="0" step="500" type="number" value="1500"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-hand-holding-usd"></i> <fg-t data-i18n="h33">أقساط القروض الأسبوعية</fg-t></label>
+<input id="weeklyLoan" min="0" step="500" type="number" value="3000"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-ellipsis"></i> <fg-t data-i18n="h34">مدفوعات أخرى أسبوعية</fg-t></label>
+<input id="otherOutflows" min="0" step="500" type="number" value="1000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-arrow-trend-up"></i> <fg-t data-i18n="h35">نمو المدفوعات الأسبوعي (%)</fg-t></label>
+<input id="outflowGrowth" step="0.1" type="number" value="0"/>
+</div>
+</div>
+<button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h36">تشغيل التنبؤ النقدي (13 أسبوعاً)</fg-t></button>
+<!-- النتائج -->
+<div class="results-section" id="resultsSection" style="display:none;">
+<div class="results-cards" id="kpiCards"></div>
+<div id="alertsBox"></div>
+<div class="section-title-sm" data-i18n="h37">📈 رصيد النقدية عبر 13 أسبوعاً</div>
+<div class="chart-container"><canvas id="cashChart"></canvas></div>
+<div class="section-title-sm" data-i18n="h38">📋 جدول التنبؤ النقدي التفصيلي</div>
+<div class="table-container" id="cashTable"></div>
+<div class="note">
+<i class="fas fa-info-circle" style="color:#cfa776;"></i>
+<strong data-i18n="h39">آلية العمل:</strong> <fg-t data-i18n="h40">رصيد بداية الأسبوع + المقبوضات − المدفوعات = رصيد نهاية الأسبوع، ثم يُرحَّل رصيد النهاية ليصبح رصيد بداية الأسبوع التالي. الصفوف الحمراء = فجوة سيولة، الصفوف الصفراء = رصيد أقل من الحد الأدنى الآمن.</fg-t>
+            </div>
+<div class="export-container">
+<button class="export-btn excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> <fg-t data-i18n="h41">تصدير Excel شامل</fg-t></button>
+<button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> <fg-t data-i18n="h42">تصدير Word</fg-t></button>
+</div>
+</div>
+<div id="initialMessage">
+<i class="fas fa-robot" style="color:#cfa776;"></i> <fg-t data-i18n="h43">سيتم عرض النتائج بعد الضغط على زر الحساب</fg-t>
+        </div>
+</div>
+</div>
+<footer class="footer-simple"><fg-t data-i18n="h44">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span></footer>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h45">حاسبة</fg-t></button>
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h46">الرئيسية</fg-t></a>
+<!-- نافذة الآلة الحاسبة -->
+<div class="modal" id="calculatorModal">
+<div class="modal-content">
+<div class="modal-header">
+<span class="close" id="modalClose">×</span>
+<h2><i class="fas fa-calculator" style="color:#cfa776;"></i> <fg-t data-i18n="h47">آلة حاسبة</fg-t></h2>
+</div>
+<div class="modal-body">
+<input class="calc-display" id="calcDisplay" readonly="" type="text"/>
+<div class="calc-buttons">
+<button class="calc-btn" data-val="9">9</button>
+<button class="calc-btn" data-val="8">8</button>
+<button class="calc-btn" data-val="7">7</button>
+<button class="calc-btn operator" data-val="/">÷</button>
+<button class="calc-btn" data-val="6">6</button>
+<button class="calc-btn" data-val="5">5</button>
+<button class="calc-btn" data-val="4">4</button>
+<button class="calc-btn operator" data-val="*">×</button>
+<button class="calc-btn" data-val="3">3</button>
+<button class="calc-btn" data-val="2">2</button>
+<button class="calc-btn" data-val="1">1</button>
+<button class="calc-btn operator" data-val="-">-</button>
+<button class="calc-btn" data-val="C">C</button>
+<button class="calc-btn" data-val="0">0</button>
+<button class="calc-btn" data-val=".">.</button>
+<button class="calc-btn operator" data-val="+">+</button>
+<button class="calc-btn" data-val="⌫">⌫</button>
+<button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+</div>
+</div>
+</div>
+</div>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+</body>
+</html>

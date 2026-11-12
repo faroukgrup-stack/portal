@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">دراسة الجدوى الفنية المتقدمة للمطاعم | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool3" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<div class="floating-shape shape-1"></div>
+<div class="floating-shape shape-2"></div>
+<section class="hero-mini">
+<h2 data-i18n="h2">دراسة الجدوى الفنية المتقدمة للمطاعم</h2>
+<p data-i18n="h3">تحليل متكامل للمساحات، المعدات، الطاقة الإنتاجية، مؤشرات الأداء، وتقييم فني ومالي</p>
+</section>
+<section class="calc-wrapper">
+<div class="calc-box" data-aos="fade-up">
+<div class="featured-badge"><i class="fas fa-utensils"></i><span data-i18n="h4">فني</span></div>
+<h2><i class="fas fa-utensils" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h5">بيانات المشروع</fg-t></h2>
+<!-- العملة واسم الجهة -->
+<div class="currency-row">
+<label><i class="fas fa-coins"></i> <fg-t data-i18n="h6">العملة:</fg-t></label>
+<select id="currencySelect">
+<option data-i18n="h7" selected="" value="$">دولار ($)</option>
+<option data-i18n="h8" value="€">يورو (€)</option>
+<option data-i18n="h9" value="₺">ليرة تركية (₺)</option>
+<option data-i18n="h10" value="ج.م">جنيه مصري (ج.م)</option>
+<option data-i18n="h11" value="د.ك">دينار كويتي (د.ك)</option>
+<option data-i18n="h12" value="ر.س">ريال سعودي (ر.س)</option>
+</select>
+<label><i class="fas fa-building"></i> <fg-t data-i18n="h13">اسم الجهة:</fg-t></label>
+<input data-i18n-attr="placeholder:h14;value:h15" id="companyName" placeholder="الجهة المستفيدة" type="text" value="اسم الجهة المستفيدة من التقرير"/>
+</div>
+<!-- النطاق والمواصفات -->
+<div class="section-title-sm" data-i18n="h16">📋 النطاق والمواصفات</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-utensils"></i> <fg-t data-i18n="h17">نوع المطبخ</fg-t></label><select id="kitchenType"><option data-i18n="h18" value="fastfood">وجبات سريعة</option><option data-i18n="h19" value="fine">مطعم فاخر</option><option data-i18n="h20" value="eastern">شرقي</option><option data-i18n="h21" value="italian">إيطالي</option><option data-i18n="h22" value="grill">مشاوي</option><option data-i18n="h23" value="seafood">أسماك</option><option data-i18n="h24" value="cafe">كافيه</option></select><span class="tooltiptext" data-i18n="h25">نوع المطبخ الرئيسي</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-chair"></i> <fg-t data-i18n="h26">عدد الكراسي</fg-t></label><input id="seats" min="1" step="5" type="number" value="50"/><span class="tooltiptext" data-i18n="h27">سعة الجلوس الإجمالية</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-concierge-bell"></i> <fg-t data-i18n="h28">نموذج الخدمة</fg-t></label><select id="serviceModel"><option data-i18n="h29" value="waiter">خدمة طاولات</option><option data-i18n="h30" value="self">سيلف سيرفس</option><option data-i18n="h31" value="delivery">توصيل فقط</option><option data-i18n="h32" value="mixed">مزيج</option></select><span class="tooltiptext" data-i18n="h33">طريقة تقديم الخدمة</span></div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-clock"></i> <fg-t data-i18n="h34">ساعات العمل اليومية</fg-t></label><input id="hoursOpen" max="24" min="1" type="number" value="12"/><span class="tooltiptext" data-i18n="h35">عدد ساعات العمل في اليوم</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-moon"></i> <fg-t data-i18n="h36">فترات التشغيل</fg-t></label><select id="shifts"><option data-i18n="h37" value="1">فترة واحدة (غداء)</option><option data-i18n="h38" value="2">فترتين (غداء وعشاء)</option><option data-i18n="h39" value="3">فترات متعددة</option></select><span class="tooltiptext" data-i18n="h40">عدد فترات العمل اليومية</span></div>
+</div>
+<!-- تحليل الموقع -->
+<div class="section-title-sm" data-i18n="h41">📍 تحليل الموقع</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-vector-square"></i> <fg-t data-i18n="h42">المساحة الإجمالية (م²)</fg-t></label><input id="totalArea" min="20" step="10" type="number" value="150"/><span class="tooltiptext" data-i18n="h43">المساحة الكلية للمطعم</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-percent"></i> <fg-t data-i18n="h44">نسبة منطقة المطبخ (%)</fg-t></label><input id="kitchenPercent" max="60" min="20" step="5" type="number" value="35"/><span class="tooltiptext" data-i18n="h45">نسبة مساحة المطبخ من الإجمالي</span></div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-bolt"></i> <fg-t data-i18n="h46">قدرة الكهرباء (أمبير)</fg-t></label><input id="electricalCapacity" min="50" step="10" type="number" value="200"/><span class="tooltiptext" data-i18n="h47">السعة الكهربائية للموقع</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-water"></i> <fg-t data-i18n="h48">مصدر المياه</fg-t></label><select id="waterAvailability"><option data-i18n="h49" value="yes">نعم - مناسب</option><option data-i18n="h50" value="partial">بحاجة تطوير</option><option data-i18n="h51" value="no">لا - غير مناسب</option></select></div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-wind"></i> <fg-t data-i18n="h52">نظام تهوية</fg-t></label><select id="ventilation"><option data-i18n="h49" value="yes">نعم - مناسب</option><option data-i18n="h53" value="partial">يحتاج تطوير</option><option data-i18n="h51" value="no">لا - غير مناسب</option></select></div>
+<div class="form-group tooltip"><label><i class="fas fa-truck"></i> <fg-t data-i18n="h54">سهولة التوصيل</fg-t></label><select id="deliveryAccess"><option data-i18n="h55" value="yes">نعم - ممتاز</option><option data-i18n="h56" value="partial">متوسط</option><option data-i18n="h57" value="no">صعب</option></select></div>
+</div>
+<!-- المعدات -->
+<div class="section-title-sm" data-i18n="h58">🔧 متطلبات المعدات</div>
+<div id="equipmentContainer"></div>
+<button class="add-equipment-btn" data-i18n="h59" id="addEquipmentBtn">➕ إضافة معدة</button>
+<div class="alert" id="powerAlert" style="display:none;"></div>
+<!-- الطاقة الإنتاجية -->
+<div class="section-title-sm" data-i18n="h60">⚡ الطاقة الإنتاجية وكفاءة التشغيل</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-rotate-left"></i> <fg-t data-i18n="h61">معدل دوران الطاولة</fg-t></label><input id="turnoverRate" min="0.5" step="0.5" type="number" value="2"/><span class="tooltiptext" data-i18n="h62">عدد مرات شغل الطاولة في ساعة الذروة</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-clock"></i> <fg-t data-i18n="h63">ساعات الذروة اليومية</fg-t></label><input id="peakHours" max="12" min="1" type="number" value="4"/><span class="tooltiptext" data-i18n="h64">عدد ساعات الذروة في اليوم</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-percent"></i> <fg-t data-i18n="h65">نسبة الإشغال المتوقعة %</fg-t></label><input id="occupancyRate" max="100" min="10" step="5" type="number" value="70"/><span class="tooltiptext" data-i18n="h66">نسبة الإشغال المتوقعة من الطاقة القصوى</span></div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-hamburger"></i> <fg-t data-i18n="h67">متوسط سعر الوجبة</fg-t></label><input id="avgMealPrice" step="5" type="number" value="50"/><span class="tooltiptext" data-i18n="h68">متوسط سعر الوجبة للعميل</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-percent"></i> <fg-t data-i18n="h69">تكلفة الطعام (%)</fg-t></label><input id="foodCostPercent" max="80" min="10" type="number" value="30"/><span class="tooltiptext" data-i18n="h70">نسبة تكلفة الطعام من سعر الوجبة</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-briefcase"></i> <fg-t data-i18n="h71">عدد الموظفين</fg-t></label><input id="employeesCount" min="1" step="1" type="number" value="6"/><span class="tooltiptext" data-i18n="h72">عدد الموظفين العاملين</span></div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-user-tie"></i> <fg-t data-i18n="h73">متوسط الراتب الشهري</fg-t></label><input id="avgSalary" step="100" type="number" value="2000"/><span class="tooltiptext" data-i18n="h74">متوسط الراتب الشهري للموظف</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-home"></i> <fg-t data-i18n="h75">الإيجار الشهري</fg-t></label><input id="monthlyRent" step="100" type="number" value="4000"/><span class="tooltiptext" data-i18n="h76">الإيجار الشهري للمطعم</span></div>
+<div class="form-group tooltip"><label><i class="fas fa-tools"></i> <fg-t data-i18n="h77">مصاريف تشغيل أخرى</fg-t></label><input id="otherOpCost" step="100" type="number" value="2000"/><span class="tooltiptext" data-i18n="h78">مصاريف شهرية أخرى</span></div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-calendar-alt"></i> <fg-t data-i18n="h79">العمر الإنتاجي للمعدات (سنوات)</fg-t></label><input id="equipmentLife" max="30" min="1" step="1" type="number" value="10"/><span class="tooltiptext" data-i18n="h80">العمر الافتراضي للمعدات</span></div>
+</div>
+<!-- التكاليف التأسيسية -->
+<div class="section-title-sm" data-i18n="h81">💰 التكاليف التأسيسية (مرة واحدة)</div>
+<div class="form-row">
+<div class="form-group tooltip"><label><i class="fas fa-hammer"></i> <fg-t data-i18n="h82">تكلفة الديكور والإنشاءات</fg-t></label><input id="constructionCost" step="1000" type="number" value="50000"/></div>
+<div class="form-group tooltip"><label><i class="fas fa-file-signature"></i> <fg-t data-i18n="h83">التراخيص والرسوم</fg-t></label><input id="licensesCost" step="500" type="number" value="5000"/></div>
+<div class="form-group tooltip"><label><i class="fas fa-hand-holding-usd"></i> <fg-t data-i18n="h84">رأس المال العامل (3 أشهر)</fg-t></label><input id="workingCapital" step="1000" type="number" value="15000"/></div>
+</div>
+<button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h85">احسب الدراسة الفنية</fg-t></button>
+<!-- النتائج -->
+<div class="results-section" id="resultsSection" style="display: none;">
+<div class="results-cards" id="kpiCards"></div>
+<div class="alert" id="warnings" style="display:none;"></div>
+<div class="section-title-sm" data-i18n="h86">📊 تحليل الأداء المالي</div>
+<div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+<div style="flex: 1; min-width: 280px;"><div class="chart-container"><canvas id="financeChart"></canvas></div></div>
+<div style="flex: 1; min-width: 280px;"><div class="chart-container"><canvas id="riskChart"></canvas></div></div>
+</div>
+<div class="result-card" id="projectRatingCard" style="background:var(--bg-card);"></div>
+<div class="export-container">
+<button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> <fg-t data-i18n="h87">تصدير تقرير Word</fg-t></button>
+<button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> <fg-t data-i18n="h88">تصدير إلى Excel</fg-t></button>
+</div>
+</div>
+<div id="initialMessage" style="margin-top:1rem; color:var(--text-muted); text-align:center;">
+<i class="fas fa-robot" style="color: var(--accent-soft);"></i> <fg-t data-i18n="h89">سيتم عرض النتائج بعد الضغط على زر الحساب</fg-t>
+        </div>
+</div>
+</section>
+<footer class="footer-simple"><fg-t data-i18n="h90">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span></footer>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h91">حاسبة</fg-t></button>
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h92">الرئيسية</fg-t></a>
+<!-- Modal -->
+<div class="modal" id="calculatorModal">
+<div class="modal-content">
+<div class="modal-header"><span class="close" id="modalClose">×</span><h2><i class="fas fa-calculator" style="color:#cfa776;"></i> <fg-t data-i18n="h93">آلة حاسبة</fg-t></h2></div>
+<div class="modal-body">
+<input class="calc-display" id="calcDisplay" readonly="" type="text"/>
+<div class="calc-buttons">
+<button class="calc-btn" data-val="9">9</button><button class="calc-btn" data-val="8">8</button><button class="calc-btn" data-val="7">7</button><button class="calc-btn operator" data-val="/">÷</button>
+<button class="calc-btn" data-val="6">6</button><button class="calc-btn" data-val="5">5</button><button class="calc-btn" data-val="4">4</button><button class="calc-btn operator" data-val="*">×</button>
+<button class="calc-btn" data-val="3">3</button><button class="calc-btn" data-val="2">2</button><button class="calc-btn" data-val="1">1</button><button class="calc-btn operator" data-val="-">-</button>
+<button class="calc-btn" data-val="C">C</button><button class="calc-btn" data-val="0">0</button><button class="calc-btn" data-val=".">.</button><button class="calc-btn operator" data-val="+">+</button>
+<button class="calc-btn" data-val="⌫">⌫</button><button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+</div>
+</div>
+</div>
+</div>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">مقياس تقييم الإداري | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool21" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+&gt;
+</head>
+<body>
+<!-- خلفية ثابتة -->
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+<div class="export-loading-box">
+<i class="fas fa-spinner"></i>
+<h3 data-i18n="h2" id="loadingTitle">جاري إنشاء التقرير...</h3>
+<p data-i18n="h3" id="loadingMsg">يرجى الانتظار</p>
+</div>
+</div>
+<!-- HERO -->
+<section class="hero-mini">
+<h2 data-i18n="h4">📋 مقياس تقييم الإداري</h2>
+<p data-i18n="h5">تقييم القيادة والاحتفاظ بالموظفين – مع توصيات تطويرية ذكية</p>
+</section>
+<!-- WRAPPER -->
+<section class="calc-wrapper">
+<div class="calc-box">
+<div class="featured-badge"><i class="fas fa-user-tie"></i><span data-i18n="h6">قيادة</span></div>
+<h2><i class="fas fa-user-tie" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h7">تقييم ذاتي للقائد</fg-t></h2>
+<!-- شريط التقدم -->
+<div class="progress-area">
+<div class="counter" id="answeredCounter">0 / 26</div>
+<div class="progress-bar-bg"><div class="progress-fill" id="progressFill"></div></div>
+<div class="counter" data-i18n="h8">✨ عقلية الاحتفاظ</div>
+</div>
+<!-- الأسئلة -->
+<div class="questions-grid" id="questionsContainer"></div>
+<!-- أزرار الإجراء -->
+<div class="action-row">
+<button class="result-btn" id="showResultBtn"><i class="fas fa-chart-bar"></i> <fg-t data-i18n="h9">عرض النتيجة والتوصيات</fg-t></button>
+<button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> <fg-t data-i18n="h10">تقرير Word</fg-t></button>
+<button class="export-excel-full-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> <fg-t data-i18n="h11">تصدير Excel</fg-t></button>
+</div>
+<div style="text-align:center;color:#aab7d4;font-size:0.8rem;margin-top:1rem;">
+<i class="fas fa-clipboard-list" style="color:#cfa776;"></i> <fg-t data-i18n="h12">26 عبارة | الحد الأقصى 104 نقطة</fg-t>
+            </div>
+</div>
+</section>
+<footer class="footer-simple">
+        <fg-t data-i18n="h13">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span>
+</footer>
+<!-- زر الرئيسية العائم -->
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h14">الرئيسية</fg-t></a>
+<!-- ====== مودال عرض النتيجة ====== -->
+<div class="modal-overlay" id="resultModal">
+<div class="modal-container">
+<div class="modal-icon">🏆</div>
+<div class="modal-title" data-i18n="h15">نتيجة التقييم</div>
+<div class="total-score" data-i18n="h16" id="modalScore">-- نقطة</div>
+<div class="interpretation" id="modalInterpretation"></div>
+<div class="recommendations-box">
+<h3 data-i18n="h17">📌 التوصيات والتطوير</h3>
+<ul id="recList"></ul>
+</div>
+<button class="modal-btn" data-i18n="h18" id="closeModalBtn">فهمت ذلك ✓</button>
+</div>
+</div>
+<!-- ====== تنبيه ====== -->
+<div class="warning-toast" data-i18n="h19" id="warningToast">⚠️ الرجاء الإجابة على جميع العبارات قبل عرض النتيجة.</div>
+<!-- ====== السكربت ====== -->
+
+</body>
+</html>

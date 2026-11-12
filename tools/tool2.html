@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">حاسبة تكاليف المطاعم الشاملة | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool2" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+</head>
+<body>
+<!-- خلفية ثابتة -->
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+<div class="export-loading-box">
+<i class="fas fa-spinner"></i>
+<h3 data-i18n="h2" id="loadingTitle">جاري إنشاء التقرير...</h3>
+<p data-i18n="h3" id="loadingMsg">يرجى الانتظار</p>
+</div>
+</div>
+<!-- HERO -->
+<section class="hero-mini">
+<h2 data-i18n="h4">حاسبة تكاليف المطاعم الشاملة</h2>
+<p data-i18n="h5">تحليل متكامل مع تحليل الموقع، مونت كارلو، مؤشرات الصحة، والقيمة السوقية</p>
+</section>
+<!-- WRAPPER -->
+<section class="calc-wrapper">
+<div class="calc-box">
+<div class="featured-badge"><i class="fas fa-utensils"></i><span data-i18n="h6">مطاعم</span></div>
+<h2><i class="fas fa-utensils" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h7">تحليل تكاليف المطعم</fg-t></h2>
+<!-- العملة واسم الجهة -->
+<div class="currency-row">
+<label><i class="fas fa-coins"></i> <fg-t data-i18n="h8">العملة:</fg-t></label>
+<select id="currencySelect">
+<option data-i18n="h9" selected="" value="$">دولار ($)</option>
+<option data-i18n="h10" value="€">يورو (€)</option>
+<option data-i18n="h11" value="₺">ليرة تركية (₺)</option>
+<option data-i18n="h12" value="ج.م">جنيه مصري (ج.م)</option>
+<option data-i18n="h13" value="د.ك">دينار كويتي (د.ك)</option>
+<option data-i18n="h14" value="ر.س">ريال سعودي (ر.س)</option>
+</select>
+<label><i class="fas fa-building"></i> <fg-t data-i18n="h15">اسم الجهة:</fg-t></label>
+<input data-i18n-attr="placeholder:h16;value:h17" id="companyName" placeholder="الجهة المستفيدة" type="text" value="اسم الجهة المستفيدة من التقرير"/>
+</div>
+<!-- معلومات أساسية -->
+<div class="section-title-sm"><i class="fas fa-database"></i> <fg-t data-i18n="h18">معلومات أساسية</fg-t></div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-users"></i> <fg-t data-i18n="h19">عدد العملاء اليومي</fg-t></label>
+<input id="dailyCustomers" min="0" step="10" type="number" value="50"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-receipt"></i> <fg-t data-i18n="h20">متوسط الفاتورة</fg-t></label>
+<input id="avgBill" min="0" step="1" type="number" value="15"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-calendar"></i> <fg-t data-i18n="h21">أيام العمل</fg-t></label>
+<input id="workingDays" min="1" step="1" type="number" value="26"/>
+</div>
+</div>
+<!-- التكاليف الثابتة -->
+<div class="section-title-sm"><i class="fas fa-building"></i> <fg-t data-i18n="h22">التكاليف الثابتة الشهرية</fg-t></div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-building"></i> <fg-t data-i18n="h23">الإيجار</fg-t></label>
+<input id="rent" min="0" step="100" type="number" value="3500"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-users"></i> <fg-t data-i18n="h24">رواتب (صافي)</fg-t></label>
+<input id="salaries" min="0" step="100" type="number" value="8000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h25">معامل تكلفة الموظف</fg-t></label>
+<input id="employeeBurden" max="200" min="0" step="5" type="number" value="35"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-bolt"></i> <fg-t data-i18n="h26">فواتير</fg-t></label>
+<input id="utilities" min="0" step="100" type="number" value="1000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-wifi"></i> <fg-t data-i18n="h27">إنترنت</fg-t></label>
+<input id="internet" min="0" step="50" type="number" value="200"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-broom"></i> <fg-t data-i18n="h28">صيانة ونظافة</fg-t></label>
+<input id="maintenance" min="0" step="50" type="number" value="300"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-ad"></i> <fg-t data-i18n="h29">تسويق</fg-t></label>
+<input id="marketing" min="0" step="100" type="number" value="500"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-boxes"></i> <fg-t data-i18n="h30">مصاريف أخرى</fg-t></label>
+<input id="otherFixed" min="0" step="50" type="number" value="200"/>
+</div>
+</div>
+<!-- التكاليف المتغيرة -->
+<div class="section-title-sm"><i class="fas fa-percent"></i> <fg-t data-i18n="h31">التكاليف المتغيرة (نسبة من الإيرادات)</fg-t></div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-drumstick-bite"></i> <fg-t data-i18n="h32">تكلفة الطعام %</fg-t></label>
+<input id="foodCostPct" max="100" min="0" step="1" type="number" value="30"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-wine-bottle"></i> <fg-t data-i18n="h33">تكلفة المشروبات %</fg-t></label>
+<input id="drinkCostPct" max="100" min="0" step="1" type="number" value="20"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-box"></i> <fg-t data-i18n="h34">تغليف %</fg-t></label>
+<input id="packagingPct" max="100" min="0" step="1" type="number" value="5"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-motorcycle"></i> <fg-t data-i18n="h35">عمولة التوصيل %</fg-t></label>
+<input id="deliveryPct" max="100" min="0" step="1" type="number" value="15"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h36">مبيعات التوصيل %</fg-t></label>
+<input id="deliverySalesPct" max="100" min="0" step="1" type="number" value="30"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-trash-alt"></i> <fg-t data-i18n="h37">نسبة الهدر %</fg-t></label>
+<input id="wastePct" max="20" min="0" step="0.5" type="number" value="3"/>
+</div>
+</div>
+<!-- ضرائب واستثمار -->
+<div class="section-title-sm"><i class="fas fa-coins"></i> <fg-t data-i18n="h38">ضرائب واستثمار أولي</fg-t></div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h39">ضريبة القيمة المضافة %</fg-t></label>
+<input id="vatPct" max="100" min="0" step="1" type="number" value="20"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-tools"></i> <fg-t data-i18n="h40">الاستثمار الأولي</fg-t></label>
+<input id="initialInvestment" min="0" step="1000" type="number" value="50000"/>
+</div>
+</div>
+<!-- تحليل الموقع -->
+<button class="collapsible" id="locationCollapse" type="button">
+<span><i class="fas fa-map-marker-alt"></i> <fg-t data-i18n="h41">تحليل الموقع</fg-t></span>
+<i class="fas fa-chevron-down"></i>
+</button>
+<div class="collapsible-content" id="locationContent">
+<div class="form-row" style="margin-top:0.5rem;">
+<div class="form-group">
+<label><i class="fas fa-walking"></i> <fg-t data-i18n="h42">حركة المشاة اليومية</fg-t></label>
+<input id="footTraffic" min="0" step="100" type="number" value="2000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h43">نسبة الدخول %</fg-t></label>
+<input id="entryRate" max="100" min="0" step="0.5" type="number" value="5"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h44">نسبة الشراء %</fg-t></label>
+<input id="purchaseRate" max="100" min="0" step="1" type="number" value="70"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-table"></i> <fg-t data-i18n="h45">عدد الطاولات</fg-t></label>
+<input id="tables" min="0" step="1" type="number" value="12"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-chair"></i> <fg-t data-i18n="h46">كراسي لكل طاولة</fg-t></label>
+<input id="seatsPerTable" min="1" step="1" type="number" value="4"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-hourglass-half"></i> <fg-t data-i18n="h47">مدة الجلسة (دق)</fg-t></label>
+<input id="sessionMinutes" min="10" step="5" type="number" value="60"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-clock"></i> <fg-t data-i18n="h48">ساعات العمل اليومية</fg-t></label>
+<input id="hoursOpen" min="1" step="1" type="number" value="14"/>
+</div>
+</div>
+</div>
+<button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h49">احسب التكاليف والأرباح</fg-t></button>
+<!-- النتائج -->
+<div class="results-section" id="resultsSection" style="display:none;">
+<div class="results-cards" id="kpiCards"></div>
+<div class="result-card" id="smartAlerts" style="text-align:right;padding:0.8rem;"></div>
+<div class="section-title-sm"><i class="fas fa-chart-pie"></i> <fg-t data-i18n="h50">تحليل بياني</fg-t></div>
+<div class="charts-container">
+<div class="chart-card">
+<h3 data-i18n="h51">توزيع التكاليف</h3>
+<div class="chart-container"><canvas id="costPieChart"></canvas></div>
+</div>
+<div class="chart-card">
+<h3 data-i18n="h52">نقطة التعادل</h3>
+<div class="chart-container"><canvas id="breakevenChart"></canvas></div>
+</div>
+</div>
+<div class="section-title-sm"><i class="fas fa-list"></i> <fg-t data-i18n="h53">تفصيل التكاليف الشهرية</fg-t></div>
+<div class="table-container" id="costBreakdownTable"></div>
+<div class="section-title-sm"><i class="fas fa-clock"></i> <fg-t data-i18n="h54">فترة استرداد الاستثمار</fg-t></div>
+<div class="result-card" id="paybackCard" style="text-align:center;"></div>
+<div class="section-title-sm"><i class="fas fa-chart-simple"></i> <fg-t data-i18n="h55">تحليل حساسية الربحية</fg-t></div>
+<div class="table-container" id="sensitivityTable"></div>
+<div class="section-title-sm"><i class="fas fa-heartbeat"></i> <fg-t data-i18n="h56">مؤشر صحة المطعم</fg-t></div>
+<div class="result-card" id="healthScoreCard" style="text-align:right;"></div>
+<div class="section-title-sm"><i class="fas fa-tag"></i> <fg-t data-i18n="h57">تقدير القيمة السوقية</fg-t></div>
+<div class="form-row" style="align-items:flex-end;">
+<div class="form-group" style="flex:2;">
+<label><i class="fas fa-times"></i> <fg-t data-i18n="h58">مضاعف القطاع</fg-t></label>
+<input id="valuationMultiple" max="10" min="1" step="0.5" type="number" value="3"/>
+</div>
+<div class="form-group" style="flex:1;min-width:80px;">
+<button class="btn-calculate" id="calcValuationBtn" style="margin:0;padding:0.6rem 1.5rem;font-size:0.9rem;"><i class="fas fa-calculator"></i> <fg-t data-i18n="h59">احسب</fg-t></button>
+</div>
+</div>
+<div class="result-card" id="valuationCard" style="text-align:center;"></div>
+<!-- تحليلات متقدمة -->
+<button class="collapsible" id="advancedCollapse" type="button">
+<span><i class="fas fa-chart-line"></i> <fg-t data-i18n="h60">تحليلات متقدمة</fg-t></span>
+<i class="fas fa-chevron-down"></i>
+</button>
+<div class="collapsible-content" id="advancedContent">
+<div class="section-title-sm" style="margin-top:0.8rem;"><i class="fas fa-dice"></i> <fg-t data-i18n="h61">محاكاة مونت كارلو (1000)</fg-t></div>
+<div class="result-card" id="monteCarloCard" style="text-align:right;">
+<button class="btn-calculate" data-i18n="h62" id="runMonteCarloBtn" style="margin:0 0 0.8rem 0;padding:0.5rem 1.5rem;font-size:0.95rem;width:auto;">تشغيل</button>
+<div id="monteCarloResults"></div>
+</div>
+<div class="section-title-sm"><i class="fas fa-ban"></i> <fg-t data-i18n="h63">نقطة الإغلاق التشغيلي</fg-t></div>
+<div class="result-card" id="shutdownCard" style="text-align:right;"></div>
+<div class="section-title-sm"><i class="fas fa-arrow-up"></i> <fg-t data-i18n="h64">الرافعة التشغيلية</fg-t></div>
+<div class="result-card" id="operatingLeverageCard" style="text-align:right;"></div>
+<div class="section-title-sm"><i class="fas fa-shield-alt"></i> <fg-t data-i18n="h65">هامش الأمان</fg-t></div>
+<div class="result-card" id="marginOfSafetyCard" style="text-align:right;"></div>
+<div class="section-title-sm"><i class="fas fa-maximize"></i> <fg-t data-i18n="h66">الطاقة القصوى والإشغال</fg-t></div>
+<div class="result-card" id="capacityCard" style="text-align:right;"></div>
+<div class="section-title-sm"><i class="fas fa-bolt"></i> <fg-t data-i18n="h67">مؤشرات كفاءة التشغيل</fg-t></div>
+<div class="result-card" id="efficiencyCard" style="text-align:right;"></div>
+</div>
+<div class="export-container">
+<button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> Word</button>
+<button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> Excel</button>
+</div>
+<div class="section-title-sm"><i class="fas fa-bullseye"></i> <fg-t data-i18n="h52">نقطة التعادل</fg-t></div>
+<div class="result-card" id="breakevenSummary" style="text-align:center;"></div>
+</div>
+<div id="initialMessage">
+<i class="fas fa-robot" style="color:#cfa776;"></i> <fg-t data-i18n="h68">سيتم عرض النتائج بعد الضغط على زر الحساب</fg-t>
+            </div>
+</div>
+</section>
+<!-- فوتر -->
+<footer class="footer-simple">
+        <fg-t data-i18n="h69">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span>
+</footer>
+<!-- أزرار عائمة -->
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h70">حاسبة</fg-t></button>
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h71">الرئيسية</fg-t></a>
+<!-- نافذة الآلة الحاسبة -->
+<div class="modal" id="calculatorModal">
+<div class="modal-content">
+<div class="modal-header">
+<span class="close" id="modalClose">×</span>
+<h2><i class="fas fa-calculator" style="color:#cfa776;"></i> <fg-t data-i18n="h72">آلة حاسبة</fg-t></h2>
+</div>
+<div class="modal-body">
+<input class="calc-display" id="calcDisplay" readonly="" type="text"/>
+<div class="calc-buttons">
+<button class="calc-btn" data-val="9">9</button>
+<button class="calc-btn" data-val="8">8</button>
+<button class="calc-btn" data-val="7">7</button>
+<button class="calc-btn operator" data-val="/">÷</button>
+<button class="calc-btn" data-val="6">6</button>
+<button class="calc-btn" data-val="5">5</button>
+<button class="calc-btn" data-val="4">4</button>
+<button class="calc-btn operator" data-val="*">×</button>
+<button class="calc-btn" data-val="3">3</button>
+<button class="calc-btn" data-val="2">2</button>
+<button class="calc-btn" data-val="1">1</button>
+<button class="calc-btn operator" data-val="-">-</button>
+<button class="calc-btn" data-val="C">C</button>
+<button class="calc-btn" data-val="0">0</button>
+<button class="calc-btn" data-val=".">.</button>
+<button class="calc-btn operator" data-val="+">+</button>
+<button class="calc-btn" data-val="⌫">⌫</button>
+<button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+</div>
+</div>
+</div>
+</div>
+
+</body>
+</html>

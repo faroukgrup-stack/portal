@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">أداة توليد المحتوى الذكي | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool24" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+&gt;
+</head>
+<body>
+<!-- خلفية ثابتة -->
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+<div class="export-loading-box">
+<i class="fas fa-spinner"></i>
+<h3 data-i18n="h2" id="loadingTitle">جاري إنشاء التقرير...</h3>
+<p data-i18n="h3" id="loadingMsg">يرجى الانتظار</p>
+</div>
+</div>
+<!-- HERO -->
+<section class="hero-mini">
+<h2 data-i18n="h4">🤖 أداة التحليل وتوليد المحتوى</h2>
+<p data-i18n="h5">أنشئ محتوى احترافي، حلل تقاريرك، واستلهم أفكاراً مبتكرة بلمسة زر واحدة</p>
+</section>
+<!-- WRAPPER -->
+<section class="calc-wrapper">
+<div class="calc-box">
+<div class="featured-badge"><i class="fas fa-magic"></i><span data-i18n="h6">ذكي</span></div>
+<h2><i class="fas fa-magic" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h7">إعدادات التوليد</fg-t></h2>
+<!-- اختيار الخدمة -->
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-cogs"></i> <fg-t data-i18n="h8">نوع الخدمة</fg-t></label>
+<select id="toolService">
+<option data-i18n="h9" value="reportAnalysis">📊 تحليل تقرير</option>
+<option data-i18n="h10" value="weeklyContent">📅 خطة أسبوعية</option>
+<option data-i18n="h11" value="buildContent">🏗️ بناء محتوى كامل</option>
+<option data-i18n="h12" value="askQuestion">❓ الإجابة على سؤال</option>
+</select>
+</div>
+<div class="form-group" id="countRow" style="display:none;">
+<label><i class="fas fa-hashtag"></i> <fg-t data-i18n="h13">العدد</fg-t></label>
+<input id="itemCount" max="30" min="1" type="number" value="7"/>
+</div>
+</div>
+<!-- نص المستخدم -->
+<div class="form-group">
+<label><i class="fas fa-file-alt"></i> <fg-t data-i18n="h14">نص التقرير أو تفاصيل المطلوب</fg-t></label>
+<textarea data-i18n-attr="placeholder:h15" id="userPrompt" placeholder="ألصق هنا النص..."></textarea>
+</div>
+<!-- الأزرار -->
+<button class="btn-calculate" id="generateBtn"><i class="fas fa-magic"></i> <fg-t data-i18n="h16">ابدأ التحليل / التوليد</fg-t></button>
+<button class="btn-calculate btn-cancel" id="cancelBtn"><i class="fas fa-times-circle"></i> <fg-t data-i18n="h17">إلغاء الطلب</fg-t></button>
+<!-- منطقة النتائج -->
+<div class="results-section" id="resultsSection" style="display: none;">
+<div class="results-cards" id="kpiCards"></div>
+<div class="section-title-sm" data-i18n="h18">📄 المحتوى المُنشأ</div>
+<div id="aiOutput"></div>
+<div class="export-container">
+<button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> <fg-t data-i18n="h19">تصدير إلى Word</fg-t></button>
+</div>
+</div>
+<div id="initialMessage" style="margin-top:1rem; color:#aab7d4; text-align:center;">
+<i class="fas fa-robot" style="color:#cfa776;"></i> <fg-t data-i18n="h20">سيتم عرض النتائج بعد الضغط على زر التوليد</fg-t>
+            </div>
+</div>
+</section>
+<footer class="footer-simple">
+        <fg-t data-i18n="h21">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span>
+</footer>
+<!-- زر الرئيسية العائم -->
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h22">الرئيسية</fg-t></a>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">هندسة قوائم الطعام | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool22" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+&gt;
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+<div class="export-loading-box">
+<i class="fas fa-spinner"></i>
+<h3 data-i18n="h2" id="loadingTitle">جاري إنشاء التقرير...</h3>
+<p data-i18n="h3" id="loadingMsg">يرجى الانتظار</p>
+</div>
+</div>
+<section class="hero-mini">
+<h2 data-i18n="h4">🧮 هندسة قوائم الطعام</h2>
+<p data-i18n="h5">تحليل المصفوفة الرباعية (BCG) – الربحية مقابل الشعبية – مع توصيات استراتيجية</p>
+</section>
+<div class="calc-wrapper">
+<div class="calc-box" data-aos="fade-up">
+<div class="featured-badge"><i class="fas fa-utensils"></i><span data-i18n="h6">هندسة</span></div>
+<h2><i class="fas fa-utensils" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h7">إدارة قائمة الطعام</fg-t></h2>
+<!-- العملة واسم الجهة -->
+<div class="currency-row">
+<label><i class="fas fa-coins"></i> <fg-t data-i18n="h8">العملة:</fg-t></label>
+<select id="currencySelect">
+<option data-i18n="h9" selected="" value="$">دولار ($)</option>
+<option data-i18n="h10" value="€">يورو (€)</option>
+<option data-i18n="h11" value="₺">ليرة تركية (₺)</option>
+<option data-i18n="h12" value="ج.م">جنيه مصري (ج.م)</option>
+<option data-i18n="h13" value="د.ك">دينار كويتي (د.ك)</option>
+<option data-i18n="h14" value="ر.س">ريال سعودي (ر.س)</option>
+</select>
+<label><i class="fas fa-building"></i> <fg-t data-i18n="h15">اسم الجهة:</fg-t></label>
+<input data-i18n-attr="placeholder:h16;value:h17" id="companyName" placeholder="الجهة المستفيدة" type="text" value="اسم الجهة المستفيدة من التقرير"/>
+</div>
+<!-- إضافة طبق فردي -->
+<div class="section-title-sm" data-i18n="h18">🍽️ إضافة طبق</div>
+<div class="input-group">
+<div class="field">
+<label><i class="fas fa-tag"></i> <fg-t data-i18n="h19">اسم الطبق</fg-t></label>
+<input data-i18n-attr="placeholder:h20" id="dishName" placeholder="مثال: برجر لحم" type="text"/>
+</div>
+<div class="field">
+<label><i class="fas fa-dollar-sign"></i> <fg-t data-i18n="h21">سعر البيع</fg-t></label>
+<input id="dishPrice" placeholder="25.00" step="0.01" type="number"/>
+</div>
+<div class="field">
+<label><i class="fas fa-coins"></i> <fg-t data-i18n="h22">التكلفة</fg-t></label>
+<input id="dishCost" placeholder="12.50" step="0.01" type="number"/>
+</div>
+<div class="field">
+<label><i class="fas fa-chart-simple"></i> <fg-t data-i18n="h23">عدد المبيعات</fg-t></label>
+<input id="dishUnits" placeholder="150" step="1" type="number"/>
+</div>
+<div class="field" style="flex:0 0 auto;">
+<button class="btn-primary" id="addDishBtn"><i class="fas fa-plus"></i> <fg-t data-i18n="h24">أضف</fg-t></button>
+</div>
+</div>
+<!-- الاستيراد والتفريغ -->
+<div class="import-area">
+<label><i class="fas fa-file-excel"></i> <fg-t data-i18n="h25">استيراد من Excel:</fg-t></label>
+<input accept=".xlsx,.xls" id="excelFileInput" type="file"/>
+<button class="btn-import" id="importExcelBtn"><i class="fas fa-upload"></i> <fg-t data-i18n="h26">استيراد</fg-t></button>
+<a class="btn-import" href="https://docs.google.com/spreadsheets/d/1w-ITXVBgAqehXgd3ZGjOagC3CyDmJnTv/export?format=xlsx" id="importExcelBtn">
+<i class="fas fa-download"></i><fg-t data-i18n="h27">تحميل ملف للتعبئة</fg-t>
+</a>
+<span data-i18n="h28" style="font-size:0.7rem;color:#aab7d4;">(الأعمدة: الاسم، السعر، التكلفة، المبيعات)</span>
+<button class="btn-clear" id="clearDishesBtn"><i class="fas fa-trash-alt"></i> <fg-t data-i18n="h29">تفريغ الكل</fg-t></button>
+</div>
+<!-- جدول الأطباق -->
+<div class="table-container" id="dishesTableContainer" style="display:none;">
+<table>
+<thead><tr><th>#</th><th data-i18n="h30">الطبق</th><th data-i18n="h21">سعر البيع</th><th data-i18n="h22">التكلفة</th><th data-i18n="h31">هامش الربح</th><th data-i18n="h32">المبيعات</th><th></th></tr></thead>
+<tbody id="dishesTableBody"></tbody>
+</table>
+</div>
+<!-- زر التحليل -->
+<div style="margin:1.2rem 0;">
+<button class="btn-primary" id="analyzeBtn" style="width:100%;justify-content:center;padding:0.9rem;"><i class="fas fa-chart-pie"></i> <fg-t data-i18n="h33">تحليل القائمة واستخراج التوصيات</fg-t></button>
+</div>
+<!-- النتائج -->
+<div id="resultsArea" style="display:none;">
+<div class="section-title-sm" data-i18n="h34">📊 ملخص التحليل (مصفوفة BCG)</div>
+<div class="summary-cards" id="summaryCards"></div>
+<div class="section-title-sm" data-i18n="h35">📈 مصفوفة الربحية والشعبية</div>
+<div class="chart-container"><canvas id="menuChart"></canvas></div>
+<div class="section-title-sm" data-i18n="h36">📋 تقرير التوصيات لكل طبق</div>
+<div class="table-container" id="recommendationsTable"></div>
+<div class="export-container">
+<button class="btn-export word" id="exportWordBtn"><i class="fas fa-file-word"></i> Word</button>
+<button class="btn-export excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> <fg-t data-i18n="h37">Excel شامل</fg-t></button>
+</div>
+</div>
+<div id="initialMessage" style="margin-top:0.5rem;color:#aab7d4;text-align:center;font-size:0.9rem;">
+<i class="fas fa-robot" style="color:#cfa776;"></i> <fg-t data-i18n="h38">أضف الأطباق ثم اضغط "تحليل القائمة" لعرض النتائج</fg-t>
+        </div>
+</div>
+</div>
+<footer class="footer-simple"><fg-t data-i18n="h39">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span></footer>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h40">حاسبة</fg-t></button>
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h41">الرئيسية</fg-t></a>
+<!-- نافذة الآلة الحاسبة -->
+<div class="modal" id="calculatorModal">
+<div class="modal-content">
+<div class="modal-header">
+<span class="close" id="modalClose">×</span>
+<h2><i class="fas fa-calculator" style="color:#cfa776;"></i> <fg-t data-i18n="h42">آلة حاسبة</fg-t></h2>
+</div>
+<div class="modal-body">
+<input class="calc-display" id="calcDisplay" readonly="" type="text"/>
+<div class="calc-buttons">
+<button class="calc-btn" data-val="9">9</button>
+<button class="calc-btn" data-val="8">8</button>
+<button class="calc-btn" data-val="7">7</button>
+<button class="calc-btn operator" data-val="/">÷</button>
+<button class="calc-btn" data-val="6">6</button>
+<button class="calc-btn" data-val="5">5</button>
+<button class="calc-btn" data-val="4">4</button>
+<button class="calc-btn operator" data-val="*">×</button>
+<button class="calc-btn" data-val="3">3</button>
+<button class="calc-btn" data-val="2">2</button>
+<button class="calc-btn" data-val="1">1</button>
+<button class="calc-btn operator" data-val="-">-</button>
+<button class="calc-btn" data-val="C">C</button>
+<button class="calc-btn" data-val="0">0</button>
+<button class="calc-btn" data-val=".">.</button>
+<button class="calc-btn operator" data-val="+">+</button>
+<button class="calc-btn" data-val="⌫">⌫</button>
+<button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+</div>
+</div>
+</div>
+</div>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+</body>
+</html>

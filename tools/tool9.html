@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">حاسبة الإهلاك المتقدمة | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool9" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+</head>
+<body>
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+<div class="export-loading-box">
+<i class="fas fa-spinner"></i>
+<h3 data-i18n="h2" id="loadingTitle">جاري إنشاء التقرير...</h3>
+<p data-i18n="h3" id="loadingMsg">يرجى الانتظار</p>
+</div>
+</div>
+<section class="hero-mini">
+<h2 data-i18n="h4">حاسبة الإهلاك المتقدمة</h2>
+<p data-i18n="h5">طرق متعددة، رسم بياني، ومؤشرات مالية احترافية مع إمكانية تحديد شهر الشراء</p>
+</section>
+<div class="calc-wrapper">
+<div class="calc-box" data-aos="fade-up">
+<div class="featured-badge"><i class="fas fa-chart-line"></i><span data-i18n="h6">إهلاك</span></div>
+<h2><i class="fas fa-chart-line" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h7">بيانات الأصل</fg-t></h2>
+<!-- العملة واسم الجهة -->
+<div class="currency-row">
+<label><i class="fas fa-coins"></i> <fg-t data-i18n="h8">العملة:</fg-t></label>
+<select id="currencySelect">
+<option data-i18n="h9" selected="" value="$">دولار ($)</option>
+<option data-i18n="h10" value="€">يورو (€)</option>
+<option data-i18n="h11" value="₺">ليرة تركية (₺)</option>
+<option data-i18n="h12" value="ج.م">جنيه مصري (ج.م)</option>
+<option data-i18n="h13" value="د.ك">دينار كويتي (د.ك)</option>
+<option data-i18n="h14" value="ر.س">ريال سعودي (ر.س)</option>
+</select>
+<label><i class="fas fa-building"></i> <fg-t data-i18n="h15">اسم الجهة:</fg-t></label>
+<input data-i18n-attr="placeholder:h16;value:h17" id="companyName" placeholder="الجهة المستفيدة" type="text" value="اسم الجهة المستفيدة من التقرير"/>
+</div>
+<!-- بيانات الأصل -->
+<div class="form-row">
+<div class="form-group tooltip">
+<label><i class="fas fa-dollar-sign"></i> <fg-t data-i18n="h18">تكلفة الأصل</fg-t></label>
+<input id="assetCost" step="1000" type="number" value="100000"/>
+<span class="tooltiptext" data-i18n="h19">التكلفة الإجمالية لشراء الأصل.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-trash-alt"></i> <fg-t data-i18n="h20">قيمة الإنقاذ (الخردة)</fg-t></label>
+<input id="salvageValue" step="1000" type="number" value="10000"/>
+<span class="tooltiptext" data-i18n="h21">القيمة المتوقعة للأصل في نهاية عمره الإنتاجي.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-calendar-alt"></i> <fg-t data-i18n="h22">العمر الإنتاجي (سنوات)</fg-t></label>
+<input id="usefulLife" max="30" min="1" type="number" value="5"/>
+<span class="tooltiptext" data-i18n="h23">عدد السنوات التي سيتم فيها استهلاك الأصل.</span>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip">
+<label><i class="fas fa-tachometer-alt"></i> <fg-t data-i18n="h24">طريقة الإهلاك</fg-t></label>
+<select id="depMethod">
+<option data-i18n="h25" value="straight">القسط الثابت (Straight Line)</option>
+<option data-i18n="h26" value="declining">القسط المتناقص (Declining Balance - 1/Life)</option>
+<option data-i18n="h27" value="double">مضاعف الرصيد (Double Declining - 2/Life)</option>
+<option data-i18n="h28" value="custom">نسبة مخصصة (Custom Rate)</option>
+</select>
+<span class="tooltiptext" data-i18n="h29">اختر الطريقة المناسبة لحساب الإهلاك.</span>
+</div>
+<div class="form-group tooltip" id="rateGroup" style="display: none;">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h30">نسبة الإهلاك السنوية (%)</fg-t></label>
+<input id="customRate" max="200" min="1" step="1" type="number" value="20"/>
+<span class="tooltiptext" data-i18n="h31">أدخل النسبة المئوية السنوية (لطريقة النسبة المخصصة فقط).</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-calendar-plus"></i> <fg-t data-i18n="h32">شهر الشراء</fg-t></label>
+<select id="purchaseMonth">
+<option data-i18n="h33" value="1">يناير</option>
+<option data-i18n="h34" value="2">فبراير</option>
+<option data-i18n="h35" value="3">مارس</option>
+<option data-i18n="h36" value="4">أبريل</option>
+<option data-i18n="h37" value="5">مايو</option>
+<option data-i18n="h38" value="6">يونيو</option>
+<option data-i18n="h39" value="7">يوليو</option>
+<option data-i18n="h40" value="8">أغسطس</option>
+<option data-i18n="h41" value="9">سبتمبر</option>
+<option data-i18n="h42" value="10">أكتوبر</option>
+<option data-i18n="h43" value="11">نوفمبر</option>
+<option data-i18n="h44" value="12">ديسمبر</option>
+</select>
+<span class="tooltiptext" data-i18n="h45">اختر الشهر الذي تم فيه شراء الأصل لحساب إهلاك السنة الأولى بشكل جزئي.</span>
+</div>
+</div>
+<button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h46">احسب الإهلاك</fg-t></button>
+<!-- النتائج -->
+<div class="results-section" id="resultsSection" style="display:none;">
+<div class="results-cards" id="kpiCards"></div>
+<div class="section-title-sm" data-i18n="h47">📉 القيمة الدفترية عبر الزمن</div>
+<div class="chart-container"><canvas id="bookValueChart"></canvas></div>
+<div class="section-title-sm" data-i18n="h48">📋 جدول الإهلاك السنوي</div>
+<div class="table-container" id="depTable"></div>
+<div class="export-container">
+<button class="export-btn excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> <fg-t data-i18n="h49">تصدير Excel شامل</fg-t></button>
+<button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> <fg-t data-i18n="h50">تصدير Word</fg-t></button>
+</div>
+</div>
+<div id="initialMessage" style="margin-top:1rem;color:var(--text-muted);text-align:center;">
+<i class="fas fa-robot" style="color:var(--accent-soft)"></i> <fg-t data-i18n="h51">سيتم عرض النتائج بعد الضغط على زر الحساب</fg-t>
+        </div>
+</div>
+</div>
+<footer class="footer-simple"><fg-t data-i18n="h52">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span></footer>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h53">حاسبة</fg-t></button>
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h54">الرئيسية</fg-t></a>
+<!-- نافذة الآلة الحاسبة -->
+<div class="modal" id="calculatorModal">
+<div class="modal-content">
+<div class="modal-header">
+<span class="close" id="modalClose">×</span>
+<h2><i class="fas fa-calculator" style="color:#cfa776;"></i> <fg-t data-i18n="h55">آلة حاسبة</fg-t></h2>
+</div>
+<div class="modal-body">
+<input class="calc-display" id="calcDisplay" readonly="" type="text"/>
+<div class="calc-buttons">
+<button class="calc-btn" data-val="9">9</button>
+<button class="calc-btn" data-val="8">8</button>
+<button class="calc-btn" data-val="7">7</button>
+<button class="calc-btn operator" data-val="/">÷</button>
+<button class="calc-btn" data-val="6">6</button>
+<button class="calc-btn" data-val="5">5</button>
+<button class="calc-btn" data-val="4">4</button>
+<button class="calc-btn operator" data-val="*">×</button>
+<button class="calc-btn" data-val="3">3</button>
+<button class="calc-btn" data-val="2">2</button>
+<button class="calc-btn" data-val="1">1</button>
+<button class="calc-btn operator" data-val="-">-</button>
+<button class="calc-btn" data-val="C">C</button>
+<button class="calc-btn" data-val="0">0</button>
+<button class="calc-btn" data-val=".">.</button>
+<button class="calc-btn operator" data-val="+">+</button>
+<button class="calc-btn" data-val="⌫">⌫</button>
+<button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+</div>
+</div>
+</div>
+</div>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+</body>
+</html>

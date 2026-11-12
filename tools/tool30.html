@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">تقييم المطاعم | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool30" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+&gt;
+</head>
+<body>
+<!-- خلفية ثابتة -->
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+<div class="export-loading-box">
+<i class="fas fa-spinner"></i>
+<h3 data-i18n="h2" id="loadingTitle">جاري إنشاء التقرير...</h3>
+<p data-i18n="h3" id="loadingMsg">يرجى الانتظار</p>
+</div>
+</div>
+<!-- HERO -->
+<section class="hero-mini">
+<h2 data-i18n="h4">🍽️ حاسبة تقييم المطاعم</h2>
+<p data-i18n="h5">قيمة عادلة مبنية على الأرباح والديون – مع تحليل الحساسية وعوامل الخطر</p>
+</section>
+<!-- WRAPPER -->
+<section class="calc-wrapper">
+<div class="calc-box">
+<div class="featured-badge"><i class="fas fa-store"></i><span data-i18n="h6">تقييم</span></div>
+<h2><i class="fas fa-store" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h7">تقييم المطاعم</fg-t></h2>
+<!-- العملة واسم المطعم -->
+<div class="currency-row">
+<label><i class="fas fa-coins"></i> <fg-t data-i18n="h8">العملة:</fg-t></label>
+<select id="currencySelect">
+<option data-i18n="h9" selected="" value="$">دولار ($)</option>
+<option data-i18n="h10" value="€">يورو (€)</option>
+<option data-i18n="h11" value="₺">ليرة تركية (₺)</option>
+<option data-i18n="h12" value="ج.م">جنيه مصري (ج.م)</option>
+<option data-i18n="h13" value="د.ك">دينار كويتي (د.ك)</option>
+<option data-i18n="h14" value="ر.س">ريال سعودي (ر.س)</option>
+</select>
+<label><i class="fas fa-store"></i> <fg-t data-i18n="h15">اسم المطعم:</fg-t></label>
+<input data-i18n-attr="placeholder:h16;value:h17" id="restaurantName" placeholder="اسم المطعم" type="text" value="مطعم النخبة"/>
+</div>
+<!-- بيانات المطعم الأساسية -->
+<div class="section-title-sm" data-i18n="h18">📋 بيانات المطعم الأساسية</div>
+<div class="form-row">
+<div class="form-group tooltip">
+<label><i class="fas fa-calendar-alt"></i> <fg-t data-i18n="h19">سنة التأسيس</fg-t></label>
+<input id="estYear" max="2026" min="1990" type="number" value="2018"/>
+<span class="tooltiptext" data-i18n="h20">السنة التي بدأ فيها المطعم نشاطه التجاري.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-file-contract"></i> <fg-t data-i18n="h21">سنة انتهاء عقد الإيجار</fg-t></label>
+<input id="leaseExpiry" max="2050" min="2025" type="number" value="2029"/>
+<span class="tooltiptext" data-i18n="h22">إذا كان متبقي على العقد أقل من 3 سنوات، يتم تخفيض المضاعف تلقائياً.</span>
+</div>
+</div>
+<!-- البيانات المالية -->
+<div class="section-title-sm" data-i18n="h23">💰 البيانات المالية (سنوية)</div>
+<div class="form-row">
+<div class="form-group tooltip">
+<label><i class="fas fa-receipt"></i> <fg-t data-i18n="h24">إجمالي الإيرادات</fg-t></label>
+<input id="revenue" step="1000" type="number" value="500000"/>
+<span class="tooltiptext" data-i18n="h25">إجمالي مبيعات المطعم السنوية.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-shopping-cart"></i> <fg-t data-i18n="h26">تكلفة البضاعة المباعة (COGS)</fg-t></label>
+<input id="cogs" step="1000" type="number" value="200000"/>
+<span class="tooltiptext" data-i18n="h27">تكلفة المواد الخام والمكونات.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-tools"></i> <fg-t data-i18n="h28">المصاريف التشغيلية (OPEX)</fg-t></label>
+<input id="opex" step="1000" type="number" value="150000"/>
+<span class="tooltiptext" data-i18n="h29">الإيجار، الرواتب، الكهرباء، التسويق، إلخ.</span>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip">
+<label><i class="fas fa-chart-line"></i> <fg-t data-i18n="h30">الإهلاك والاستهلاك (D&amp;A)</fg-t></label>
+<input id="depreciation" step="1000" type="number" value="20000"/>
+<span class="tooltiptext" data-i18n="h31">التناقص السنوي في قيمة الأصول.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-hand-holding-usd"></i> <fg-t data-i18n="h32">الفوائد المدفوعة</fg-t></label>
+<input id="interest" step="1000" type="number" value="10000"/>
+<span class="tooltiptext" data-i18n="h33">الفوائد السنوية على القروض.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-file-invoice-dollar"></i> <fg-t data-i18n="h34">الضرائب المدفوعة</fg-t></label>
+<input id="taxes" step="1000" type="number" value="15000"/>
+<span class="tooltiptext" data-i18n="h35">إجمالي الضرائب السنوية.</span>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip">
+<label><i class="fas fa-university"></i> <fg-t data-i18n="h36">إجمالي الديون القائمة</fg-t></label>
+<input id="totalDebt" step="1000" type="number" value="200000"/>
+<span class="tooltiptext" data-i18n="h37">المبلغ المتبقي من القروض.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-couch"></i> <fg-t data-i18n="h38">القيمة السوقية للمعدات والأثاث</fg-t></label>
+<input id="assetValue" step="1000" type="number" value="80000"/>
+<span class="tooltiptext" data-i18n="h39">القيمة التقديرية لو بيعت المعدات اليوم.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-sliders-h"></i> <fg-t data-i18n="h40">مضاعف السوق (2 - 4)</fg-t></label>
+<input id="multiplier" max="4" min="2" step="0.1" type="number" value="3"/>
+<span class="tooltiptext" data-i18n="h41">يعكس قوة العلامة التجارية ونمو الأرباح.</span>
+</div>
+</div>
+<!-- ضخ رأس مال -->
+<div class="capital-injection">
+<h3><i class="fas fa-money-bill-wave"></i> <fg-t data-i18n="h42">سيناريو ضخ رأس مال إضافي</fg-t></h3>
+<div class="form-row">
+<div class="form-group" style="flex:0 0 auto;">
+<label><input id="capitalInjectionEnabled" style="width:auto; margin-left:0.5rem;" type="checkbox"/> <fg-t data-i18n="h43">تفعيل الضخ</fg-t></label>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-coins"></i> <fg-t data-i18n="h44">قيمة الضخ</fg-t></label>
+<input disabled="" id="injectionAmount" step="1000" type="number" value="50000"/>
+<span class="tooltiptext" data-i18n="h45">المبلغ الإضافي المستثمر.</span>
+</div>
+<div class="form-group tooltip">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h46">العائد المتوقع (%)</fg-t></label>
+<input disabled="" id="injectionROI" step="0.5" type="number" value="20"/>
+<span class="tooltiptext" data-i18n="h47">العائد السنوي المتوقع من الضخ.</span>
+</div>
+</div>
+</div>
+<!-- حصة المستثمر -->
+<div class="section-title-sm" data-i18n="h48">👤 حصتك في المطعم</div>
+<div class="form-row">
+<div class="form-group tooltip" style="flex: 1 1 200px;">
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h49">نسبة الملكية (%)</fg-t></label>
+<input id="ownershipPercent" max="100" min="1" step="0.1" type="number" value="50"/>
+<span class="tooltiptext" data-i18n="h50">النسبة التي تملكها من المطعم.</span>
+</div>
+</div>
+<button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h51">احسب التقييم</fg-t></button>
+<!-- منطقة النتائج -->
+<div class="results-section" id="resultsSection" style="display: none;">
+<div class="results-cards" id="kpiCards"></div>
+<div class="warning-note" id="leaseWarning" style="display:none;"></div>
+<div class="result-card" id="efficiencyCard" style="text-align:right; padding:1.2rem; margin-bottom:1.5rem;"></div>
+<div class="section-title-sm" data-i18n="h52">📈 تحليل الحساسية (تأثير المضاعف على القيمة العادلة)</div>
+<div class="table-container" id="sensitivityTable"></div>
+<div class="export-container">
+<button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> <fg-t data-i18n="h53">تصدير تقرير كامل (Word)</fg-t></button>
+<button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> <fg-t data-i18n="h54">تصدير إلى Excel شامل</fg-t></button>
+</div>
+</div>
+<div id="initialMessage" style="margin-top:1rem; color:#aab7d4; text-align:center;">
+<i class="fas fa-robot" style="color:#cfa776;"></i> <fg-t data-i18n="h55">أدخل البيانات واضغط على زر الحساب</fg-t>
+            </div>
+</div>
+</section>
+<footer class="footer-simple">
+        <fg-t data-i18n="h56">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span>
+</footer>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h57">حاسبة</fg-t></button>
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h58">الرئيسية</fg-t></a>
+<div class="modal" id="calculatorModal">
+<div class="modal-content">
+<div class="modal-header">
+<span class="close" id="modalClose">×</span>
+<h2><i class="fas fa-calculator" style="color:#cfa776;"></i> <fg-t data-i18n="h59">آلة حاسبة</fg-t></h2>
+</div>
+<div class="modal-body">
+<input class="calc-display" id="calcDisplay" readonly="" type="text"/>
+<div class="calc-buttons">
+<button class="calc-btn" data-val="9">9</button>
+<button class="calc-btn" data-val="8">8</button>
+<button class="calc-btn" data-val="7">7</button>
+<button class="calc-btn operator" data-val="/">÷</button>
+<button class="calc-btn" data-val="6">6</button>
+<button class="calc-btn" data-val="5">5</button>
+<button class="calc-btn" data-val="4">4</button>
+<button class="calc-btn operator" data-val="*">×</button>
+<button class="calc-btn" data-val="3">3</button>
+<button class="calc-btn" data-val="2">2</button>
+<button class="calc-btn" data-val="1">1</button>
+<button class="calc-btn operator" data-val="-">-</button>
+<button class="calc-btn" data-val="C">C</button>
+<button class="calc-btn" data-val="0">0</button>
+<button class="calc-btn" data-val=".">.</button>
+<button class="calc-btn operator" data-val="+">+</button>
+<button class="calc-btn" data-val="⌫">⌫</button>
+<button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+</div>
+</div>
+</div>
+</div>
+
+</body>
+</html>

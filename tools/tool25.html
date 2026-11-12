@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" name="viewport"/>
+<title data-i18n="h1">حاسبة الفجوة النقدية | FAROUK GRUP</title>
+<!-- FAROUK GRUP v7 — Supabase: اللغة/التصميم/الحماية/الترجمة تُدار من fg-boot.js -->
+<meta content="tool25" name="fg-tool"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/fg-config.js"></script>
+<script src="../js/fg-boot.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+&gt;
+</head>
+<body>
+<!-- خلفية ثابتة -->
+<div class="glow-bg"><span></span><span></span><span></span></div>
+<!-- شاشة تحميل التصدير -->
+<div class="export-loading" id="exportLoading">
+<div class="export-loading-box">
+<i class="fas fa-spinner"></i>
+<h3 data-i18n="h2" id="loadingTitle">جاري إنشاء التقرير...</h3>
+<p data-i18n="h3" id="loadingMsg">يرجى الانتظار</p>
+</div>
+</div>
+<!-- HERO -->
+<section class="hero-mini">
+<h2 data-i18n="h4">💵 حاسبة الفجوة النقدية (CCC)</h2>
+<p data-i18n="h5">تحليل دورة التحويل النقدي من الميزانية العمومية وقائمة الدخل</p>
+</section>
+<!-- WRAPPER -->
+<section class="calc-wrapper">
+<div class="calc-box">
+<div class="featured-badge"><i class="fas fa-money-bill-wave"></i><span data-i18n="h6">فجوة</span></div>
+<h2><i class="fas fa-money-bill-wave" style="color:#cfa776;margin-left:0.5rem;"></i><fg-t data-i18n="h7">دورة التحويل النقدي</fg-t></h2>
+<!-- العملة واسم الجهة -->
+<div class="currency-row">
+<label><i class="fas fa-coins"></i> <fg-t data-i18n="h8">العملة:</fg-t></label>
+<select id="currencySelect">
+<option data-i18n="h9" selected="" value="$">دولار ($)</option>
+<option data-i18n="h10" value="€">يورو (€)</option>
+<option data-i18n="h11" value="₺">ليرة تركية (₺)</option>
+<option data-i18n="h12" value="ج.م">جنيه مصري (ج.م)</option>
+<option data-i18n="h13" value="د.ك">دينار كويتي (د.ك)</option>
+<option data-i18n="h14" value="ر.س">ريال سعودي (ر.س)</option>
+</select>
+<label><i class="fas fa-building"></i> <fg-t data-i18n="h15">اسم الجهة:</fg-t></label>
+<input data-i18n-attr="placeholder:h16;value:h17" id="companyName" placeholder="الجهة المستفيدة" type="text" value="الشركة / المنشأة"/>
+<label><i class="fas fa-calendar-alt"></i> <fg-t data-i18n="h18">مدة الفترة:</fg-t></label>
+<select id="periodMonths">
+<option data-i18n="h19" value="3">ربع سنوي (3 أشهر)</option>
+<option data-i18n="h20" value="6">نصف سنوي (6 أشهر)</option>
+<option data-i18n="h21" selected="" value="12">سنوي (12 شهر)</option>
+</select>
+</div>
+<!-- بيانات الميزانية العمومية -->
+<div class="section-title-sm" data-i18n="h22">📊 بيانات الميزانية العمومية (بداية ونهاية الفترة)</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-boxes"></i> <fg-t data-i18n="h23">مخزون أول المدة</fg-t></label>
+<input id="invStart" step="1000" type="number" value="220000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-boxes"></i> <fg-t data-i18n="h24">مخزون آخر المدة</fg-t></label>
+<input id="invEnd" step="1000" type="number" value="280000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-users"></i> <fg-t data-i18n="h25">حسابات مدينة أول المدة</fg-t></label>
+<input id="arStart" step="1000" type="number" value="150000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-users"></i> <fg-t data-i18n="h26">حسابات مدينة آخر المدة</fg-t></label>
+<input id="arEnd" step="1000" type="number" value="210000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-hand-holding-usd"></i> <fg-t data-i18n="h27">حسابات دائنة أول المدة</fg-t></label>
+<input id="apStart" step="1000" type="number" value="100000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-hand-holding-usd"></i> <fg-t data-i18n="h28">حسابات دائنة آخر المدة</fg-t></label>
+<input id="apEnd" step="1000" type="number" value="140000"/>
+</div>
+</div>
+<!-- بيانات قائمة الدخل -->
+<div class="section-title-sm" data-i18n="h29">📈 بيانات قائمة الدخل (خلال الفترة)</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-file-invoice"></i> <fg-t data-i18n="h30">تكلفة البضائع المباعة (COGS)</fg-t></label>
+<input id="cogs" step="1000" type="number" value="1200000"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-chart-line"></i> <fg-t data-i18n="h31">صافي المبيعات الائتمانية</fg-t></label>
+<input id="creditSales" step="1000" type="number" value="1500000"/>
+</div>
+</div>
+<button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h32">احسب الفجوة النقدية</fg-t></button>
+<!-- منطقة النتائج -->
+<div class="results-section" id="resultsSection" style="display: none;">
+<div class="results-cards" id="kpiCards"></div>
+<div class="section-title-sm" data-i18n="h33">📊 الرسوم البيانية</div>
+<div class="charts-container">
+<div class="chart-card"><h3 data-i18n="h34">مكونات الفجوة النقدية</h3><div class="chart-container"><canvas id="cccChart"></canvas></div></div>
+<div class="chart-card"><h3 data-i18n="h35">توزيع المكونات</h3><div class="chart-container"><canvas id="componentsChart"></canvas></div></div>
+</div>
+<div class="section-title-sm" data-i18n="h36">📋 تفاصيل الحساب</div>
+<div class="recommendation-box" id="calculationDetails"></div>
+<div class="section-title-sm" data-i18n="h37">💡 التوصيات والتحليل</div>
+<div class="recommendation-box" id="recommendations"></div>
+<div class="export-container">
+<button class="export-word-btn" id="exportWordBtn"><i class="fas fa-file-word"></i> <fg-t data-i18n="h38">تصدير تقرير كامل (Word)</fg-t></button>
+<button class="export-excel-full-btn" id="exportFullExcelBtn"><i class="fas fa-file-excel"></i> <fg-t data-i18n="h39">تصدير إلى Excel شامل</fg-t></button>
+</div>
+</div>
+<div id="initialMessage" style="margin-top:1rem; color:#aab7d4; text-align:center;">
+<i class="fas fa-robot" style="color:#cfa776;"></i> <fg-t data-i18n="h40">سيتم عرض النتائج بعد الضغط على زر الحساب</fg-t>
+            </div>
+</div>
+</section>
+<footer class="footer-simple">
+        <fg-t data-i18n="h41">جميع الحقوق محفوظة © 2026</fg-t> <span>FAROUK GRUP</span>
+</footer>
+<button class="calc-floating-btn" id="calculatorBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h42">حاسبة</fg-t></button>
+<a class="home-floating-btn" href="../index.html"><i class="fas fa-home"></i> <fg-t data-i18n="h43">الرئيسية</fg-t></a>
+<div class="modal" id="calculatorModal">
+<div class="modal-content">
+<div class="modal-header">
+<span class="close" id="modalClose">×</span>
+<h2><i class="fas fa-calculator" style="color:#cfa776;"></i> <fg-t data-i18n="h44">آلة حاسبة</fg-t></h2>
+</div>
+<div class="modal-body">
+<input class="calc-display" id="calcDisplay" readonly="" type="text"/>
+<div class="calc-buttons">
+<button class="calc-btn" data-val="9">9</button>
+<button class="calc-btn" data-val="8">8</button>
+<button class="calc-btn" data-val="7">7</button>
+<button class="calc-btn operator" data-val="/">÷</button>
+<button class="calc-btn" data-val="6">6</button>
+<button class="calc-btn" data-val="5">5</button>
+<button class="calc-btn" data-val="4">4</button>
+<button class="calc-btn operator" data-val="*">×</button>
+<button class="calc-btn" data-val="3">3</button>
+<button class="calc-btn" data-val="2">2</button>
+<button class="calc-btn" data-val="1">1</button>
+<button class="calc-btn operator" data-val="-">-</button>
+<button class="calc-btn" data-val="C">C</button>
+<button class="calc-btn" data-val="0">0</button>
+<button class="calc-btn" data-val=".">.</button>
+<button class="calc-btn operator" data-val="+">+</button>
+<button class="calc-btn" data-val="⌫">⌫</button>
+<button class="calc-btn equals" data-val="=" style="grid-column:span 3;">=</button>
+</div>
+</div>
+</div>
+</div>
+
+</body>
+</html>
