@@ -9,7 +9,7 @@
  */
 window.FG_CONFIG = {
     SUPABASE_URL: "https://ljysoujfhrcolncyhyfd.supabase.co",
-    SUPABASE_ANON_KEY: "ضع-هنا-المفتاح-العام-sb_publishable",
+    SUPABASE_ANON_KEY: "sb_publishable_EFcCy6PQY7KwyH39yYWTJw_l0Z6-jRp",
 
     DEFAULT_LANG: "ar",              // العربية هي اللغة الأساسية
     LANGS: ["ar", "en", "tr"],       // لغات احتياطية فقط، فالقائمة الفعلية تُقرأ من جدول languages
