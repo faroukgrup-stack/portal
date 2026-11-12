@@ -1,0 +1,131 @@
+/* مكونات خاصة بالأداة tool15tr */
+
+
+:root {
+    /* ═══ لوحة الألوان الموحدة — عدّل هنا لتغيير هوية المنصة كاملة ═══ */
+    --gold: #cfa776;
+    --gold-deep: #b48554;
+    --gold-bright: #d4b15a;
+    --bg: #0b0e17;
+    --bg-2: #121824;
+    --text: #f0f4fa;
+    --text-muted: #b8c5dc;   /* مفتّح عن السابق لتحسين تباين النصوص الصغيرة */
+    --danger: #dc3545;
+    --danger-soft: #f87171;
+    --success: #28a745;
+    --warning: #ffc107;
+    /* ═══ مقياس الانحناء الموحد (4 قيم فقط) ═══ */
+    --radius-xs: 4px;
+    --radius-sm: 10px;
+    --radius-md: 20px;
+    --radius-lg: 30px;
+    --radius-xl: 40px;
+}
+
+.sop-card, .result-card, .container, .checklist-section,
+        .checklist-item, .item-row, .btn-primary, .btn-secondary,
+        .btn-export, .currency-row, .calc-floating-btn, .home-floating-btn,
+        .featured-badge, .glow-bg, .floating-shape, .result-area,
+        .info-item input, .signature-item input, .notes-field textarea {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    animation: none !important;
+    transition: none !important;
+}
+.section-title {
+    color: var(--gold);
+    font-weight: 900;
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px dashed rgba(180,133,84,0.1);
+    padding-bottom: 0.4rem;
+}
+.section-title i {
+    color: var(--gold);
+}
+.recommendation-box strong {
+    display: block;
+    margin-bottom: 0.2rem;
+}
+.score {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--gold);
+}
+.evaluation {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+.btn-primary, .btn-secondary {
+    background: rgba(180,133,84,0.15);
+    border: 1px solid rgba(180,133,84,0.2);
+    color: var(--gold);
+    border-radius: var(--radius-xl);
+    padding: 0.8rem 1.8rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'Tajawal', sans-serif;
+    flex: 1 1 auto;
+    justify-content: center;
+}
+.btn-primary:hover, .btn-secondary:hover {
+    background: rgba(180,133,84,0.3);
+    color: #fff;
+    border-color: var(--gold-deep);
+}
+.section-title, .result-card .label, .hero-mini h2 {
+    -webkit-text-fill-color: initial !important;
+    color: var(--gold) !important;
+    background: none !important;
+    background-image: none !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+@media (min-width: 1024px) {
+    .section-title {
+    font-size: 1.4rem;
+}
+}
+@media (min-width: 1024px) {
+    .btn-primary, .btn-secondary {
+    font-size: 1.1rem;
+    padding: 1rem 2.5rem;
+}
+}
+@media (min-width: 1024px) {
+    .score {
+    font-size: 2.5rem;
+}
+}
+@media (max-width: 768px) {
+    .section-title {
+    font-size: 1rem;
+}
+}
+@media (max-width: 768px) {
+    .notes-field, .recommendation-box {
+    margin-right: 0;
+    width: 100%;
+}
+}
+@media (max-width: 768px) {
+    .btn-primary, .btn-secondary {
+    width: 100%;
+    justify-content: center;
+}
+}
+@media (max-width: 768px) {
+    .score {
+    font-size: 1.6rem;
+}
+}
