@@ -86,7 +86,7 @@
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             recalcAverage();
-            form.submit();
+            window.FG_submitSurvey(form);
             setTimeout(() => {
                 form.style.display = 'none';
                 document.querySelector('.header').style.display = 'none';
