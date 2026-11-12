@@ -1,3 +1,8 @@
+/**
+ * js/app.js — البوابة الرئيسية (FAROUK GRUP v7 — Supabase)
+ * المصادقة: Supabase Auth | الاشتراك: RPC my_subscription | النصوص: ui_translations | الأدوات: جدول tools
+ * لا توجد أي معادلة مالية في هذا الملف.
+ */
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
 }
@@ -32,50 +37,6 @@ if ('serviceWorker' in navigator) {
 })();
 // ---- نهاية كود الحماية ----
 
-function applyLanguage(lang) {
-    currentLang = lang;
-    localStorage.setItem('appLanguage', lang);
-    document.documentElement.lang = lang;
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        el.textContent = t(key);
-    });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.getAttribute('data-i18n-placeholder');
-        el.placeholder = t(key);
-    });
-    document.querySelectorAll('#languageSelect option').forEach(opt => {
-        const key = opt.getAttribute('data-i18n');
-        if (key) opt.textContent = t(key);
-    });
-    const savedName = localStorage.getItem('userName') || t('userLabel');
-    const savedDays = localStorage.getItem('daysLeft') || '?';
-    document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')} ${savedDays} ${t('day')})`;
-    const subscribeLink = document.getElementById('subscribeLink');
-    if (subscribeLink) {
-        subscribeLink.href = lang === 'ar' ? 'https://portal.farouk-grup.com/finance-hub' : 'https://portal.farouk-grup.com/finance-huben';
-    }
-    const guideLink = document.getElementById('guideLink');
-    const surveyLink = document.getElementById('surveyLink');
-    if (guideLink) {
-        guideLink.href = lang === 'ar' ? 'guide.html' : (lang === 'tr' ? 'guidetr.html' : 'guideen.html');
-    }
-    if (surveyLink) {
-        surveyLink.href = lang === 'ar' ? 'survey.html' : (lang === 'tr' ? 'surveytr.html' : 'surveyen.html');
-    }
-    renderTools();
-}
-
-const loginLangSelect = document.getElementById('loginLangSelect');
-if (loginLangSelect) {
-    loginLangSelect.value = currentLang;
-    loginLangSelect.addEventListener('change', function () {
-        applyLanguage(this.value);
-        errorMsg.textContent = '';
-    });
-}
-
 const passwordField = document.getElementById('passwordInput');
 const togglePasswordBtn = document.getElementById('togglePasswordBtn');
 const eyeIcon = document.getElementById('eyeIcon');
@@ -86,8 +47,73 @@ togglePasswordBtn.addEventListener('click', function() {
     eyeIcon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
 });
 
-const GOOGLE_SCRIPT_URL = "https://farouk-api-proxy.faroukgrup.workers.dev/";
-const SESSION_DURATION_MS = 24 * 60 * 60 * 1000;
+// ============================================================
+// تبديل اللغة (النصوص من قاعدة البيانات)
+// ============================================================
+function fillLangSelect(sel, withKeys) {
+    if (!sel) return;
+    sel.innerHTML = '';
+    SUPPORTED_LANGS.forEach(function (l) {
+        const o = document.createElement('option');
+        o.value = l.code;
+        o.textContent = l.name;
+        sel.appendChild(o);
+    });
+    sel.value = currentLang;
+}
+
+async function applyLanguage(lang) {
+    if (!SUPPORTED_LANGS.some(l => l.code === lang)) lang = 'ar';
+    await loadPortalDict(lang);
+    currentLang = lang;
+    localStorage.setItem('appLanguage', lang);
+    document.documentElement.lang = lang;
+    document.documentElement.dir = langDir(lang);
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = t(key);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        el.placeholder = t(key);
+    });
+    fillLangSelect(document.getElementById('languageSelect'));
+    fillLangSelect(document.getElementById('loginLangSelect'));
+    updateUserLabel();
+    const subscribeLink = document.getElementById('subscribeLink');
+    if (subscribeLink) {
+        subscribeLink.href = lang === 'ar' ? 'https://portal.farouk-grup.com/finance-hub' : 'https://portal.farouk-grup.com/finance-huben';
+    }
+    const guideLink = document.getElementById('guideLink');
+    const surveyLink = document.getElementById('surveyLink');
+    // الدليل والاستبيان صفحات ثابتة بثلاث لغات؛ أي لغة جديدة تعرض النسخة الإنجليزية
+    if (guideLink) guideLink.href = lang === 'ar' ? 'guide.html' : (lang === 'tr' ? 'guidetr.html' : 'guideen.html');
+    if (surveyLink) surveyLink.href = lang === 'ar' ? 'survey.html' : (lang === 'tr' ? 'surveytr.html' : 'surveyen.html');
+    renderTools();
+    document.documentElement.classList.remove('fg-loading');
+}
+
+function updateUserLabel() {
+    const el = document.getElementById('userNameDisplay');
+    if (!el) return;
+    const savedName = localStorage.getItem('userName') || t('userLabel');
+    const savedDays = localStorage.getItem('daysLeft') || '?';
+    el.textContent = `${savedName} (${t('remaining')} ${savedDays} ${t('day')})`;
+}
+
+const loginLangSelect = document.getElementById('loginLangSelect');
+if (loginLangSelect) {
+    loginLangSelect.addEventListener('change', async function () {
+        await applyLanguage(this.value);
+        errorMsg.textContent = '';
+    });
+}
+
+// ============================================================
+// الجلسة والاشتراك — Supabase Auth + RPC my_subscription
+// ============================================================
+const SESSION_DURATION_MS = 24 * 60 * 60 * 1000;   // إعادة الدخول كل 24 ساعة كما في النسخة السابقة
+const RENEW_URL = 'https://www.entervia.co/checkout/77';
 
 const loginOverlay = document.getElementById('loginOverlay');
 const dashboard = document.getElementById('dashboard');
@@ -109,30 +135,25 @@ function getRemainingSessionTime() {
     const elapsed = Date.now() - parseInt(loginTs);
     return Math.max(0, SESSION_DURATION_MS - elapsed);
 }
+function isSessionExpired() { return getRemainingSessionTime() <= 0; }
 
-function isSessionExpired() {
-    return getRemainingSessionTime() <= 0;
+function clearLocalSession() {
+    ['userName', 'userEmail', 'daysLeft', 'loginTimestamp', 'currentUserEmail', 'fg_sub'].forEach(k => localStorage.removeItem(k));
 }
 
-function forceLogout(reason, isSubscriptionExpired = false) {
+async function forceLogout(reason, isSubscriptionExpired = false) {
     dashboard.classList.remove('show');
-    if (logoutTimer) { clearTimeout(logoutTimer);
-        logoutTimer = null; }
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('daysLeft');
-    localStorage.removeItem('loginTimestamp');
-    localStorage.removeItem('currentUserEmail');
-
+    if (logoutTimer) { clearTimeout(logoutTimer); logoutTimer = null; }
+    clearLocalSession();
+    try { await sb.auth.signOut(); } catch (e) {}
     if (isSubscriptionExpired) {
-        sessionExpiredTitle.textContent = t('sessionExpiredTitle') + ' (⚠️ انتهى الاشتراك)';
-        sessionExpiredMsg.textContent = reason;
+        sessionExpiredTitle.textContent = t('sessionExpiredTitle') + ' (' + t('subExpiredTag') + ')';
         renewLinkBtn.style.display = 'inline-block';
     } else {
         sessionExpiredTitle.textContent = t('sessionExpiredTitle');
-        sessionExpiredMsg.textContent = reason;
         renewLinkBtn.style.display = 'none';
     }
+    sessionExpiredMsg.textContent = reason;
     loginOverlay.classList.remove('show');
     sessionExpiredOverlay.classList.add('show');
 }
@@ -140,13 +161,8 @@ function forceLogout(reason, isSubscriptionExpired = false) {
 function startSessionTimer() {
     if (logoutTimer) clearTimeout(logoutTimer);
     const remaining = getRemainingSessionTime();
-    if (remaining > 0) {
-        logoutTimer = setTimeout(() => {
-            forceLogout(t('sessionExpiredMsg'), false);
-        }, remaining);
-    } else {
-        forceLogout(t('sessionExpiredMsg'), false);
-    }
+    if (remaining > 0) logoutTimer = setTimeout(() => forceLogout(t('sessionExpiredMsg'), false), remaining);
+    else forceLogout(t('sessionExpiredMsg'), false);
 }
 
 function showLoginScreen() {
@@ -157,126 +173,118 @@ function showLoginScreen() {
     usernameInput?.focus();
 }
 
+function showDashboard() {
+    loginOverlay.classList.remove('show');
+    sessionExpiredOverlay.classList.remove('show');
+    dashboard.classList.add('show');
+    updateUserLabel();
+    startSessionTimer();
+    loadAllData();
+}
+
+/** يقرأ الاشتراك من السيرفر ويحفظ الاسم/الأيام المتبقية */
+async function fetchSubscription() {
+    const { data, error } = await sb.rpc('my_subscription');
+    if (error) throw error;
+    if (data && data.status === 'active') {
+        localStorage.setItem('userName', data.full_name || data.email || '');
+        localStorage.setItem('userEmail', data.email || '');
+        localStorage.setItem('currentUserEmail', data.email || '');
+        localStorage.setItem('daysLeft', data.days_left);
+        localStorage.setItem('fg_sub', JSON.stringify({ status: 'active', ts: Date.now() }));
+    }
+    return data || { status: 'none' };
+}
+
+async function signIn(email, pass) {
+    let r = await sb.auth.signInWithPassword({ email, password: pass });
+    if (!r.error) return { ok: true };
+    // ترحيل تلقائي لمستخدمي Google Sheet القدامى عند أول دخول
+    if (r.error.status === 400 || /invalid/i.test(r.error.message || '')) {
+        const m = await sb.functions.invoke('legacy-login', { body: { email, password: pass } });
+        const st = m.data && m.data.status;
+        if (st === 'migrated') {
+            r = await sb.auth.signInWithPassword({ email, password: pass });
+            if (!r.error) return { ok: true };
+        }
+        if (st === 'weak') return { ok: false, reason: 'weak' };
+        if (st === 'ratelimit') return { ok: false, reason: 'ratelimit' };
+        return { ok: false, reason: 'invalid' };
+    }
+    if (r.error.status === 429) return { ok: false, reason: 'ratelimit' };
+    throw r.error;
+}
+
 // ============================================================
-// تسجيل الدخول (مع دعم frozen)
+// تسجيل الدخول (مع دعم frozen / expired)
 // ============================================================
 async function attemptLogin() {
-    const user = usernameInput.value.trim();
+    const user = usernameInput.value.trim().toLowerCase();
     const pass = passwordField.value.trim();
 
-    if (!user || !pass) {
-        errorMsg.textContent = t('errorEmpty');
-        return;
-    }
-    if (!user.includes('@') || !user.includes('.')) {
-        errorMsg.textContent = t('errorEmail');
-        return;
-    }
+    if (!user || !pass) { errorMsg.textContent = t('errorEmpty'); return; }
+    if (!user.includes('@') || !user.includes('.')) { errorMsg.textContent = t('errorEmail'); return; }
 
-    loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> ' + (currentLang === 'ar' ? 'جاري التحقق...' : 'Verifying...');
+    loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> ' + t('verifying');
     loginBtn.disabled = true;
     errorMsg.innerHTML = '';
 
     try {
-        const formData = new FormData();
-        formData.append('action', 'login');
-        formData.append('username', user);
-        formData.append('password', pass);
-        const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
-        const result = await response.json();
-
-        if (result.status === 'success') {
-            localStorage.setItem('userToken', result.token);
-            localStorage.setItem('userName', result.name);
-            localStorage.setItem('daysLeft', result.daysLeft);
+        const res = await signIn(user, pass);
+        if (!res.ok) {
+            errorMsg.innerHTML = res.reason === 'weak' ? t('weakLegacy') : res.reason === 'ratelimit' ? t('tooMany') : t('errorInvalid');
+            return;
+        }
+        const sub = await fetchSubscription();
+        if (sub.status === 'active') {
             localStorage.setItem('loginTimestamp', Date.now().toString());
-            localStorage.setItem('currentUserEmail', user);
-
-            const savedName = result.name || t('userLabel');
-            document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')} ${result.daysLeft} ${t('day')})`;
-
-            loginOverlay.classList.remove('show');
-            sessionExpiredOverlay.classList.remove('show');
-            dashboard.classList.add('show');
-
-            startSessionTimer();
-            loadAllData();
-        } else if (result.status === 'expired') {
-            errorMsg.innerHTML = t('errorExpired') + ' <a href="https://www.entervia.co/checkout/77" target="_blank" style="color:#cfa776;">' + (currentLang === 'ar' ? 'من هنا' : 'here') + '</a>';
-        } else if (result.status === 'frozen') {
-            errorMsg.innerHTML = '❌ تم تجميد الحساب، يرجى مراجعة الإدارة.';
+            showDashboard();
         } else {
-            errorMsg.innerHTML = t('errorInvalid');
+            await sb.auth.signOut();
+            if (sub.status === 'expired') {
+                errorMsg.innerHTML = t('errorExpired') + ' <a href="' + RENEW_URL + '" target="_blank" style="color:#cfa776;">' + t('here') + '</a>';
+            } else if (sub.status === 'frozen') {
+                errorMsg.textContent = t('errorFrozen');
+            } else {
+                errorMsg.textContent = t('errorInvalid');
+            }
         }
     } catch (error) {
-        errorMsg.innerHTML = t('errorNetwork');
+        console.error(error);
+        errorMsg.textContent = t('errorNetwork');
     } finally {
         loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> ' + t('loginBtn');
         loginBtn.disabled = false;
     }
 }
 
-function initialSessionCheck() {
-    const token = localStorage.getItem('userToken');
-    if (!token) {
+async function initialSessionCheck() {
+    const { data } = await sb.auth.getSession();
+    if (!data || !data.session || isSessionExpired()) {
+        if (data && data.session) { try { await sb.auth.signOut(); } catch (e) {} }
+        clearLocalSession();
         showLoginScreen();
         return;
     }
-
-    if (isSessionExpired()) {
-        localStorage.removeItem('userToken');
-        localStorage.removeItem('loginTimestamp');
-        localStorage.removeItem('currentUserEmail');
-        showLoginScreen();
-        return;
-    }
-
-    loginOverlay.classList.remove('show');
-    sessionExpiredOverlay.classList.remove('show');
-    dashboard.classList.add('show');
-
-    const savedName = localStorage.getItem('userName') || t('userLabel');
-    const savedDays = localStorage.getItem('daysLeft') || '?';
-    document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')} ${savedDays} ${t('day')})`;
-
-    startSessionTimer();
-    loadAllData();
-
-    validateWithServerInBackground(token);
-}
-
-async function validateWithServerInBackground(token) {
+    showDashboard();
+    // تحقق من السيرفر بالخلفية (انتهاء/تجميد الاشتراك)
     try {
-        const formData = new FormData();
-        formData.append('action', 'validate');
-        formData.append('token', token);
-        const resp = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
-        const result = await resp.json();
-        if (result.status === 'expired') {
-            forceLogout(t('errorExpired'), true);
-        } else if (result.status === 'frozen') {
-            forceLogout('تم تجميد الحساب، يرجى مراجعة الإدارة.', false);
-        } else if (result.status === 'success') {
-            localStorage.setItem('daysLeft', result.daysLeft);
-            const savedName = localStorage.getItem('userName') || t('userLabel');
-            document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')} ${result.daysLeft} ${t('day')})`;
-        }
-    } catch (e) {
-        // نستمر بالجلسة المحلية
-    }
+        const sub = await fetchSubscription();
+        if (sub.status === 'expired') forceLogout(t('errorExpired'), true);
+        else if (sub.status === 'frozen') forceLogout(t('errorFrozen'), false);
+        else if (sub.status !== 'active') forceLogout(t('sessionExpiredMsg'), false);
+        else updateUserLabel();
+    } catch (e) { /* نستمر بالجلسة المحلية عند انقطاع الشبكة */ }
 }
 
 loginBtn.addEventListener('click', attemptLogin);
 passwordField.addEventListener('keypress', (e) => { if (e.key === 'Enter') attemptLogin(); });
 usernameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') passwordField.focus(); });
 
-logoutBtn.addEventListener('click', () => {
+logoutBtn.addEventListener('click', async () => {
     if (logoutTimer) clearTimeout(logoutTimer);
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('daysLeft');
-    localStorage.removeItem('loginTimestamp');
-    localStorage.removeItem('currentUserEmail');
+    clearLocalSession();
+    try { await sb.auth.signOut(); } catch (e) {}
     showLoginScreen();
 });
 
@@ -286,15 +294,14 @@ reloginBtn.addEventListener('click', () => {
 });
 
 document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && dashboard.classList.contains('show')) {
-        if (isSessionExpired()) {
-            forceLogout(t('sessionExpiredMsg'), false);
-        }
+    if (document.visibilityState === 'visible' && dashboard.classList.contains('show') && isSessionExpired()) {
+        forceLogout(t('sessionExpiredMsg'), false);
     }
 });
 
-window.addEventListener('load', () => {
-    applyLanguage(currentLang);
+window.addEventListener('load', async () => {
+    try { await loadLanguages(); } catch (e) {}
+    await applyLanguage(currentLang);
     initialSessionCheck();
     updateDateTime();
     setInterval(updateDateTime, 1000);
@@ -305,7 +312,7 @@ const timeSpan = document.getElementById('currentTime');
 
 function updateDateTime() {
     const now = new Date();
-    const locale = currentLang === 'ar' ? 'ar-EG' : 'en-US';
+    const locale = currentLang === 'ar' ? 'ar-EG' : currentLang === 'tr' ? 'tr-TR' : currentLang;
     dateSpan.textContent = now.toLocaleDateString(locale, {
         weekday: 'long',
         year: 'numeric',
@@ -358,7 +365,7 @@ window.calculateCalc = function() {
             res = a * b;
             break;
         case '/':
-            if (b === 0) { alert(currentLang === 'ar' ? 'خطأ' : 'Error');
+            if (b === 0) { alert(t('calcError'));
                 return; }
             res = a / b;
             break;
@@ -434,7 +441,7 @@ function renderTodos() {
     });
     document.querySelectorAll('.delete-todo').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (confirm(currentLang === 'ar' ? 'حذف المهمة؟' : 'Delete task?')) {
+            if (confirm(t('confirmDelTask'))) {
                 todos.splice(this.dataset.index, 1);
                 saveTodos();
             }
@@ -457,7 +464,7 @@ const notes = document.getElementById('notesArea');
 
 document.getElementById('saveLocal').addEventListener('click', function() {
     localStorage.setItem('employeeNotes', notes.value);
-    alert(currentLang === 'ar' ? 'تم حفظ الملاحظات.' : 'Notes saved.');
+    alert(t('notesSaved'));
 });
 
 document.getElementById('exportNotes').addEventListener('click', function() {
@@ -495,7 +502,7 @@ const appList = document.getElementById('appointmentsList');
 function renderApps() {
     appList.innerHTML = '';
     apps.slice().sort((a, b) => a.date.localeCompare(b.date)).forEach(function(a, idx) {
-        const d = new Date(a.date).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US', { day: 'numeric',
+        const d = new Date(a.date).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : currentLang === 'tr' ? 'tr-TR' : currentLang, { day: 'numeric',
             month: 'short' });
         const div = document.createElement('div');
         div.className = 'appointment-item';
@@ -512,7 +519,7 @@ function renderApps() {
     });
     document.querySelectorAll('.delete-app').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            if (confirm(currentLang === 'ar' ? 'حذف الموعد؟' : 'Delete appointment?')) {
+            if (confirm(t('confirmDelApp'))) {
                 apps.splice(this.dataset.idx, 1);
                 localStorage.setItem('employeeAppointments', JSON.stringify(apps));
                 renderApps();
@@ -522,8 +529,7 @@ function renderApps() {
 }
 
 document.getElementById('addAppBtn').addEventListener('click', function() {
-    if (!appTitle.value || !appDate.value) return alert(currentLang === 'ar' ? 'يرجى إدخال العنوان والتاريخ' :
-        'Please enter title and date');
+    if (!appTitle.value || !appDate.value) return alert(t('needTitleDate'));
     apps.push({ title: appTitle.value, date: appDate.value, desc: appDesc.value });
     localStorage.setItem('employeeAppointments', JSON.stringify(apps));
     renderApps();
@@ -534,7 +540,7 @@ document.getElementById('addAppBtn').addEventListener('click', function() {
 
 document.getElementById('exportApps').addEventListener('click', function() {
     const lines = apps.map(a => `${a.date},${a.title},${a.desc}`).join('\n');
-    const blob = new Blob(['التاريخ,العنوان,الوصف\n' + lines], { type: 'text/csv' });
+    const blob = new Blob([t('csvHeader') + '\n' + lines], { type: 'text/csv' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `appointments_faroukgrup_${new Date().toISOString().slice(0,10)}.csv`;
@@ -546,91 +552,45 @@ function loadAppointments() {
     renderApps();
 }
 
-const toolCategories = [{
-    nameKey: "cat_جدوى",
-    icon: "fa-chart-pie",
-    tools: [
-        { nameKey: "tool_feasibility", icon: "fa-chart-pie", file: "tool1.html" },
-        { nameKey: "tool_tech_feasibility", icon: "fa-gear", file: "tool3.html" },
-        { nameKey: "tool_marketing", icon: "fa-chart-simple", file: "tool4.html" },
-        { nameKey: "tool_realestate", icon: "fa-building", file: "tool5.html" },
-        { nameKey: "tool_roi", icon: "fa-chart-line", file: "tool11.html" },
-        { nameKey: "tool_restaurant_eval", icon: "fa-ranking-star", file: "tool30.html" },
-        { nameKey: "tool_software_eval", icon: "fa-laptop-code", file: "tool27.html" },
-        { nameKey: "tool_npv_irr", icon: "fa-wave-square", file: "tool26.html" },
-        { nameKey: "tool_cagr", icon: "fa-arrow-trend-up", file: "tool32.html" }
-    ]
-}, {
-    nameKey: "cat_مالي",
-    icon: "fa-coins",
-    tools: [
-        { nameKey: "tool_cashflow", icon: "fa-coins", file: "tool8.html" },
-        { nameKey: "tool_cashgap", icon: "fas fa-money-bill-wave", file: "tool25.html" },
-        { nameKey: "tool_cash_forecast_13w", icon: "fas fa-money-bill-trend-up", file: "tool31.html" },
-        { nameKey: "tool_ratios", icon: "fa-percentage", file: "tool18.html" },
-        { nameKey: "tool_forecast", icon: "fa-arrow-trend-up", file: "tool19.html" },
-        { nameKey: "tool_wacc", icon: "fa-scale-balanced", file: "tool10.html" },
-        { nameKey: "tool_depreciation", icon: "fa-chart-column", file: "tool9.html" },
-        { nameKey: "tool_scenario", icon: "fas fa-lightbulb", file: "tool28.html" },
-        { nameKey: "tool_loan", icon: "fa-hand-holding-usd", file: "tool12.html" }
-    ]
-}, {
-    nameKey: "cat_تكاليف",
-    icon: "fa-calculator",
-    tools: [
-        { nameKey: "tool_restaurant_cost", icon: "fa-utensils", file: "tool2.html" },
-        { nameKey: "tool_breakeven", icon: "fa-chart-line", file: "tool7.html" },
-        { nameKey: "tool_multibreak", icon: "fa-chart-line", file: "tool17.html" },
-        { nameKey: "tool_menu_eng", icon: "fa-object-group", file: "tool22.html" },
-        { nameKey: "tool_cac", icon: "fas fa-users", file: "tool23.html" },
-        { nameKey: "tool_labor", icon: "fa-users", file: "tool13.html" }
-    ]
-}, {
-    nameKey: "cat_مخاطر",
-    icon: "fa-shield",
-    tools: [
-        { nameKey: "tool_risk", icon: "fa-wave-square", file: "tool6.html" },
-        { nameKey: "tool_haccp", icon: "fa-exclamation-triangle", file: "tool14.html" },
-        { nameKey: "tool_sop", icon: "fa-clipboard-list", file: "tool15.html" }
-    ]
-}, {
-    nameKey: "cat_اداري",
-    icon: "fa-user-tie",
-    tools: [
-        { nameKey: "tool_employee", icon: "fa-user-check", file: "tool20.html" },
-        { nameKey: "tool_manager", icon: "fa-user-check", file: "tool21.html" },
-        { nameKey: "tool_skills", icon: "fa-award", file: "tool29.html" },
-        { nameKey: "tool_content", icon: "fas fa-robot", file: "tool24.html" },
-        { nameKey: "tool_admin_calc", icon: "fa-calculator", file: "tool16.html" }
-    ]
-}];
+// ============================================================
+// قائمة الأدوات من قاعدة البيانات (جدولا tool_categories و tools)
+// صفحة واحدة لكل أداة؛ اللغة تُقرأ من appLanguage داخل الصفحة
+// ============================================================
+let toolCategories = [];
+try { toolCategories = JSON.parse(localStorage.getItem('fg_tools') || '[]') || []; } catch (e) {}
+
+async function loadToolCatalog() {
+    const [cats, tools] = await Promise.all([
+        sb.from('tool_categories').select('cat_key,icon,sort').order('sort'),
+        sb.from('tools').select('tool_id,name_key,cat_key,icon,file,sort').eq('enabled', true).order('sort')
+    ]);
+    if (cats.error || tools.error) return;
+    toolCategories = cats.data.map(c => ({
+        nameKey: c.cat_key, icon: c.icon,
+        tools: tools.data.filter(x => x.cat_key === c.cat_key).map(x => ({ nameKey: x.name_key, icon: x.icon, file: x.file }))
+    })).filter(c => c.tools.length);
+    localStorage.setItem('fg_tools', JSON.stringify(toolCategories));
+    renderTools();
+}
 
 function renderTools() {
     const container = document.getElementById('toolsContainer');
     container.innerHTML = '';
-    const lang = currentLang;
     toolCategories.forEach(function(cat) {
         const catDiv = document.createElement('div');
         catDiv.className = 'tools-category';
         const titleDiv = document.createElement('div');
         titleDiv.className = 'category-title';
-        const catName = t(cat.nameKey);
-        titleDiv.innerHTML = `<i class="fas ${cat.icon}"></i> ${catName}`;
+        titleDiv.innerHTML = `<i class="fas ${cat.icon}"></i> ${t(cat.nameKey)}`;
         catDiv.appendChild(titleDiv);
         const grid = document.createElement('div');
         grid.className = 'tools-grid';
         cat.tools.forEach(function(tool) {
             const card = document.createElement('div');
             card.className = 'tool-card';
-            let filePath = 'tools/' + tool.file;
-            if (lang === 'en') {
-                filePath = filePath.replace(/\.html$/, 'en.html');
-            } else if (lang === 'tr') {
-                filePath = filePath.replace(/\.html$/, 'tr.html');
-            }
+            const filePath = 'tools/' + tool.file;
             card.onclick = function() { location.href = filePath; };
-            const toolName = t(tool.nameKey);
-            card.innerHTML = `<i class="fas ${tool.icon}"></i><h4>${toolName}</h4>`;
+            card.innerHTML = `<i class="fas ${tool.icon}"></i><h4>${t(tool.nameKey)}</h4>`;
             grid.appendChild(card);
         });
         catDiv.appendChild(grid);
@@ -648,20 +608,15 @@ settingsBtn.addEventListener('click', function() {
     settingsOverlay.classList.add('show');
     languageSelect.value = currentLang;
 });
-
-closeSettingsBtn.addEventListener('click', function() {
+closeSettingsBtn.addEventListener('click', function() { settingsOverlay.classList.remove('show'); });
+applyLanguageBtn.addEventListener('click', async function() {
+    await applyLanguage(languageSelect.value);
     settingsOverlay.classList.remove('show');
 });
 
-applyLanguageBtn.addEventListener('click', function() {
-    const newLang = languageSelect.value;
-    applyLanguage(newLang);
-    const savedName = localStorage.getItem('userName') || t('userLabel');
-    const savedDays = localStorage.getItem('daysLeft') || '?';
-    document.getElementById('userNameDisplay').textContent = `${savedName} (${t('remaining')} ${savedDays} ${t('day')})`;
-    settingsOverlay.classList.remove('show');
-});
-
+// ============================================================
+// تغيير كلمة المرور — تحقق من الحالية ثم sb.auth.updateUser
+// ============================================================
 const changeEmail = document.getElementById('changeEmail');
 const changeCurrentPass = document.getElementById('changeCurrentPass');
 const changeNewPass = document.getElementById('changeNewPass');
@@ -670,62 +625,31 @@ const changePasswordBtn = document.getElementById('changePasswordBtn');
 const changePassMsg = document.getElementById('changePassMsg');
 
 changePasswordBtn.addEventListener('click', async function() {
-    const email = changeEmail.value.trim();
+    const email = changeEmail.value.trim().toLowerCase();
     const current = changeCurrentPass.value.trim();
     const newPass = changeNewPass.value.trim();
-    const confirm = changeConfirmPass.value.trim();
+    const confirmPass = changeConfirmPass.value.trim();
+    changePassMsg.style.color = '#f87171';
 
-    const currentUserEmail = localStorage.getItem('currentUserEmail');
-    if (!currentUserEmail) {
-        changePassMsg.textContent = t('changePassNotLoggedIn');
-        return;
-    }
-    if (email !== currentUserEmail) {
-        changePassMsg.textContent = t('changePassWrongEmail');
-        return;
-    }
-
-    if (!email || !current || !newPass || !confirm) {
-        changePassMsg.textContent = currentLang === 'ar' ? '❌ يرجى ملء جميع الحقول' :
-            '❌ Please fill all fields';
-        return;
-    }
-    if (newPass !== confirm) {
-        changePassMsg.textContent = t('changePassMismatch');
-        return;
-    }
-    if (newPass.length < 6) {
-        changePassMsg.textContent = currentLang === 'ar' ? '❌ كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل' :
-            '❌ New password must be at least 6 characters';
-        return;
-    }
+    const currentUserEmail = (localStorage.getItem('currentUserEmail') || '').toLowerCase();
+    if (!currentUserEmail) { changePassMsg.textContent = t('changePassNotLoggedIn'); return; }
+    if (email !== currentUserEmail) { changePassMsg.textContent = t('changePassWrongEmail'); return; }
+    if (!email || !current || !newPass || !confirmPass) { changePassMsg.textContent = t('fillAll'); return; }
+    if (newPass !== confirmPass) { changePassMsg.textContent = t('changePassMismatch'); return; }
+    if (newPass.length < 6) { changePassMsg.textContent = t('newPassShort'); return; }
 
     changePasswordBtn.disabled = true;
-    changePasswordBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> ' + (currentLang === 'ar' ? 'جاري...' :
-        'Processing...');
+    changePasswordBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> ' + t('processing');
     changePassMsg.textContent = '';
-
     try {
-        const formData = new FormData();
-        formData.append('action', 'changePassword');
-        formData.append('email', email);
-        formData.append('currentPassword', current);
-        formData.append('newPassword', newPass);
-        const resp = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
-        const result = await resp.json();
-        if (result.status === 'success') {
-            changePassMsg.style.color = '#4ade80';
-            changePassMsg.textContent = t('changePassSuccess');
-            changeEmail.value = '';
-            changeCurrentPass.value = '';
-            changeNewPass.value = '';
-            changeConfirmPass.value = '';
-        } else {
-            changePassMsg.style.color = '#f87171';
-            changePassMsg.textContent = t('changePassError') + (result.message || '');
-        }
+        const check = await sb.auth.signInWithPassword({ email, password: current });
+        if (check.error) { changePassMsg.textContent = t('changePassError') + t('errorInvalid'); return; }
+        const { error } = await sb.auth.updateUser({ password: newPass });
+        if (error) { changePassMsg.textContent = t('changePassError') + (error.message || ''); return; }
+        changePassMsg.style.color = '#4ade80';
+        changePassMsg.textContent = t('changePassSuccess');
+        changeEmail.value = ''; changeCurrentPass.value = ''; changeNewPass.value = ''; changeConfirmPass.value = '';
     } catch (e) {
-        changePassMsg.style.color = '#f87171';
         changePassMsg.textContent = t('errorNetwork');
     } finally {
         changePasswordBtn.disabled = false;
@@ -738,6 +662,7 @@ function loadAllData() {
     loadNotes();
     loadAppointments();
     renderTools();
+    loadToolCatalog();
 }
 
 let deferredPrompt;
