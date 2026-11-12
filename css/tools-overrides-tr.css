@@ -111,3 +111,7 @@ input:focus-visible {
     outline: 2px solid var(--gold) !important;
     outline-offset: 2px !important;
 }
+
+/* آلة حاسبة موحدة في كل اللغات: نفس ترتيب النسخة العربية (العمليات يساراً، 7-4-1 يساراً و9-6-3 يميناً) */
+.calc-buttons { direction: rtl !important; }
+.calc-display { direction: ltr !important; text-align: left !important; }
