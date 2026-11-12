@@ -614,6 +614,18 @@ applyLanguageBtn.addEventListener('click', async function() {
     settingsOverlay.classList.remove('show');
 });
 
+// نافذة تغيير كلمة المرور المنبثقة
+const changePassOverlay = document.getElementById('changePassOverlay');
+document.getElementById('openChangePassBtn').addEventListener('click', function() {
+    settingsOverlay.classList.remove('show');
+    ['changeEmail','changeCurrentPass','changeNewPass','changeConfirmPass'].forEach(function(id){ document.getElementById(id).value = ''; });
+    document.getElementById('changePassMsg').textContent = '';
+    var ce = localStorage.getItem('currentUserEmail') || ''; if (ce) document.getElementById('changeEmail').value = ce;
+    changePassOverlay.classList.add('show');
+});
+document.getElementById('closeChangePassBtn').addEventListener('click', function() { changePassOverlay.classList.remove('show'); });
+changePassOverlay.addEventListener('click', function(e) { if (e.target === changePassOverlay) changePassOverlay.classList.remove('show'); });
+
 // ============================================================
 // تغيير كلمة المرور — تحقق من الحالية ثم sb.auth.updateUser
 // ============================================================
