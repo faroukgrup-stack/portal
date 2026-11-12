@@ -16,7 +16,7 @@
                         let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
                         calcDisplay.value = r;
                         currentCalcInput = r.toString();
-                    } catch (e) { calcDisplay.value = 'خطأ';
+                    } catch (e) { calcDisplay.value = T('s1');
                         currentCalcInput = ''; }
                     return;
                 }
@@ -78,214 +78,32 @@
             let currentResults = null;
             let currentInputs = null;
 
-            // ===== الدوال المالية الأساسية =====
-            function calculateIRR(cashFlows, guess = 0.1, maxIter = 10000, tol = 1e-8) {
-                let hasPositive = false,
-                    hasNegative = false;
-                for (let i = 0; i < cashFlows.length; i++) { if (cashFlows[i] > 0) hasPositive = true; if (cashFlows[i] <
-                        0) hasNegative = true; }
-                if (!hasPositive || !hasNegative) return NaN;
-                let low = -0.99;
-                let high = 1e6;
-                let fLow = 0,
-                    fHigh = 0;
-                for (let i = 0; i < cashFlows.length; i++) { fLow += cashFlows[i] / Math.pow(1 + low, i);
-                    fHigh += cashFlows[i] / Math.pow(1 + high, i); }
-                if (fLow * fHigh > 0) {
-                    let step = 1;
-                    while (fLow * fHigh > 0 && high < 1e12) { high *= 2;
-                        fHigh = 0; for (let i = 0; i < cashFlows.length; i++) fHigh += cashFlows[i] / Math.pow(1 +
-                            high, i); }
-                    if (fLow * fHigh > 0) return NaN;
-                }
-                for (let iter = 0; iter < maxIter; iter++) {
-                    let mid = (low + high) / 2;
-                    let fMid = 0;
-                    for (let i = 0; i < cashFlows.length; i++) fMid += cashFlows[i] / Math.pow(1 + mid, i);
-                    if (Math.abs(fMid) < tol) return mid;
-                    if (fMid > 0) low = mid;
-                    else high = mid;
-                }
-                return (low + high) / 2;
-            }
-
-            function calculateMIRR(cashFlows, financeRate, reinvestRate) {
-                let n = cashFlows.length - 1;
-                let pvNeg = 0;
-                let fvPos = 0;
-                for (let i = 0; i <= n; i++) {
-                    if (cashFlows[i] < 0) pvNeg += cashFlows[i] / Math.pow(1 + financeRate, i);
-                    else if (cashFlows[i] > 0) fvPos += cashFlows[i] * Math.pow(1 + reinvestRate, n - i);
-                }
-                if (pvNeg === 0) return NaN;
-                return Math.pow(-fvPos / pvNeg, 1 / n) - 1;
-            }
-
-            function computeProjectFromInputs(inputs) {
-                const fixedCap = inputs.fixedCapital,
-                    setupCap = inputs.setupCapital,
-                    monthlySales = inputs.monthlySales,
-                    employees = inputs.employees,
-                    netSalary = inputs.netSalary,
-                    salaryBurden = inputs.salaryBurden,
-                    netRent = inputs.netRent,
-                    rentTax = inputs.rentTax,
-                    totalVariableCostPercent = inputs.totalVariableCostPercent,
-                    opexMonthly = inputs.opexMonthly,
-                    cashReserve = inputs.cashReserve,
-                    growth = inputs.growth,
-                    expGrowth = inputs.expGrowth,
-                    discount = inputs.discount,
-                    taxRate = inputs.taxRate,
-                    lifeYears = inputs.lifeYears,
-                    reinvestRate = inputs.reinvestRate,
-                    wcMonths = inputs.wcMonths,
-                    pricePerUnit = inputs.pricePerUnit;
-
-                const salariesMonthly = employees * netSalary * salaryBurden;
-                const rentMonthly = netRent * (1 + rentTax);
-                const fixedMonthly = salariesMonthly + rentMonthly + opexMonthly;
-                const totalFixedMonthly = fixedMonthly + cashReserve;
-                const workingCapitalRequired = totalFixedMonthly * wcMonths;
-                const totalInvestment = fixedCap + setupCap + workingCapitalRequired;
-                const revenue1 = monthlySales * 12;
-                const fixedExpenses1 = (salariesMonthly + rentMonthly + opexMonthly) * 12;
-                const depreciation = fixedCap / lifeYears;
-                const years = lifeYears;
-
-                let revenues = [],
-                    fixedExpenses = [],
-                    variableExpenses = [],
-                    ebit = [],
-                    tax = [],
-                    nopat = [],
-                    fcf = [];
-                let cashFlows = [-totalInvestment];
-                for (let i = 1; i <= years; i++) {
-                    let rev = revenue1 * Math.pow(1 + growth, i - 1);
-                    let fixedExp = fixedExpenses1 * Math.pow(1 + expGrowth, i - 1);
-                    let varExp = rev * totalVariableCostPercent;
-                    let ebit_ = rev - fixedExp - varExp - depreciation;
-                    let tax_ = ebit_ > 0 ? ebit_ * taxRate : 0;
-                    let nopat_ = ebit_ - tax_;
-                    let fcf_ = nopat_ + depreciation;
-                    revenues.push(rev);
-                    fixedExpenses.push(fixedExp);
-                    variableExpenses.push(varExp);
-                    ebit.push(ebit_);
-                    tax.push(tax_);
-                    nopat.push(nopat_);
-                    fcf.push(fcf_);
-                    cashFlows.push(fcf_);
-                }
-
-                let npv = -totalInvestment;
-                for (let i = 1; i <= years; i++) npv += fcf[i - 1] / Math.pow(1 + discount, i);
-
-                const irrValue = calculateIRR(cashFlows);
-                const mirrValue = calculateMIRR(cashFlows, discount, reinvestRate);
-
-                let cum = 0,
-                    paybackYear = null,
-                    paybackFraction = 0;
-                for (let i = 0; i < cashFlows.length; i++) {
-                    cum += cashFlows[i];
-                    if (cum >= 0 && paybackYear === null) { paybackYear = i; let prevCum = cum - cashFlows[i];
-                        paybackFraction = -prevCum / cashFlows[i]; break; }
-                }
-                const payback = paybackYear !== null ? paybackYear - 1 + paybackFraction : null;
-
-                let discountedCum = 0,
-                    dpbpYear = null,
-                    dpbpFraction = 0;
-                for (let i = 0; i < cashFlows.length; i++) {
-                    let dcf = cashFlows[i] / Math.pow(1 + discount, i);
-                    discountedCum += dcf;
-                    if (discountedCum >= 0 && dpbpYear === null) { dpbpYear = i; let prevCum = discountedCum - dcf;
-                        dpbpFraction = -prevCum / dcf; break; }
-                }
-                const dpbp = dpbpYear !== null ? dpbpYear - 1 + dpbpFraction : null;
-
-                const pvFuture = cashFlows.slice(1).reduce((acc, val, idx) => acc + val / Math.pow(1 + discount, idx +
-                1), 0);
-                const pi = pvFuture / Math.abs(cashFlows[0]);
-                const avgNetProfit = nopat.reduce((a, b) => a + b, 0) / years;
-                const roi = avgNetProfit / totalInvestment;
-                const operatingMargin = revenues[0] ? (ebit[0] / revenues[0]) * 100 : 0;
-                const debtService = inputs.debtService || 0;
-                const ebitda1 = ebit[0] + depreciation;
-                const dscr = debtService > 0 ? ebitda1 / debtService : 0;
-                const totalFixedAnnual = fixedExpenses1;
-                const contributionMarginRatio = 1 - totalVariableCostPercent;
-                const beRevenueActual = totalFixedAnnual / contributionMarginRatio;
-                const beUnitsActual = beRevenueActual / pricePerUnit;
-                const ebitda = ebit[0] + depreciation;
-                const netIncome = nopat[0];
-                const netProfitMargin = revenues[0] ? (netIncome / revenues[0]) * 100 : 0;
-
-                return { npv, irr: irrValue, mirr: mirrValue, payback, dpbp, pi, roi, operatingMargin, dscr,
-                    workingCapitalRequired, totalInvestment, beRevenueActual, beUnitsActual, totalFixedMonthly,
-                    contributionMarginRatio, revenues, fixedExpenses, variableExpenses, ebit, tax, nopat, fcf,
-                    years, depreciation, cashFlows, ebitda, netIncome, netProfitMargin };
-            }
-
-            function evaluateProject(res, inputs) {
-                let score = 0;
-                const details = [];
-                if (res.npv > 0) { score += 20;
-                    details.push("✅ NPV موجب"); } else details.push("❌ NPV سالب");
-                if (!isNaN(res.irr) && res.irr > inputs.discount) { score += 20;
-                    details.push("✅ IRR > معدل الخصم"); } else details.push("❌ IRR ≤ معدل الخصم");
-                if (res.pi >= 1) { score += 20;
-                    details.push("✅ PI ≥ 1"); } else details.push("❌ PI < 1");
-                const halfLife = inputs.lifeYears / 2;
-                if (res.payback !== null && res.payback < halfLife) { score += 20;
-                    details.push(`✅ فترة الاسترداد (${res.payback.toFixed(1)} سنة) < نصف العمر (${halfLife} سنة)`); } else if (
-                    res.payback !== null) details.push(`❌ فترة الاسترداد (${res.payback.toFixed(1)} سنة) ≥ نصف العمر (${halfLife} سنة)`);
-                else details.push("❌ لا يوجد استرداد خلال عمر المشروع");
-                if (inputs.debtService > 0) { if (res.dscr > 1.3) { score += 20;
-                        details.push(`✅ DSCR (${res.dscr.toFixed(2)}) > 1.3`); } else details.push(
-                        `❌ DSCR (${res.dscr.toFixed(2)}) ≤ 1.3`); } else { score += 20;
-                    details.push("✅ لا يوجد دين (افتراضي 20 نقطة)"); }
-                let grade = "",
-                    gradeClass = "",
-                    icon = "";
-                if (score >= 80) { grade = "ممتاز";
-                    gradeClass = "status-good";
-                    icon = "🟢"; } else if (score >= 50) { grade = "مقبول";
-                    gradeClass = "status-warning";
-                    icon = "🟡"; } else { grade = "عالي المخاطر";
-                    gradeClass = "status-bad";
-                    icon = "🔴"; }
-                return { score, grade, gradeClass, icon, details };
-            }
+            // ===== المعادلات المالية تُنفّذ الآن على السيرفر (Supabase Edge Function: calc/tool1) =====
 
             let charts = {};
 
-            function renderCharts(res, inputs, currency) {
+            function renderCharts(res, inputs, currency, C) {
                 for (let key in charts) if (charts[key]) charts[key].destroy();
 
                 const ctx1 = document.getElementById('cashFlowChart').getContext('2d');
                 charts.cashFlow = new Chart(ctx1, {
                     type: 'bar',
                     data: {
-                        labels: Array.from({ length: res.years }, (_, i) => `سنة ${i+1}`),
-                        datasets: [{ label: 'التدفق النقدي الحر', data: res.fcf, backgroundColor: 'rgba(184,134,11,0.7)',
+                        labels: Array.from({ length: res.years }, (_, i) => `${T('s16')}${i+1}`),
+                        datasets: [{ label: T('s17'), data: res.fcf, backgroundColor: 'rgba(184,134,11,0.7)',
                             borderColor: '#b8860b', borderWidth: 1 }]
                     },
                     options: { responsive: true, plugins: { legend: { display: false } } }
                 });
 
-                const discountRates = [5, 7, 10, 12, 15, 18, 20];
-                const npvValues = discountRates.map(r => { let d = r / 100;
-                    let npv = -res.totalInvestment; for (let i = 1; i <= res.years; i++) npv += res.fcf[i - 1] / Math
-                        .pow(1 + d, i); return npv; });
+                const discountRates = C.discountRates;
+                const npvValues = C.npvValues;
                 const ctx2 = document.getElementById('npvCurveChart').getContext('2d');
                 charts.npvCurve = new Chart(ctx2, {
                     type: 'line',
                     data: {
                         labels: discountRates.map(r => r + '%'),
-                        datasets: [{ label: 'صافي القيمة الحالية', data: npvValues, borderColor: '#b8860b',
+                        datasets: [{ label: T('s18'), data: npvValues, borderColor: '#b8860b',
                             backgroundColor: 'rgba(184,134,11,0.1)', fill: true }]
                     }
                 });
@@ -294,58 +112,38 @@
                 charts.revExp = new Chart(ctx3, {
                     type: 'line',
                     data: {
-                        labels: Array.from({ length: res.years }, (_, i) => `سنة ${i+1}`),
+                        labels: Array.from({ length: res.years }, (_, i) => `${T('s16')}${i+1}`),
                         datasets: [
-                            { label: 'الإيرادات', data: res.revenues, borderColor: '#28a745' },
-                            { label: 'إجمالي المصروفات', data: res.fixedExpenses.map((f, i) => f + res
-                                    .variableExpenses[i]), borderColor: '#dc3545' }
+                            { label: T('s19'), data: res.revenues, borderColor: '#28a745' },
+                            { label: T('s20'), data: C.totalExpenses, borderColor: '#dc3545' }
                         ]
                     }
                 });
 
-                const beUnits = res.beUnitsActual;
-                const units = [0, beUnits, beUnits * 1.5];
-                const revenueData = units.map(u => u * inputs.pricePerUnit);
-                const fixedCostData = units.map(() => res.fixedExpenses[0]);
-                const totalCostData = units.map(u => res.fixedExpenses[0] + u * inputs.pricePerUnit * res
-                    .totalVariableCostPercent);
+                const units = C.units, revenueData = C.revenueData, fixedCostData = C.fixedCostData, totalCostData = C.totalCostData;
                 const ctx4 = document.getElementById('breakevenChart').getContext('2d');
                 charts.breakeven = new Chart(ctx4, {
                     type: 'line',
                     data: {
-                        labels: units.map(u => u.toFixed(0) + ' وحدة'),
+                        labels: units.map(u => u.toFixed(0) + T('s21')),
                         datasets: [
-                            { label: 'الإيرادات', data: revenueData, borderColor: '#28a745' },
-                            { label: 'التكلفة الكلية', data: totalCostData, borderColor: '#dc3545' },
-                            { label: 'التكلفة الثابتة', data: fixedCostData, borderColor: '#b8860b',
+                            { label: T('s19'), data: revenueData, borderColor: '#28a745' },
+                            { label: T('s22'), data: totalCostData, borderColor: '#dc3545' },
+                            { label: T('s23'), data: fixedCostData, borderColor: '#b8860b',
                             borderDash: [5, 5] }
                         ]
                     }
                 });
             }
 
-            function renderScenarios(res, inputs, currency) {
-                const pessimisticInputs = { ...inputs };
-                pessimisticInputs.monthlySales *= 0.8;
-                pessimisticInputs.totalVariableCostPercent = Math.min(inputs.totalVariableCostPercent * 1.1, 1);
-                pessimisticInputs.growth *= 0.5;
-                const pesRes = computeProjectFromInputs(pessimisticInputs);
-
-                const optimisticInputs = { ...inputs };
-                optimisticInputs.monthlySales *= 1.2;
-                optimisticInputs.totalVariableCostPercent = Math.max(inputs.totalVariableCostPercent * 0.9, 0);
-                optimisticInputs.growth *= 1.5;
-                const optRes = computeProjectFromInputs(optimisticInputs);
-
-                document.getElementById('scenarioContainer').innerHTML = `
-                    <div class="scenario-card pessimistic"><h4>🔴 متشائم</h4><div class="value">${currency}${pesRes.npv.toFixed(0)}</div><div class="label">NPV</div><div class="value">${!isNaN(pesRes.irr)?(pesRes.irr*100).toFixed(2)+'%':'غير محدد'}</div></div>
-                    <div class="scenario-card expected"><h4>🟡 متوقع</h4><div class="value">${currency}${res.npv.toFixed(0)}</div><div class="label">NPV</div><div class="value">${!isNaN(res.irr)?(res.irr*100).toFixed(2)+'%':'غير محدد'}</div></div>
-                    <div class="scenario-card optimistic"><h4>🟢 متفائل</h4><div class="value">${currency}${optRes.npv.toFixed(0)}</div><div class="label">NPV</div><div class="value">${!isNaN(optRes.irr)?(optRes.irr*100).toFixed(2)+'%':'غير محدد'}</div></div>
+            function renderScenarios(res, inputs, currency, SC) {
+                const pesRes = SC.pes, optRes = SC.opt;
+                document.getElementById('scenarioContainer').innerHTML = `${T('s25')}${currency}${pesRes.npv.toFixed(0)}</div><div class="label">NPV</div><div class="value">${!isNaN(pesRes.irr)?(pesRes.irr*100).toFixed(2)+'%':T('s24')}${T('s26')}${currency}${res.npv.toFixed(0)}</div><div class="label">NPV</div><div class="value">${!isNaN(res.irr)?(res.irr*100).toFixed(2)+'%':T('s24')}${T('s27')}${currency}${optRes.npv.toFixed(0)}</div><div class="label">NPV</div><div class="value">${!isNaN(optRes.irr)?(optRes.irr*100).toFixed(2)+'%':T('s24')}</div></div>
                 `;
             }
 
             // ===== الحدث الرئيسي للحساب =====
-            document.getElementById('calculateBtn').addEventListener('click', function() {
+            document.getElementById('calculateBtn').addEventListener('click', async function() {
                 const currency = document.getElementById('currencySelect').value;
                 const inputs = {
                     fixedCapital: parseFloat(document.getElementById('fixedCapital').value) || 0,
@@ -371,41 +169,31 @@
                     pricePerUnit: parseFloat(document.getElementById('pricePerUnit').value) || 0
                 };
 
-                const res = computeProjectFromInputs(inputs);
+                let R;
+                try { R = await FG.calc('tool1', 'main', inputs); } catch (e) { FG.calcError(e); return; }
+                const res = R.res;
                 window.lastResult = res;
+                window.lastEvaluation = R.evaluation;
                 window.lastInputs = inputs;
 
                 document.getElementById('initialMessage').style.display = 'none';
                 document.getElementById('resultsSection').style.display = 'block';
 
-                document.getElementById('kpiCards').innerHTML = `
-                    <div class="result-card"><i class="fas fa-coins"></i><h4>صافي القيمة الحالية (NPV)</h4><div class="value">${currency}${res.npv.toFixed(0)}</div><div class="status ${res.npv>0?'status-good':'status-bad'}">${res.npv>0?'مقبول':'غير مقبول'}</div></div>
-                    <div class="result-card"><i class="fas fa-percent"></i><h4>معدل العائد الداخلي (IRR)</h4><div class="value">${!isNaN(res.irr)?(res.irr*100).toFixed(2):'غير محدد'}%</div><div class="status ${res.irr>inputs.discount?'status-good':'status-bad'}">${!isNaN(res.irr)?(res.irr>inputs.discount?'> معدل الخصم':'≤ معدل الخصم'):''}</div></div>
-                    <div class="result-card"><i class="fas fa-chart-pie"></i><h4>مؤشر الربحية (PI)</h4><div class="value">${res.pi.toFixed(2)}</div><div class="unit">${res.pi>=1?'مربح':'غير مربح'}</div></div>
-                    <div class="result-card"><i class="fas fa-clock"></i><h4>فترة الاسترداد</h4><div class="value">${res.payback!==null?res.payback.toFixed(1):'∞'}</div><div class="unit">سنة</div></div>
-                    <div class="result-card"><i class="fas fa-hourglass-half"></i><h4>الاسترداد المخصوم</h4><div class="value">${res.dpbp!==null?res.dpbp.toFixed(1):'∞'}</div><div class="unit">سنة</div></div>
-                    <div class="result-card"><i class="fas fa-percent"></i><h4>العائد على الاستثمار (ROI)</h4><div class="value">${(res.roi*100).toFixed(2)}%</div><div class="unit">متوسط سنوي</div></div>
-                    <div class="result-card"><i class="fas fa-hand-holding-usd"></i><h4>رأس المال العامل</h4><div class="value">${currency}${res.workingCapitalRequired.toFixed(0)}</div></div>
-                    <div class="result-card"><i class="fas fa-percent"></i><h4>هامش التشغيل</h4><div class="value">${res.operatingMargin.toFixed(2)}%</div></div>
-                    <div class="result-card"><i class="fas fa-percent"></i><h4>MIRR</h4><div class="value">${!isNaN(res.mirr)?(res.mirr*100).toFixed(2):'غير محدد'}%</div></div>
-                    <div class="result-card"><i class="fas fa-shield-alt"></i><h4>DSCR</h4><div class="value">${res.dscr.toFixed(2)}</div></div>
-                    <div class="result-card"><i class="fas fa-chart-line"></i><h4>EBITDA (س1)</h4><div class="value">${currency}${res.ebitda.toFixed(0)}</div></div>
-                    <div class="result-card"><i class="fas fa-file-invoice-dollar"></i><h4>صافي الربح (س1)</h4><div class="value">${currency}${res.netIncome.toFixed(0)}</div></div>
-                    <div class="result-card"><i class="fas fa-percent"></i><h4>هامش الربح الصافي</h4><div class="value">${res.netProfitMargin.toFixed(2)}%</div></div>
+                document.getElementById('kpiCards').innerHTML = `${T('s34')}${currency}${res.npv.toFixed(0)}</div><div class="status ${res.npv>0?'status-good':'status-bad'}">${res.npv>0?T('s28'):T('s29')}${T('s35')}${!isNaN(res.irr)?(res.irr*100).toFixed(2):T('s24')}%</div><div class="status ${res.irr>inputs.discount?'status-good':'status-bad'}">${!isNaN(res.irr)?(res.irr>inputs.discount?T('s30'):T('s31')):''}${T('s36')}${res.pi.toFixed(2)}</div><div class="unit">${res.pi>=1?T('s32'):T('s33')}${T('s37')}${res.payback!==null?res.payback.toFixed(1):'∞'}${T('s38')}${res.dpbp!==null?res.dpbp.toFixed(1):'∞'}${T('s39')}${(res.roi*100).toFixed(2)}${T('s40')}${currency}${res.workingCapitalRequired.toFixed(0)}${T('s41')}${res.operatingMargin.toFixed(2)}%</div></div>
+                    <div class="result-card"><i class="fas fa-percent"></i><h4>MIRR</h4><div class="value">${!isNaN(res.mirr)?(res.mirr*100).toFixed(2):T('s24')}%</div></div>
+                    <div class="result-card"><i class="fas fa-shield-alt"></i><h4>DSCR</h4><div class="value">${res.dscr.toFixed(2)}${T('s42')}${currency}${res.ebitda.toFixed(0)}${T('s43')}${currency}${res.netIncome.toFixed(0)}${T('s44')}${res.netProfitMargin.toFixed(2)}%</div></div>
                 `;
 
-                const evaluation = evaluateProject(res, inputs);
+                const evaluation = R.evaluation;
                 let detailsHtml = evaluation.details.map(d =>
                     `<div style="font-size:0.85rem; margin:0.1rem 0;">${d}</div>`).join('');
-                document.getElementById('projectScore').innerHTML = `
-                    <h3><i class="fas fa-star" style="color:var(--accent-soft);"></i> تقييم المشروع</h3>
-                    <div style="font-size:2rem; font-weight:900; color:var(--accent-soft);">${evaluation.score} / 100</div>
+                document.getElementById('projectScore').innerHTML = `${T('s45')}${evaluation.score} / 100</div>
                     <div class="status ${evaluation.gradeClass}" style="font-size:1.1rem; margin:0.5rem 0;">${evaluation.icon} ${evaluation.grade}</div>
                     <div style="margin-top:0.8rem; border-top:1px solid var(--border-light); padding-top:0.5rem;">${detailsHtml}</div>
                 `;
 
                 let tableHtml =
-                    '<table><thead><tr><th>السنة</th><th>الإيرادات</th><th>المصاريف الثابتة</th><th>المتغيرة</th><th>الإهلاك</th><th>EBIT</th><th>الضريبة</th><th>صافي الربح</th><th>التدفق النقدي</th></tr></thead><tbody>';
+                    T('s46');
                 for (let i = 0; i < res.years; i++) {
                     tableHtml +=
                         `<tr><td>${i+1}</td><td>${currency}${res.revenues[i].toFixed(0)}</td><td>${currency}${res.fixedExpenses[i].toFixed(0)}</td><td>${currency}${res.variableExpenses[i].toFixed(0)}</td><td>${currency}${res.depreciation.toFixed(0)}</td><td class="${res.ebit[i]<0?'negative':'positive'}">${currency}${res.ebit[i].toFixed(0)}</td><td>${currency}${res.tax[i].toFixed(0)}</td><td class="${res.nopat[i]<0?'negative':'positive'}">${currency}${res.nopat[i].toFixed(0)}</td><td class="${res.fcf[i]<0?'negative':'positive'}">${currency}${res.fcf[i].toFixed(0)}</td></tr>`;
@@ -413,59 +201,30 @@
                 tableHtml += '</tbody></table>';
                 document.getElementById('cashFlowTable').innerHTML = tableHtml;
 
-                const riskDataText = `
-                    <strong>الاستثمار الأولي:</strong> ${currency} ${res.totalInvestment.toFixed(0)}<br>
-                    <strong>الإيرادات السنوية (س1):</strong> ${currency} ${res.revenues[0].toFixed(0)}<br>
-                    <strong>التكاليف الثابتة (س1):</strong> ${currency} ${res.fixedExpenses[0].toFixed(0)}<br>
-                    <strong>التكاليف المتغيرة (س1):</strong> ${currency} ${res.variableExpenses[0].toFixed(0)}<br>
-                    <strong>الإهلاك السنوي:</strong> ${currency} ${res.depreciation.toFixed(0)}<br>
-                    <strong>نمو الإيرادات:</strong> ${(inputs.growth*100).toFixed(1)}%<br>
-                    <strong>نمو التكاليف:</strong> ${(inputs.expGrowth*100).toFixed(1)}%<br>
-                    <strong>معدل الخصم:</strong> ${(inputs.discount*100).toFixed(1)}%<br>
-                    <strong>معدل الضريبة:</strong> ${(inputs.taxRate*100).toFixed(0)}%
+                const riskDataText = `${T('s47')}${currency} ${res.totalInvestment.toFixed(0)}${T('s48')}${currency} ${res.revenues[0].toFixed(0)}${T('s49')}${currency} ${res.fixedExpenses[0].toFixed(0)}${T('s50')}${currency} ${res.variableExpenses[0].toFixed(0)}${T('s51')}${currency} ${res.depreciation.toFixed(0)}${T('s52')}${(inputs.growth*100).toFixed(1)}${T('s53')}${(inputs.expGrowth*100).toFixed(1)}${T('s54')}${(inputs.discount*100).toFixed(1)}${T('s55')}${(inputs.taxRate*100).toFixed(0)}%
                 `;
                 document.getElementById('riskDataText').innerHTML = riskDataText;
 
-                document.getElementById('breakevenCard').innerHTML = `
-                    <div><i class="fas fa-calendar-alt" style="color:var(--accent-soft);"></i> <strong>إيرادات التعادل (سنوية):</strong> ${currency}${res.beRevenueActual.toFixed(0)}</div>
-                    <div><i class="fas fa-boxes" style="color:var(--accent-soft);"></i> <strong>عدد الوحدات (سنوياً):</strong> ${res.beUnitsActual.toFixed(0)} وحدة</div>
-                    <div><span style="font-size:0.8rem; color:var(--text-muted);">(التكاليف الثابتة الشهرية: ${currency}${res.totalFixedMonthly.toFixed(0)}، هامش المساهمة ${(res.contributionMarginRatio*100).toFixed(0)}%)</span></div>
+                document.getElementById('breakevenCard').innerHTML = `${T('s56')}${currency}${res.beRevenueActual.toFixed(0)}${T('s57')}${res.beUnitsActual.toFixed(0)}${T('s58')}${currency}${res.totalFixedMonthly.toFixed(0)}${T('s59')}${(res.contributionMarginRatio*100).toFixed(0)}%)</span></div>
                 `;
 
-                renderCharts(res, inputs, currency);
-                renderScenarios(res, inputs, currency);
+                renderCharts(res, inputs, currency, R.charts);
+                renderScenarios(res, inputs, currency, R.scenarios);
             });
 
             // ===== تحليل الحساسية =====
-            document.getElementById('runSensitivity').addEventListener('click', function() {
-                if (!window.lastInputs) { alert('الرجاء إجراء التحليل الأساسي أولاً.'); return; }
+            document.getElementById('runSensitivity').addEventListener('click', async function() {
+                if (!window.lastInputs) { alert(T('s60')); return; }
                 const inputs = { ...window.lastInputs };
                 const currency = document.getElementById('currencySelect').value;
                 const sensitivityVar = document.getElementById('sensitivityVar').value;
                 const rangePercent = parseFloat(document.getElementById('sensitivityRange').value) / 100;
-                const multipliers = [-rangePercent, -rangePercent / 2, 0, rangePercent / 2, rangePercent];
-                const labels = [],
-                    npvResults = [],
-                    irrResults = [];
-
-                for (let m of multipliers) {
-                    let modified = { ...inputs };
-                    if (sensitivityVar === 'monthlySales') modified.monthlySales = inputs.monthlySales * (1 + m);
-                    else if (sensitivityVar === 'fixedCosts') { modified.netSalary *= (1 + m);
-                        modified.netRent *= (1 + m);
-                        modified.opexMonthly *= (1 + m); } else if (sensitivityVar === 'totalVariableCostPercent')
-                        modified.totalVariableCostPercent = Math.min(1, Math.max(0, inputs.totalVariableCostPercent * (
-                            1 + m)));
-                    else if (sensitivityVar === 'discountRate') modified.discount = inputs.discount * (1 + m);
-                    else if (sensitivityVar === 'growthRate') modified.growth = inputs.growth * (1 + m);
-                    const res = computeProjectFromInputs(modified);
-                    npvResults.push(res.npv);
-                    irrResults.push(res.irr * 100);
-                    labels.push((m * 100).toFixed(0) + '%');
-                }
+                let SR;
+                try { SR = await FG.calc('tool1', 'sensitivity', { inputs, sensitivityVar, rangePercent }); } catch (e) { FG.calcError(e); return; }
+                const labels = SR.labels, npvResults = SR.npvResults, irrResults = SR.irrResults;
 
                 let tableHtml =
-                    '<table><thead><tr><th>التغيير</th><th>NPV</th><th>IRR (%)</th></tr></thead><tbody>';
+                    T('s61');
                 for (let i = 0; i < labels.length; i++) {
                     tableHtml +=
                         `<tr><td>${labels[i]}</td><td class="${npvResults[i]>0?'positive':'negative'}">${currency}${npvResults[i].toFixed(0)}</td><td>${irrResults[i].toFixed(2)}%</td></tr>`;
@@ -477,16 +236,16 @@
             // ========== تصدير Excel ==========
             async function exportToFullExcel() {
                 if (!window.lastResult || !window.lastInputs) {
-                    alert('الرجاء إجراء التحليل أولاً.');
+                    alert(T('s62'));
                     return;
                 }
-                showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والرسوم البيانية');
+                showLoading(T('s63'), T('s64'));
                 try {
                     const currency = document.getElementById('currencySelect').value;
-                    const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+                    const companyName = document.getElementById('companyName').value || T('s65');
                     const res = window.lastResult;
                     const inputs = window.lastInputs;
-                    const evaluation = evaluateProject(res, inputs);
+                    const evaluation = window.lastEvaluation;
 
                     const workbook = new ExcelJS.Workbook();
                     workbook.creator = 'FAROUK GRUP';
@@ -509,7 +268,7 @@
                     function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11,
                                 color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid',
                                 fgColor: { argb: bg } }, alignment: { horizontal: 'center',
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'thin', color: { argb: G } }, bottom: { style: 'thin',
                                     color: { argb: G } }, left: { style: 'thin', color: { argb: G } },
                                 right: { style: 'thin', color: { argb: G } } } }; }
@@ -517,7 +276,7 @@
                     function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial',
                                 bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern',
                                 pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h,
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, left: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, right: { style: 'hair',
@@ -531,13 +290,13 @@
                         tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true,
                             size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid',
                             fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle',
-                            wrapText: true, readingOrder: 'rtl' }; c.border = { top: { style: 'medium',
+                            wrapText: true, readingOrder: FG.dir() }; c.border = { top: { style: 'medium',
                                 color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } },
                             left: { style: 'medium', color: { argb: G } }, right: { style: 'medium',
                                 color: { argb: G } } }; }
 
                     // 1. غلاف التقرير
-                    const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true,
+                    const cv = workbook.addWorksheet(T('s66'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
                     for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
@@ -545,19 +304,19 @@
                     cv.getRow(4).height = 60;
                     cv.mergeCells(2, 1, 2, 4);
                     const bc = cv.getCell(2, 1);
-                    bc.value = 'مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+                    bc.value = T('s67');
                     bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
                     bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
                     bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                    readingOrder: 'rtl' };
+                    readingOrder: FG.dir() };
                     bc.border = { bottom: { style: 'thick', color: { argb: G } } };
-                    mh(cv, 1, 4, 4, `تقرير دراسة الجدوى المالية\n${companyName}`, DB, GL, 18);
+                    mh(cv, 1, 4, 4, `${T('s68')}${companyName}`, DB, GL, 18);
                     const inf = [
-                        ['📋 الجهة', companyName],
-                        ['📅 التاريخ', new Date().toLocaleDateString('ar-EG')],
-                        ['💰 العملة', currency],
+                        [T('s69'), companyName],
+                        [T('s70'), new Date().toLocaleDateString(FG.locale())],
+                        [T('s71'), currency],
                         ['📊 NPV', `${currency} ${res.npv.toFixed(0)}`],
-                        ['📈 IRR', !isNaN(res.irr) ? (res.irr * 100).toFixed(2) + '%' : 'غير محدد']
+                        ['📈 IRR', !isNaN(res.irr) ? (res.irr * 100).toFixed(2) + '%' : T('s24')]
                     ];
                     let ir = 6;
                     inf.forEach(([l, v], idx) => {
@@ -570,12 +329,12 @@
                         const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
                         ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         cv.getRow(ir).height = 28;
@@ -583,46 +342,46 @@
                     });
 
                     // 2. المدخلات
-                    const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true,
+                    const inputsSheet = workbook.addWorksheet(T('s72'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     inputsSheet.getColumn(1).width = 5;
                     inputsSheet.getColumn(2).width = 38;
                     inputsSheet.getColumn(3).width = 22;
                     inputsSheet.getColumn(4).width = 22;
                     inputsSheet.getColumn(5).width = 5;
-                    mh(inputsSheet, 1, 5, 1, '📋 جدول المدخلات والافتراضات الأساسية', DB, GL, 14);
+                    mh(inputsSheet, 1, 5, 1, T('s73'), DB, GL, 14);
                     inputsSheet.getRow(1).height = 40;
-                    mh(inputsSheet, 2, 4, 2, 'البيانات الأساسية للمشروع', SB, W, 11);
+                    mh(inputsSheet, 2, 4, 2, T('s74'), SB, W, 11);
                     inputsSheet.getRow(2).height = 28;
                     const inputFields = [
-                        ['رأس المال الثابت', inputs.fixedCapital, `${currency} ${inputs.fixedCapital.toFixed(0)}`],
-                        ['رأس المال التأسيسي', inputs.setupCapital, `${currency} ${inputs.setupCapital.toFixed(0)}`],
-                        ['المبيعات النقدية الشهرية', inputs.monthlySales,
+                        [T('s75'), inputs.fixedCapital, `${currency} ${inputs.fixedCapital.toFixed(0)}`],
+                        [T('s76'), inputs.setupCapital, `${currency} ${inputs.setupCapital.toFixed(0)}`],
+                        [T('s77'), inputs.monthlySales,
                             `${currency} ${inputs.monthlySales.toFixed(0)}`],
-                        ['عدد الموظفين', inputs.employees, ''],
-                        ['متوسط الراتب الشهري (صافي)', inputs.netSalary,
+                        [T('s78'), inputs.employees, ''],
+                        [T('s79'), inputs.netSalary,
                             `${currency} ${inputs.netSalary.toFixed(0)}`],
-                        ['نسبة تكاليف الموظفين', inputs.salaryBurden, ''],
-                        ['الإيجار الشهري (صافي)', inputs.netRent, `${currency} ${inputs.netRent.toFixed(0)}`],
-                        ['ضريبة القيمة المضافة على الإيجار', inputs.rentTax * 100, `${(inputs.rentTax*100).toFixed(0)}%`],
-                        ['إجمالي التكاليف المتغيرة (% من المبيعات)', inputs.totalVariableCostPercent * 100,
+                        [T('s80'), inputs.salaryBurden, ''],
+                        [T('s81'), inputs.netRent, `${currency} ${inputs.netRent.toFixed(0)}`],
+                        [T('s82'), inputs.rentTax * 100, `${(inputs.rentTax*100).toFixed(0)}%`],
+                        [T('s83'), inputs.totalVariableCostPercent * 100,
                             `${(inputs.totalVariableCostPercent*100).toFixed(1)}%`
                         ],
-                        ['مصاريف تشغيلية شهرية ثابتة', inputs.opexMonthly,
+                        [T('s84'), inputs.opexMonthly,
                             `${currency} ${inputs.opexMonthly.toFixed(0)}`],
-                        ['احتياطي نقدي شهري', inputs.cashReserve,
+                        [T('s85'), inputs.cashReserve,
                             `${currency} ${inputs.cashReserve.toFixed(0)}`],
-                        ['شهور تغطية رأس المال العامل', inputs.wcMonths, ''],
-                        ['نمو المبيعات السنوي', inputs.growth * 100, `${(inputs.growth*100).toFixed(1)}%`],
-                        ['نمو المصاريف السنوي', inputs.expGrowth * 100, `${(inputs.expGrowth*100).toFixed(1)}%`],
-                        ['معدل الخصم (WACC)', inputs.discount * 100, `${(inputs.discount*100).toFixed(1)}%`],
-                        ['ضريبة الدخل', inputs.taxRate * 100, `${(inputs.taxRate*100).toFixed(0)}%`],
-                        ['العمر الإنتاجي', inputs.lifeYears, 'سنة'],
-                        ['معدل إعادة الاستثمار (MIRR)', inputs.reinvestRate * 100,
+                        [T('s86'), inputs.wcMonths, ''],
+                        [T('s87'), inputs.growth * 100, `${(inputs.growth*100).toFixed(1)}%`],
+                        [T('s88'), inputs.expGrowth * 100, `${(inputs.expGrowth*100).toFixed(1)}%`],
+                        [T('s89'), inputs.discount * 100, `${(inputs.discount*100).toFixed(1)}%`],
+                        [T('s90'), inputs.taxRate * 100, `${(inputs.taxRate*100).toFixed(0)}%`],
+                        [T('s91'), inputs.lifeYears, T('s92')],
+                        [T('s93'), inputs.reinvestRate * 100,
                             `${(inputs.reinvestRate*100).toFixed(1)}%`],
-                        ['خدمة الدين السنوية', inputs.debtService,
+                        [T('s94'), inputs.debtService,
                             `${currency} ${inputs.debtService.toFixed(0)}`],
-                        ['سعر بيع الوحدة', inputs.pricePerUnit, `${currency} ${inputs.pricePerUnit.toFixed(0)}`]
+                        [T('s95'), inputs.pricePerUnit, `${currency} ${inputs.pricePerUnit.toFixed(0)}`]
                     ];
                     let iRow = 3;
                     inputFields.forEach(([label, val, note], idx) => {
@@ -634,7 +393,7 @@
                         lc.value = label;
                         vc.value = val;
                         nc.value = note;
-                        ap(lc, cs(bg, DT, true, 'right'));
+                        ap(lc, cs(bg, DT, true, FG.start()));
                         ap(vc, { ...cs(bg, '0000FF', false, 'center'), numFmt: typeof val === 'number' ?
                             '#,##0' : null });
                         ap(nc, cs(bg, '00695C', false, 'center'));
@@ -642,23 +401,23 @@
                     });
 
                     // 3. KPI
-                    const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true,
+                    const kpiSheet = workbook.addWorksheet(T('s96'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [5, 32, 22, 22, 22, 5].forEach((w, i) => kpiSheet.getColumn(i + 1).width = w);
-                    mh(kpiSheet, 1, 6, 1, '📊 لوحة مؤشرات الأداء الرئيسية', DB, GL, 15);
+                    mh(kpiSheet, 1, 6, 1, T('s97'), DB, GL, 15);
                     kpiSheet.getRow(1).height = 45;
-                    mh(kpiSheet, 2, 5, 2, `${companyName} | ${new Date().toLocaleDateString('ar-EG')}`, HB, W, 10);
+                    mh(kpiSheet, 2, 5, 2, `${companyName} | ${new Date().toLocaleDateString(FG.locale())}`, HB, W, 10);
                     kpiSheet.getRow(2).height = 26;
                     const kpis = [
                         { label: 'NPV', value: `${currency} ${res.npv.toFixed(0)}`, good: res.npv > 0 },
                         { label: 'IRR', value: !isNaN(res.irr) ? (res.irr * 100).toFixed(2) + '%' :
-                            'غير محدد', good: !isNaN(res.irr) && res.irr > inputs.discount },
+                            T('s24'), good: !isNaN(res.irr) && res.irr > inputs.discount },
                         { label: 'PI', value: res.pi.toFixed(2), good: res.pi >= 1 },
-                        { label: 'فترة الاسترداد', value: res.payback !== null ? res.payback.toFixed(1) +
-                            ' سنة' : '∞', good: res.payback !== null && res.payback < inputs
+                        { label: T('s98'), value: res.payback !== null ? res.payback.toFixed(1) +
+                            T('s99') : '∞', good: res.payback !== null && res.payback < inputs
                             .lifeYears / 2 },
                         { label: 'ROI', value: (res.roi * 100).toFixed(2) + '%', good: true },
-                        { label: 'EBITDA (س1)', value: `${currency} ${res.ebitda.toFixed(0)}`, good: true }
+                        { label: T('s100'), value: `${currency} ${res.ebitda.toFixed(0)}`, good: true }
                     ];
                     let kRow = 3;
                     kpis.forEach((k, idx) => {
@@ -685,30 +444,30 @@
                         ic.font = { name: 'Arial', bold: true, size: 14, color: { argb: '555555' } };
                         ic.alignment = { horizontal: 'center', vertical: 'middle' };
                         lc2.font = { name: 'Arial', bold: true, size: 11, color: { argb: DT } };
-                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        lc2.alignment = { horizontal: FG.start(), vertical: 'middle', readingOrder: FG.dir() };
                         vc3.font = { name: 'Arial', bold: true, size: 13, color: { argb: tc } };
                         vc3.alignment = { horizontal: 'center', vertical: 'middle' };
                         nc2.font = { name: 'Arial', size: 9, color: { argb: '444444' } };
-                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                         kRow++;
                     });
                     kRow++;
                     kpiSheet.mergeCells(kRow, 2, kRow, 5);
                     const kFinal = kpiSheet.getCell(kRow, 2);
-                    kFinal.value = res.npv > 0 ? '✅ المشروع مجدٍ مالياً (NPV موجب)' :
-                        '⚠️ المشروع غير مجدٍ (NPV سالب)';
+                    kFinal.value = res.npv > 0 ? T('s101') :
+                        T('s102');
                     kFinal.font = { name: 'Arial', bold: true, size: 13, color: { argb: res.npv > 0 ? PT :
                             '856404' } };
                     kFinal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: res.npv > 0 ? PB :
                         GB } };
-                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() };
                     kFinal.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
                             color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
                         right: { style: 'medium', color: { argb: G } } };
                     kpiSheet.getRow(kRow).height = 40;
 
                     // 4. التدفقات النقدية
-                    const cashSheet = workbook.addWorksheet('التدفقات النقدية', { views: [{ rightToLeft: true,
+                    const cashSheet = workbook.addWorksheet(T('s103'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     cashSheet.getColumn(1).width = 5;
                     cashSheet.getColumn(2).width = 15;
@@ -721,10 +480,10 @@
                     cashSheet.getColumn(9).width = 18;
                     cashSheet.getColumn(10).width = 18;
                     cashSheet.getColumn(11).width = 5;
-                    mh(cashSheet, 1, 11, 1, '📋 التدفقات النقدية المتوقعة', DB, GL, 14);
+                    mh(cashSheet, 1, 11, 1, T('s104'), DB, GL, 14);
                     cashSheet.getRow(1).height = 40;
-                    cashSheet.addRow(['السنة', 'الإيرادات', 'المصاريف الثابتة', 'المتغيرة', 'الإهلاك', 'EBIT', 'الضريبة',
-                        'صافي الربح', 'التدفق النقدي'
+                    cashSheet.addRow([T('s105'), T('s19'), T('s106'), T('s107'), T('s108'), 'EBIT', T('s109'),
+                        T('s110'), T('s111')
                     ]);
                     for (let i = 0; i < res.years; i++) {
                         cashSheet.addRow([i + 1, res.revenues[i], res.fixedExpenses[i], res.variableExpenses[i],
@@ -736,12 +495,12 @@
                     cashHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
 
                     // 5. الرسوم البيانية
-                    const chartsSheet = workbook.addWorksheet('الرسوم البيانية', { views: [{ rightToLeft: true,
+                    const chartsSheet = workbook.addWorksheet(T('s112'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     chartsSheet.getColumn(1).width = 5;
                     chartsSheet.getColumn(2).width = 50;
                     chartsSheet.getColumn(3).width = 5;
-                    mh(chartsSheet, 1, 3, 1, '📊 الرسوم البيانية للمشروع', DB, GL, 14);
+                    mh(chartsSheet, 1, 3, 1, T('s113'), DB, GL, 14);
                     chartsSheet.getRow(1).height = 40;
                     const chartContainer = document.querySelector('.charts-container');
                     if (chartContainer) {
@@ -759,23 +518,23 @@
                     }
 
                     // 6. التقييم
-                    const evalSheet = workbook.addWorksheet('التقييم والتوصيات', { views: [{ rightToLeft: true,
+                    const evalSheet = workbook.addWorksheet(T('s114'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     evalSheet.getColumn(1).width = 5;
                     evalSheet.getColumn(2).width = 50;
                     evalSheet.getColumn(3).width = 5;
-                    mh(evalSheet, 1, 3, 1, '📝 التقييم والتوصيات', DB, GL, 14);
+                    mh(evalSheet, 1, 3, 1, T('s115'), DB, GL, 14);
                     evalSheet.getRow(1).height = 45;
                     const sections = [
-                        { title: '1. تقييم المشروع', content: `الدرجة: ${evaluation.score}/100\nالتصنيف: ${evaluation.grade}\n${evaluation.details.join('\n')}` },
-                        { title: '2. تحليل نقطة التعادل',
-                        content: `إيرادات التعادل السنوية: ${currency} ${res.beRevenueActual.toFixed(0)}\nعدد الوحدات: ${res.beUnitsActual.toFixed(0)} وحدة` },
-                        { title: '3. التوصيات', content: res.npv > 0 ?
-                            '• المشروع مجدٍ مادياً، يُنصح بالمضي قدماً.\n• راقب التكاليف المتغيرة للحفاظ على الهوامش.\n• احتفظ برأس المال العامل المطلوب.' :
-                            '• المشروع غير مجدٍ بالشكل الحالي.\n• ابحث عن خفض التكاليف أو زيادة الإيرادات.\n• أعد تقييم الافتراضات أو ادرس بدائل.'
+                        { title: T('s116'), content: `${T('s117')}${evaluation.score}${T('s118')}${evaluation.grade}\n${evaluation.details.join('\n')}` },
+                        { title: T('s119'),
+                        content: `${T('s120')}${currency} ${res.beRevenueActual.toFixed(0)}${T('s121')}${res.beUnitsActual.toFixed(0)}${T('s21')}` },
+                        { title: T('s122'), content: res.npv > 0 ?
+                            T('s123') :
+                            T('s124')
                         },
-                        { title: '4. تنويه',
-                        content: 'هذا التحليل مبني على افتراضات تقديرية. النتائج الفعلية قد تختلف. يُنصح باستشارة خبير مالي.' }
+                        { title: T('s125'),
+                        content: T('s126') }
                     ];
                     let itRow = 2;
                     sections.forEach((sec, idx) => {
@@ -787,8 +546,8 @@
                         tc3.font = { name: 'Arial', bold: true, size: 12, color: { argb: GL } };
                         tc3.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: idx % 2 ===
                                 0 ? HB : SB } };
-                        tc3.alignment = { horizontal: 'right', vertical: 'middle',
-                        readingOrder: 'rtl' };
+                        tc3.alignment = { horizontal: FG.start(), vertical: 'middle',
+                        readingOrder: FG.dir() };
                         tc3.border = { bottom: { style: 'medium', color: { argb: G } } };
                         itRow++;
                         evalSheet.getRow(itRow).height = Math.max(60, sec.content.split('\n')
@@ -798,8 +557,8 @@
                         cc.value = sec.content;
                         cc.font = { name: 'Arial', size: 10, color: { argb: DT } };
                         cc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEFCF6' } };
-                        cc.alignment = { horizontal: 'right', vertical: 'top', wrapText: true,
-                            readingOrder: 'rtl' };
+                        cc.alignment = { horizontal: FG.start(), vertical: 'top', wrapText: true,
+                            readingOrder: FG.dir() };
                         cc.border = { top: { style: 'hair' }, bottom: { style: 'hair',
                                 color: { argb: G } }, left: { style: 'hair' }, right: { style: 'hair' } };
                     });
@@ -808,11 +567,11 @@
                     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                     const now = new Date();
                     const fileName =
-                        `تقرير_جدوى_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+                        `${T('s127')}${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
                     saveAs(blob, fileName);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ أثناء إنشاء ملف Excel: ' + err.message);
+                    alert(T('s128') + err.message);
                 } finally {
                     hideLoading();
                 }
@@ -821,16 +580,16 @@
             // ========== تصدير Word ==========
             async function exportToWord() {
                 if (!window.lastResult || !window.lastInputs) {
-                    alert('الرجاء إجراء التحليل أولاً.');
+                    alert(T('s62'));
                     return;
                 }
-                showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات والرسوم البيانية');
+                showLoading(T('s129'), T('s130'));
                 try {
                     const currency = document.getElementById('currencySelect').value;
-                    const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+                    const companyName = document.getElementById('companyName').value || T('s65');
                     const res = window.lastResult;
                     const inputs = window.lastInputs;
-                    const evaluation = evaluateProject(res, inputs);
+                    const evaluation = window.lastEvaluation;
 
                     const chartContainer = document.querySelector('.charts-container');
                     let chartImgBase64 = '';
@@ -871,62 +630,22 @@
                     }
 
                     const now = new Date();
-                    const dateStr = now.toLocaleDateString('ar-EG');
+                    const dateStr = now.toLocaleDateString(FG.locale());
 
-                    const fullHtml = `<!DOCTYPE html>
-                    <html dir="rtl">
-                    <head><meta charset="utf-8"><title>تقرير جدوى - FAROUK GRUP</title>
-                    <style>
-                        body{font-family:'Tajawal',sans-serif;margin:2rem;background:#fff;color:#333;}
-                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                        .cover h1{font-size:32px;color:#b8860b;margin:0;}
-                        .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-                        table{width:100%;border-collapse:collapse;margin:20px 0;}
-                        th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                        th{background:#fefcf6;color:#b8860b;}
-                        .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
-                        .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
-                    </style></head>
-                    <body>
-                        <div class="cover">
-                            <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                            <h2>تقرير دراسة الجدوى المالية الشاملة</h2>
-                            <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
-                            <p>العملة: ${currency} | NPV: ${currency} ${res.npv.toFixed(0)}</p>
-                        </div>
-                        <h2 style="color:#b8860b;">المدخلات الأساسية</h2>
-                        <table><tbody>
-                            <tr><th>رأس المال الثابت</th><td>${currency} ${inputs.fixedCapital}</td><th>رأس المال التأسيسي</th><td>${currency} ${inputs.setupCapital}</td></tr>
-                            <tr><th>المبيعات الشهرية</th><td>${currency} ${inputs.monthlySales}</td><th>عدد الموظفين</th><td>${inputs.employees}</td></tr>
-                            <tr><th>متوسط الراتب</th><td>${currency} ${inputs.netSalary}</td><th>الإيجار الشهري</th><td>${currency} ${inputs.netRent}</td></tr>
-                            <tr><th>نمو المبيعات</th><td>${(inputs.growth*100).toFixed(1)}%</td><th>معدل الخصم</th><td>${(inputs.discount*100).toFixed(1)}%</td></tr>
-                        </tbody></table>
-                        <h2 style="color:#b8860b;">📊 مؤشرات الأداء</h2>
-                        <table>${kpiRows}</table>
-                        <h2 style="color:#b8860b;">📈 الرسوم البيانية</h2>
-                        <div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>
-                        <h2 style="color:#b8860b;">📋 التدفقات النقدية</h2>
-                        <table><thead><tr><th>السنة</th><th>الإيرادات</th><th>المصاريف الثابتة</th><th>المتغيرة</th><th>الإهلاك</th><th>EBIT</th><th>الضريبة</th><th>صافي الربح</th><th>التدفق النقدي</th></tr></thead><tbody>${tableRows}</tbody></table>
-                        <h2 style="color:#b8860b;">🎯 نقطة التعادل</h2>
-                        <p>إيرادات التعادل السنوية: ${currency} ${res.beRevenueActual.toFixed(0)} (${res.beUnitsActual.toFixed(0)} وحدة)</p>
-                        <h2 style="color:#b8860b;">💡 التقييم والتوصيات</h2>
-                        <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">
-                            <p><strong>التقييم:</strong> ${evaluation.score}/100 - ${evaluation.grade}</p>
-                            <p>${evaluation.details.join('<br>')}</p>
-                        </div>
-                        <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+                    const fullHtml = `${T('s131')}${companyName}${T('s132')}${dateStr}${T('s133')}${currency} | NPV: ${currency} ${res.npv.toFixed(0)}${T('s134')}${currency} ${inputs.fixedCapital}${T('s135')}${currency} ${inputs.setupCapital}${T('s136')}${currency} ${inputs.monthlySales}${T('s137')}${inputs.employees}${T('s138')}${currency} ${inputs.netSalary}${T('s139')}${currency} ${inputs.netRent}${T('s140')}${(inputs.growth*100).toFixed(1)}${T('s141')}${(inputs.discount*100).toFixed(1)}${T('s142')}${kpiRows}${T('s143')}${chartImgBase64}${T('s144')}${tableRows}${T('s145')}${currency} ${res.beRevenueActual.toFixed(0)} (${res.beUnitsActual.toFixed(0)}${T('s146')}${evaluation.score}/100 - ${evaluation.grade}</p>
+                            <p>${evaluation.details.join('<br>')}${T('s147')}${now.getFullYear()}</div>
                     </body></html>`;
 
                     const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
                     link.download =
-                        `تقرير_جدوى_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+                        `${T('s127')}${companyName}_${now.toISOString().slice(0,10)}.doc`;
                     link.click();
                     URL.revokeObjectURL(link.href);
                 } catch (error) {
                     console.error(error);
-                    alert('خطأ في إنشاء تقرير Word');
+                    alert(T('s148'));
                 } finally {
                     hideLoading();
                 }

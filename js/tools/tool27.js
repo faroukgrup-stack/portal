@@ -16,7 +16,7 @@
                         let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
                         calcDisplay.value = r;
                         currentCalcInput = r.toString();
-                    } catch (e) { calcDisplay.value = 'خطأ';
+                    } catch (e) { calcDisplay.value = T('s1');
                         currentCalcInput = ''; }
                     return;
                 }
@@ -84,126 +84,42 @@
             };
 
             // ===== الحساب الرئيسي =====
-            function computeSaaS() {
+            async function computeSaaS() {
                 const cur = document.getElementById('currencySelect').value;
-
+                const v = (id) => document.getElementById(id).value;
+                let P;
                 if (currentStage === 'pre') {
-                    const berkus = ['berkusIdea', 'berkusPrototype', 'berkusTeam', 'berkusRelations', 'berkusExecution']
-                        .map(id => Math.min(parseFloat(document.getElementById(id).value) || 0, 500000))
-                        .reduce((a, b) => a + b, 0);
-                    const rebuild = parseFloat(document.getElementById('rebuildCost').value) || 0;
-                    const risk = parseFloat(document.getElementById('riskPremium').value) || 0;
-                    const riskCost = rebuild * (1 + risk / 100);
-                    return {
-                        stage: 'pre',
-                        currency: cur,
-                        berkusTotal: berkus,
-                        riskAdjustedCost: riskCost,
-                        preLow: Math.min(berkus, riskCost),
-                        preBase: (berkus + riskCost) / 2,
-                        preHigh: Math.max(berkus, riskCost)
+                    P = {
+                        stage: 'pre', currency: cur,
+                        berkusValues: ['berkusIdea', 'berkusPrototype', 'berkusTeam', 'berkusRelations', 'berkusExecution']
+                            .map(id => parseFloat(v(id)) || 0),
+                        rebuild: parseFloat(v('rebuildCost')) || 0,
+                        risk: parseFloat(v('riskPremium')) || 0
+                    };
+                } else {
+                    P = {
+                        stage: 'post', currency: cur,
+                        ARR: parseFloat(v('arrInput')) || 0,
+                        growth: parseFloat(v('growthRate')) || 0,
+                        gross: parseFloat(v('grossMargin')) || 0,
+                        margin: parseFloat(v('profitMargin')) || 0,
+                        churn: parseFloat(v('churnRate')) || 0,
+                        nrr: parseFloat(v('nrrInput')) || 100,
+                        cust: parseFloat(v('customersCount')) || 0,
+                        cac: parseFloat(v('cacInput')) || 0,
+                        ltv: parseFloat(v('ltvInput')) || 0,
+                        netBurn: parseFloat(v('netBurnRate')) || 0,
+                        cash: parseFloat(v('cashOnHand')) || 0,
+                        arrQ: parseFloat(v('arrCurrentQ')),
+                        arrPrevQ: parseFloat(v('arrPrevQ')),
+                        salesMkt: parseFloat(v('salesMarketingPrevQ')),
+                        exitVal: parseFloat(v('exitValue')) || 0,
+                        roi: parseFloat(v('roiMultiple')) || 10
                     };
                 }
-
-                // مرحلة ما بعد الإيرادات
-                const ARR = parseFloat(document.getElementById('arrInput').value) || 0;
-                const growth = parseFloat(document.getElementById('growthRate').value) || 0;
-                const gross = parseFloat(document.getElementById('grossMargin').value) || 0;
-                const margin = parseFloat(document.getElementById('profitMargin').value) || 0;
-                const churn = parseFloat(document.getElementById('churnRate').value) || 0;
-                const nrr = parseFloat(document.getElementById('nrrInput').value) || 100;
-                const cust = parseFloat(document.getElementById('customersCount').value) || 0;
-                const cac = parseFloat(document.getElementById('cacInput').value) || 0;
-                const ltv = parseFloat(document.getElementById('ltvInput').value) || 0;
-                const netBurn = parseFloat(document.getElementById('netBurnRate').value) || 0;
-                const cash = parseFloat(document.getElementById('cashOnHand').value) || 0;
-                const arrQ = parseFloat(document.getElementById('arrCurrentQ').value);
-                const arrPrevQ = parseFloat(document.getElementById('arrPrevQ').value);
-                const salesMkt = parseFloat(document.getElementById('salesMarketingPrevQ').value);
-                const exitVal = parseFloat(document.getElementById('exitValue').value) || 0;
-                const roi = parseFloat(document.getElementById('roiMultiple').value) || 10;
-
-                const rule40 = growth + margin;
-                const ltvCac = cac > 0 ? ltv / cac : 0;
-                const grossRatio = gross / 100;
-                const mrrPerCust = cust > 0 ? (ARR / 12) / cust : 0;
-                const cacPayback = (mrrPerCust > 0 && cac > 0) ? cac / (mrrPerCust * grossRatio) : null;
-
-                let magicNum, magicEst = false;
-                if (!isNaN(arrQ) && !isNaN(arrPrevQ) && !isNaN(salesMkt) && salesMkt > 0 && arrPrevQ > 0) {
-                    magicNum = ((arrQ - arrPrevQ) * 4) / salesMkt;
-                } else {
-                    magicNum = (growth > 0 && netBurn > 0) ? (ARR * (growth / 100)) / (netBurn * 12 * 0.6) : 0;
-                    magicEst = true;
-                }
-                document.getElementById('magicNumberNote').style.display = magicEst ? 'block' : 'none';
-
-                const netNewARR = ARR * (growth / 100);
-                const burnMult = (netNewARR > 0 && netBurn > 0) ? (netBurn * 12) / netNewARR : null;
-                const runway = netBurn > 0 ? cash / netBurn : Infinity;
-
-                // حساب النقاط لتحديد المضاعف
-                let score = 0;
-                if (growth >= 100) score += 40;
-                else if (growth >= 50) score += 30 + (growth - 50) * 0.2;
-                else if (growth >= 20) score += 15 + (growth - 20) * 0.5;
-                else score += growth * 0.75;
-
-                if (gross >= 80) score += 15;
-                else if (gross >= 60) score += 10 + (gross - 60) * 0.25;
-
-                if (nrr >= 130) score += 15;
-                else if (nrr >= 100) score += 10 + (nrr - 100) * 0.166;
-
-                if (churn <= 1) score += 10;
-                else if (churn <= 2) score += 8;
-                else if (churn <= 5) score += 4;
-
-                if (ltvCac >= 5) score += 10;
-                else if (ltvCac >= 3) score += 6 + (ltvCac - 3) * 2;
-                else if (ltvCac >= 1) score += ltvCac * 2;
-
-                if (rule40 >= 40) score += 10;
-                else if (rule40 >= 0) score += rule40 * 0.25;
-
-                const baseMult = 2 + (score / 100) * 18;
-                const lowMult = Math.max(1.5, baseMult - 2.2);
-                const highMult = Math.min(22, baseMult + 2.2);
-
-                const evLow = ARR * lowMult;
-                const evBase = ARR * baseMult;
-                const evHigh = ARR * highMult;
-
-                const vcBase = roi > 0 ? exitVal / roi : 0;
-                const vcLow = vcBase * 0.7;
-                const vcHigh = vcBase * 1.4;
-
-                return {
-                    stage: 'post',
-                    currency: cur,
-                    ARR,
-                    growthRate: growth,
-                    grossMargin: gross,
-                    profitMargin: margin,
-                    churn,
-                    nrr,
-                    ltvCac,
-                    cacPaybackMonths: cacPayback,
-                    magicNumber: magicNum,
-                    magicEstimated: magicEst,
-                    burnMultiple: burnMult,
-                    runwayMonths: runway,
-                    rule40,
-                    lowMultiple: lowMult,
-                    baseMultiple: baseMult,
-                    highMultiple: highMult,
-                    evLow,
-                    evBase,
-                    evHigh,
-                    vcLow,
-                    vcBase,
-                    vcHigh
-                };
+                const res = await FG.calc('tool27', 'main', P);
+                if (res.stage === 'post') document.getElementById('magicNumberNote').style.display = res.magicEstimated ? 'block' : 'none';
+                return res;
             }
 
             // ===== عرض النتائج =====
@@ -214,51 +130,31 @@
 
                 if (res.stage === 'post') {
                     // بطاقات KPI
-                    document.getElementById('kpiCards').innerHTML = `
-                        <div class="result-card"><i class="fas fa-sync-alt"></i><h4>الإيراد المتكرر</h4><div class="value">${cur}${(res.ARR/1000).toFixed(0)}K</div></div>
-                        <div class="result-card"><i class="fas fa-chart-line"></i><h4>معدل النمو</h4><div class="value">${res.growthRate.toFixed(1)}%</div></div>
-                        <div class="result-card"><i class="fas fa-undo-alt"></i><h4>صافي الاحتفاظ</h4><div class="value">${res.nrr.toFixed(0)}%</div></div>
-                        <div class="result-card"><i class="fas fa-balance-scale"></i><h4>القيمة للتكلفة</h4><div class="value">${res.ltvCac.toFixed(2)}x</div></div>
-                        <div class="result-card"><i class="fas fa-clock"></i><h4>استرداد الاكتساب</h4><div class="value">${res.cacPaybackMonths !== null ? res.cacPaybackMonths.toFixed(1)+' شهر' : 'غير متوفر'}</div></div>
-                        <div class="result-card"><i class="fas fa-magic"></i><h4>الرقم السحري</h4><div class="value">${res.magicNumber.toFixed(2)}${res.magicEstimated ? '*' : ''}</div></div>
-                        <div class="result-card"><i class="fas fa-fire"></i><h4>مضاعف الحرق</h4><div class="value">${res.burnMultiple !== null ? res.burnMultiple.toFixed(2)+'x' : 'غير متوفر'}</div></div>
-                        <div class="result-card"><i class="fas fa-hourglass-half"></i><h4>المدرج النقدي</h4><div class="value">${isFinite(res.runwayMonths) ? res.runwayMonths.toFixed(1)+' شهر' : '∞'}</div></div>
+                    document.getElementById('kpiCards').innerHTML = `${T('s4')}${cur}${(res.ARR/1000).toFixed(0)}${T('s5')}${res.growthRate.toFixed(1)}${T('s6')}${res.nrr.toFixed(0)}${T('s7')}${res.ltvCac.toFixed(2)}${T('s8')}${res.cacPaybackMonths !== null ? res.cacPaybackMonths.toFixed(1)+T('s2') : T('s3')}${T('s9')}${res.magicNumber.toFixed(2)}${res.magicEstimated ? '*' : ''}${T('s10')}${res.burnMultiple !== null ? res.burnMultiple.toFixed(2)+'x' : T('s3')}${T('s11')}${isFinite(res.runwayMonths) ? res.runwayMonths.toFixed(1)+T('s2') : '∞'}</div></div>
                     `;
 
                     // قاعدة الـ40
-                    let badgeClass = 'status-good';
-                    if (res.rule40 < 20) badgeClass = 'status-bad';
-                    else if (res.rule40 < 40) badgeClass = 'status-warning';
+                    const badgeClass = res.ev.r40Class;
                     document.getElementById('rule40Badge').innerHTML = `
-                        <span class="status ${badgeClass}" style="font-size:1.1rem;padding:0.4rem 1.2rem;">
-                            قاعدة الـ 40: ${res.rule40.toFixed(1)}% (نمو ${res.growthRate}% + هامش ${res.profitMargin}%) – ${res.rule40 >= 40 ? '✅ متحققة' : '⚠️ غير متحققة'}
+                        <span class="status ${badgeClass}${T('s14')}${res.rule40.toFixed(1)}${T('s15')}${res.growthRate}${T('s16')}${res.profitMargin}%) – ${res.ev.r40 ? T('s12') : T('s13')}
                         </span>
                     `;
 
                     // جدول التقييم
-                    document.getElementById('valuationTable').innerHTML = `
-                        <table>
-                            <thead><tr><th>الطريقة</th><th>منخفض</th><th>أساسي</th><th>مرتفع</th></tr></thead>
-                            <tbody>
-                                <tr><td><strong>مضاعف الإيراد (${res.baseMultiple.toFixed(1)}x)</strong></td><td>${cur}${(res.evLow/1e6).toFixed(2)} مليون</td><td class="highlight">${cur}${(res.evBase/1e6).toFixed(2)} مليون</td><td>${cur}${(res.evHigh/1e6).toFixed(2)} مليون</td></tr>
-                                <tr><td><strong>طريقة رأس المال الجريء</strong></td><td>${cur}${(res.vcLow/1e6).toFixed(2)} مليون</td><td class="highlight">${cur}${(res.vcBase/1e6).toFixed(2)} مليون</td><td>${cur}${(res.vcHigh/1e6).toFixed(2)} مليون</td></tr>
-                                <tr style="background:rgba(180,133,84,0.08);"><td><strong>📊 النطاق الإجمالي</strong></td><td><strong>${cur}${(Math.min(res.evLow,res.vcLow)/1e6).toFixed(2)} مليون</strong></td><td><strong>${cur}${(((res.evBase+res.vcBase)/2)/1e6).toFixed(2)} مليون</strong></td><td><strong>${cur}${(Math.max(res.evHigh,res.vcHigh)/1e6).toFixed(2)} مليون</strong></td></tr>
-                            </tbody>
-                        </table>
-                    `;
+                    document.getElementById('valuationTable').innerHTML = `${T('s17')}${res.baseMultiple.toFixed(1)}x)</strong></td><td>${cur}${(res.evLow/1e6).toFixed(2)}${T('s18')}${cur}${(res.evBase/1e6).toFixed(2)}${T('s19')}${cur}${(res.evHigh/1e6).toFixed(2)}${T('s20')}${cur}${(res.vcLow/1e6).toFixed(2)}${T('s18')}${cur}${(res.vcBase/1e6).toFixed(2)}${T('s19')}${cur}${(res.vcHigh/1e6).toFixed(2)}${T('s21')}${cur}${(Math.min(res.evLow,res.vcLow)/1e6).toFixed(2)}${T('s22')}${cur}${(((res.evBase+res.vcBase)/2)/1e6).toFixed(2)}${T('s22')}${cur}${(Math.max(res.evHigh,res.vcHigh)/1e6).toFixed(2)}${T('s23')}`;
 
                     // التفسير
-                    let explainHtml = `<h4 style="color:#cfa776;">📝 تفسير النتائج</h4>`;
-                    explainHtml += `<p><strong>قاعدة الـ 40:</strong> ${res.rule40.toFixed(1)}% – ${res.rule40 >= 40 ? '✅ ممتاز، النمو والربحية متوازنان.' : '⚠️ أقل من 40%، قد تحتاج لتحسين الربحية أو النمو.'}</p>`;
-                    explainHtml += `<p><strong>نسبة القيمة للتكلفة (LTV/CAC):</strong> ${res.ltvCac.toFixed(2)}x – ${res.ltvCac >= 3 ? '✅ نسبة صحية، تكلفة الاكتساب مغطاة جيداً.' : '⚠️ أقل من 3x، يجب تحسين كفاءة التسويق.'}</p>`;
-                    explainHtml += `<p><strong>فترة استرداد تكلفة الاكتساب:</strong> ${res.cacPaybackMonths !== null ? res.cacPaybackMonths.toFixed(1)+' شهر' : 'غير متوفر'} – ${res.cacPaybackMonths !== null && res.cacPaybackMonths < 12 ? '✅ استرداد سريع لتكلفة الاكتساب.' : '⚠️ فترة استرداد طويلة نسبياً.'}</p>`;
-                    explainHtml += `<p><strong>الرقم السحري (Magic Number):</strong> ${res.magicNumber.toFixed(2)} – ${res.magicNumber >= 1 ? '✅ كفاءة إنفاق تسويقي عالية.' : '⚠️ العائد على الإنفاق التسويقي منخفض.'}</p>`;
-                    explainHtml += `<p><strong>مضاعف الحرق (Burn Multiple):</strong> ${res.burnMultiple !== null ? res.burnMultiple.toFixed(2)+'x' : 'غير متوفر'} – ${res.burnMultiple !== null && res.burnMultiple < 1.5 ? '✅ حرق نقدي فعال مقارنة بالنمو.' : '⚠️ الحرق مرتفع مقارنة بالإيرادات الجديدة.'}</p>`;
-                    explainHtml += `<p><strong>المدرج النقدي (Runway):</strong> ${isFinite(res.runwayMonths) ? res.runwayMonths.toFixed(1)+' شهر' : '∞'} – ${isFinite(res.runwayMonths) && res.runwayMonths > 18 ? '✅ سيولة مريحة تغطي أكثر من 18 شهراً.' : '⚠️ قد تحتاج لجولة تمويل قريباً.'}</p>`;
-                    explainHtml += `<p style="margin-top:1rem;"><strong>💡 خلاصة:</strong> التقييم الأساسي للشركة يقع في نطاق <strong>${cur}${(Math.min(res.evLow,res.vcLow)/1e6).toFixed(2)} مليون – ${cur}${(Math.max(res.evHigh,res.vcHigh)/1e6).toFixed(2)} مليون</strong> بناءً على الطريقتين. يُنصح باستخدام هذا النطاق في المفاوضات الاستثمارية.</p>`;
+                    let explainHtml = `${T('s24')}`;
+                    explainHtml += `${T('s27')}${res.rule40.toFixed(1)}% – ${res.ev.r40 ? T('s25') : T('s26')}</p>`;
+                    explainHtml += `${T('s30')}${res.ltvCac.toFixed(2)}x – ${res.ev.ltv ? T('s28') : T('s29')}</p>`;
+                    explainHtml += `${T('s34')}${res.cacPaybackMonths !== null ? res.cacPaybackMonths.toFixed(1)+T('s31') : T('s3')} – ${res.ev.pay ? T('s32') : T('s33')}</p>`;
+                    explainHtml += `${T('s37')}${res.magicNumber.toFixed(2)} – ${res.ev.magic ? T('s35') : T('s36')}</p>`;
+                    explainHtml += `${T('s40')}${res.burnMultiple !== null ? res.burnMultiple.toFixed(2)+'x' : T('s3')} – ${res.ev.burn ? T('s38') : T('s39')}</p>`;
+                    explainHtml += `${T('s43')}${isFinite(res.runwayMonths) ? res.runwayMonths.toFixed(1)+T('s31') : '∞'} – ${res.ev.runway ? T('s41') : T('s42')}</p>`;
+                    explainHtml += `${T('s44')}${cur}${(Math.min(res.evLow,res.vcLow)/1e6).toFixed(2)}${T('s45')}${cur}${(Math.max(res.evHigh,res.vcHigh)/1e6).toFixed(2)}${T('s46')}`;
                     document.getElementById('explainSection').innerHTML = explainHtml;
 
-                    document.getElementById('additionalNotes').innerHTML = `${res.magicEstimated ? '⚠️ الرقم السحري (Magic Number) تقريبي. أدخل بيانات ربعية للحصول على القيمة الدقيقة. ' : ''}💰 المدرج النقدي (Runway) ومضاعف الحرق (Burn Multiple) محسوبان على أساس صافي الحرق الشهري.`;
+                    document.getElementById('additionalNotes').innerHTML = `${res.magicEstimated ? T('s47') : ''}${T('s48')}`;
 
                     // الرسم البياني
                     const ctx = document.getElementById('valuationChart').getContext('2d');
@@ -266,12 +162,12 @@
                     valuationChart = new Chart(ctx, {
                         type: 'bar',
                         data: {
-                            labels: ['منخفض', 'أساسي', 'مرتفع'],
+                            labels: [T('s49'), T('s50'), T('s51')],
                             datasets: [
-                                { label: 'مضاعف الإيراد المتكرر', data: [res.evLow / 1e6, res.evBase / 1e6, res
+                                { label: T('s52'), data: [res.evLow / 1e6, res.evBase / 1e6, res
                                         .evHigh / 1e6
                                     ], backgroundColor: '#c9a050' },
-                                { label: 'طريقة رأس المال الجريء', data: [res.vcLow / 1e6, res.vcBase / 1e6, res
+                                { label: T('s53'), data: [res.vcLow / 1e6, res.vcBase / 1e6, res
                                         .vcHigh / 1e6
                                     ], backgroundColor: '#4a7a8c' }
                             ]
@@ -281,7 +177,7 @@
                             maintainAspectRatio: false,
                             plugins: { legend: { labels: { color: '#f0f4fa' } } },
                             scales: {
-                                y: { ticks: { callback: v => v + ' مليون', color: '#f0f4fa' }, grid: { color: 'rgba(180,133,84,0.15)' } },
+                                y: { ticks: { callback: v => v + T('s54'), color: '#f0f4fa' }, grid: { color: 'rgba(180,133,84,0.15)' } },
                                 x: { ticks: { color: '#f0f4fa' } }
                             }
                         }
@@ -289,29 +185,11 @@
 
                 } else {
                     // مرحلة ما قبل الإيرادات
-                    document.getElementById('kpiCards').innerHTML = `
-                        <div class="result-card"><i class="fas fa-seedling"></i><h4>تقييم بيركوس</h4><div class="value">${cur}${(res.berkusTotal/1000).toFixed(0)} ألف</div></div>
-                        <div class="result-card"><i class="fas fa-cogs"></i><h4>التكلفة المستبدلة</h4><div class="value">${cur}${(res.riskAdjustedCost/1000).toFixed(0)} ألف</div></div>
-                    `;
+                    document.getElementById('kpiCards').innerHTML = `${T('s55')}${cur}${(res.berkusTotal/1000).toFixed(0)}${T('s56')}${cur}${(res.riskAdjustedCost/1000).toFixed(0)}${T('s57')}`;
                     document.getElementById('rule40Badge').innerHTML = '';
-                    document.getElementById('valuationTable').innerHTML = `
-                        <table>
-                            <thead><tr><th>الطريقة</th><th>القيمة</th></tr></thead>
-                            <tbody>
-                                <tr><td><strong>طريقة بيركوس</strong></td><td class="highlight">${cur}${(res.berkusTotal/1000).toFixed(0)} ألف</td></tr>
-                                <tr><td><strong>التكلفة المستبدلة</strong></td><td class="highlight">${cur}${(res.riskAdjustedCost/1000).toFixed(0)} ألف</td></tr>
-                                <tr style="background:rgba(180,133,84,0.08);"><td><strong>📊 النطاق الإجمالي</strong></td><td><strong>${cur}${(res.preLow/1000).toFixed(0)} ألف – ${cur}${(res.preHigh/1000).toFixed(0)} ألف</strong></td></tr>
-                            </tbody>
-                        </table>
-                    `;
-                    document.getElementById('explainSection').innerHTML = `
-                        <h4 style="color:#cfa776;">📝 تفسير النتائج</h4>
-                        <p>في مرحلة ما قبل الإيرادات، يُعرض نطاق التقييم بناءً على طريقتي بيركوس والتكلفة المستبدلة بشكل منفصل. النطاق يعكس القيمة الدنيا والقصوى بين الطريقتين.</p>
-                        <p><strong>تقييم بيركوس:</strong> ${cur}${(res.berkusTotal/1000).toFixed(0)} ألف – يعتمد على خمسة عوامل: الفكرة، النموذج الأولي، الفريق، العلاقات، والتنفيذ.</p>
-                        <p><strong>التكلفة المستبدلة:</strong> ${cur}${(res.riskAdjustedCost/1000).toFixed(0)} ألف – تكلفة إعادة بناء التقنية مضافاً إليها علاوة المخاطرة.</p>
-                        <p style="margin-top:1rem;"><strong>💡 خلاصة:</strong> النطاق التقديري للشركة هو <strong>${cur}${(res.preLow/1000).toFixed(0)} ألف – ${cur}${(res.preHigh/1000).toFixed(0)} ألف</strong>. يُنصح باستخدام هذا النطاق في المفاوضات التأسيسية.</p>
-                    `;
-                    document.getElementById('additionalNotes').innerHTML = 'التقييم في المراحل المبكرة تقديري بطبيعته. الأرقام الفعلية تعتمد على قناعة المستثمرين وجودة العرض.';
+                    document.getElementById('valuationTable').innerHTML = `${T('s58')}${cur}${(res.berkusTotal/1000).toFixed(0)}${T('s59')}${cur}${(res.riskAdjustedCost/1000).toFixed(0)}${T('s60')}${cur}${(res.preLow/1000).toFixed(0)}${T('s61')}${cur}${(res.preHigh/1000).toFixed(0)}${T('s62')}`;
+                    document.getElementById('explainSection').innerHTML = `${T('s63')}${cur}${(res.berkusTotal/1000).toFixed(0)}${T('s64')}${cur}${(res.riskAdjustedCost/1000).toFixed(0)}${T('s65')}${cur}${(res.preLow/1000).toFixed(0)}${T('s61')}${cur}${(res.preHigh/1000).toFixed(0)}${T('s66')}`;
+                    document.getElementById('additionalNotes').innerHTML = T('s67');
 
                     // إخفاء الرسم البياني
                     if (valuationChart) { valuationChart.destroy();
@@ -323,19 +201,20 @@
             }
 
             // ===== ربط زر الحساب =====
-            document.getElementById('calculateBtn').addEventListener('click', function() {
-                const res = computeSaaS();
+            document.getElementById('calculateBtn').addEventListener('click', async function() {
+                let res;
+                try { res = await computeSaaS(); } catch (e) { FG.calcError(e); return; }
                 displayResults(res);
             });
 
             // ========== تصدير Excel ==========
             async function exportToFullExcel() {
-                if (!globalSaaSData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-                showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والرسوم البيانية');
+                if (!globalSaaSData) { alert(T('s68')); return; }
+                showLoading(T('s69'), T('s70'));
                 try {
                     const D = globalSaaSData;
                     const cur = D.currency;
-                    const company = document.getElementById('companyName').value || 'الشركة';
+                    const company = document.getElementById('companyName').value || T('s71');
 
                     const workbook = new ExcelJS.Workbook();
                     workbook.creator = 'FAROUK GRUP';
@@ -358,7 +237,7 @@
                     function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11,
                                 color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid',
                                 fgColor: { argb: bg } }, alignment: { horizontal: 'center',
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'thin', color: { argb: G } }, bottom: { style: 'thin',
                                     color: { argb: G } }, left: { style: 'thin', color: { argb: G } },
                                 right: { style: 'thin', color: { argb: G } } } }; }
@@ -366,7 +245,7 @@
                     function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial',
                                 bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern',
                                 pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h,
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, left: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, right: { style: 'hair',
@@ -380,13 +259,13 @@
                         tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true,
                             size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid',
                             fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle',
-                            wrapText: true, readingOrder: 'rtl' }; c.border = { top: { style: 'medium',
+                            wrapText: true, readingOrder: FG.dir() }; c.border = { top: { style: 'medium',
                                 color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } },
                             left: { style: 'medium', color: { argb: G } }, right: { style: 'medium',
                                 color: { argb: G } } }; }
 
                     // 1. غلاف التقرير
-                    const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true,
+                    const cv = workbook.addWorksheet(T('s72'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
                     for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
@@ -394,26 +273,26 @@
                     cv.getRow(4).height = 60;
                     cv.mergeCells(2, 1, 2, 4);
                     const bc = cv.getCell(2, 1);
-                    bc.value = 'مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+                    bc.value = T('s73');
                     bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
                     bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
                     bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                    readingOrder: 'rtl' };
+                    readingOrder: FG.dir() };
                     bc.border = { bottom: { style: 'thick', color: { argb: G } } };
-                    mh(cv, 1, 4, 4, `تقرير تقييم شركة برمجية ناشئة\n${company}`, DB, GL, 18);
+                    mh(cv, 1, 4, 4, `${T('s74')}${company}`, DB, GL, 18);
                     const inf = [
-                        ['📋 اسم الشركة', company],
-                        ['📅 التاريخ', new Date().toLocaleDateString('ar-EG')],
-                        ['💰 العملة', cur],
-                        ['📊 المرحلة', D.stage === 'post' ? 'ما بعد الإيرادات' : 'ما قبل الإيرادات']
+                        [T('s75'), company],
+                        [T('s76'), new Date().toLocaleDateString(FG.locale())],
+                        [T('s77'), cur],
+                        [T('s78'), D.stage === 'post' ? T('s79') : T('s80')]
                     ];
                     if (D.stage === 'post') {
-                        inf.push(['📈 التقييم الأساسي', `${cur} ${fmtNum((D.evBase + D.vcBase) / 2)}`]);
-                        inf.push(['🔢 مضاعف الإيراد', `${D.baseMultiple.toFixed(2)}x`]);
-                        inf.push(['🎯 قاعدة الـ40', `${D.rule40.toFixed(1)}%`]);
+                        inf.push([T('s81'), `${cur} ${fmtNum((D.evBase + D.vcBase) / 2)}`]);
+                        inf.push([T('s82'), `${D.baseMultiple.toFixed(2)}x`]);
+                        inf.push([T('s83'), `${D.rule40.toFixed(1)}%`]);
                     } else {
-                        inf.push(['📈 تقييم بيركوس', `${cur} ${fmtNum(D.berkusTotal)}`]);
-                        inf.push(['🔧 تكلفة مستبدلة', `${cur} ${fmtNum(D.riskAdjustedCost)}`]);
+                        inf.push([T('s84'), `${cur} ${fmtNum(D.berkusTotal)}`]);
+                        inf.push([T('s85'), `${cur} ${fmtNum(D.riskAdjustedCost)}`]);
                     }
                     let ir = 6;
                     inf.forEach(([l, v], idx) => {
@@ -426,12 +305,12 @@
                         const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
                         ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         cv.getRow(ir).height = 28;
@@ -439,16 +318,16 @@
                     });
 
                     // 2. المدخلات
-                    const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true,
+                    const inputsSheet = workbook.addWorksheet(T('s86'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     inputsSheet.getColumn(1).width = 5;
                     inputsSheet.getColumn(2).width = 38;
                     inputsSheet.getColumn(3).width = 22;
                     inputsSheet.getColumn(4).width = 22;
                     inputsSheet.getColumn(5).width = 5;
-                    mh(inputsSheet, 1, 5, 1, '📋 جدول المدخلات والافتراضات الأساسية', DB, GL, 14);
+                    mh(inputsSheet, 1, 5, 1, T('s87'), DB, GL, 14);
                     inputsSheet.getRow(1).height = 40;
-                    mh(inputsSheet, 2, 4, 2, 'البيانات الأساسية', SB, W, 11);
+                    mh(inputsSheet, 2, 4, 2, T('s88'), SB, W, 11);
                     inputsSheet.getRow(2).height = 28;
 
                     let iRow = 3;
@@ -469,75 +348,71 @@
                     };
 
                     if (D.stage === 'post') {
-                        addInputRow('الإيراد السنوي المتكرر (ARR)', D.ARR);
-                        addInputRow('معدل النمو السنوي', D.growthRate, '%');
-                        addInputRow('هامش الربح الإجمالي', D.grossMargin, '%');
-                        addInputRow('هامش الربح التشغيلي', D.profitMargin, '%');
-                        addInputRow('معدل التسرب الشهري', D.churn, '%');
-                        addInputRow('صافي الاحتفاظ (NRR)', D.nrr, '%');
-                        addInputRow('عدد العملاء', parseFloat(document.getElementById('customersCount').value) || 0);
-                        addInputRow('تكلفة اكتساب العميل (CAC)', parseFloat(document.getElementById('cacInput')
+                        addInputRow(T('s89'), D.ARR);
+                        addInputRow(T('s90'), D.growthRate, '%');
+                        addInputRow(T('s91'), D.grossMargin, '%');
+                        addInputRow(T('s92'), D.profitMargin, '%');
+                        addInputRow(T('s93'), D.churn, '%');
+                        addInputRow(T('s94'), D.nrr, '%');
+                        addInputRow(T('s95'), parseFloat(document.getElementById('customersCount').value) || 0);
+                        addInputRow(T('s96'), parseFloat(document.getElementById('cacInput')
                             .value) || 0);
-                        addInputRow('القيمة الدائمة للعميل (LTV)', parseFloat(document.getElementById('ltvInput')
+                        addInputRow(T('s97'), parseFloat(document.getElementById('ltvInput')
                             .value) || 0);
-                        addInputRow('صافي الحرق الشهري', parseFloat(document.getElementById('netBurnRate').value) ||
+                        addInputRow(T('s98'), parseFloat(document.getElementById('netBurnRate').value) ||
                             0);
-                        addInputRow('النقد المتاح', parseFloat(document.getElementById('cashOnHand').value) || 0);
-                        addInputRow('قيمة التخارج المتوقعة', parseFloat(document.getElementById('exitValue')
+                        addInputRow(T('s99'), parseFloat(document.getElementById('cashOnHand').value) || 0);
+                        addInputRow(T('s100'), parseFloat(document.getElementById('exitValue')
                             .value) || 0);
-                        addInputRow('مضاعف العائد المستهدف', parseFloat(document.getElementById('roiMultiple')
+                        addInputRow(T('s101'), parseFloat(document.getElementById('roiMultiple')
                             .value) || 10);
-                        addInputRow('سنوات التخارج', parseFloat(document.getElementById('exitYears').value) || 6);
+                        addInputRow(T('s102'), parseFloat(document.getElementById('exitYears').value) || 6);
                     } else {
-                        addInputRow('بيركوس - الفكرة', parseFloat(document.getElementById('berkusIdea').value) || 0);
-                        addInputRow('بيركوس - النموذج الأولي', parseFloat(document.getElementById('berkusPrototype')
+                        addInputRow(T('s103'), parseFloat(document.getElementById('berkusIdea').value) || 0);
+                        addInputRow(T('s104'), parseFloat(document.getElementById('berkusPrototype')
                             .value) || 0);
-                        addInputRow('بيركوس - الفريق', parseFloat(document.getElementById('berkusTeam').value) || 0);
-                        addInputRow('بيركوس - العلاقات', parseFloat(document.getElementById('berkusRelations')
+                        addInputRow(T('s105'), parseFloat(document.getElementById('berkusTeam').value) || 0);
+                        addInputRow(T('s106'), parseFloat(document.getElementById('berkusRelations')
                             .value) || 0);
-                        addInputRow('بيركوس - التنفيذ', parseFloat(document.getElementById('berkusExecution')
+                        addInputRow(T('s107'), parseFloat(document.getElementById('berkusExecution')
                             .value) || 0);
-                        addInputRow('تكلفة إعادة البناء', parseFloat(document.getElementById('rebuildCost')
+                        addInputRow(T('s108'), parseFloat(document.getElementById('rebuildCost')
                             .value) || 0);
-                        addInputRow('علاوة المخاطرة', parseFloat(document.getElementById('riskPremium').value) || 0,
+                        addInputRow(T('s109'), parseFloat(document.getElementById('riskPremium').value) || 0,
                             '%');
                     }
 
                     // 3. مؤشرات الأداء
-                    const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true,
+                    const kpiSheet = workbook.addWorksheet(T('s110'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [5, 32, 22, 22, 22, 5].forEach((w, i) => kpiSheet.getColumn(i + 1).width = w);
-                    mh(kpiSheet, 1, 6, 1, '📊 لوحة مؤشرات الأداء الرئيسية', DB, GL, 15);
+                    mh(kpiSheet, 1, 6, 1, T('s111'), DB, GL, 15);
                     kpiSheet.getRow(1).height = 45;
-                    mh(kpiSheet, 2, 5, 2, `${company} | ${new Date().toLocaleDateString('ar-EG')}`, HB, W, 10);
+                    mh(kpiSheet, 2, 5, 2, `${company} | ${new Date().toLocaleDateString(FG.locale())}`, HB, W, 10);
                     kpiSheet.getRow(2).height = 26;
 
                     let kpis = [];
                     if (D.stage === 'post') {
                         kpis = [
-                            { label: 'الإيراد المتكرر (ARR)', value: `${cur} ${fmtNum(D.ARR)}`, good: true },
-                            { label: 'معدل النمو', value: `${D.growthRate.toFixed(1)}%`, good: D.growthRate >
-                                    20 },
-                            { label: 'صافي الاحتفاظ (NRR)', value: `${D.nrr.toFixed(0)}%`, good: D.nrr >= 100 },
-                            { label: 'القيمة للتكلفة (LTV/CAC)', value: `${D.ltvCac.toFixed(2)}x`, good: D
-                                    .ltvCac >= 3 },
-                            { label: 'استرداد تكلفة الاكتساب', value: D.cacPaybackMonths !== null ? `${D.cacPaybackMonths.toFixed(1)} شهر` :
-                                    'غير متوفر', good: D.cacPaybackMonths !== null && D.cacPaybackMonths <
-                                    12 },
-                            { label: 'الرقم السحري', value: `${D.magicNumber.toFixed(2)}`, good: D
-                                    .magicNumber >= 1 },
-                            { label: 'مضاعف الحرق', value: D.burnMultiple !== null ? `${D.burnMultiple.toFixed(2)}x` :
-                                    'غير متوفر', good: D.burnMultiple !== null && D.burnMultiple < 1.5 },
-                            { label: 'المدرج النقدي', value: isFinite(D.runwayMonths) ? `${D.runwayMonths.toFixed(1)} شهر` :
-                                    '∞', good: isFinite(D.runwayMonths) && D.runwayMonths > 12 }
+                            { label: T('s112'), value: `${cur} ${fmtNum(D.ARR)}`, good: true },
+                            { label: T('s113'), value: `${D.growthRate.toFixed(1)}%`, good: D.ev.growth },
+                            { label: T('s114'), value: `${D.nrr.toFixed(0)}%`, good: D.ev.nrr },
+                            { label: T('s115'), value: `${D.ltvCac.toFixed(2)}x`, good: D.ev.ltv },
+                            { label: T('s116'), value: D.cacPaybackMonths !== null ? `${D.cacPaybackMonths.toFixed(1)}${T('s2')}` :
+                                    T('s3'), good: D.ev.pay },
+                            { label: T('s117'), value: `${D.magicNumber.toFixed(2)}`, good: D.ev.magic },
+                            { label: T('s118'), value: D.burnMultiple !== null ? `${D.burnMultiple.toFixed(2)}x` :
+                                    T('s3'), good: D.ev.burn },
+                            { label: T('s119'), value: isFinite(D.runwayMonths) ? `${D.runwayMonths.toFixed(1)}${T('s2')}` :
+                                    '∞', good: D.ev.runway12 }
                         ];
                     } else {
                         kpis = [
-                            { label: 'تقييم بيركوس', value: `${cur} ${fmtNum(D.berkusTotal)}`, good: true },
-                            { label: 'التكلفة المستبدلة', value: `${cur} ${fmtNum(D.riskAdjustedCost)}`,
+                            { label: T('s120'), value: `${cur} ${fmtNum(D.berkusTotal)}`, good: true },
+                            { label: T('s121'), value: `${cur} ${fmtNum(D.riskAdjustedCost)}`,
                             good: true },
-                            { label: 'النطاق الأدنى', value: `${cur} ${fmtNum(D.preLow)}`, good: true },
-                            { label: 'النطاق الأعلى', value: `${cur} ${fmtNum(D.preHigh)}`, good: true }
+                            { label: T('s122'), value: `${cur} ${fmtNum(D.preLow)}`, good: true },
+                            { label: T('s123'), value: `${cur} ${fmtNum(D.preHigh)}`, good: true }
                         ];
                     }
 
@@ -566,43 +441,43 @@
                         ic.font = { name: 'Arial', bold: true, size: 14, color: { argb: '555555' } };
                         ic.alignment = { horizontal: 'center', vertical: 'middle' };
                         lc2.font = { name: 'Arial', bold: true, size: 11, color: { argb: DT } };
-                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                         vc3.font = { name: 'Arial', bold: true, size: 13, color: { argb: tc } };
                         vc3.alignment = { horizontal: 'center', vertical: 'middle' };
                         nc2.font = { name: 'Arial', size: 9, color: { argb: '444444' } };
-                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                         kRow++;
                     });
                     kRow++;
                     kpiSheet.mergeCells(kRow, 2, kRow, 5);
                     const kFinal = kpiSheet.getCell(kRow, 2);
                     const isGood = D.stage === 'post' ? (D.evBase + D.vcBase) / 2 > 0 : D.preBase > 0;
-                    kFinal.value = isGood ? '✅ التقييم إيجابي' : '⚠️ التقييم يحتاج مراجعة';
+                    kFinal.value = isGood ? T('s124') : T('s125');
                     kFinal.font = { name: 'Arial', bold: true, size: 13, color: { argb: isGood ? PT :
                         '856404' } };
                     kFinal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: isGood ? PB : GB } };
-                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() };
                     kFinal.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
                             color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
                         right: { style: 'medium', color: { argb: G } } };
                     kpiSheet.getRow(kRow).height = 40;
 
                     // 4. نطاق التقييم
-                    const valSheet = workbook.addWorksheet('نطاق التقييم', { views: [{ rightToLeft: true,
+                    const valSheet = workbook.addWorksheet(T('s126'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [5, 35, 22, 22, 22, 5].forEach((w, i) => valSheet.getColumn(i + 1).width = w);
-                    mh(valSheet, 1, 6, 1, '📊 نطاق التقييم', DB, GL, 14);
+                    mh(valSheet, 1, 6, 1, T('s127'), DB, GL, 14);
                     valSheet.getRow(1).height = 40;
 
                     if (D.stage === 'post') {
-                        ['الطريقة', 'منخفض', 'أساسي', 'مرتفع'].forEach((h, i) => { const c = valSheet.getCell(2, i +
+                        [T('s128'), T('s49'), T('s50'), T('s51')].forEach((h, i) => { const c = valSheet.getCell(2, i +
                             2);
                             c.value = h;
                             ap(c, hs(SB, GL)); });
                         const data = [
-                            [`مضاعف الإيراد (${D.baseMultiple.toFixed(1)}x)`, D.evLow, D.evBase, D.evHigh],
-                            ['طريقة رأس المال الجريء', D.vcLow, D.vcBase, D.vcHigh],
-                            ['النطاق الإجمالي', Math.min(D.evLow, D.vcLow), (D.evBase + D.vcBase) / 2, Math
+                            [`${T('s129')}${D.baseMultiple.toFixed(1)}x)`, D.evLow, D.evBase, D.evHigh],
+                            [T('s53'), D.vcLow, D.vcBase, D.vcHigh],
+                            [T('s130'), Math.min(D.evLow, D.vcLow), (D.evBase + D.vcBase) / 2, Math
                                 .max(D.evHigh, D.vcHigh)
                             ]
                         ];
@@ -621,13 +496,13 @@
                             });
                         });
                     } else {
-                        ['الطريقة', 'القيمة'].forEach((h, i) => { const c = valSheet.getCell(2, i + 2);
+                        [T('s128'), T('s131')].forEach((h, i) => { const c = valSheet.getCell(2, i + 2);
                             c.value = h;
                             ap(c, hs(SB, GL)); });
                         [
-                            ['طريقة بيركوس', D.berkusTotal],
-                            ['التكلفة المستبدلة', D.riskAdjustedCost],
-                            ['النطاق', `${fmtNum(D.preLow)} – ${fmtNum(D.preHigh)}`]
+                            [T('s132'), D.berkusTotal],
+                            [T('s121'), D.riskAdjustedCost],
+                            [T('s133'), `${fmtNum(D.preLow)} – ${fmtNum(D.preHigh)}`]
                         ].forEach((row, i) => {
                             const r = 3 + i;
                             valSheet.getRow(r).height = 30;
@@ -644,12 +519,12 @@
 
                     // 5. الرسم البياني (للمرحلة ما بعد الإيرادات فقط)
                     if (D.stage === 'post') {
-                        const chartSheet = workbook.addWorksheet('الرسم البياني', { views: [{ rightToLeft: true,
+                        const chartSheet = workbook.addWorksheet(T('s134'), { views: [{ rightToLeft: FG.isRTL(),
                                 showGridLines: false }] });
                         chartSheet.getColumn(1).width = 5;
                         chartSheet.getColumn(2).width = 50;
                         chartSheet.getColumn(3).width = 5;
-                        mh(chartSheet, 1, 3, 1, '📈 نطاق التقييم - رسم بياني', DB, GL, 14);
+                        mh(chartSheet, 1, 3, 1, T('s135'), DB, GL, 14);
                         chartSheet.getRow(1).height = 40;
                         const canvasElem = document.getElementById('valuationChart');
                         if (canvasElem) {
@@ -668,36 +543,36 @@
                     }
 
                     // 6. التفسير والتوصيات
-                    const intSheet = workbook.addWorksheet('التفسير والتوصيات', { views: [{ rightToLeft: true,
+                    const intSheet = workbook.addWorksheet(T('s136'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     intSheet.getColumn(1).width = 5;
                     intSheet.getColumn(2).width = 50;
                     intSheet.getColumn(3).width = 5;
-                    mh(intSheet, 1, 3, 1, '📝 التفسير والتوصيات', DB, GL, 14);
+                    mh(intSheet, 1, 3, 1, T('s137'), DB, GL, 14);
                     intSheet.getRow(1).height = 45;
 
                     let sections = [];
                     if (D.stage === 'post') {
                         const baseVal = (D.evBase + D.vcBase) / 2;
                         sections = [
-                            { title: '1. ملخص التقييم',
-                            content: `الشركة: ${company}\nالتقييم الأساسي: ${cur} ${fmtNum(baseVal)}\nمضاعف الإيراد: ${D.baseMultiple.toFixed(2)}x\nقاعدة الـ40: ${D.rule40.toFixed(1)}%` },
-                            { title: '2. تحليل المؤشرات',
-                            content: `نسبة LTV/CAC: ${D.ltvCac.toFixed(2)}x\nفترة استرداد CAC: ${D.cacPaybackMonths !== null ? D.cacPaybackMonths.toFixed(1)+' شهر' : 'غير متوفر'}\nالرقم السحري: ${D.magicNumber.toFixed(2)}\nمضاعف الحرق: ${D.burnMultiple !== null ? D.burnMultiple.toFixed(2)+'x' : 'غير متوفر'}\nالمدرج النقدي: ${isFinite(D.runwayMonths) ? D.runwayMonths.toFixed(1)+' شهر' : '∞'}` },
-                            { title: '3. التوصيات',
-                            content: baseVal > 0 && D.rule40 >= 20 ? '• يمكن استخدام هذا النطاق في المفاوضات الاستثمارية.\n• يُنصح بتحسين المؤشرات الضعيفة لرفع المضاعف.\n• مراقبة معدل الحرق والمدرج النقدي باستمرار.' :
-                                '• مراجعة هيكل التكاليف والإيرادات.\n• تحسين كفاءة التسويق والمبيعات.\n• طلب استشارة متخصصة قبل جولة التمويل.' },
-                            { title: '4. تنويه',
-                            content: 'هذا التحليل مبني على افتراضات تقديرية ونموذج تسجيل نقاط. النتائج الفعلية قد تختلف. يُنصح باستشارة خبير مالي قبل اتخاذ القرارات الاستثمارية.' }
+                            { title: T('s138'),
+                            content: `${T('s139')}${company}${T('s140')}${cur} ${fmtNum(baseVal)}${T('s141')}${D.baseMultiple.toFixed(2)}${T('s142')}${D.rule40.toFixed(1)}%` },
+                            { title: T('s143'),
+                            content: `${T('s144')}${D.ltvCac.toFixed(2)}${T('s145')}${D.cacPaybackMonths !== null ? D.cacPaybackMonths.toFixed(1)+T('s31') : T('s3')}${T('s146')}${D.magicNumber.toFixed(2)}${T('s147')}${D.burnMultiple !== null ? D.burnMultiple.toFixed(2)+'x' : T('s3')}${T('s148')}${isFinite(D.runwayMonths) ? D.runwayMonths.toFixed(1)+T('s31') : '∞'}` },
+                            { title: T('s149'),
+                            content: baseVal > 0 && D.ev.r40mid ? T('s150') :
+                                T('s151') },
+                            { title: T('s152'),
+                            content: T('s153') }
                         ];
                     } else {
                         sections = [
-                            { title: '1. ملخص التقييم',
-                            content: `الشركة: ${company} (مرحلة ما قبل الإيرادات)\nتقييم بيركوس: ${cur} ${fmtNum(D.berkusTotal)}\nالتكلفة المستبدلة: ${cur} ${fmtNum(D.riskAdjustedCost)}\nالنطاق: ${cur} ${fmtNum(D.preLow)} – ${cur} ${fmtNum(D.preHigh)}` },
-                            { title: '2. التوصيات',
-                            content: '• التركيز على بناء المنتج الأولي (MVP).\n• تعزيز الفريق المؤسس والعلاقات الاستراتيجية.\n• البحث عن مستثمرين ملائكيين أو صناديق تأسيسية.\n• تقييم الشركة حالياً يقع ضمن نطاق الجولات التأسيسية.' },
-                            { title: '3. تنويه',
-                            content: 'التقييم في المراحل المبكرة تقديري بطبيعته. الأرقام الفعلية تعتمد على قناعة المستثمرين وجودة العرض.' }
+                            { title: T('s138'),
+                            content: `${T('s139')}${company}${T('s154')}${cur} ${fmtNum(D.berkusTotal)}${T('s155')}${cur} ${fmtNum(D.riskAdjustedCost)}${T('s156')}${cur} ${fmtNum(D.preLow)} – ${cur} ${fmtNum(D.preHigh)}` },
+                            { title: T('s157'),
+                            content: T('s158') },
+                            { title: T('s159'),
+                            content: T('s67') }
                         ];
                     }
 
@@ -712,7 +587,7 @@
                         tc3.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: idx % 2 ===
                                 0 ? HB : SB } };
                         tc3.alignment = { horizontal: 'right', vertical: 'middle',
-                        readingOrder: 'rtl' };
+                        readingOrder: FG.dir() };
                         tc3.border = { bottom: { style: 'medium', color: { argb: G } } };
                         itRow++;
                         intSheet.getRow(itRow).height = Math.max(60, sec.content.split('\n')
@@ -723,7 +598,7 @@
                         cc.font = { name: 'Arial', size: 10, color: { argb: DT } };
                         cc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEFCF6' } };
                         cc.alignment = { horizontal: 'right', vertical: 'top', wrapText: true,
-                            readingOrder: 'rtl' };
+                            readingOrder: FG.dir() };
                         cc.border = { top: { style: 'hair' }, bottom: { style: 'hair',
                                 color: { argb: G } }, left: { style: 'hair' }, right: { style: 'hair' } };
                     });
@@ -732,11 +607,11 @@
                     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                     const now = new Date();
                     const fileName =
-                        `تقرير_تقييم_${company}_${now.toISOString().slice(0,10)}.xlsx`;
+                        `${T('s160')}${company}_${now.toISOString().slice(0,10)}.xlsx`;
                     saveAs(blob, fileName);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ أثناء إنشاء ملف Excel: ' + err.message);
+                    alert(T('s161') + err.message);
                 } finally {
                     hideLoading();
                 }
@@ -744,14 +619,14 @@
 
             // ========== تصدير Word ==========
             async function exportToWord() {
-                if (!globalSaaSData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-                showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات والرسوم البيانية');
+                if (!globalSaaSData) { alert(T('s68')); return; }
+                showLoading(T('s162'), T('s163'));
                 try {
                     const D = globalSaaSData;
                     const cur = D.currency;
-                    const company = document.getElementById('companyName').value || 'الشركة';
+                    const company = document.getElementById('companyName').value || T('s71');
                     const now = new Date();
-                    const dateStr = now.toLocaleDateString('ar-EG');
+                    const dateStr = now.toLocaleDateString(FG.locale());
 
                     let chartImg = '';
                     if (D.stage === 'post') {
@@ -770,98 +645,53 @@
                         sensRows = '';
                     if (D.stage === 'post') {
                         const kpis = [
-                            { l: 'الإيراد المتكرر (ARR)', v: `${cur} ${fmtNum(D.ARR)}`, g: true },
-                            { l: 'معدل النمو السنوي', v: `${D.growthRate.toFixed(1)}%`, g: D.growthRate > 20 },
-                            { l: 'صافي الاحتفاظ (NRR)', v: `${D.nrr.toFixed(0)}%`, g: D.nrr >= 100 },
-                            { l: 'القيمة للتكلفة (LTV/CAC)', v: `${D.ltvCac.toFixed(2)}x`, g: D.ltvCac >= 3 },
-                            { l: 'استرداد تكلفة الاكتساب', v: D.cacPaybackMonths !== null ? `${D.cacPaybackMonths.toFixed(1)} شهر` :
-                                    'غير متوفر', g: D.cacPaybackMonths !== null && D.cacPaybackMonths <
-                                    12 },
-                            { l: 'الرقم السحري (Magic Number)', v: `${D.magicNumber.toFixed(2)}`, g: D
-                                    .magicNumber >= 1 },
-                            { l: 'مضاعف الحرق (Burn Multiple)', v: D.burnMultiple !== null ? `${D.burnMultiple.toFixed(2)}x` :
-                                    'غير متوفر', g: D.burnMultiple !== null && D.burnMultiple < 1.5 },
-                            { l: 'المدرج النقدي (Runway)', v: isFinite(D.runwayMonths) ? `${D.runwayMonths.toFixed(1)} شهر` :
-                                    '∞', g: isFinite(D.runwayMonths) && D.runwayMonths > 12 }
+                            { l: T('s112'), v: `${cur} ${fmtNum(D.ARR)}`, g: true },
+                            { l: T('s164'), v: `${D.growthRate.toFixed(1)}%`, g: D.ev.growth },
+                            { l: T('s114'), v: `${D.nrr.toFixed(0)}%`, g: D.ev.nrr },
+                            { l: T('s115'), v: `${D.ltvCac.toFixed(2)}x`, g: D.ev.ltv },
+                            { l: T('s116'), v: D.cacPaybackMonths !== null ? `${D.cacPaybackMonths.toFixed(1)}${T('s31')}` :
+                                    T('s3'), g: D.ev.pay },
+                            { l: T('s165'), v: `${D.magicNumber.toFixed(2)}`, g: D.ev.magic },
+                            { l: T('s166'), v: D.burnMultiple !== null ? `${D.burnMultiple.toFixed(2)}x` :
+                                    T('s3'), g: D.ev.burn },
+                            { l: T('s167'), v: isFinite(D.runwayMonths) ? `${D.runwayMonths.toFixed(1)}${T('s31')}` :
+                                    '∞', g: D.ev.runway12 }
                         ];
                         kpis.forEach(k => {
                             kpiRows +=
                                 `<tr><td style="padding:10px;background:${k.g?'#d4edda':'#f8d7da'};text-align:right;">${k.l}</td><td style="padding:10px;background:${k.g?'#d4edda':'#f8d7da'};text-align:center;"><strong style="color:${k.g?'#155724':'#721c24'};">${k.v}</strong></td></tr>`;
                         });
-                        metricsTable = `
-                            <h3 style="color:#b8860b;">📊 نطاق التقييم</h3>
-                            <table><thead><tr><th>الطريقة</th><th>منخفض</th><th>أساسي</th><th>مرتفع</th></tr></thead><tbody>
-                                <tr><td>مضاعف الإيراد (${D.baseMultiple.toFixed(1)}x)</td><td>${cur} ${fmtNum(D.evLow)}</td><td><strong>${cur} ${fmtNum(D.evBase)}</strong></td><td>${cur} ${fmtNum(D.evHigh)}</td></tr>
-                                <tr><td>طريقة رأس المال الجريء</td><td>${cur} ${fmtNum(D.vcLow)}</td><td><strong>${cur} ${fmtNum(D.vcBase)}</strong></td><td>${cur} ${fmtNum(D.vcHigh)}</td></tr>
-                                <tr style="background:#fefcf6;"><td><strong>النطاق الإجمالي</strong></td><td><strong>${cur} ${fmtNum(Math.min(D.evLow,D.vcLow))}</strong></td><td><strong>${cur} ${fmtNum((D.evBase+D.vcBase)/2)}</strong></td><td><strong>${cur} ${fmtNum(Math.max(D.evHigh,D.vcHigh))}</strong></td></tr>
+                        metricsTable = `${T('s168')}${D.baseMultiple.toFixed(1)}x)</td><td>${cur} ${fmtNum(D.evLow)}</td><td><strong>${cur} ${fmtNum(D.evBase)}</strong></td><td>${cur} ${fmtNum(D.evHigh)}${T('s169')}${cur} ${fmtNum(D.vcLow)}</td><td><strong>${cur} ${fmtNum(D.vcBase)}</strong></td><td>${cur} ${fmtNum(D.vcHigh)}${T('s170')}${cur} ${fmtNum(Math.min(D.evLow,D.vcLow))}</strong></td><td><strong>${cur} ${fmtNum((D.evBase+D.vcBase)/2)}</strong></td><td><strong>${cur} ${fmtNum(Math.max(D.evHigh,D.vcHigh))}</strong></td></tr>
                             </tbody></table>
                         `;
-                        sensRows = `
-                            <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;margin:20px 0;">
-                                <h4 style="color:#b8860b;">📝 تفسير النتائج</h4>
-                                <p><strong>قاعدة الـ40:</strong> ${D.rule40.toFixed(1)}% – ${D.rule40>=40?'✅ متحققة':'⚠️ غير متحققة'}</p>
-                                <p><strong>LTV/CAC:</strong> ${D.ltvCac.toFixed(2)}x – ${D.ltvCac>=3?'✅ صحي':'⚠️ يحتاج تحسين'}</p>
-                                <p><strong>فترة استرداد CAC:</strong> ${D.cacPaybackMonths!==null?D.cacPaybackMonths.toFixed(1)+' شهر':'غير متوفر'}</p>
-                                <p><strong>الرقم السحري:</strong> ${D.magicNumber.toFixed(2)} – ${D.magicNumber>=1?'✅ كفاءة عالية':'⚠️ منخفض'}</p>
-                                <p><strong>مضاعف الحرق:</strong> ${D.burnMultiple!==null?D.burnMultiple.toFixed(2)+'x':'غير متوفر'} – ${D.burnMultiple!==null&&D.burnMultiple<1.5?'✅ فعال':'⚠️ مرتفع'}</p>
-                                <p><strong>المدرج النقدي:</strong> ${isFinite(D.runwayMonths)?D.runwayMonths.toFixed(1)+' شهر':'∞'}</p>
+                        sensRows = `${T('s181')}${D.rule40.toFixed(1)}% – ${D.ev.r40?T('s171'):T('s172')}</p>
+                                <p><strong>LTV/CAC:</strong> ${D.ltvCac.toFixed(2)}x – ${D.ev.ltv?T('s173'):T('s174')}${T('s182')}${D.cacPaybackMonths!==null?D.cacPaybackMonths.toFixed(1)+T('s175'):T('s176')}${T('s183')}${D.magicNumber.toFixed(2)} – ${D.ev.magic?T('s177'):T('s178')}${T('s184')}${D.burnMultiple!==null?D.burnMultiple.toFixed(2)+'x':T('s176')} – ${D.ev.burn?T('s179'):T('s180')}${T('s185')}${isFinite(D.runwayMonths)?D.runwayMonths.toFixed(1)+T('s175'):'∞'}</p>
                             </div>
                         `;
                     } else {
-                        kpiRows = `
-                            <tr><td style="padding:10px;background:#d4edda;text-align:right;">تقييم بيركوس</td><td style="padding:10px;background:#d4edda;text-align:center;"><strong style="color:#155724;">${cur} ${fmtNum(D.berkusTotal)}</strong></td></tr>
-                            <tr><td style="padding:10px;background:#d4edda;text-align:right;">التكلفة المستبدلة</td><td style="padding:10px;background:#d4edda;text-align:center;"><strong style="color:#155724;">${cur} ${fmtNum(D.riskAdjustedCost)}</strong></td></tr>
+                        kpiRows = `${T('s186')}${cur} ${fmtNum(D.berkusTotal)}${T('s187')}${cur} ${fmtNum(D.riskAdjustedCost)}</strong></td></tr>
                         `;
-                        metricsTable = `
-                            <h3 style="color:#b8860b;">📊 نطاق التقييم</h3>
-                            <table><thead><tr><th>الطريقة</th><th>القيمة</th></tr></thead><tbody>
-                                <tr><td>طريقة بيركوس</td><td><strong>${cur} ${fmtNum(D.berkusTotal)}</strong></td></tr>
-                                <tr><td>التكلفة المستبدلة</td><td><strong>${cur} ${fmtNum(D.riskAdjustedCost)}</strong></td></tr>
-                                <tr style="background:#fefcf6;"><td><strong>النطاق الإجمالي</strong></td><td><strong>${cur} ${fmtNum(D.preLow)} – ${cur} ${fmtNum(D.preHigh)}</strong></td></tr>
+                        metricsTable = `${T('s188')}${cur} ${fmtNum(D.berkusTotal)}${T('s189')}${cur} ${fmtNum(D.riskAdjustedCost)}${T('s190')}${cur} ${fmtNum(D.preLow)} – ${cur} ${fmtNum(D.preHigh)}</strong></td></tr>
                             </tbody></table>
                         `;
                     }
 
-                    const fullHtml = `<!DOCTYPE html>
-                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
-                    <head><meta charset='utf-8'><title>تقرير تقييم شركة برمجية - FAROUK GRUP</title>
-                    <style>
-                        body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;}
-                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                        .cover h1{font-size:32px;color:#b8860b;margin:0;}
-                        .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-                        .cover p{color:#666;}
-                        table{width:100%;border-collapse:collapse;margin:20px 0;direction:rtl;}
-                        th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                        th{background:#fefcf6;color:#b8860b;font-weight:bold;}
-                        .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
-                        .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;font-size:10pt;}
-                    </style></head>
-                    <body>
-                        <div class="cover">
-                            <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                            <h2>تقرير تقييم شركة برمجية ناشئة</h2>
-                            <p>الجهة: ${company} | التاريخ: ${dateStr}</p>
-                            <p>المرحلة: ${D.stage==='post'?'ما بعد الإيرادات':'ما قبل الإيرادات'} | العملة: ${cur}</p>
-                        </div>
-                        <h2 style="color:#b8860b;">📊 مؤشرات الأداء الرئيسية</h2>
-                        <table>${kpiRows}</table>
+                    const fullHtml = `${T('s192')}${company}${T('s193')}${dateStr}${T('s194')}${D.stage==='post'?T('s79'):T('s80')}${T('s195')}${cur}${T('s196')}${kpiRows}</table>
                         ${metricsTable}
                         ${sensRows}
-                        ${chartImg?`<h2 style="color:#b8860b;">📈 الرسم البياني لنطاق التقييم</h2><div style="text-align:center;"><img src="${chartImg}" class="chart-img"/></div>`:''}
-                        <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()} | www.farouk-grup.com</div>
+                        ${chartImg?`${T('s191')}${chartImg}" class="chart-img"/></div>`:''}${T('s197')}${now.getFullYear()} | www.farouk-grup.com</div>
                     </body></html>`;
 
                     const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
                     link.download =
-                        `تقرير_تقييم_${company}_${now.toISOString().slice(0,10)}.doc`;
+                        `${T('s160')}${company}_${now.toISOString().slice(0,10)}.doc`;
                     link.click();
                     URL.revokeObjectURL(link.href);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ في إنشاء تقرير Word');
+                    alert(T('s198'));
                 } finally {
                     hideLoading();
                 }
@@ -877,8 +707,7 @@
                 switchStage('post');
                 // تنفيذ الحساب تلقائياً بعد تحميل الصفحة
                 setTimeout(function() {
-                    const res = computeSaaS();
-                    displayResults(res);
+                    computeSaaS().then(displayResults, FG.calcError);
                 }, 400);
             });
 

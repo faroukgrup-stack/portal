@@ -16,7 +16,7 @@
                         let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
                         calcDisplay.value = r;
                         currentCalcInput = r.toString();
-                    } catch (e) { calcDisplay.value = 'خطأ';
+                    } catch (e) { calcDisplay.value = T('s1');
                         currentCalcInput = ''; }
                     return;
                 }
@@ -79,9 +79,7 @@
                     const row = document.createElement('div');
                     row.className = 'cashflow-row';
                     const yearNum = idx + 1;
-                    row.innerHTML = `
-                        <div class="field">
-                            <label>السنة ${yearNum}</label>
+                    row.innerHTML = `${T('s2')}${yearNum}</label>
                             <input type="number" class="cf-input" data-index="${idx}" value="${val}" step="1000">
                         </div>
                     `;
@@ -125,11 +123,11 @@
             });
 
             // ===== الحساب الرئيسي =====
-            function calculateInvestmentMetrics() {
+            async function calculateInvestmentMetrics() {
                 updateCashflowsFromInputs();
 
                 const currency = document.getElementById('currencySelect').value;
-                const company = document.getElementById('companyName').value || 'الجهة';
+                const company = document.getElementById('companyName').value || T('s3');
                 const initialInvestment = parseFloat(document.getElementById('initialInvestment').value) || 0;
                 const discountRate = parseFloat(document.getElementById('discountRate').value) / 100 || 0;
                 const years = parseInt(document.getElementById('projectYears').value) || 0;
@@ -138,88 +136,20 @@
                 while (cashflows.length > years) cashflows.pop();
 
                 if (initialInvestment <= 0 || discountRate < 0 || years <= 0) {
-                    alert('الرجاء إدخال قيم صحيحة (استثمار > 0، معدل خصم >= 0، سنوات > 0).');
+                    alert(T('s4'));
                     return;
                 }
 
-                // حساب NPV
-                let npv = -initialInvestment;
-                for (let i = 0; i < years; i++) {
-                    const cf = cashflows[i] || 0;
-                    npv += cf / Math.pow(1 + discountRate, i + 1);
-                }
-
-                // حساب IRR (طريقة نيوتن-رافسون)
-                let irr = 0.1;
-                const maxIter = 1000;
-                const tolerance = 0.00001;
-                for (let iter = 0; iter < maxIter; iter++) {
-                    let npv_irr = -initialInvestment;
-                    let dnpv = 0;
-                    for (let i = 0; i < years; i++) {
-                        const cf = cashflows[i] || 0;
-                        const denom = Math.pow(1 + irr, i + 1);
-                        npv_irr += cf / denom;
-                        dnpv += -(i + 1) * cf / Math.pow(1 + irr, i + 2);
-                    }
-                    if (Math.abs(npv_irr) < tolerance) break;
-                    if (dnpv === 0) break;
-                    irr = irr - npv_irr / dnpv;
-                    if (irr < -0.99) irr = -0.99;
-                    if (irr > 10) irr = 10;
-                }
-                const irrPercent = irr * 100;
-
-                // فترة الاسترداد (Payback)
-                let cumulative = 0;
-                let paybackYear = 0;
-                let paybackRemaining = 0;
-                for (let i = 0; i < years; i++) {
-                    cumulative += cashflows[i] || 0;
-                    if (cumulative >= initialInvestment) {
-                        paybackYear = i + 1;
-                        const excess = cumulative - initialInvestment;
-                        paybackRemaining = (cashflows[i] || 0) > 0 ? (excess / (cashflows[i] || 0)) : 0;
-                        break;
-                    }
-                }
-                let payback = paybackYear > 0 ? paybackYear - paybackRemaining : 0;
-
-                // فترة الاسترداد المخصومة
-                let discountedCumulative = 0;
-                let dPaybackYear = 0;
-                let dPaybackRemaining = 0;
-                for (let i = 0; i < years; i++) {
-                    const dcf = (cashflows[i] || 0) / Math.pow(1 + discountRate, i + 1);
-                    discountedCumulative += dcf;
-                    if (discountedCumulative >= initialInvestment) {
-                        dPaybackYear = i + 1;
-                        const excess = discountedCumulative - initialInvestment;
-                        dPaybackRemaining = dcf > 0 ? (excess / dcf) : 0;
-                        break;
-                    }
-                }
-                let dPayback = dPaybackYear > 0 ? dPaybackYear - dPaybackRemaining : 0;
-
-                const isAcceptable = npv > 0 && irrPercent > discountRate * 100;
-                let status = '',
-                    statusClass = '';
-                if (isAcceptable) {
-                    status = 'مقبول (استثمار مجدٍ)';
-                    statusClass = 'status-good';
-                } else if (npv > 0 || irrPercent > discountRate * 100) {
-                    status = 'مقبول جزئياً (يرجى المراجعة)';
-                    statusClass = 'status-warning';
-                } else {
-                    status = 'غير مقبول (استثمار غير مجدٍ)';
-                    statusClass = 'status-bad';
-                }
+                let R;
+                try { R = await FG.calc('tool26', 'main', { initialInvestment, discountRate, years, cashflows }); } catch (e) { FG.calcError(e); return; }
+                const { npv, irrPercent, payback, dPayback, isAcceptable, status, statusClass } = R;
 
                 currentResults = {
                     currency,
                     company,
                     inputs: { initialInvestment, discountRate: discountRate * 100, years, cashflows: [...cashflows] },
-                    outputs: { npv, irr: irrPercent, payback, dPayback, status, statusClass, isAcceptable }
+                    outputs: { npv, irr: irrPercent, payback, dPayback, status, statusClass, isAcceptable },
+                    rows: R.rows
                 };
 
                 document.getElementById('resultsSection').style.display = 'block';
@@ -227,48 +157,19 @@
 
                 // بطاقات النتائج
                 document.getElementById('kpiCards').innerHTML = `
-                    <div class="result-card" style="border-color:${npv >= 0 ? '#28a745' : '#dc3545'};">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <h4>صافي القيمة الحالية (NPV)</h4>
-                        <div class="value" style="color:${npv >= 0 ? '#4ade80' : '#f87171'}">${currency}${npv.toFixed(2)}</div>
-                        <div class="unit">${npv >= 0 ? '✅ إيجابي' : '❌ سلبي'}</div>
-                    </div>
-                    <div class="result-card">
-                        <i class="fas fa-percent"></i>
-                        <h4>معدل العائد الداخلي (IRR)</h4>
-                        <div class="value">${irrPercent.toFixed(2)}%</div>
-                        <div class="unit">مقارنة بالخصم: ${(discountRate*100).toFixed(2)}%</div>
-                    </div>
-                    <div class="result-card">
-                        <i class="fas fa-clock"></i>
-                        <h4>فترة الاسترداد (Payback)</h4>
-                        <div class="value">${payback.toFixed(2)}</div>
-                        <div class="unit">سنة</div>
-                    </div>
-                    <div class="result-card">
-                        <i class="fas fa-hourglass-half"></i>
-                        <h4>الاسترداد المخصوم</h4>
-                        <div class="value">${dPayback.toFixed(2)}</div>
-                        <div class="unit">سنة</div>
-                    </div>
-                    <div class="result-card" style="border-color:${isAcceptable ? '#28a745' : '#dc3545'};">
-                        <i class="fas fa-check-circle"></i>
-                        <h4>الحكم النهائي</h4>
-                        <div class="value" style="font-size:1.1rem;"><span class="status ${statusClass}">${status}</span></div>
+                    <div class="result-card" style="border-color:${npv >= 0 ? '#28a745' : '#dc3545'}${T('s10')}${npv >= 0 ? '#4ade80' : '#f87171'}">${currency}${npv.toFixed(2)}</div>
+                        <div class="unit">${npv >= 0 ? T('s8') : T('s9')}${T('s11')}${irrPercent.toFixed(2)}${T('s12')}${(discountRate*100).toFixed(2)}${T('s13')}${payback.toFixed(2)}${T('s14')}${dPayback.toFixed(2)}${T('s15')}${isAcceptable ? '#28a745' : '#dc3545'}${T('s16')}${statusClass}">${status}</span></div>
                     </div>
                 `;
 
                 // جدول التدفقات
-                let tableHtml = `<table><thead><tr><th>السنة</th><th>التدفق النقدي</th><th>العامل المخصوم</th><th>القيمة المخصومة</th><th>التراكمي</th></tr></thead><tbody>`;
-                let cum = -initialInvestment;
+                let tableHtml = `${T('s17')}`;
                 for (let i = 0; i < years; i++) {
-                    const cf = cashflows[i] || 0;
-                    const dcf = cf / Math.pow(1 + discountRate, i + 1);
-                    cum += dcf;
+                    const { cf, factor, dcf, cum } = R.rows[i];
                     tableHtml += `<tr>
                         <td>${i+1}</td>
                         <td>${currency}${cf.toFixed(0)}</td>
-                        <td>${(1 / Math.pow(1 + discountRate, i + 1)).toFixed(4)}</td>
+                        <td>${factor.toFixed(4)}</td>
                         <td>${currency}${dcf.toFixed(0)}</td>
                         <td class="${cum >= 0 ? 'positive' : 'negative'}">${currency}${cum.toFixed(0)}</td>
                     </tr>`;
@@ -278,22 +179,22 @@
 
                 // التوصيات
                 const recDiv = document.getElementById('recommendations');
-                let recHtml = `<h4 style="color:#cfa776;">📌 تحليل الجدوى</h4>`;
+                let recHtml = `${T('s18')}`;
                 if (isAcceptable) {
-                    recHtml += `<p style="color:#4ade80;">✅ المشروع مقبول استثمارياً.</p>`;
-                    recHtml += `<p>صافي القيمة الحالية إيجابي (${currency}${npv.toFixed(2)})، ومعدل العائد الداخلي (${irrPercent.toFixed(2)}%) يتجاوز معدل الخصم (${(discountRate*100).toFixed(2)}%).</p>`;
+                    recHtml += `${T('s19')}`;
+                    recHtml += `${T('s20')}${currency}${npv.toFixed(2)}${T('s21')}${irrPercent.toFixed(2)}${T('s22')}${(discountRate*100).toFixed(2)}%).</p>`;
                     if (payback < years) {
-                        recHtml += `<p>فترة الاسترداد (${payback.toFixed(2)} سنة) أقل من مدة المشروع (${years} سنوات).</p>`;
+                        recHtml += `${T('s23')}${payback.toFixed(2)}${T('s24')}${years}${T('s25')}`;
                     } else {
-                        recHtml += `<p>⚠️ فترة الاسترداد (${payback.toFixed(2)} سنة) تتجاوز مدة المشروع (${years} سنوات).</p>`;
+                        recHtml += `${T('s26')}${payback.toFixed(2)}${T('s27')}${years}${T('s28')}`;
                     }
                 } else if (npv > 0 || irrPercent > discountRate * 100) {
-                    recHtml += `<p style="color:#fbbf24;">🟡 المشروع مقبول جزئياً.</p>`;
-                    recHtml += `<p>أحد المؤشرين إيجابي ولكن ليس كلاهما. يوصى بإعادة تقييم الافتراضات أو تحسين التدفقات النقدية.</p>`;
+                    recHtml += `${T('s29')}`;
+                    recHtml += `${T('s30')}`;
                 } else {
-                    recHtml += `<p style="color:#f87171;">🔴 المشروع غير مجدٍ استثمارياً.</p>`;
-                    recHtml += `<p>صافي القيمة الحالية سلبي (${currency}${npv.toFixed(2)})، ومعدل العائد الداخلي (${irrPercent.toFixed(2)}%) أقل من معدل الخصم (${(discountRate*100).toFixed(2)}%).</p>`;
-                    recHtml += `<p>يوصى بإعادة دراسة المشروع أو البحث عن بدائل استثمارية أفضل.</p>`;
+                    recHtml += `${T('s31')}`;
+                    recHtml += `${T('s32')}${currency}${npv.toFixed(2)}${T('s21')}${irrPercent.toFixed(2)}${T('s33')}${(discountRate*100).toFixed(2)}%).</p>`;
+                    recHtml += `${T('s34')}`;
                 }
                 recDiv.innerHTML = recHtml;
 
@@ -306,7 +207,7 @@
                 const cumulativeValues = [];
                 let cumVal = -initialInvestment;
                 for (let i = 0; i < years; i++) {
-                    labels.push(`سنة ${i+1}`);
+                    labels.push(`${T('s35')}${i+1}`);
                     dataValues.push(cashflows[i] || 0);
                     cumVal += (cashflows[i] || 0);
                     cumulativeValues.push(cumVal);
@@ -317,7 +218,7 @@
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'التدفق النقدي السنوي',
+                            label: T('s36'),
                             data: dataValues,
                             backgroundColor: dataValues.map(v => v >= 0 ? 'rgba(40,167,69,0.7)' :
                                 'rgba(220,53,69,0.7)'),
@@ -326,7 +227,7 @@
                             borderRadius: 4,
                             order: 2
                         }, {
-                            label: 'التراكمي',
+                            label: T('s37'),
                             data: cumulativeValues,
                             type: 'line',
                             borderColor: '#b48554',
@@ -354,8 +255,8 @@
 
             // ========== تصدير Excel ==========
             async function exportToFullExcel() {
-                if (!currentResults) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-                showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والرسوم البيانية');
+                if (!currentResults) { alert(T('s38')); return; }
+                showLoading(T('s39'), T('s40'));
                 try {
                     const D = currentResults;
                     const currency = D.currency;
@@ -382,7 +283,7 @@
                     function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11,
                                 color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid',
                                 fgColor: { argb: bg } }, alignment: { horizontal: 'center',
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'thin', color: { argb: G } }, bottom: { style: 'thin',
                                     color: { argb: G } }, left: { style: 'thin', color: { argb: G } },
                                 right: { style: 'thin', color: { argb: G } } } }; }
@@ -390,7 +291,7 @@
                     function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial',
                                 bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern',
                                 pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h,
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, left: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, right: { style: 'hair',
@@ -404,13 +305,13 @@
                         tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true,
                             size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid',
                             fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle',
-                            wrapText: true, readingOrder: 'rtl' }; c.border = { top: { style: 'medium',
+                            wrapText: true, readingOrder: FG.dir() }; c.border = { top: { style: 'medium',
                                 color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } },
                             left: { style: 'medium', color: { argb: G } }, right: { style: 'medium',
                                 color: { argb: G } } }; }
 
                     // 1. غلاف التقرير
-                    const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true,
+                    const cv = workbook.addWorksheet(T('s41'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
                     for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
@@ -418,20 +319,20 @@
                     cv.getRow(4).height = 60;
                     cv.mergeCells(2, 1, 2, 4);
                     const bc = cv.getCell(2, 1);
-                    bc.value = 'مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+                    bc.value = T('s42');
                     bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
                     bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
                     bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                    readingOrder: 'rtl' };
+                    readingOrder: FG.dir() };
                     bc.border = { bottom: { style: 'thick', color: { argb: G } } };
-                    mh(cv, 1, 4, 4, `تقرير تحليل الاستثمار\n${company}`, DB, GL, 18);
+                    mh(cv, 1, 4, 4, `${T('s43')}${company}`, DB, GL, 18);
                     const inf = [
-                        ['📋 الجهة', company],
-                        ['📅 التاريخ', new Date().toLocaleDateString('ar-EG')],
-                        ['💰 العملة', currency],
+                        [T('s44'), company],
+                        [T('s45'), new Date().toLocaleDateString(FG.locale())],
+                        [T('s46'), currency],
                         ['📊 NPV', `${currency}${D.outputs.npv.toFixed(2)}`],
                         ['📈 IRR', `${D.outputs.irr.toFixed(2)}%`],
-                        ['🏷️ الحكم', D.outputs.status]
+                        [T('s47'), D.outputs.status]
                     ];
                     let ir = 6;
                     inf.forEach(([l, v], idx) => {
@@ -444,12 +345,12 @@
                         const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
                         ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         cv.getRow(ir).height = 28;
@@ -457,21 +358,21 @@
                     });
 
                     // 2. المدخلات
-                    const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true,
+                    const inputsSheet = workbook.addWorksheet(T('s48'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     inputsSheet.getColumn(1).width = 5;
                     inputsSheet.getColumn(2).width = 38;
                     inputsSheet.getColumn(3).width = 22;
                     inputsSheet.getColumn(4).width = 22;
                     inputsSheet.getColumn(5).width = 5;
-                    mh(inputsSheet, 1, 5, 1, '📋 جدول المدخلات والافتراضات الأساسية', DB, GL, 14);
+                    mh(inputsSheet, 1, 5, 1, T('s49'), DB, GL, 14);
                     inputsSheet.getRow(1).height = 40;
-                    mh(inputsSheet, 2, 4, 2, 'البيانات الأساسية للمشروع', SB, W, 11);
+                    mh(inputsSheet, 2, 4, 2, T('s50'), SB, W, 11);
                     inputsSheet.getRow(2).height = 28;
                     const inputFields = [
-                        ['الاستثمار المبدئي', D.inputs.initialInvestment, `${currency} ${D.inputs.initialInvestment.toFixed(0)}`],
-                        ['معدل الخصم', D.inputs.discountRate, `${D.inputs.discountRate.toFixed(2)}%`],
-                        ['مدة المشروع (سنوات)', D.inputs.years, '']
+                        [T('s51'), D.inputs.initialInvestment, `${currency} ${D.inputs.initialInvestment.toFixed(0)}`],
+                        [T('s52'), D.inputs.discountRate, `${D.inputs.discountRate.toFixed(2)}%`],
+                        [T('s53'), D.inputs.years, '']
                     ];
                     let iRow = 3;
                     inputFields.forEach(([label, val, note], idx) => {
@@ -491,7 +392,7 @@
                     });
 
                     // 3. التدفقات النقدية
-                    const cfSheet = workbook.addWorksheet('التدفقات النقدية', { views: [{ rightToLeft: true,
+                    const cfSheet = workbook.addWorksheet(T('s54'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     cfSheet.getColumn(1).width = 5;
                     cfSheet.getColumn(2).width = 15;
@@ -500,15 +401,12 @@
                     cfSheet.getColumn(5).width = 22;
                     cfSheet.getColumn(6).width = 22;
                     cfSheet.getColumn(7).width = 5;
-                    mh(cfSheet, 1, 7, 1, '📋 جدول التدفقات النقدية', DB, GL, 14);
+                    mh(cfSheet, 1, 7, 1, T('s55'), DB, GL, 14);
                     cfSheet.getRow(1).height = 40;
-                    cfSheet.addRow(['السنة', 'التدفق النقدي', 'العامل المخصوم', 'القيمة المخصومة', 'التراكمي']);
-                    let cum = -D.inputs.initialInvestment;
+                    cfSheet.addRow([T('s56'), T('s57'), T('s58'), T('s59'), T('s37')]);
                     for (let i = 0; i < D.inputs.years; i++) {
-                        const cf = D.inputs.cashflows[i] || 0;
-                        const dcf = cf / Math.pow(1 + D.inputs.discountRate / 100, i + 1);
-                        cum += dcf;
-                        cfSheet.addRow([i + 1, cf, (1 / Math.pow(1 + D.inputs.discountRate / 100, i + 1))
+                        const { cf, factor, dcf, cum } = D.rows[i];
+                        cfSheet.addRow([i + 1, cf, factor
                             .toFixed(4), dcf, cum
                         ]);
                     }
@@ -517,21 +415,21 @@
                     cfHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
 
                     // 4. مؤشرات الأداء
-                    const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true,
+                    const kpiSheet = workbook.addWorksheet(T('s60'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [5, 32, 22, 22, 22, 5].forEach((w, i) => kpiSheet.getColumn(i + 1).width = w);
-                    mh(kpiSheet, 1, 6, 1, '📊 لوحة مؤشرات الأداء الرئيسية', DB, GL, 15);
+                    mh(kpiSheet, 1, 6, 1, T('s61'), DB, GL, 15);
                     kpiSheet.getRow(1).height = 45;
-                    mh(kpiSheet, 2, 5, 2, `${company} | ${new Date().toLocaleDateString('ar-EG')}`, HB, W, 10);
+                    mh(kpiSheet, 2, 5, 2, `${company} | ${new Date().toLocaleDateString(FG.locale())}`, HB, W, 10);
                     kpiSheet.getRow(2).height = 26;
                     const kpis = [
                         { label: 'NPV', value: `${currency}${D.outputs.npv.toFixed(2)}`, good: D.outputs.npv >
                             0 },
                         { label: 'IRR', value: `${D.outputs.irr.toFixed(2)}%`, good: D.outputs.irr > D
                                 .inputs.discountRate },
-                        { label: 'Payback', value: `${D.outputs.payback.toFixed(2)} سنة`, good: D.outputs
+                        { label: 'Payback', value: `${D.outputs.payback.toFixed(2)}${T('s62')}`, good: D.outputs
                                 .payback < D.inputs.years },
-                        { label: 'الحكم', value: D.outputs.status, good: D.outputs.isAcceptable }
+                        { label: T('s63'), value: D.outputs.status, good: D.outputs.isAcceptable }
                     ];
                     let kRow = 3;
                     kpis.forEach((k, idx) => {
@@ -558,35 +456,35 @@
                         ic.font = { name: 'Arial', bold: true, size: 14, color: { argb: '555555' } };
                         ic.alignment = { horizontal: 'center', vertical: 'middle' };
                         lc2.font = { name: 'Arial', bold: true, size: 11, color: { argb: DT } };
-                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                         vc3.font = { name: 'Arial', bold: true, size: 13, color: { argb: tc } };
                         vc3.alignment = { horizontal: 'center', vertical: 'middle' };
                         nc2.font = { name: 'Arial', size: 9, color: { argb: '444444' } };
-                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                         kRow++;
                     });
                     kRow++;
                     kpiSheet.mergeCells(kRow, 2, kRow, 5);
                     const kFinal = kpiSheet.getCell(kRow, 2);
-                    kFinal.value = D.outputs.isAcceptable ? '✅ المشروع مجدٍ استثمارياً' :
-                        '⚠️ المشروع غير مجدٍ استثمارياً';
+                    kFinal.value = D.outputs.isAcceptable ? T('s64') :
+                        T('s65');
                     kFinal.font = { name: 'Arial', bold: true, size: 13, color: { argb: D.outputs
                             .isAcceptable ? PT : '856404' } };
                     kFinal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: D.outputs
                             .isAcceptable ? PB : GB } };
-                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() };
                     kFinal.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
                             color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
                         right: { style: 'medium', color: { argb: G } } };
                     kpiSheet.getRow(kRow).height = 40;
 
                     // 5. الرسوم البيانية
-                    const chartsSheet = workbook.addWorksheet('الرسم البياني', { views: [{ rightToLeft: true,
+                    const chartsSheet = workbook.addWorksheet(T('s66'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     chartsSheet.getColumn(1).width = 5;
                     chartsSheet.getColumn(2).width = 50;
                     chartsSheet.getColumn(3).width = 5;
-                    mh(chartsSheet, 1, 3, 1, '📊 التدفقات النقدية', DB, GL, 14);
+                    mh(chartsSheet, 1, 3, 1, T('s67'), DB, GL, 14);
                     chartsSheet.getRow(1).height = 40;
 
                     const chartContainer = document.querySelector('.chart-container');
@@ -605,34 +503,34 @@
                     }
 
                     // 6. التوصيات
-                    const recSheet = workbook.addWorksheet('التوصيات', { views: [{ rightToLeft: true,
+                    const recSheet = workbook.addWorksheet(T('s68'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     recSheet.getColumn(1).width = 5;
                     recSheet.getColumn(2).width = 50;
                     recSheet.getColumn(3).width = 5;
-                    mh(recSheet, 1, 3, 1, '💡 التوصيات', DB, GL, 14);
+                    mh(recSheet, 1, 3, 1, T('s69'), DB, GL, 14);
                     recSheet.getRow(1).height = 40;
                     let recContent = '';
                     if (D.outputs.isAcceptable) {
                         recContent =
-                            `✅ المشروع مقبول استثمارياً.\nصافي القيمة الحالية إيجابي (${currency}${D.outputs.npv.toFixed(2)})، ومعدل العائد الداخلي (${D.outputs.irr.toFixed(2)}%) يتجاوز معدل الخصم (${D.inputs.discountRate.toFixed(2)}%).\nفترة الاسترداد: ${D.outputs.payback.toFixed(2)} سنة`;
+                            `${T('s70')}${currency}${D.outputs.npv.toFixed(2)}${T('s21')}${D.outputs.irr.toFixed(2)}${T('s22')}${D.inputs.discountRate.toFixed(2)}${T('s71')}${D.outputs.payback.toFixed(2)}${T('s62')}`;
                     } else {
                         recContent =
-                            `🔴 المشروع غير مجدٍ استثمارياً.\nصافي القيمة الحالية سلبي (${currency}${D.outputs.npv.toFixed(2)})، ومعدل العائد الداخلي (${D.outputs.irr.toFixed(2)}%) أقل من معدل الخصم (${D.inputs.discountRate.toFixed(2)}%).\nيوصى بإعادة دراسة المشروع أو البحث عن بدائل استثمارية أفضل.`;
+                            `${T('s72')}${currency}${D.outputs.npv.toFixed(2)}${T('s21')}${D.outputs.irr.toFixed(2)}${T('s33')}${D.inputs.discountRate.toFixed(2)}${T('s73')}`;
                     }
                     recSheet.getCell(3, 2).value = recContent;
                     recSheet.getCell(3, 2).font = { name: 'Arial', size: 11 };
-                    recSheet.getCell(3, 2).alignment = { wrapText: true, readingOrder: 'rtl' };
+                    recSheet.getCell(3, 2).alignment = { wrapText: true, readingOrder: FG.dir() };
 
                     const buffer = await workbook.xlsx.writeBuffer();
                     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                     const now = new Date();
                     const fileName =
-                        `تقرير_استثمار_${company}_${now.toISOString().slice(0,10)}.xlsx`;
+                        `${T('s74')}${company}_${now.toISOString().slice(0,10)}.xlsx`;
                     saveAs(blob, fileName);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ أثناء إنشاء ملف Excel: ' + err.message);
+                    alert(T('s75') + err.message);
                 } finally {
                     hideLoading();
                 }
@@ -640,14 +538,14 @@
 
             // ========== تصدير Word ==========
             async function exportToWord() {
-                if (!currentResults) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-                showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات والرسوم البيانية');
+                if (!currentResults) { alert(T('s38')); return; }
+                showLoading(T('s76'), T('s77'));
                 try {
                     const D = currentResults;
                     const currency = D.currency;
                     const company = D.company;
                     const now = new Date();
-                    const dateStr = now.toLocaleDateString('ar-EG');
+                    const dateStr = now.toLocaleDateString(FG.locale());
 
                     const chartContainer = document.querySelector('.chart-container');
                     let chartImgBase64 = '';
@@ -666,62 +564,20 @@
                             `<tr><td>${i+1}</td><td>${currency}${(D.inputs.cashflows[i]||0).toFixed(0)}</td></tr>`;
                     }
 
-                    const fullHtml = `<!DOCTYPE html>
-                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
-                    <head><meta charset='utf-8'><title>تقرير تحليل الاستثمار - FAROUK GRUP</title>
-                    <style>
-                        body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;}
-                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                        .cover h1{font-size:32px;color:#b8860b;margin:0;}
-                        .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-                        table{width:100%;border-collapse:collapse;margin:20px 0;direction:rtl;}
-                        th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                        th{background:#fefcf6;color:#b8860b;font-weight:bold;}
-                        .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
-                        .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;}
-                        .rec{background:#f9f9f9;padding:15px;border-right:4px solid #b8860b;margin:20px 0;}
-                    </style></head>
-                    <body>
-                        <div class="cover">
-                            <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                            <h2>تقرير تحليل الاستثمار</h2>
-                            <p>الجهة: ${company} | التاريخ: ${dateStr}</p>
-                            <p>العملة: ${currency}</p>
-                        </div>
-                        <h2 style="color:#b8860b;">بيانات المشروع</h2>
-                        <table><tbody>
-                            <tr><th>الاستثمار المبدئي</th><td>${currency}${D.inputs.initialInvestment.toFixed(0)}</td></tr>
-                            <tr><th>معدل الخصم</th><td>${D.inputs.discountRate.toFixed(2)}%</td></tr>
-                            <tr><th>مدة المشروع</th><td>${D.inputs.years} سنوات</td></tr>
-                        </tbody></table>
-                        <h2 style="color:#b8860b;">📈 التدفقات النقدية السنوية</h2>
-                        <table><thead><tr><th>السنة</th><th>التدفق النقدي</th></tr></thead><tbody>${cfRows}</tbody></table>
-                        <h2 style="color:#b8860b;">📊 مؤشرات الاستثمار</h2>
-                        <table>
-                            <thead><tr><th>المؤشر</th><th>القيمة</th></tr></thead>
-                            <tbody>
-                                <tr><td>صافي القيمة الحالية (NPV)</td><td>${currency}${D.outputs.npv.toFixed(2)}</td></tr>
-                                <tr><td>معدل العائد الداخلي (IRR)</td><td>${D.outputs.irr.toFixed(2)}%</td></tr>
-                                <tr><td>فترة الاسترداد (Payback)</td><td>${D.outputs.payback.toFixed(2)} سنة</td></tr>
-                                <tr><td>فترة الاسترداد المخصومة</td><td>${D.outputs.dPayback.toFixed(2)} سنة</td></tr>
-                                <tr style="font-weight:bold;"><td>الحكم النهائي</td><td style="color:${D.outputs.isAcceptable ? '#28a745' : '#dc3545'};">${D.outputs.status}</td></tr>
-                            </tbody>
-                        </table>
-                        <div class="rec"><h3 style="color:#b8860b;">💡 التوصية</h3><p>${D.outputs.isAcceptable ? '✅ المشروع مقبول استثمارياً.' : '🔴 المشروع غير مجدٍ استثمارياً.'}</p></div>
-                        ${chartImgBase64 ? `<h2 style="color:#b8860b;">📊 الرسم البياني للتدفقات النقدية</h2><div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>` : ''}
-                        <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+                    const fullHtml = `${T('s81')}${company}${T('s82')}${dateStr}${T('s83')}${currency}${T('s84')}${currency}${D.inputs.initialInvestment.toFixed(0)}${T('s85')}${D.inputs.discountRate.toFixed(2)}${T('s86')}${D.inputs.years}${T('s87')}${cfRows}${T('s88')}${currency}${D.outputs.npv.toFixed(2)}${T('s89')}${D.outputs.irr.toFixed(2)}${T('s90')}${D.outputs.payback.toFixed(2)}${T('s91')}${D.outputs.dPayback.toFixed(2)}${T('s92')}${D.outputs.isAcceptable ? '#28a745' : '#dc3545'};">${D.outputs.status}${T('s93')}${D.outputs.isAcceptable ? T('s78') : T('s79')}</p></div>
+                        ${chartImgBase64 ? `${T('s80')}${chartImgBase64}" class="chart-img" /></div>` : ''}${T('s94')}${now.getFullYear()}</div>
                     </body></html>`;
 
                     const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
                     link.download =
-                        `تقرير_استثمار_${company}_${now.toISOString().slice(0,10)}.doc`;
+                        `${T('s74')}${company}_${now.toISOString().slice(0,10)}.doc`;
                     link.click();
                     URL.revokeObjectURL(link.href);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ في إنشاء تقرير Word');
+                    alert(T('s95'));
                 } finally {
                     hideLoading();
                 }

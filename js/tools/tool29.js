@@ -15,40 +15,40 @@
 
             // ========== تعريف المجالات والمعايير (16 معياراً) ==========
             const domains = [{
-                name: "المعرفة",
+                name: T('s1'),
                 icon: "fa-brain",
                 criteria: [
-                    "فهم دقيق لأساسيات مالية الشركات (بيان الدخل، الميزانية، التدفق النقدي)",
-                    "إنتاج دراسة حالة باستخدام تقنيات مالية مثل التدفقات النقدية المخصومة",
-                    "معرفة كافية بنظام المحاسبة الإدارية والقدرة على شرحه وتعديله",
-                    "فهم سياسات وإجراءات الموارد البشرية لدعم الفريق في الرواتب والحياة المهنية"
+                    T('s2'),
+                    T('s3'),
+                    T('s4'),
+                    T('s5')
                 ]
             }, {
-                name: "القدرات",
+                name: T('s6'),
                 icon: "fa-chart-line",
                 criteria: [
-                    "الدخول لموقع شركة وتحديد منتجاتها وإستراتيجيات السوق خلال 10 دقائق",
-                    "حساب النسب المالية من التقرير السنوي ومقارنة المؤسسات بمعايير الصناعة",
-                    "استخدام عملية تقييم المخاطر وتقديم تقديرات مالية متفائلة ومحتملة ومتشائمة",
-                    "تقديم حالة عمل مقنعة لترويج مشروع وتعديل مؤشرات الأداء الرئيسية"
+                    T('s7'),
+                    T('s8'),
+                    T('s9'),
+                    T('s10')
                 ]
             }, {
-                name: "التوجيهات",
+                name: T('s11'),
                 icon: "fa-compass",
                 criteria: [
-                    "إنفاق أموال المؤسسة بحرص والبحث المستمر عن خفض التكاليف وزيادة العوائد",
-                    "التحرك الدائم نحو مؤشرات الأداء الرئيسية مع إدراك متى تكون غير مناسبة وتغييرها",
-                    "الالتزام بتحقيق الأهداف مع إدراك أن الجهل بالأمور المالية والإدارية يقلل الأداء",
-                    "تقوية العلاقة المعرفية بالماليات واعتبار الإدارة المالية مصدراً لدعم الأهداف"
+                    T('s12'),
+                    T('s13'),
+                    T('s14'),
+                    T('s15')
                 ]
             }, {
-                name: "السلوكيات",
+                name: T('s16'),
                 icon: "fa-user-check",
                 criteria: [
-                    "قراءة الصفحات المالية للصحف بانتظام ومتابعة تطورات الصناعة والعملاء",
-                    "إجراء اتصالات فردية مع أعضاء الفريق وفهم طموحاتهم الشخصية والمهنية",
-                    "مراجعة خطة التطوير الشخصي باستمرار والتخطيط للترقية التالية",
-                    "إظهار الحماس للفريق والإصرار على تحقيق جميع مؤشرات الأداء الرئيسية"
+                    T('s17'),
+                    T('s18'),
+                    T('s19'),
+                    T('s20')
                 ]
             }];
 
@@ -63,12 +63,12 @@
             const container = document.getElementById("questionsContainer");
 
             const scoreLabels = {
-                0: "غير مدرك",
-                1: "معرفة ضئيلة",
-                2: "اطلاع معقول",
-                3: "مستوى جيد",
-                4: "أعلى من العادي",
-                5: "خبير"
+                0: T('s21'),
+                1: T('s22'),
+                2: T('s23'),
+                3: T('s24'),
+                4: T('s25'),
+                5: T('s26')
             };
 
             // ========== بناء الواجهة ==========
@@ -178,84 +178,13 @@
             }
 
             // ========== الحسابات والتوصيات ==========
-            function calculateTotalScore() {
-                let sum = 0;
-                for (let i = 0; i < totalQuestions; i++) {
-                    if (answers[i] === null) return null;
-                    sum += answers[i];
-                }
-                return sum;
-            }
-
-            function getCriticalAndWarningItems() {
-                const critical = [];
-                const warning = [];
-                allCriteria.forEach((item, idx) => {
-                    if (answers[idx] === null) return;
-                    if (answers[idx] === 0 || answers[idx] === 1) {
-                        critical.push({ ...item, index: idx, score: answers[idx] });
-                    } else if (answers[idx] === 2) {
-                        warning.push({ ...item, index: idx, score: answers[idx] });
-                    }
-                });
-                return { critical, warning };
-            }
-
-            function getInterpretation(score) {
-                const maxScore = totalQuestions * 5; // 80
-                const percent = (score / maxScore) * 100;
-                if (percent >= 85) return { level: "خبير متمرس", message: "معارف ومهارات استثنائية، أنت قدوة في مؤسستك.",
-                    color: "#4ade80" };
-                else if (percent >= 70) return { level: "متقدم", message: "مستوى جيد جداً مع فرص للتحسين في بعض الجوانب.",
-                    color: "#facc15" };
-                else if (percent >= 50) return { level: "مؤهل", message: "أساس متين، لكن هناك فجوات تحتاج إلى خطة تطويرية.",
-                    color: "#fb923c" };
-                else if (percent >= 30) return { level: "مبتدئ", message: "معارف أساسية فقط، ينبغي تكثيف التعلم والتطبيق العملي.",
-                    color: "#f87171" };
-                else return { level: "وعي محدود", message: "أنت في بداية الطريق، تحتاج إلى بناء قاعدة معرفية قوية فوراً.",
-                    color: "#ef4444" };
-            }
-
-            function generateRecommendations() {
-                const totalScore = calculateTotalScore();
-                if (totalScore === null) return [];
-                const { critical, warning } = getCriticalAndWarningItems();
-                let recommendations = [];
-
-                if (critical.length > 0) {
-                    recommendations.push("🔴 <strong>جوانب حرجة (تحتاج علاجاً فورياً):</strong>");
-                    critical.forEach(item => {
-                        recommendations.push(`• ${item.text} (الدرجة: ${item.score} - ${scoreLabels[item.score]})`);
-                    });
-                    recommendations.push("⚠️ هذه الجوانب جوهرية للنجاح ويجب العمل عليها بأولوية قصوى.");
-                }
-                if (warning.length > 0) {
-                    recommendations.push("🟠 <strong>جوانب مقلقة (تحتاج تطوير ومراقبة):</strong>");
-                    warning.forEach(item => {
-                        recommendations.push(`• ${item.text} (الدرجة: 2 - ${scoreLabels[2]})`);
-                    });
-                }
-                if (critical.length === 0 && warning.length === 0 && totalScore > 0) {
-                    recommendations.push("✅ لا توجد جوانب حرجة أو مقلقة جداً. حافظ على التميز وراقب تقدمك.");
-                }
-
-                const maxScore = totalQuestions * 5;
-                const percent = (totalScore / maxScore) * 100;
-                if (percent < 50) {
-                    recommendations.push(
-                        "📌 نصيحة: ركز على بناء المعرفة المالية والإدارية عبر دورات متخصصة واطلب توجيهاً من خبراء.");
-                } else if (percent < 75) {
-                    recommendations.push(
-                        "📌 نصيحة: عمّق فهمك في المجالات البرتقالية، ومارس تطبيق المهارات في مشاريع حقيقية.");
-                } else {
-                    recommendations.push("📌 نصيحة: أنت في وضع قوي، شارك معرفتك مع زملائك وتولى مهاماً قيادية.");
-                }
-
-                return recommendations;
+            // الحساب والتفسير والتوصيات تتم على الخادم (Supabase Edge Function)
+            async function evaluateAll() {
+                return await FG.calc('tool29', 'evaluate', { answers });
             }
 
             // ========== عرض المودال ==========
-            function showResultModal() {
+            async function showResultModal() {
                 for (let i = 0; i < totalQuestions; i++) {
                     if (answers[i] === null) {
                         const toast = document.getElementById("warningToast");
@@ -274,12 +203,12 @@
                         return;
                     }
                 }
-                const totalScore = calculateTotalScore();
+                let E;
+                try { E = await evaluateAll(); } catch (e) { FG.calcError(e); return; }
+                const { totalScore, interpretation, recommendations } = E;
                 if (totalScore === null) return;
-                const interpretation = getInterpretation(totalScore);
-                const recommendations = generateRecommendations();
 
-                document.getElementById("modalScore").innerText = `${totalScore} نقطة (من 80)`;
+                document.getElementById("modalScore").innerText = `${totalScore}${T('s46')}`;
                 document.getElementById("modalInterpretation").innerHTML = `
                     <strong style="color: ${interpretation.color}; font-size:1.3rem;">${interpretation.level}</strong><br>
                     ${interpretation.message}
@@ -303,10 +232,10 @@
             });
 
             // ========== تصدير Word ==========
-            function generateWordHTML() {
-                const empName = document.getElementById("empName").value || "غير محدد";
-                const jobTitle = document.getElementById("jobTitle").value || "غير محدد";
-                const department = document.getElementById("department").value || "غير محدد";
+            async function generateWordHTML() {
+                const empName = document.getElementById("empName").value || T('s47');
+                const jobTitle = document.getElementById("jobTitle").value || T('s47');
+                const department = document.getElementById("department").value || T('s47');
                 const evalDate = document.getElementById("evalDate").value || new Date().toISOString().slice(0, 10);
 
                 let totalScore = 0;
@@ -315,9 +244,10 @@
                     if (answers[i] === null) { allAnswered = false; break; }
                     totalScore += answers[i];
                 }
-                const interpretation = allAnswered ? getInterpretation(totalScore) : { level: "غير مكتمل",
-                    message: "لم يتم الإجابة على جميع المعايير." };
-                const recommendations = allAnswered ? generateRecommendations() : ["أكمل الإجابة على جميع المعايير."];
+                const E = allAnswered ? await evaluateAll() : null;
+                const interpretation = allAnswered ? E.interpretation : { level: T('s48'),
+                    message: T('s49') };
+                const recommendations = allAnswered ? E.recommendations : [T('s50')];
 
                 let rows = "";
                 allCriteria.forEach((item, idx) => {
@@ -334,49 +264,12 @@
 
                 let recHtml = recommendations.map(r => `<li>${r}</li>`).join('');
 
-                return `<!DOCTYPE html>
-                <html dir="rtl">
-                <head><meta charset="UTF-8">
-                    <style>
-                        body { font-family: 'Arial', 'Tajawal', sans-serif; padding: 30px; direction: rtl; }
-                        h1 { color: #0a1a2a; border-bottom: 3px solid #b48554; padding-bottom: 10px; }
-                        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                        .info-table td { padding: 8px; border: 1px solid #ccc; }
-                        .info-table td:first-child { font-weight: bold; background: #f0f0f0; width: 25%; }
-                        .summary { background: #f5f0e8; padding: 15px; border-radius: 12px; margin: 20px 0; }
-                        .summary strong { color: #b48554; }
-                        .rec-box { border-right: 5px solid #b48554; padding: 15px; background: #faf8f5; border-radius: 10px; margin: 20px 0; }
-                        .rec-box h3 { margin-top: 0; color: #0a1a2a; }
-                        .rec-box ul { padding-right: 20px; }
-                        .rec-box li { margin-bottom: 8px; }
-                        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-                        th { background: #1a1a2e; color: white; padding: 8px; border: 1px solid #999; }
-                        td { border: 1px solid #ddd; padding: 6px; }
-                        .footer { margin-top: 30px; font-size: 0.8rem; color: #555; text-align: center; }
-                    </style>
-                </head>
-                <body>
-                    <h1>تقرير تقييم المعارف والمهارات</h1>
-                    <table class="info-table">
-                        <tr><td><strong>الاسم</strong></td><td>${empName}</td><td><strong>المسمى الوظيفي</strong></td><td>${jobTitle}</td></tr>
-                        <tr><td><strong>القسم</strong></td><td>${department}</td><td><strong>تاريخ التقييم</strong></td><td>${evalDate}</td></tr>
-                    </table>
-                    <div class="summary">
-                        <strong>النتيجة:</strong> ${allAnswered ? totalScore+'/80' : 'غير مكتملة'} &nbsp;|&nbsp;
-                        <strong>التقدير:</strong> <span style="color:${interpretation.color};">${interpretation.level}</span><br>
-                        <small>${interpretation.message}</small>
-                    </div>
-                    <div class="rec-box">
-                        <h3>📌 التوصيات</h3>
-                        <ul>${recHtml}</ul>
-                    </div>
-                    <h2>تفاصيل المعايير</h2>
-                    <table><thead><tr><th>#</th><th>المجال</th><th>المعيار</th><th>التقدير</th><th>الدرجة</th></tr></thead><tbody>${rows}</tbody></table>
-                    <div class="footer">تم إنشاء هذا التقرير بواسطة مجموعة فاروق للإستشارات والأعمال | ${new Date().toLocaleDateString('ar-EG')}</div>
+                return `${T('s52')}${empName}${T('s53')}${jobTitle}${T('s54')}${department}${T('s55')}${evalDate}${T('s56')}${allAnswered ? totalScore+'/80' : T('s51')}${T('s57')}${interpretation.color};">${interpretation.level}</span><br>
+                        <small>${interpretation.message}${T('s58')}${recHtml}${T('s59')}${rows}${T('s60')}${new Date().toLocaleDateString(FG.locale())}</div>
                 </body></html>`;
             }
 
-            function exportToWord() {
+            async function exportToWord() {
                 for (let i = 0; i < totalQuestions; i++) {
                     if (answers[i] === null) {
                         const toast = document.getElementById("warningToast");
@@ -389,11 +282,12 @@
                         return;
                     }
                 }
-                const content = generateWordHTML();
+                let content;
+                try { content = await generateWordHTML(); } catch (e) { FG.calcError(e); return; }
                 const blob = new Blob(['\uFEFF' + content], { type: 'application/msword' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `تقييم_المهارات_${document.getElementById('empName').value || 'شخصي'}.doc`;
+                link.download = `${T('s62')}${document.getElementById('empName').value || T('s61')}.doc`;
                 link.click();
                 URL.revokeObjectURL(link.href);
             }
@@ -414,16 +308,14 @@
                     }
                 }
 
-                showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والجداول');
+                showLoading(T('s63'), T('s64'));
                 try {
-                    const empName = document.getElementById("empName").value || "غير محدد";
-                    const jobTitle = document.getElementById("jobTitle").value || "غير محدد";
-                    const department = document.getElementById("department").value || "غير محدد";
+                    const empName = document.getElementById("empName").value || T('s47');
+                    const jobTitle = document.getElementById("jobTitle").value || T('s47');
+                    const department = document.getElementById("department").value || T('s47');
                     const evalDate = document.getElementById("evalDate").value || new Date().toISOString().slice(0, 10);
 
-                    const totalScore = calculateTotalScore();
-                    const interpretation = getInterpretation(totalScore);
-                    const recommendations = generateRecommendations();
+                    const { totalScore, interpretation, recommendations } = await evaluateAll();
 
                     const workbook = new ExcelJS.Workbook();
                     workbook.creator = 'FAROUK GRUP';
@@ -443,7 +335,7 @@
                     function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11,
                                 color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid',
                                 fgColor: { argb: bg } }, alignment: { horizontal: 'center',
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'thin', color: { argb: G } }, bottom: { style: 'thin',
                                     color: { argb: G } }, left: { style: 'thin', color: { argb: G } },
                                 right: { style: 'thin', color: { argb: G } } } }; }
@@ -451,7 +343,7 @@
                     function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial',
                                 bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern',
                                 pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h,
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, left: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, right: { style: 'hair',
@@ -465,13 +357,13 @@
                         tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true,
                             size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid',
                             fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle',
-                            wrapText: true, readingOrder: 'rtl' }; c.border = { top: { style: 'medium',
+                            wrapText: true, readingOrder: FG.dir() }; c.border = { top: { style: 'medium',
                                 color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } },
                             left: { style: 'medium', color: { argb: G } }, right: { style: 'medium',
                                 color: { argb: G } } }; }
 
                     // 1. غلاف التقرير
-                    const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true,
+                    const cv = workbook.addWorksheet(T('s65'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
                     for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
@@ -479,20 +371,20 @@
                     cv.getRow(4).height = 60;
                     cv.mergeCells(2, 1, 2, 4);
                     const bc = cv.getCell(2, 1);
-                    bc.value = 'مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+                    bc.value = T('s66');
                     bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
                     bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
                     bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                    readingOrder: 'rtl' };
+                    readingOrder: FG.dir() };
                     bc.border = { bottom: { style: 'thick', color: { argb: G } } };
-                    mh(cv, 1, 4, 4, `تقرير تقييم المعارف والمهارات\n${empName}`, DB, GL, 18);
+                    mh(cv, 1, 4, 4, `${T('s67')}${empName}`, DB, GL, 18);
                     const inf = [
-                        ['📋 اسم الموظف', empName],
-                        ['📅 التاريخ', evalDate],
-                        ['💼 المسمى الوظيفي', jobTitle],
-                        ['🏢 القسم', department],
-                        ['📊 النتيجة الإجمالية', `${totalScore}/80`],
-                        ['🏅 التقدير', interpretation.level]
+                        [T('s68'), empName],
+                        [T('s69'), evalDate],
+                        [T('s70'), jobTitle],
+                        [T('s71'), department],
+                        [T('s72'), `${totalScore}/80`],
+                        [T('s73'), interpretation.level]
                     ];
                     let ir = 6;
                     inf.forEach(([l, v], idx) => {
@@ -505,12 +397,12 @@
                         const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
                         ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         cv.getRow(ir).height = 28;
@@ -518,20 +410,20 @@
                     });
 
                     // 2. النتيجة والتوصيات
-                    const recSheet = workbook.addWorksheet('النتيجة والتوصيات', { views: [{ rightToLeft: true,
+                    const recSheet = workbook.addWorksheet(T('s74'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     recSheet.getColumn(1).width = 5;
                     recSheet.getColumn(2).width = 50;
                     recSheet.getColumn(3).width = 5;
-                    mh(recSheet, 1, 3, 1, '📊 النتيجة الإجمالية والتوصيات', DB, GL, 14);
+                    mh(recSheet, 1, 3, 1, T('s75'), DB, GL, 14);
                     recSheet.getRow(1).height = 40;
 
                     recSheet.mergeCells(2, 2, 2, 2);
                     const sc = recSheet.getCell(2, 2);
-                    sc.value = `النتيجة: ${totalScore}/80  |  التقدير: ${interpretation.level}`;
+                    sc.value = `${T('s76')}${totalScore}${T('s77')}${interpretation.level}`;
                     sc.font = { name: 'Arial', bold: true, size: 14, color: { argb: interpretation.color } };
                     sc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AR } };
-                    sc.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+                    sc.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() };
                     sc.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
                             color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
                         right: { style: 'medium', color: { argb: G } } };
@@ -543,7 +435,7 @@
                     ic.font = { name: 'Arial', size: 11, color: { argb: DT } };
                     ic.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEFCF6' } };
                     ic.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                    readingOrder: 'rtl' };
+                    readingOrder: FG.dir() };
                     ic.border = { top: { style: 'hair' }, bottom: { style: 'hair', color: { argb: G } },
                         left: { style: 'hair' }, right: { style: 'hair' } };
                     recSheet.getRow(3).height = 40;
@@ -551,10 +443,10 @@
                     let recRow = 5;
                     recSheet.mergeCells(recRow, 2, recRow, 2);
                     const rt = recSheet.getCell(recRow, 2);
-                    rt.value = '📌 التوصيات وأولويات التطوير';
+                    rt.value = T('s78');
                     rt.font = { name: 'Arial', bold: true, size: 12, color: { argb: GL } };
                     rt.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HB } };
-                    rt.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                    rt.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                     rt.border = { bottom: { style: 'medium', color: { argb: G } } };
                     recSheet.getRow(recRow).height = 30;
                     recRow++;
@@ -567,7 +459,7 @@
                         rc.font = { name: 'Arial', size: 10, color: { argb: DT } };
                         rc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
                         rc.alignment = { horizontal: 'right', vertical: 'top', wrapText: true,
-                            readingOrder: 'rtl' };
+                            readingOrder: FG.dir() };
                         rc.border = { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                             right: { style: 'hair' } };
                         recSheet.getRow(recRow).height = 22;
@@ -575,7 +467,7 @@
                     });
 
                     // 3. تفاصيل المعايير
-                    const detailSheet = workbook.addWorksheet('تفاصيل التقييم', { views: [{ rightToLeft: true,
+                    const detailSheet = workbook.addWorksheet(T('s79'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     detailSheet.getColumn(1).width = 5;
                     detailSheet.getColumn(2).width = 10;
@@ -584,9 +476,9 @@
                     detailSheet.getColumn(5).width = 20;
                     detailSheet.getColumn(6).width = 15;
                     detailSheet.getColumn(7).width = 5;
-                    mh(detailSheet, 1, 7, 1, '📋 تفاصيل التقييم حسب المعايير', DB, GL, 14);
+                    mh(detailSheet, 1, 7, 1, T('s80'), DB, GL, 14);
                     detailSheet.getRow(1).height = 40;
-                    detailSheet.addRow(['#', 'المجال', 'المعيار', 'التقدير', 'الدرجة']);
+                    detailSheet.addRow(['#', T('s81'), T('s82'), T('s83'), T('s84')]);
                     const detailHeader = detailSheet.getRow(2);
                     detailHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
                     detailHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
@@ -606,7 +498,7 @@
                                         'FFDC3545' } };
                             }
                             Object.assign(cell, cs(bgColor, DT, false, cell.col === 2 || cell.col ===
-                                5 ? 'center' : 'right'));
+                                5 ? 'center' : FG.start()));
                         });
                     });
 
@@ -614,11 +506,11 @@
                     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                     const now = new Date();
                     const fileName =
-                        `تقييم_مهارات_${empName}_${now.toISOString().slice(0,10)}.xlsx`;
+                        `${T('s85')}${empName}_${now.toISOString().slice(0,10)}.xlsx`;
                     saveAs(blob, fileName);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ أثناء إنشاء ملف Excel: ' + err.message);
+                    alert(T('s86') + err.message);
                 } finally {
                     hideLoading();
                 }

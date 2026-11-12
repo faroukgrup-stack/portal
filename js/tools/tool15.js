@@ -12,7 +12,7 @@
                 let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/'));
                 calcDisplay.value = r;
                 currentCalcInput = r.toString();
-            } catch(e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
+            } catch(e) { calcDisplay.value = T('s1'); currentCalcInput = ''; }
             return;
         }
         currentCalcInput += v;
@@ -58,71 +58,71 @@
 
     // ===== بيانات التوصيات =====
     const correctiveActions = {
-        sop1_1: { risk: "مرتفع", action: "يجب رفض المواد إذا كانت درجة حرارتها أعلى من 4°C للمبردة أو -18°C للمجمدة.", recommendation: "استخدم مقياس حرارة معاير وسجل درجة الحرارة. إذا كانت مرتفعة، أعِد الشحنة فوراً." },
-        sop1_2: { risk: "متوسط", action: "العبوات التالفة قد تسبب تلوثاً.", recommendation: "افحص العبوات عند الاستلام. إذا وجدت تالفة، أعدها أو استخدمها فوراً." },
-        sop1_3: { risk: "مرتفع", action: "المواد منتهية الصلاحية يجب عدم استخدامها.", recommendation: "تحقق من التواريخ قبل الاستلام. أي مادة منتهية يجب رفضها." },
-        sop1_4: { risk: "متوسط", action: "المواد عالية الخطورة تحتاج شهادة صحية.", recommendation: "اطلب الشهادة من المورد واحتفظ بها في الملف." },
-        sop1_5: { risk: "متوسط", action: "المواد النيئة قد تلوث الجاهزة.", recommendation: "خصص منطقة منفصلة للمواد النيئة والجاهزة." },
-        sop1_6: { risk: "منخفض", action: "عدم تسجيل بيانات الاستلام قد يفقد المعلومات.", recommendation: "التأكد من تعبئة سجل الاستلام يومياً." },
-        sop2_1: { risk: "متوسط", action: "درجة حرارة المخازن الجافة غير مناسبة.", recommendation: "ركب مقياس حرارة وسجل القراءات يومياً." },
-        sop2_2: { risk: "منخفض", action: "الرفوف المنخفضة تصعب التنظيف.", recommendation: "ارفع الرفوف إلى 15-20 سم عن الأرض." },
-        sop2_3: { risk: "مرتفع", action: "عدم تسجيل حرارة الثلاجات قد يؤدي لفساد الأغذية.", recommendation: "سجل درجة الحرارة مرتين يومياً." },
-        sop2_4: { risk: "مرتفع", action: "ارتفاع حرارة المجمدات يفسد الأغذية.", recommendation: "راقب وسجل درجة الحرارة يومياً." },
-        sop2_5: { risk: "متوسط", action: "تخزين المواد النيئة فوق المطبوخة يسبب تلوثاً.", recommendation: "احرص على وضع النيء في الرفوف السفلية." },
-        sop2_6: { risk: "مرتفع", action: "المواد الكيميائية بجوار الغذاء خطر.", recommendation: "خصص مكاناً منفصلاً للمواد الكيميائية." },
-        sop2_7: { risk: "منخفض", action: "عدم تطبيق FIFO قد يسبب انتهاء صلاحية.", recommendation: "درب العاملين على FIFO." },
-        sop2_8: { risk: "متوسط", action: "التكديس يمنع دوران الهواء.", recommendation: "اترك مسافات بين المواد." },
-        sop3_1: { risk: "مرتفع", action: "عدم غسل اليدين ينقل الملوثات.", recommendation: "تأكد من غسل اليدين لمدة 20 ثانية." },
-        sop3_2: { risk: "مرتفع", action: "استخدام لوح واحد يسبب تلوثاً متقاطعاً.", recommendation: "خصص ألواح تقطيع مختلفة." },
-        sop3_3: { risk: "مرتفع", action: "عدم تعقيم الأدوات يلوث الأغذية.", recommendation: "عقم الأدوات فور الانتهاء." },
-        sop3_4: { risk: "مرتفع", action: "ترك المواد خارج التبريد ينمو البكتيريا.", recommendation: "أعد المواد إلى الثلاجة فوراً." },
-        sop3_5: { risk: "متوسط", action: "إذابة الأغذية في الغرفة ينمو البكتيريا.", recommendation: "أذب الأغذية في الثلاجة أو الميكروويف." },
-        sop3_6: { risk: "متوسط", action: "الأغذية غير المغطاة قد تتلوث.", recommendation: "غطِّ الأغذية أثناء التحضير." },
-        sop3_7: { risk: "متوسط", action: "الخضروات غير المغسولة تنقل ملوثات.", recommendation: "اغسل الخضروات جيداً." },
-        sop4_1: { risk: "مرتفع", action: "الدواجن غير المطهية تحمل السالمونيلا.", recommendation: "اطه الدواجن حتى 74°C." },
-        sop4_2: { risk: "مرتفع", action: "اللحوم المفرومة تحتاج 71°C.", recommendation: "استخدم مقياس حرارة." },
-        sop4_3: { risk: "مرتفع", action: "الأسماك غير المطهية قد تحمل طفيليات.", recommendation: "اطه الأسماك حتى 63°C." },
-        sop4_4: { risk: "مرتفع", action: "إعادة التسخين غير الكافية لا تقتل البكتيريا.", recommendation: "أعد التسخين إلى 74°C." },
-        sop4_5: { risk: "متوسط", action: "عدم تسجيل درجات الحرارة يصعب التتبع.", recommendation: "سجل درجات حرارة الطهي." },
-        sop4_6: { risk: "متوسط", action: "إعادة التسخين المتكرر يفسد الطعام.", recommendation: "لا تعِد تسخين الطعام أكثر من مرة." },
-        sop5_1: { risk: "مرتفع", action: "تجهيز الأطباق بأيدٍ غير نظيفة يلوثها.", recommendation: "اغسل يديك جيداً قبل التقديم." },
-        sop5_2: { risk: "مرتفع", action: "أوانٍ غير نظيفة تنقل التلوث.", recommendation: "تأكد من نظافة الأواني." },
-        sop5_3: { risk: "مرتفع", action: "الطعام البارد ينمو البكتيريا.", recommendation: "استخدم طاولات تسخين." },
-        sop5_4: { risk: "مرتفع", action: "الطعام البارد يجب أن يبقى تحت 4°C.", recommendation: "استخدم طاولات مبردة." },
-        sop5_5: { risk: "متوسط", action: "لمس الطعام باليد ينقل الملوثات.", recommendation: "استخدم قفازات أو أدوات." },
-        sop5_6: { risk: "متوسط", action: "الطعام المكشوف يتعرض للتلوث.", recommendation: "استخدم أغطية شفافة." },
-        sop6_1: { risk: "مرتفع", action: "التبريد البطيء يسمح بنمو البكتيريا.", recommendation: "برد الطعام من 60°C إلى 20°C خلال ساعتين." },
-        sop6_2: { risk: "مرتفع", action: "المرحلة الثانية من التبريد مهمة.", recommendation: "أكمل التبريد إلى 4°C." },
-        sop6_3: { risk: "متوسط", action: "الأوعية العميقة تبطئ التبريد.", recommendation: "استخدم أوعية ضحلة." },
-        sop6_4: { risk: "متوسط", action: "الطعام غير المغطى يتلوث.", recommendation: "غطِّ الطعام وضع تاريخ التصنيع." },
-        sop6_5: { risk: "مرتفع", action: "وضع الطعام الساخن في الثلاجة يرفع حرارتها.", recommendation: "برد الطعام أولاً." },
-        sop6_6: { risk: "مرتفع", action: "عدم المراقبة يفقد السيطرة.", recommendation: "سجل درجات الحرارة يومياً." },
-        sop7_1: { risk: "مرتفع", action: "الزي غير النظيف ينقل الأوساخ.", recommendation: "وفر زياً نظيفاً يومياً." },
-        sop7_2: { risk: "مرتفع", action: "الشعر قد يسقط في الطعام.", recommendation: "الزم بارتداء أغطية الشعر." },
-        sop7_3: { risk: "متوسط", action: "المجوهرات تحمل البكتيريا.", recommendation: "امنع ارتداء المجوهرات." },
-        sop7_4: { risk: "متوسط", action: "الأظافر الطويلة تخفي البكتيريا.", recommendation: "شدد على تقليم الأظافر." },
-        sop7_5: { risk: "مرتفع", action: "العامل المريض ينقل الأمراض.", recommendation: "اطلب الإبلاغ عن أي أعراض." },
-        sop7_6: { risk: "مرتفع", action: "عدم غسل اليدين ينقل الجراثيم.", recommendation: "وفر أحواض غسيل وتعليمات." },
-        sop7_7: { risk: "متوسط", action: "نقص المعقم يقلل من النظافة.", recommendation: "وفر معقمات كحولية." },
-        sop8_1: { risk: "مرتفع", action: "الأسطح غير النظيفة تلوث الطعام.", recommendation: "نظف وعقم أسطح العمل." },
-        sop8_2: { risk: "مرتفع", action: "الأحواض القذرة تنشر البكتيريا.", recommendation: "نظف الأحواض يومياً." },
-        sop8_3: { risk: "متوسط", action: "بقايا الطعام تجذب الآفات.", recommendation: "نظف الأرضيات فوراً." },
-        sop8_4: { risk: "مرتفع", action: "مواد غير معتمدة لا تعقم.", recommendation: "استخدم مواد معتمدة." },
-        sop8_5: { risk: "متوسط", action: "عدم وجود جدول تنظيف يؤدي للتراكم.", recommendation: "أعد جدول تنظيف ووقع عليه." },
-        sop8_6: { risk: "متوسط", action: "مراوح الشفط المتسخة تلوث الهواء.", recommendation: "نظف مراوح الشفط دورياً." },
-        sop8_7: { risk: "مرتفع", action: "غسل الأواني بماء بارد لا يعقم.", recommendation: "تأكد من 60°C." },
-        sop9_1: { risk: "مرتفع", action: "وجود آفات يشير لخلل في النظافة.", recommendation: "افحص المنشأة يومياً." },
-        sop9_2: { risk: "متوسط", action: "الفتحات تسمح بدخول الحشرات.", recommendation: "سد جميع الفتحات." },
-        sop9_3: { risk: "متوسط", action: "عدم وجود مصائد يسمح بتكاثر الآفات.", recommendation: "ركب مصائد ضوئية." },
-        sop9_4: { risk: "متوسط", action: "مكافحة الآفات المهنية ضرورية.", recommendation: "احتفظ بعقد مع شركة مكافحة." },
-        sop9_5: { risk: "مرتفع", action: "النفايات المتراكمة تجذب الآفات.", recommendation: "تخلص من النفايات فوراً." },
-        sop10_1: { risk: "مرتفع", action: "عدم التسجيل يجعل التتبع مستحيلاً.", recommendation: "سجل درجات الحرارة يومياً." },
-        sop10_2: { risk: "مرتفع", action: "درجات الطهي أساسية للسلامة.", recommendation: "سجلها في سجل خاص." },
-        sop10_3: { risk: "متوسط", action: "فقدان سجلات الاستلام يعيق التتبع.", recommendation: "احتفظ بالسجلات 6 أشهر." },
-        sop10_4: { risk: "منخفض", action: "التوقيع يضمن المسؤولية.", recommendation: "اطلب توقيع المسؤول." },
-        sop10_5: { risk: "مرتفع", action: "العاملون غير المدربين يجهلون السلامة.", recommendation: "قدم دورات تدريبية." },
-        sop10_6: { risk: "متوسط", action: "غياب التعليمات يؤدي للنسيان.", recommendation: "علق تعليمات واضحة." },
-        sop10_7: { risk: "منخفض", action: "الاجتماعات تذكر العاملين.", recommendation: "عقد اجتماعات أسبوعية." }
+        sop1_1: { risk: T('s2'), action: T('s3'), recommendation: T('s4') },
+        sop1_2: { risk: T('s5'), action: T('s6'), recommendation: T('s7') },
+        sop1_3: { risk: T('s2'), action: T('s8'), recommendation: T('s9') },
+        sop1_4: { risk: T('s5'), action: T('s10'), recommendation: T('s11') },
+        sop1_5: { risk: T('s5'), action: T('s12'), recommendation: T('s13') },
+        sop1_6: { risk: T('s14'), action: T('s15'), recommendation: T('s16') },
+        sop2_1: { risk: T('s5'), action: T('s17'), recommendation: T('s18') },
+        sop2_2: { risk: T('s14'), action: T('s19'), recommendation: T('s20') },
+        sop2_3: { risk: T('s2'), action: T('s21'), recommendation: T('s22') },
+        sop2_4: { risk: T('s2'), action: T('s23'), recommendation: T('s24') },
+        sop2_5: { risk: T('s5'), action: T('s25'), recommendation: T('s26') },
+        sop2_6: { risk: T('s2'), action: T('s27'), recommendation: T('s28') },
+        sop2_7: { risk: T('s14'), action: T('s29'), recommendation: T('s30') },
+        sop2_8: { risk: T('s5'), action: T('s31'), recommendation: T('s32') },
+        sop3_1: { risk: T('s2'), action: T('s33'), recommendation: T('s34') },
+        sop3_2: { risk: T('s2'), action: T('s35'), recommendation: T('s36') },
+        sop3_3: { risk: T('s2'), action: T('s37'), recommendation: T('s38') },
+        sop3_4: { risk: T('s2'), action: T('s39'), recommendation: T('s40') },
+        sop3_5: { risk: T('s5'), action: T('s41'), recommendation: T('s42') },
+        sop3_6: { risk: T('s5'), action: T('s43'), recommendation: T('s44') },
+        sop3_7: { risk: T('s5'), action: T('s45'), recommendation: T('s46') },
+        sop4_1: { risk: T('s2'), action: T('s47'), recommendation: T('s48') },
+        sop4_2: { risk: T('s2'), action: T('s49'), recommendation: T('s50') },
+        sop4_3: { risk: T('s2'), action: T('s51'), recommendation: T('s52') },
+        sop4_4: { risk: T('s2'), action: T('s53'), recommendation: T('s54') },
+        sop4_5: { risk: T('s5'), action: T('s55'), recommendation: T('s56') },
+        sop4_6: { risk: T('s5'), action: T('s57'), recommendation: T('s58') },
+        sop5_1: { risk: T('s2'), action: T('s59'), recommendation: T('s60') },
+        sop5_2: { risk: T('s2'), action: T('s61'), recommendation: T('s62') },
+        sop5_3: { risk: T('s2'), action: T('s63'), recommendation: T('s64') },
+        sop5_4: { risk: T('s2'), action: T('s65'), recommendation: T('s66') },
+        sop5_5: { risk: T('s5'), action: T('s67'), recommendation: T('s68') },
+        sop5_6: { risk: T('s5'), action: T('s69'), recommendation: T('s70') },
+        sop6_1: { risk: T('s2'), action: T('s71'), recommendation: T('s72') },
+        sop6_2: { risk: T('s2'), action: T('s73'), recommendation: T('s74') },
+        sop6_3: { risk: T('s5'), action: T('s75'), recommendation: T('s76') },
+        sop6_4: { risk: T('s5'), action: T('s77'), recommendation: T('s78') },
+        sop6_5: { risk: T('s2'), action: T('s79'), recommendation: T('s80') },
+        sop6_6: { risk: T('s2'), action: T('s81'), recommendation: T('s82') },
+        sop7_1: { risk: T('s2'), action: T('s83'), recommendation: T('s84') },
+        sop7_2: { risk: T('s2'), action: T('s85'), recommendation: T('s86') },
+        sop7_3: { risk: T('s5'), action: T('s87'), recommendation: T('s88') },
+        sop7_4: { risk: T('s5'), action: T('s89'), recommendation: T('s90') },
+        sop7_5: { risk: T('s2'), action: T('s91'), recommendation: T('s92') },
+        sop7_6: { risk: T('s2'), action: T('s93'), recommendation: T('s94') },
+        sop7_7: { risk: T('s5'), action: T('s95'), recommendation: T('s96') },
+        sop8_1: { risk: T('s2'), action: T('s97'), recommendation: T('s98') },
+        sop8_2: { risk: T('s2'), action: T('s99'), recommendation: T('s100') },
+        sop8_3: { risk: T('s5'), action: T('s101'), recommendation: T('s102') },
+        sop8_4: { risk: T('s2'), action: T('s103'), recommendation: T('s104') },
+        sop8_5: { risk: T('s5'), action: T('s105'), recommendation: T('s106') },
+        sop8_6: { risk: T('s5'), action: T('s107'), recommendation: T('s108') },
+        sop8_7: { risk: T('s2'), action: T('s109'), recommendation: T('s110') },
+        sop9_1: { risk: T('s2'), action: T('s111'), recommendation: T('s112') },
+        sop9_2: { risk: T('s5'), action: T('s113'), recommendation: T('s114') },
+        sop9_3: { risk: T('s5'), action: T('s115'), recommendation: T('s116') },
+        sop9_4: { risk: T('s5'), action: T('s117'), recommendation: T('s118') },
+        sop9_5: { risk: T('s2'), action: T('s119'), recommendation: T('s120') },
+        sop10_1: { risk: T('s2'), action: T('s121'), recommendation: T('s82') },
+        sop10_2: { risk: T('s2'), action: T('s122'), recommendation: T('s123') },
+        sop10_3: { risk: T('s5'), action: T('s124'), recommendation: T('s125') },
+        sop10_4: { risk: T('s14'), action: T('s126'), recommendation: T('s127') },
+        sop10_5: { risk: T('s2'), action: T('s128'), recommendation: T('s129') },
+        sop10_6: { risk: T('s5'), action: T('s130'), recommendation: T('s131') },
+        sop10_7: { risk: T('s14'), action: T('s132'), recommendation: T('s133') }
     };
 
     function setupRecommendations() {
@@ -134,7 +134,7 @@
                     const data = correctiveActions[id];
                     if (data) {
                         recBox.style.display = 'block';
-                        recBox.innerHTML = `<strong>⚠️ مستوى الخطر: ${data.risk}</strong><br><strong>الإجراء التصحيحي:</strong> ${data.action}<br><strong>التوصية:</strong> ${data.recommendation}`;
+                        recBox.innerHTML = `${T('s134')}${data.risk}${T('s135')}${data.action}${T('s136')}${data.recommendation}`;
                     }
                 } else {
                     recBox.style.display = 'none';
@@ -144,9 +144,9 @@
     }
 
     // ===== جمع بيانات التدقيق =====
-    function collectAuditData() {
+    async function collectAuditData() {
         const date = document.getElementById('checkDate').value;
-        const inspector = document.getElementById('inspectorName').value || 'غير محدد';
+        const inspector = document.getElementById('inspectorName').value || T('s137');
         const signatureName = document.getElementById('signatureName').value || inspector;
         const signature = document.getElementById('signature').value || '';
         const items = document.querySelectorAll('.sop-item');
@@ -167,25 +167,21 @@
             });
         });
         const total = items.length;
-        const percent = Math.round((checked / total) * 100);
-        let evaluation = '', overallRiskLevel = '';
-        if (percent === 100) { evaluation = 'ممتاز! امتثال كامل'; overallRiskLevel = 'منخفض'; }
-        else if (percent >= 90) { evaluation = 'جيد جداً'; overallRiskLevel = 'منخفض'; }
-        else if (percent >= 75) { evaluation = 'مقبول'; overallRiskLevel = 'متوسط'; }
-        else if (percent >= 50) { evaluation = 'يحتاج تحسين'; overallRiskLevel = 'مرتفع'; }
-        else { evaluation = 'غير مطابق'; overallRiskLevel = 'مرتفع جداً'; }
+        const S = await FG.calc('tool15', 'score', { checked, total });
+        const { percent, evaluation, overallRiskLevel } = S;
         return { date, inspector, signatureName, signature, details, checked, total, percent, evaluation, overallRiskLevel };
     }
 
     // ===== حساب النتيجة =====
-    document.getElementById('calculateBtn').addEventListener('click', function() {
-        const data = collectAuditData();
+    document.getElementById('calculateBtn').addEventListener('click', async function() {
+        let data;
+        try { data = await collectAuditData(); } catch (e) { FG.calcError(e); return; }
         document.getElementById('resultArea').style.display = 'flex';
         document.getElementById('scoreDisplay').textContent = data.percent + '%';
         document.getElementById('evaluationText').textContent = data.evaluation;
         const riskEl = document.getElementById('overallRiskDisplay');
-        riskEl.textContent = `مستوى الخطر العام: ${data.overallRiskLevel}`;
-        riskEl.className = 'overall-risk ' + (data.overallRiskLevel.includes('منخفض') ? 'risk-level-low' : (data.overallRiskLevel.includes('متوسط') ? 'risk-level-medium' : 'risk-level-high'));
+        riskEl.textContent = `${T('s144')}${data.overallRiskLevel}`;
+        riskEl.className = 'overall-risk ' + (data.overallRiskLevel.includes(T('s14')) ? 'risk-level-low' : (data.overallRiskLevel.includes(T('s5')) ? 'risk-level-medium' : 'risk-level-high'));
         window.lastAuditData = data;
     });
 
@@ -193,8 +189,8 @@
     // ========== تصدير Excel احترافي ==========
     // ================================================================
     document.getElementById('exportExcelBtn').addEventListener('click', async function() {
-        if (!window.lastAuditData) { alert('الرجاء إجراء التحليل أولاً (اضغط على "احسب النتيجة").'); return; }
-        showLoading('جاري إنشاء تقرير Excel...', 'إنشاء الأوراق');
+        if (!window.lastAuditData) { alert(T('s145')); return; }
+        showLoading(T('s146'), T('s147'));
         try {
             const data = window.lastAuditData;
             const workbook = new ExcelJS.Workbook();
@@ -203,80 +199,80 @@
             const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
             const PT = 'FF155724', NT = 'FF721C24', GB = 'FFFFF3CD';
 
-            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
-            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:FG.dir()},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
             function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
-            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
 
             // 1. غلاف التقرير
-            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const cv = workbook.addWorksheet(T('s148'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
             cv.getRow(2).height=80; cv.getRow(4).height=60;
             cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
-            bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
-            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
-            mh(cv,1,4,4,`تقرير تدقيق SOPs\n${data.inspector}`,DB,GL,18);
-            const inf=[['📋 التاريخ',data.date],['👤 المسؤول',data.inspector],['📊 نسبة الامتثال',`${data.percent}%`],['⚠️ مستوى الخطر',data.overallRiskLevel]];
+            bc.value=T('s149');
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};
+            mh(cv,1,4,4,`${T('s150')}${data.inspector}`,DB,GL,18);
+            const inf=[[T('s151'),data.date],[T('s152'),data.inspector],[T('s153'),`${data.percent}%`],[T('s154'),data.overallRiskLevel]];
             let ir=6;
             inf.forEach(([l,v],idx)=>{
                 cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
                 const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
                 const bg=idx%2===0?AR:'FFFEFCF6';
-                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
-                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
                 cv.getRow(ir).height=28; ir++;
             });
 
             // 2. تفاصيل التدقيق
-            const detailSheet = workbook.addWorksheet('تفاصيل التدقيق', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const detailSheet = workbook.addWorksheet(T('s155'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             detailSheet.getColumn(1).width = 5; detailSheet.getColumn(2).width = 50; detailSheet.getColumn(3).width = 15; detailSheet.getColumn(4).width = 20; detailSheet.getColumn(5).width = 30; detailSheet.getColumn(6).width = 5;
-            mh(detailSheet,1,6,1,'📋 قائمة تدقيق SOPs',DB,GL,14);
+            mh(detailSheet,1,6,1,T('s156'),DB,GL,14);
             detailSheet.getRow(1).height=40;
-            detailSheet.addRow(['البند', 'الحالة', 'مستوى الخطر', 'ملاحظات', 'التوصية']);
+            detailSheet.addRow([T('s157'), T('s158'), T('s159'), T('s160'), T('s161')]);
             const headerRow = detailSheet.getRow(2);
             headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
             headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
             data.details.forEach(item => {
-                detailSheet.addRow([item.label, item.status ? '✅ مطابق' : '❌ غير مطابق', item.risk, item.note, item.status ? '' : item.recommendation]);
+                detailSheet.addRow([item.label, item.status ? T('s162') : T('s163'), item.risk, item.note, item.status ? '' : item.recommendation]);
             });
 
             // 3. ملخص النتائج
-            const summarySheet = workbook.addWorksheet('ملخص النتائج', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const summarySheet = workbook.addWorksheet(T('s164'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             summarySheet.getColumn(1).width = 30; summarySheet.getColumn(2).width = 40;
-            mh(summarySheet,1,2,1,'📊 ملخص التدقيق',DB,GL,14);
+            mh(summarySheet,1,2,1,T('s165'),DB,GL,14);
             summarySheet.getRow(1).height=40;
             const summaryData = [
-                ['نسبة الامتثال', `${data.percent}%`],
-                ['التقييم', data.evaluation],
-                ['مستوى الخطر العام', data.overallRiskLevel],
-                ['عدد البنود المطابقة', data.checked],
-                ['إجمالي البنود', data.total],
-                ['توقيع المسؤول', `${data.signatureName} - ${data.signature || '__________'}`]
+                [T('s166'), `${data.percent}%`],
+                [T('s167'), data.evaluation],
+                [T('s168'), data.overallRiskLevel],
+                [T('s169'), data.checked],
+                [T('s170'), data.total],
+                [T('s171'), `${data.signatureName} - ${data.signature || '__________'}`]
             ];
             summaryData.forEach((row,idx) => {
                 const r = idx + 3;
-                const lc = summarySheet.getCell(r,1); lc.value = row[0]; ap(lc, cs(idx%2===0?'FFFEFCF6':'FFFFFFFF',DT,true,'right'));
+                const lc = summarySheet.getCell(r,1); lc.value = row[0]; ap(lc, cs(idx%2===0?'FFFEFCF6':'FFFFFFFF',DT,true,FG.start()));
                 const vc = summarySheet.getCell(r,2); vc.value = row[1]; ap(vc, cs(idx%2===0?'FFFEFCF6':'FFFFFFFF',DT,false,'center'));
             });
 
             const buffer = await workbook.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             const now = new Date();
-            const fileName = `تقرير_SOPs_${data.date}_${now.toISOString().slice(0,10)}.xlsx`;
+            const fileName = `${T('s172')}${data.date}_${now.toISOString().slice(0,10)}.xlsx`;
             saveAs(blob, fileName);
-        } catch(err) { alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
+        } catch(err) { alert(T('s173') + err.message); } finally { hideLoading(); }
     });
 
     // ================================================================
     // ========== تصدير Word احترافي ==========
     // ================================================================
     document.getElementById('exportWordBtn').addEventListener('click', async function() {
-        if (!window.lastAuditData) { alert('الرجاء إجراء التحليل أولاً (اضغط على "احسب النتيجة").'); return; }
-        showLoading('جاري إنشاء تقرير Word...', 'جمع البيانات');
+        if (!window.lastAuditData) { alert(T('s145')); return; }
+        showLoading(T('s174'), T('s175'));
         try {
             const data = window.lastAuditData;
             const now = new Date();
-            const dateStr = now.toLocaleDateString('ar-EG');
+            const dateStr = now.toLocaleDateString(FG.locale());
 
             const resultArea = document.getElementById('resultArea');
             let resultImg = '';
@@ -293,7 +289,7 @@
             let itemsHTML = '';
             data.details.forEach(item => {
                 const statusColor = item.status ? '#155724' : '#721c24';
-                const statusText = item.status ? '✅ مطابق' : '❌ غير مطابق';
+                const statusText = item.status ? T('s162') : T('s163');
                 itemsHTML += `
                     <tr>
                         <td style="border:1px solid #b8860b;padding:8px;text-align:right;">${item.label}</td>
@@ -305,49 +301,18 @@
                 `;
             });
 
-            const fullHtml = `<!DOCTYPE html>
-            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
-            <head><meta charset='utf-8'><title>تقرير SOPs - FAROUK GRUP</title>
-            <style>
-                body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;color:#333;}
-                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                .cover h1{font-size:32px;color:#b8860b;margin:0;}
-                .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-                .cover p{color:#666;}
-                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                th{background:#fefcf6;color:#b8860b;font-weight:bold;}
-                .signature{margin-top:40px;display:flex;justify-content:space-between;flex-wrap:wrap;}
-                .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
-                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
-            </style></head>
-            <body>
-                <div class="cover">
-                    <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                    <h2>📋 تقرير تدقيق إجراءات التشغيل القياسية (SOPs)</h2>
-                    <p>التاريخ: ${data.date} | المسؤول: ${data.inspector}</p>
-                    <p>تاريخ التقرير: ${dateStr}</p>
+            const fullHtml = `${T('s176')}${data.date}${T('s177')}${data.inspector}${T('s178')}${dateStr}</p>
                 </div>
-                ${resultImg ? `<div style="text-align:center;margin:20px 0;"><img src="${resultImg}" style="max-width:100%;border:1px solid #b8860b;border-radius:10px;" /></div>` : ''}
-                <h2 style="color:#b8860b;">نتيجة التدقيق: ${data.percent}% - ${data.evaluation}</h2>
-                <h3 style="color:#b8860b;">مستوى الخطر العام: ${data.overallRiskLevel}</h3>
-                <table>
-                    <thead><tr><th style="background:#fefcf6;color:#b8860b;border:1px solid #b8860b;padding:8px;">البند</th><th style="background:#fefcf6;color:#b8860b;border:1px solid #b8860b;padding:8px;">الحالة</th><th style="background:#fefcf6;color:#b8860b;border:1px solid #b8860b;padding:8px;">مستوى الخطر</th><th style="background:#fefcf6;color:#b8860b;border:1px solid #b8860b;padding:8px;">ملاحظات</th><th style="background:#fefcf6;color:#b8860b;border:1px solid #b8860b;padding:8px;">التوصية</th></tr></thead>
-                    <tbody>${itemsHTML}</tbody>
-                </table>
-                <div class="signature">
-                    <div><strong>اسم المسؤول:</strong> ${data.signatureName}</div>
-                    <div><strong>التوقيع:</strong> ${data.signature || '________________'}</div>
-                </div>
-                <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()} | www.farouk-grup.com</div>
+                ${resultImg ? `<div style="text-align:center;margin:20px 0;"><img src="${resultImg}" style="max-width:100%;border:1px solid #b8860b;border-radius:10px;" /></div>` : ''}${T('s179')}${data.percent}% - ${data.evaluation}${T('s180')}${data.overallRiskLevel}${T('s181')}${itemsHTML}${T('s182')}${data.signatureName}${T('s183')}${data.signature || '________________'}${T('s184')}${now.getFullYear()} | www.farouk-grup.com</div>
             </body></html>`;
 
             const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `تقرير_SOPs_${data.date}_${now.toISOString().slice(0,10)}.doc`;
+            link.download = `${T('s172')}${data.date}_${now.toISOString().slice(0,10)}.doc`;
             link.click();
             URL.revokeObjectURL(link.href);
-        } catch(err) { alert('خطأ Word: ' + err.message); } finally { hideLoading(); }
+        } catch(err) { alert(T('s185') + err.message); } finally { hideLoading(); }
     });
 
     // ===== تهيئة أولية =====

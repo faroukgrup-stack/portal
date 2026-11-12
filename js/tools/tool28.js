@@ -16,7 +16,7 @@
                         let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
                         calcDisplay.value = r;
                         currentCalcInput = r.toString();
-                    } catch (e) { calcDisplay.value = 'خطأ';
+                    } catch (e) { calcDisplay.value = T('s1');
                         currentCalcInput = ''; }
                     return;
                 }
@@ -70,9 +70,9 @@
             let currentResults = null;
 
             // ===== المحاكاة الرئيسية =====
-            function runSimulation() {
+            async function runSimulation() {
                 const currency = document.getElementById('currencySelect').value;
-                const company = document.getElementById('companyName').value || 'الجهة';
+                const company = document.getElementById('companyName').value || T('s2');
 
                 const baseRevenue = parseFloat(document.getElementById('baseRevenue').value) || 0;
                 const baseSalaries = parseFloat(document.getElementById('baseSalaries').value) || 0;
@@ -84,107 +84,64 @@
                 const scenarioMaterialsPct = parseFloat(document.getElementById('scenarioMaterials').value) || 0;
 
                 if (baseRevenue <= 0 || baseSalaries < 0 || baseMaterials < 0 || baseOtherCosts < 0) {
-                    alert('الرجاء إدخال قيم صحيحة (الإيرادات > 0، التكاليف >= 0).');
+                    alert(T('s3'));
                     return;
                 }
 
-                const currentTotalCosts = baseSalaries + baseMaterials + baseOtherCosts;
-                const currentProfit = baseRevenue - currentTotalCosts;
-                const currentMargin = baseRevenue > 0 ? (currentProfit / baseRevenue) * 100 : 0;
-
-                const scenarioRevenue = baseRevenue * (1 + scenarioRevenuePct / 100);
-                const scenarioSalaries = baseSalaries * (1 + scenarioSalariesPct / 100);
-                const scenarioMaterials = baseMaterials * (1 + scenarioMaterialsPct / 100);
-                const scenarioTotalCosts = scenarioSalaries + scenarioMaterials + baseOtherCosts;
-                const scenarioProfit = scenarioRevenue - scenarioTotalCosts;
-                const scenarioMargin = scenarioRevenue > 0 ? (scenarioProfit / scenarioRevenue) * 100 : 0;
-
-                const revenueChange = scenarioRevenue - baseRevenue;
-                const costsChange = scenarioTotalCosts - currentTotalCosts;
-                const profitChange = scenarioProfit - currentProfit;
-                const marginChange = scenarioMargin - currentMargin;
+                let R;
+                try { R = await FG.calc('tool28', 'main', { baseRevenue, baseSalaries, baseMaterials, baseOtherCosts, scenarioRevenuePct, scenarioSalariesPct, scenarioMaterialsPct }); } catch (e) { FG.calcError(e); return; }
+                const currentTotalCosts = R.base.totalCosts, currentProfit = R.base.profit, currentMargin = R.base.margin;
+                const scenarioRevenue = R.scenario.revenue, scenarioSalaries = R.scenario.salaries, scenarioMaterials = R.scenario.materials;
+                const scenarioTotalCosts = R.scenario.totalCosts, scenarioProfit = R.scenario.profit, scenarioMargin = R.scenario.margin;
+                const revenueChange = R.changes.revenue, costsChange = R.changes.costs, profitChange = R.changes.profit, marginChange = R.changes.margin;
 
                 currentResults = {
                     currency,
                     company,
-                    base: { revenue: baseRevenue, salaries: baseSalaries, materials: baseMaterials,
-                        otherCosts: baseOtherCosts, totalCosts: currentTotalCosts, profit: currentProfit,
-                        margin: currentMargin },
-                    scenario: { revenue: scenarioRevenue, salaries: scenarioSalaries,
-                        materials: scenarioMaterials, otherCosts: baseOtherCosts,
-                        totalCosts: scenarioTotalCosts, profit: scenarioProfit, margin: scenarioMargin },
-                    changes: { revenue: revenueChange, costs: costsChange, profit: profitChange,
-                        margin: marginChange },
+                    base: R.base,
+                    scenario: R.scenario,
+                    changes: R.changes,
                     scenarioPcts: { revenue: scenarioRevenuePct, salaries: scenarioSalariesPct,
                         materials: scenarioMaterialsPct },
-                    isBetter: scenarioProfit > currentProfit
+                    isBetter: R.isBetter
                 };
 
                 document.getElementById('resultsSection').style.display = 'block';
                 document.getElementById('initialMessage').style.display = 'none';
 
                 // بطاقات النتائج
-                document.getElementById('kpiCards').innerHTML = `
-                    <div class="result-card">
-                        <i class="fas fa-chart-line"></i>
-                        <h4>الإيرادات</h4>
-                        <div class="value" style="color:${revenueChange >= 0 ? '#4ade80' : '#f87171'}">${currency}${scenarioRevenue.toFixed(0)}</div>
-                        <div class="change ${revenueChange >= 0 ? 'change-positive' : 'change-negative'}">${revenueChange >= 0 ? '+' : ''}${currency}${revenueChange.toFixed(0)} (${scenarioRevenuePct >= 0 ? '+' : ''}${scenarioRevenuePct}%)</div>
-                    </div>
-                    <div class="result-card">
-                        <i class="fas fa-file-invoice"></i>
-                        <h4>إجمالي التكاليف</h4>
-                        <div class="value" style="color:${costsChange <= 0 ? '#4ade80' : '#f87171'}">${currency}${scenarioTotalCosts.toFixed(0)}</div>
-                        <div class="change ${costsChange <= 0 ? 'change-positive' : 'change-negative'}">${costsChange >= 0 ? '+' : ''}${currency}${costsChange.toFixed(0)}</div>
-                    </div>
-                    <div class="result-card">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <h4>صافي الربح</h4>
-                        <div class="value" style="color:${profitChange >= 0 ? '#4ade80' : '#f87171'}">${currency}${scenarioProfit.toFixed(0)}</div>
-                        <div class="change ${profitChange >= 0 ? 'change-positive' : 'change-negative'}">${profitChange >= 0 ? '+' : ''}${currency}${profitChange.toFixed(0)} (${(profitChange / (currentProfit || 1) * 100).toFixed(1)}%)</div>
-                    </div>
-                    <div class="result-card">
-                        <i class="fas fa-percent"></i>
-                        <h4>هامش الربح</h4>
-                        <div class="value" style="color:${marginChange >= 0 ? '#4ade80' : '#f87171'}">${scenarioMargin.toFixed(1)}%</div>
+                document.getElementById('kpiCards').innerHTML = `${T('s4')}${revenueChange >= 0 ? '#4ade80' : '#f87171'}">${currency}${scenarioRevenue.toFixed(0)}</div>
+                        <div class="change ${revenueChange >= 0 ? 'change-positive' : 'change-negative'}">${revenueChange >= 0 ? '+' : ''}${currency}${revenueChange.toFixed(0)} (${scenarioRevenuePct >= 0 ? '+' : ''}${scenarioRevenuePct}${T('s5')}${costsChange <= 0 ? '#4ade80' : '#f87171'}">${currency}${scenarioTotalCosts.toFixed(0)}</div>
+                        <div class="change ${costsChange <= 0 ? 'change-positive' : 'change-negative'}">${costsChange >= 0 ? '+' : ''}${currency}${costsChange.toFixed(0)}${T('s6')}${profitChange >= 0 ? '#4ade80' : '#f87171'}">${currency}${scenarioProfit.toFixed(0)}</div>
+                        <div class="change ${profitChange >= 0 ? 'change-positive' : 'change-negative'}">${profitChange >= 0 ? '+' : ''}${currency}${profitChange.toFixed(0)} (${(profitChange / (currentProfit || 1) * 100).toFixed(1)}${T('s7')}${marginChange >= 0 ? '#4ade80' : '#f87171'}">${scenarioMargin.toFixed(1)}%</div>
                         <div class="change ${marginChange >= 0 ? 'change-positive' : 'change-negative'}">${marginChange >= 0 ? '+' : ''}${marginChange.toFixed(1)}%</div>
                     </div>
                 `;
 
                 // جدول المقارنة
-                document.getElementById('comparisonTable').innerHTML = `
-                    <table>
-                        <thead><tr><th>المؤشر</th><th>القيمة الحالية</th><th>قيمة السيناريو</th><th>التغيير</th><th>نسبة التغيير</th></tr></thead>
-                        <tbody>
-                            <tr><td>الإيرادات</td><td>${currency}${baseRevenue.toFixed(0)}</td><td>${currency}${scenarioRevenue.toFixed(0)}</td><td style="color:${revenueChange >= 0 ? '#4ade80' : '#f87171'}">${revenueChange >= 0 ? '+' : ''}${currency}${revenueChange.toFixed(0)}</td><td style="color:${revenueChange >= 0 ? '#4ade80' : '#f87171'}">${scenarioRevenuePct >= 0 ? '+' : ''}${scenarioRevenuePct}%</td></tr>
-                            <tr><td>الرواتب</td><td>${currency}${baseSalaries.toFixed(0)}</td><td>${currency}${scenarioSalaries.toFixed(0)}</td><td style="color:${(scenarioSalaries - baseSalaries) <= 0 ? '#4ade80' : '#f87171'}">${(scenarioSalaries - baseSalaries) >= 0 ? '+' : ''}${currency}${(scenarioSalaries - baseSalaries).toFixed(0)}</td><td style="color:${(scenarioSalaries - baseSalaries) <= 0 ? '#4ade80' : '#f87171'}">${scenarioSalariesPct >= 0 ? '+' : ''}${scenarioSalariesPct}%</td></tr>
-                            <tr><td>المواد الخام</td><td>${currency}${baseMaterials.toFixed(0)}</td><td>${currency}${scenarioMaterials.toFixed(0)}</td><td style="color:${(scenarioMaterials - baseMaterials) <= 0 ? '#4ade80' : '#f87171'}">${(scenarioMaterials - baseMaterials) >= 0 ? '+' : ''}${currency}${(scenarioMaterials - baseMaterials).toFixed(0)}</td><td style="color:${(scenarioMaterials - baseMaterials) <= 0 ? '#4ade80' : '#f87171'}">${scenarioMaterialsPct >= 0 ? '+' : ''}${scenarioMaterialsPct}%</td></tr>
-                            <tr><td>مصاريف أخرى</td><td>${currency}${baseOtherCosts.toFixed(0)}</td><td>${currency}${baseOtherCosts.toFixed(0)}</td><td style="color:#fbbf24;">0</td><td style="color:#fbbf24;">0%</td></tr>
-                            <tr style="font-weight:900;border-top:2px solid rgba(180,133,84,0.2);"><td>إجمالي التكاليف</td><td>${currency}${currentTotalCosts.toFixed(0)}</td><td>${currency}${scenarioTotalCosts.toFixed(0)}</td><td style="color:${costsChange <= 0 ? '#4ade80' : '#f87171'}">${costsChange >= 0 ? '+' : ''}${currency}${costsChange.toFixed(0)}</td><td style="color:${costsChange <= 0 ? '#4ade80' : '#f87171'}">${(costsChange / (currentTotalCosts || 1) * 100).toFixed(1)}%</td></tr>
-                            <tr style="font-weight:900;background:rgba(180,133,84,0.1);"><td>صافي الربح</td><td>${currency}${currentProfit.toFixed(0)}</td><td>${currency}${scenarioProfit.toFixed(0)}</td><td style="color:${profitChange >= 0 ? '#4ade80' : '#f87171'}">${profitChange >= 0 ? '+' : ''}${currency}${profitChange.toFixed(0)}</td><td style="color:${profitChange >= 0 ? '#4ade80' : '#f87171'}">${(profitChange / (currentProfit || 1) * 100).toFixed(1)}%</td></tr>
-                            <tr><td>هامش الربح</td><td>${currentMargin.toFixed(1)}%</td><td>${scenarioMargin.toFixed(1)}%</td><td style="color:${marginChange >= 0 ? '#4ade80' : '#f87171'}">${marginChange >= 0 ? '+' : ''}${marginChange.toFixed(1)}%</td><td style="color:${marginChange >= 0 ? '#4ade80' : '#f87171'}">${(marginChange / (currentMargin || 1) * 100).toFixed(1)}%</td></tr>
+                document.getElementById('comparisonTable').innerHTML = `${T('s8')}${currency}${baseRevenue.toFixed(0)}</td><td>${currency}${scenarioRevenue.toFixed(0)}</td><td style="color:${revenueChange >= 0 ? '#4ade80' : '#f87171'}">${revenueChange >= 0 ? '+' : ''}${currency}${revenueChange.toFixed(0)}</td><td style="color:${revenueChange >= 0 ? '#4ade80' : '#f87171'}">${scenarioRevenuePct >= 0 ? '+' : ''}${scenarioRevenuePct}${T('s9')}${currency}${baseSalaries.toFixed(0)}</td><td>${currency}${scenarioSalaries.toFixed(0)}</td><td style="color:${(scenarioSalaries - baseSalaries) <= 0 ? '#4ade80' : '#f87171'}">${(scenarioSalaries - baseSalaries) >= 0 ? '+' : ''}${currency}${(scenarioSalaries - baseSalaries).toFixed(0)}</td><td style="color:${(scenarioSalaries - baseSalaries) <= 0 ? '#4ade80' : '#f87171'}">${scenarioSalariesPct >= 0 ? '+' : ''}${scenarioSalariesPct}${T('s10')}${currency}${baseMaterials.toFixed(0)}</td><td>${currency}${scenarioMaterials.toFixed(0)}</td><td style="color:${(scenarioMaterials - baseMaterials) <= 0 ? '#4ade80' : '#f87171'}">${(scenarioMaterials - baseMaterials) >= 0 ? '+' : ''}${currency}${(scenarioMaterials - baseMaterials).toFixed(0)}</td><td style="color:${(scenarioMaterials - baseMaterials) <= 0 ? '#4ade80' : '#f87171'}">${scenarioMaterialsPct >= 0 ? '+' : ''}${scenarioMaterialsPct}${T('s11')}${currency}${baseOtherCosts.toFixed(0)}</td><td>${currency}${baseOtherCosts.toFixed(0)}${T('s12')}${currency}${currentTotalCosts.toFixed(0)}</td><td>${currency}${scenarioTotalCosts.toFixed(0)}</td><td style="color:${costsChange <= 0 ? '#4ade80' : '#f87171'}">${costsChange >= 0 ? '+' : ''}${currency}${costsChange.toFixed(0)}</td><td style="color:${costsChange <= 0 ? '#4ade80' : '#f87171'}">${(costsChange / (currentTotalCosts || 1) * 100).toFixed(1)}${T('s13')}${currency}${currentProfit.toFixed(0)}</td><td>${currency}${scenarioProfit.toFixed(0)}</td><td style="color:${profitChange >= 0 ? '#4ade80' : '#f87171'}">${profitChange >= 0 ? '+' : ''}${currency}${profitChange.toFixed(0)}</td><td style="color:${profitChange >= 0 ? '#4ade80' : '#f87171'}">${(profitChange / (currentProfit || 1) * 100).toFixed(1)}${T('s14')}${currentMargin.toFixed(1)}%</td><td>${scenarioMargin.toFixed(1)}%</td><td style="color:${marginChange >= 0 ? '#4ade80' : '#f87171'}">${marginChange >= 0 ? '+' : ''}${marginChange.toFixed(1)}%</td><td style="color:${marginChange >= 0 ? '#4ade80' : '#f87171'}">${(marginChange / (currentMargin || 1) * 100).toFixed(1)}%</td></tr>
                         </tbody>
                     </table>
                 `;
 
                 // التوصيات
                 const recDiv = document.getElementById('recommendations');
-                let recHtml = `<h4 style="color:#cfa776;"><i class="fas fa-lightbulb" style="color:#cfa776;"></i> تحليل السيناريو</h4>`;
+                let recHtml = `${T('s15')}`;
                 if (currentResults.isBetter) {
-                    recHtml += `<p style="color:#4ade80;">✅ السيناريو يؤدي إلى <strong>تحسن</strong> في الربحية بمقدار ${currency}${profitChange.toFixed(0)} (${(profitChange / (currentProfit || 1) * 100).toFixed(1)}%).</p>`;
-                    recHtml += `<p style="color:#f0f4fa;">التغييرات الإيجابية في المبيعات أو خفض التكاليف أثرت بشكل إيجابي على النتيجة النهائية. استمر في تعزيز الاستراتيجيات التي أدت إلى هذا التحسن.</p>`;
+                    recHtml += `${T('s16')}${currency}${profitChange.toFixed(0)} (${(profitChange / (currentProfit || 1) * 100).toFixed(1)}%).</p>`;
+                    recHtml += `${T('s17')}`;
                 } else {
-                    recHtml += `<p style="color:#f87171;">🔴 السيناريو يؤدي إلى <strong>تراجع</strong> في الربحية بمقدار ${currency}${Math.abs(profitChange).toFixed(0)} (${(Math.abs(profitChange) / (currentProfit || 1) * 100).toFixed(1)}%).</p>`;
+                    recHtml += `${T('s18')}${currency}${Math.abs(profitChange).toFixed(0)} (${(Math.abs(profitChange) / (currentProfit || 1) * 100).toFixed(1)}%).</p>`;
                     let reasons = [];
-                    if (revenueChange < 0) reasons.push('انخفاض الإيرادات');
-                    if (scenarioSalaries > baseSalaries) reasons.push('ارتفاع الرواتب');
-                    if (scenarioMaterials > baseMaterials) reasons.push('ارتفاع تكلفة المواد الخام');
+                    if (revenueChange < 0) reasons.push(T('s19'));
+                    if (scenarioSalaries > baseSalaries) reasons.push(T('s20'));
+                    if (scenarioMaterials > baseMaterials) reasons.push(T('s21'));
                     if (reasons.length > 0) {
-                        recHtml += `<p style="color:#f0f4fa;">الأسباب الرئيسية: <strong style="color:#fbbf24;">${reasons.join('، ')}</strong>.</p>`;
+                        recHtml += `${T('s23')}${reasons.join(T('s22'))}</strong>.</p>`;
                     }
-                    recHtml += `<p style="color:#f0f4fa;">يوصى بمراجعة هيكل التكاليف، البحث عن بدائل للمواد الخام، أو زيادة الكفاءة التشغيلية للتعويض.</p>`;
+                    recHtml += `${T('s24')}`;
                 }
-                recHtml += `<p style="color:#aab7d4;font-size:0.85rem;margin-top:0.5rem;">* يعتمد التحليل على البيانات المدخلة وقد لا يعكس جميع العوامل التشغيلية.</p>`;
+                recHtml += `${T('s25')}`;
                 recDiv.innerHTML = recHtml;
 
                 // الرسوم البيانية
@@ -197,16 +154,16 @@
                 comparisonChart = new Chart(ctx1, {
                     type: 'bar',
                     data: {
-                        labels: ['الإيرادات', 'التكاليف الكلية', 'صافي الربح'],
+                        labels: [T('s26'), T('s27'), T('s28')],
                         datasets: [{
-                            label: 'القيمة الحالية',
+                            label: T('s29'),
                             data: [baseRevenue, currentTotalCosts, currentProfit],
                             backgroundColor: 'rgba(180,133,84,0.6)',
                             borderColor: '#b48554',
                             borderWidth: 2,
                             borderRadius: 4
                         }, {
-                            label: 'قيمة السيناريو',
+                            label: T('s30'),
                             data: [scenarioRevenue, scenarioTotalCosts, scenarioProfit],
                             backgroundColor: currentResults.isBetter ? 'rgba(40,167,69,0.6)' :
                                 'rgba(220,53,69,0.6)',
@@ -229,9 +186,9 @@
                 impactChart = new Chart(ctx2, {
                     type: 'line',
                     data: {
-                        labels: ['الحالي', 'السيناريو'],
+                        labels: [T('s31'), T('s32')],
                         datasets: [{
-                            label: 'هامش الربح %',
+                            label: T('s33'),
                             data: [currentMargin, scenarioMargin],
                             borderColor: '#4ade80',
                             backgroundColor: 'rgba(74,222,128,0.1)',
@@ -239,7 +196,7 @@
                             tension: 0.1,
                             pointRadius: 6
                         }, {
-                            label: 'صافي الربح',
+                            label: T('s28'),
                             data: [currentProfit, scenarioProfit],
                             borderColor: '#b48554',
                             backgroundColor: 'rgba(180,133,84,0.1)',
@@ -275,8 +232,8 @@
 
             // ========== تصدير Excel ==========
             async function exportToFullExcel() {
-                if (!currentResults) { alert('الرجاء تشغيل المحاكاة أولاً.'); return; }
-                showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والرسوم البيانية');
+                if (!currentResults) { alert(T('s34')); return; }
+                showLoading(T('s35'), T('s36'));
                 try {
                     const D = currentResults;
                     const currency = D.currency;
@@ -303,7 +260,7 @@
                     function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11,
                                 color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid',
                                 fgColor: { argb: bg } }, alignment: { horizontal: 'center',
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'thin', color: { argb: G } }, bottom: { style: 'thin',
                                     color: { argb: G } }, left: { style: 'thin', color: { argb: G } },
                                 right: { style: 'thin', color: { argb: G } } } }; }
@@ -311,7 +268,7 @@
                     function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial',
                                 bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern',
                                 pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h,
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, left: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, right: { style: 'hair',
@@ -325,13 +282,13 @@
                         tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true,
                             size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid',
                             fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle',
-                            wrapText: true, readingOrder: 'rtl' }; c.border = { top: { style: 'medium',
+                            wrapText: true, readingOrder: FG.dir() }; c.border = { top: { style: 'medium',
                                 color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } },
                             left: { style: 'medium', color: { argb: G } }, right: { style: 'medium',
                                 color: { argb: G } } }; }
 
                     // 1. غلاف التقرير
-                    const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true,
+                    const cv = workbook.addWorksheet(T('s37'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
                     for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
@@ -339,21 +296,21 @@
                     cv.getRow(4).height = 60;
                     cv.mergeCells(2, 1, 2, 4);
                     const bc = cv.getCell(2, 1);
-                    bc.value = 'مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+                    bc.value = T('s38');
                     bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
                     bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
                     bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                    readingOrder: 'rtl' };
+                    readingOrder: FG.dir() };
                     bc.border = { bottom: { style: 'thick', color: { argb: G } } };
-                    mh(cv, 1, 4, 4, `تقرير تحليل السيناريوهات\n${company}`, DB, GL, 18);
+                    mh(cv, 1, 4, 4, `${T('s39')}${company}`, DB, GL, 18);
                     const inf = [
-                        ['📋 الجهة', company],
-                        ['📅 التاريخ', new Date().toLocaleDateString('ar-EG')],
-                        ['💰 العملة', currency],
-                        ['📊 تغيير المبيعات', `${D.scenarioPcts.revenue >= 0 ? '+' : ''}${D.scenarioPcts.revenue}%`],
-                        ['📊 تغيير الرواتب', `${D.scenarioPcts.salaries >= 0 ? '+' : ''}${D.scenarioPcts.salaries}%`],
-                        ['📊 تغيير المواد', `${D.scenarioPcts.materials >= 0 ? '+' : ''}${D.scenarioPcts.materials}%`],
-                        ['📈 صافي الربح الجديد', `${currency}${D.scenario.profit.toFixed(0)}`]
+                        [T('s40'), company],
+                        [T('s41'), new Date().toLocaleDateString(FG.locale())],
+                        [T('s42'), currency],
+                        [T('s43'), `${D.scenarioPcts.revenue >= 0 ? '+' : ''}${D.scenarioPcts.revenue}%`],
+                        [T('s44'), `${D.scenarioPcts.salaries >= 0 ? '+' : ''}${D.scenarioPcts.salaries}%`],
+                        [T('s45'), `${D.scenarioPcts.materials >= 0 ? '+' : ''}${D.scenarioPcts.materials}%`],
+                        [T('s46'), `${currency}${D.scenario.profit.toFixed(0)}`]
                     ];
                     let ir = 6;
                     inf.forEach(([l, v], idx) => {
@@ -366,12 +323,12 @@
                         const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
                         ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         cv.getRow(ir).height = 28;
@@ -379,16 +336,16 @@
                     });
 
                     // 2. المدخلات
-                    const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true,
+                    const inputsSheet = workbook.addWorksheet(T('s47'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     inputsSheet.getColumn(1).width = 5;
                     inputsSheet.getColumn(2).width = 38;
                     inputsSheet.getColumn(3).width = 22;
                     inputsSheet.getColumn(4).width = 22;
                     inputsSheet.getColumn(5).width = 5;
-                    mh(inputsSheet, 1, 5, 1, '📋 جدول المدخلات والافتراضات الأساسية', DB, GL, 14);
+                    mh(inputsSheet, 1, 5, 1, T('s48'), DB, GL, 14);
                     inputsSheet.getRow(1).height = 40;
-                    mh(inputsSheet, 2, 4, 2, 'البيانات الأساسية', SB, W, 11);
+                    mh(inputsSheet, 2, 4, 2, T('s49'), SB, W, 11);
                     inputsSheet.getRow(2).height = 28;
 
                     let iRow = 3;
@@ -408,31 +365,31 @@
                         iRow++;
                     };
 
-                    addInputRow('الإيرادات الشهرية', D.base.revenue);
-                    addInputRow('الرواتب الشهرية', D.base.salaries);
-                    addInputRow('تكلفة المواد الخام', D.base.materials);
-                    addInputRow('المصاريف التشغيلية الأخرى', D.base.otherCosts);
-                    addInputRow('تغيير المبيعات %', D.scenarioPcts.revenue);
-                    addInputRow('تغيير الرواتب %', D.scenarioPcts.salaries);
-                    addInputRow('تغيير المواد %', D.scenarioPcts.materials);
+                    addInputRow(T('s50'), D.base.revenue);
+                    addInputRow(T('s51'), D.base.salaries);
+                    addInputRow(T('s52'), D.base.materials);
+                    addInputRow(T('s53'), D.base.otherCosts);
+                    addInputRow(T('s54'), D.scenarioPcts.revenue);
+                    addInputRow(T('s55'), D.scenarioPcts.salaries);
+                    addInputRow(T('s56'), D.scenarioPcts.materials);
 
                     // 3. مؤشرات الأداء
-                    const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true,
+                    const kpiSheet = workbook.addWorksheet(T('s57'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [5, 32, 22, 22, 22, 5].forEach((w, i) => kpiSheet.getColumn(i + 1).width = w);
-                    mh(kpiSheet, 1, 6, 1, '📊 لوحة مؤشرات الأداء الرئيسية', DB, GL, 15);
+                    mh(kpiSheet, 1, 6, 1, T('s58'), DB, GL, 15);
                     kpiSheet.getRow(1).height = 45;
-                    mh(kpiSheet, 2, 5, 2, `${company} | ${new Date().toLocaleDateString('ar-EG')}`, HB, W, 10);
+                    mh(kpiSheet, 2, 5, 2, `${company} | ${new Date().toLocaleDateString(FG.locale())}`, HB, W, 10);
                     kpiSheet.getRow(2).height = 26;
 
                     const kpis = [
-                        { label: 'الإيرادات (حالي)', value: `${currency} ${D.base.revenue.toFixed(0)}` },
-                        { label: 'الإيرادات (سيناريو)', value: `${currency} ${D.scenario.revenue.toFixed(0)}` },
-                        { label: 'صافي الربح (حالي)', value: `${currency} ${D.base.profit.toFixed(0)}` },
-                        { label: 'صافي الربح (سيناريو)', value: `${currency} ${D.scenario.profit.toFixed(0)}` },
-                        { label: 'تغيير الربح', value: `${currency} ${D.changes.profit.toFixed(0)}`, good: D
+                        { label: T('s59'), value: `${currency} ${D.base.revenue.toFixed(0)}` },
+                        { label: T('s60'), value: `${currency} ${D.scenario.revenue.toFixed(0)}` },
+                        { label: T('s61'), value: `${currency} ${D.base.profit.toFixed(0)}` },
+                        { label: T('s62'), value: `${currency} ${D.scenario.profit.toFixed(0)}` },
+                        { label: T('s63'), value: `${currency} ${D.changes.profit.toFixed(0)}`, good: D
                                 .isBetter },
-                        { label: 'هامش الربح (سيناريو)', value: `${D.scenario.margin.toFixed(1)}%`, good: D
+                        { label: T('s64'), value: `${D.scenario.margin.toFixed(1)}%`, good: D
                                 .scenario.margin > D.base.margin }
                     ];
 
@@ -461,29 +418,29 @@
                         ic.font = { name: 'Arial', bold: true, size: 14, color: { argb: '555555' } };
                         ic.alignment = { horizontal: 'center', vertical: 'middle' };
                         lc2.font = { name: 'Arial', bold: true, size: 11, color: { argb: DT } };
-                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                         vc3.font = { name: 'Arial', bold: true, size: 13, color: { argb: tc } };
                         vc3.alignment = { horizontal: 'center', vertical: 'middle' };
                         nc2.font = { name: 'Arial', size: 9, color: { argb: '444444' } };
-                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                         kRow++;
                     });
                     kRow++;
                     kpiSheet.mergeCells(kRow, 2, kRow, 5);
                     const kFinal = kpiSheet.getCell(kRow, 2);
-                    kFinal.value = D.isBetter ? '✅ السيناريو يحسن الربحية' : '🔴 السيناريو يقلل الربحية';
+                    kFinal.value = D.isBetter ? T('s65') : T('s66');
                     kFinal.font = { name: 'Arial', bold: true, size: 13, color: { argb: D.isBetter ? PT :
                         NT } };
                     kFinal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: D.isBetter ? PB :
                         NB } };
-                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() };
                     kFinal.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
                             color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
                         right: { style: 'medium', color: { argb: G } } };
                     kpiSheet.getRow(kRow).height = 40;
 
                     // 4. جدول المقارنة
-                    const compSheet = workbook.addWorksheet('جدول المقارنة', { views: [{ rightToLeft: true,
+                    const compSheet = workbook.addWorksheet(T('s67'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     compSheet.getColumn(1).width = 5;
                     compSheet.getColumn(2).width = 30;
@@ -492,28 +449,28 @@
                     compSheet.getColumn(5).width = 22;
                     compSheet.getColumn(6).width = 22;
                     compSheet.getColumn(7).width = 5;
-                    mh(compSheet, 1, 7, 1, '📋 جدول المقارنة التفصيلي', DB, GL, 14);
+                    mh(compSheet, 1, 7, 1, T('s68'), DB, GL, 14);
                     compSheet.getRow(1).height = 40;
-                    compSheet.addRow(['المؤشر', 'القيمة الحالية', 'قيمة السيناريو', 'التغيير', 'نسبة التغيير %']);
+                    compSheet.addRow([T('s69'), T('s70'), T('s71'), T('s72'), T('s73')]);
                     const cmpData = [
-                        ['الإيرادات', D.base.revenue, D.scenario.revenue, D.changes.revenue, (D.changes
+                        [T('s26'), D.base.revenue, D.scenario.revenue, D.changes.revenue, (D.changes
                             .revenue / D.base.revenue * 100)],
-                        ['الرواتب', D.base.salaries, D.scenario.salaries, D.scenario.salaries - D.base
+                        [T('s74'), D.base.salaries, D.scenario.salaries, D.scenario.salaries - D.base
                             .salaries, ((D.scenario.salaries - D.base.salaries) / D.base.salaries *
                             100)
                         ],
-                        ['المواد الخام', D.base.materials, D.scenario.materials, D.scenario.materials - D
+                        [T('s75'), D.base.materials, D.scenario.materials, D.scenario.materials - D
                             .base.materials, ((D.scenario.materials - D.base.materials) / D.base
                             .materials * 100)
                         ],
-                        ['مصاريف أخرى', D.base.otherCosts, D.scenario.otherCosts, 0, 0],
-                        ['إجمالي التكاليف', D.base.totalCosts, D.scenario.totalCosts, D.changes.costs, (D
+                        [T('s76'), D.base.otherCosts, D.scenario.otherCosts, 0, 0],
+                        [T('s77'), D.base.totalCosts, D.scenario.totalCosts, D.changes.costs, (D
                             .changes.costs / D.base.totalCosts * 100)
                         ],
-                        ['صافي الربح', D.base.profit, D.scenario.profit, D.changes.profit, (D.changes
+                        [T('s28'), D.base.profit, D.scenario.profit, D.changes.profit, (D.changes
                             .profit / D.base.profit * 100)
                         ],
-                        ['هامش الربح %', D.base.margin, D.scenario.margin, D.changes.margin, (D.changes
+                        [T('s33'), D.base.margin, D.scenario.margin, D.changes.margin, (D.changes
                             .margin / D.base.margin * 100)
                         ]
                     ];
@@ -533,12 +490,12 @@
                     compHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
 
                     // 5. الرسوم البيانية
-                    const chartSheet = workbook.addWorksheet('الرسوم البيانية', { views: [{ rightToLeft: true,
+                    const chartSheet = workbook.addWorksheet(T('s78'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     chartSheet.getColumn(1).width = 5;
                     chartSheet.getColumn(2).width = 50;
                     chartSheet.getColumn(3).width = 5;
-                    mh(chartSheet, 1, 3, 1, '📊 الرسوم البيانية', DB, GL, 14);
+                    mh(chartSheet, 1, 3, 1, T('s79'), DB, GL, 14);
                     chartSheet.getRow(1).height = 40;
 
                     const chartContainer = document.querySelector('.chart-card');
@@ -557,29 +514,29 @@
                     }
 
                     // 6. التوصيات
-                    const recSheet = workbook.addWorksheet('التوصيات', { views: [{ rightToLeft: true,
+                    const recSheet = workbook.addWorksheet(T('s80'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     recSheet.getColumn(1).width = 5;
                     recSheet.getColumn(2).width = 50;
                     recSheet.getColumn(3).width = 5;
-                    mh(recSheet, 1, 3, 1, '💡 التوصيات', DB, GL, 14);
+                    mh(recSheet, 1, 3, 1, T('s81'), DB, GL, 14);
                     recSheet.getRow(1).height = 40;
                     let recContent = D.isBetter ?
-                        `✅ السيناريو يحسن الربحية.\nتغيير صافي الربح: ${currency} ${D.changes.profit.toFixed(0)} (${(D.changes.profit / D.base.profit * 100).toFixed(1)}%).\nالتوصية: استمر في استراتيجيات زيادة المبيعات أو خفض التكاليف.` :
-                        `🔴 السيناريو يقلل الربحية.\nتغيير صافي الربح: ${currency} ${D.changes.profit.toFixed(0)} (${(D.changes.profit / D.base.profit * 100).toFixed(1)}%).\nالتوصية: راجع هيكل التكاليف، ابحث عن بدائل للمواد، أو حسّن الكفاءة التشغيلية.`;
+                        `${T('s82')}${currency} ${D.changes.profit.toFixed(0)} (${(D.changes.profit / D.base.profit * 100).toFixed(1)}${T('s83')}` :
+                        `${T('s84')}${currency} ${D.changes.profit.toFixed(0)} (${(D.changes.profit / D.base.profit * 100).toFixed(1)}${T('s85')}`;
                     recSheet.getCell(3, 2).value = recContent;
                     recSheet.getCell(3, 2).font = { name: 'Arial', size: 11 };
-                    recSheet.getCell(3, 2).alignment = { wrapText: true, readingOrder: 'rtl' };
+                    recSheet.getCell(3, 2).alignment = { wrapText: true, readingOrder: FG.dir() };
 
                     const buffer = await workbook.xlsx.writeBuffer();
                     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                     const now = new Date();
                     const fileName =
-                        `تقرير_سيناريوهات_${company}_${now.toISOString().slice(0,10)}.xlsx`;
+                        `${T('s86')}${company}_${now.toISOString().slice(0,10)}.xlsx`;
                     saveAs(blob, fileName);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ أثناء إنشاء ملف Excel: ' + err.message);
+                    alert(T('s87') + err.message);
                 } finally {
                     hideLoading();
                 }
@@ -587,14 +544,14 @@
 
             // ========== تصدير Word ==========
             async function exportToWord() {
-                if (!currentResults) { alert('الرجاء تشغيل المحاكاة أولاً.'); return; }
-                showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات والرسوم البيانية');
+                if (!currentResults) { alert(T('s34')); return; }
+                showLoading(T('s88'), T('s89'));
                 try {
                     const D = currentResults;
                     const currency = D.currency;
                     const company = D.company;
                     const now = new Date();
-                    const dateStr = now.toLocaleDateString('ar-EG');
+                    const dateStr = now.toLocaleDateString(FG.locale());
 
                     const chartContainer = document.querySelector('.chart-card');
                     let chartImgBase64 = '';
@@ -607,63 +564,21 @@
                         chartImgBase64 = img.toDataURL('image/png');
                     }
 
-                    const fullHtml = `<!DOCTYPE html>
-                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
-                    <head><meta charset='utf-8'><title>تقرير تحليل السيناريوهات - FAROUK GRUP</title>
-                    <style>
-                        body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;}
-                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                        .cover h1{font-size:32px;color:#b8860b;margin:0;}
-                        .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-                        table{width:100%;border-collapse:collapse;margin:20px 0;direction:rtl;}
-                        th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                        th{background:#fefcf6;color:#b8860b;font-weight:bold;}
-                        .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
-                        .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;font-size:10pt;}
-                        .rec{background:#f9f9f9;padding:15px;border-right:4px solid #b8860b;margin:20px 0;}
-                    </style></head>
-                    <body>
-                        <div class="cover">
-                            <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                            <h2>تقرير تحليل السيناريوهات</h2>
-                            <p>الجهة: ${company} | التاريخ: ${dateStr}</p>
-                            <p>العملة: ${currency}</p>
+                    const fullHtml = `${T('s93')}${company}${T('s94')}${dateStr}${T('s95')}${currency}${T('s96')}${D.scenarioPcts.revenue >= 0 ? '+' : ''}${D.scenarioPcts.revenue}${T('s97')}${D.scenarioPcts.salaries >= 0 ? '+' : ''}${D.scenarioPcts.salaries}${T('s98')}${D.scenarioPcts.materials >= 0 ? '+' : ''}${D.scenarioPcts.materials}${T('s99')}${currency}${D.base.revenue.toFixed(0)}</td><td>${currency}${D.scenario.revenue.toFixed(0)}</td><td style="color:${D.changes.revenue >= 0 ? '#28a745' : '#dc3545'}">${D.changes.revenue >= 0 ? '+' : ''}${currency}${D.changes.revenue.toFixed(0)}${T('s100')}${currency}${D.base.totalCosts.toFixed(0)}</td><td>${currency}${D.scenario.totalCosts.toFixed(0)}</td><td style="color:${D.changes.costs <= 0 ? '#28a745' : '#dc3545'}">${D.changes.costs >= 0 ? '+' : ''}${currency}${D.changes.costs.toFixed(0)}${T('s101')}${currency}${D.base.profit.toFixed(0)}</td><td>${currency}${D.scenario.profit.toFixed(0)}</td><td style="color:${D.changes.profit >= 0 ? '#28a745' : '#dc3545'}">${D.changes.profit >= 0 ? '+' : ''}${currency}${D.changes.profit.toFixed(0)}${T('s102')}${D.base.margin.toFixed(1)}%</td><td>${D.scenario.margin.toFixed(1)}%</td><td style="color:${D.changes.margin >= 0 ? '#28a745' : '#dc3545'}">${D.changes.margin >= 0 ? '+' : ''}${D.changes.margin.toFixed(1)}${T('s103')}${D.isBetter ? T('s90') : T('s91')}${T('s104')}${currency}${D.changes.profit.toFixed(0)} (${(D.changes.profit / D.base.profit * 100).toFixed(1)}%)</p>
                         </div>
-                        <h2 style="color:#b8860b;">تغييرات السيناريو</h2>
-                        <ul>
-                            <li>المبيعات: ${D.scenarioPcts.revenue >= 0 ? '+' : ''}${D.scenarioPcts.revenue}%</li>
-                            <li>الرواتب: ${D.scenarioPcts.salaries >= 0 ? '+' : ''}${D.scenarioPcts.salaries}%</li>
-                            <li>المواد الخام: ${D.scenarioPcts.materials >= 0 ? '+' : ''}${D.scenarioPcts.materials}%</li>
-                        </ul>
-                        <h2 style="color:#b8860b;">📊 جدول المقارنة</h2>
-                        <table>
-                            <thead><tr><th>المؤشر</th><th>القيمة الحالية</th><th>قيمة السيناريو</th><th>التغيير</th></tr></thead>
-                            <tbody>
-                                <tr><td>الإيرادات</td><td>${currency}${D.base.revenue.toFixed(0)}</td><td>${currency}${D.scenario.revenue.toFixed(0)}</td><td style="color:${D.changes.revenue >= 0 ? '#28a745' : '#dc3545'}">${D.changes.revenue >= 0 ? '+' : ''}${currency}${D.changes.revenue.toFixed(0)}</td></tr>
-                                <tr><td>إجمالي التكاليف</td><td>${currency}${D.base.totalCosts.toFixed(0)}</td><td>${currency}${D.scenario.totalCosts.toFixed(0)}</td><td style="color:${D.changes.costs <= 0 ? '#28a745' : '#dc3545'}">${D.changes.costs >= 0 ? '+' : ''}${currency}${D.changes.costs.toFixed(0)}</td></tr>
-                                <tr style="font-weight:bold;background:#f0f0f0;"><td>صافي الربح</td><td>${currency}${D.base.profit.toFixed(0)}</td><td>${currency}${D.scenario.profit.toFixed(0)}</td><td style="color:${D.changes.profit >= 0 ? '#28a745' : '#dc3545'}">${D.changes.profit >= 0 ? '+' : ''}${currency}${D.changes.profit.toFixed(0)}</td></tr>
-                                <tr><td>هامش الربح</td><td>${D.base.margin.toFixed(1)}%</td><td>${D.scenario.margin.toFixed(1)}%</td><td style="color:${D.changes.margin >= 0 ? '#28a745' : '#dc3545'}">${D.changes.margin >= 0 ? '+' : ''}${D.changes.margin.toFixed(1)}%</td></tr>
-                            </tbody>
-                        </table>
-                        <div class="rec">
-                            <h3 style="color:#b8860b;">📌 التوصية</h3>
-                            <p>${D.isBetter ? '✅ السيناريو يؤدي إلى تحسن في الربحية.' : '🔴 السيناريو يؤدي إلى تراجع في الربحية.'}</p>
-                            <p>التغيير الكلي في صافي الربح: ${currency}${D.changes.profit.toFixed(0)} (${(D.changes.profit / D.base.profit * 100).toFixed(1)}%)</p>
-                        </div>
-                        ${chartImgBase64 ? `<h2 style="color:#b8860b;">📈 الرسوم البيانية</h2><div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>` : ''}
-                        <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+                        ${chartImgBase64 ? `${T('s92')}${chartImgBase64}" class="chart-img" /></div>` : ''}${T('s105')}${now.getFullYear()}</div>
                     </body></html>`;
 
                     const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
                     link.download =
-                        `تقرير_سيناريوهات_${company}_${now.toISOString().slice(0,10)}.doc`;
+                        `${T('s86')}${company}_${now.toISOString().slice(0,10)}.doc`;
                     link.click();
                     URL.revokeObjectURL(link.href);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ في إنشاء تقرير Word');
+                    alert(T('s106'));
                 } finally {
                     hideLoading();
                 }

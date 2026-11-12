@@ -12,7 +12,7 @@
                 let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/'));
                 calcDisplay.value = r;
                 currentCalcInput = r.toString();
-            } catch(e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
+            } catch(e) { calcDisplay.value = T('s1'); currentCalcInput = ''; }
             return;
         }
         currentCalcInput += v;
@@ -60,65 +60,41 @@
     let roiChart;
     let globalRoiData = null;
 
-    document.getElementById('calculateBtn').addEventListener('click', function() {
+    document.getElementById('calculateBtn').addEventListener('click', async function() {
         const currency = document.getElementById('currencySelect').value;
-        const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+        const companyName = document.getElementById('companyName').value || T('s2');
         const cost = parseFloat(document.getElementById('investmentCost').value) || 0;
         const profitInput = parseFloat(document.getElementById('annualProfit').value) || 0;
         const period = parseFloat(document.getElementById('period').value);
         const forecastYears = parseInt(document.getElementById('forecastYears').value) || 5;
 
         if (cost <= 0) {
-            alert('الرجاء إدخال تكلفة استثمار صحيحة.');
+            alert(T('s3'));
             return;
         }
 
-        const annualProfit = profitInput / period;
-        const roi = (annualProfit / cost) * 100;
-        const payback = cost / annualProfit;
-
-        let statusText = '', statusClass = '';
-        if (roi > 0) { statusText = 'مربح'; statusClass = 'status-good'; }
-        else if (roi < 0) { statusText = 'خاسر'; statusClass = 'status-bad'; }
-        else { statusText = 'محايد'; statusClass = 'status-warning'; }
+        let R;
+        try { R = await FG.calc('tool11', 'main', { cost, profitInput, period, forecastYears }); } catch (e) { FG.calcError(e); return; }
+        const { annualProfit, roi, payback, statusText, statusClass, years, cumulativeCash } = R;
 
         globalRoiData = {
             currency, companyName,
             cost, annualProfit, period, forecastYears,
             roi, payback, statusText, statusClass,
-            interpretation: roi > 20 ? 'استثمار ممتاز بعائد مرتفع جداً.' :
-                          (roi > 10 ? 'استثمار جيد بعائد معقول.' :
-                          (roi > 0 ? 'استثمار مقبول لكن العائد منخفض نسبياً.' :
-                          'استثمار خاسر، يُنصح بإعادة التقييم.'))
+            interpretation: R.interpretation,
+            roiVerdict: R.roiVerdict
         };
 
         document.getElementById('initialMessage').style.display = 'none';
         document.getElementById('resultsSection').style.display = 'block';
 
-        document.getElementById('kpiCards').innerHTML = `
-            <div class="result-card"><i class="fas fa-percent"></i><h4>العائد على الاستثمار (ROI)</h4><div class="value">${roi.toFixed(2)}%</div><div class="status ${statusClass}">${statusText}</div></div>
-            <div class="result-card"><i class="fas fa-clock"></i><h4>فترة الاسترداد</h4><div class="value">${payback.toFixed(1)}</div><div class="unit">سنة</div></div>
-            <div class="result-card"><i class="fas fa-dollar-sign"></i><h4>صافي الربح السنوي</h4><div class="value">${currency} ${annualProfit.toFixed(0)}</div></div>
-            <div class="result-card"><i class="fas fa-coins"></i><h4>تكلفة الاستثمار</h4><div class="value">${currency} ${cost.toFixed(0)}</div></div>
+        document.getElementById('kpiCards').innerHTML = `${T('s11')}${roi.toFixed(2)}%</div><div class="status ${statusClass}">${statusText}${T('s12')}${payback.toFixed(1)}${T('s13')}${currency} ${annualProfit.toFixed(0)}${T('s14')}${currency} ${cost.toFixed(0)}</div></div>
         `;
 
         // رسم بياني
         const ctx = document.getElementById('roiChart').getContext('2d');
         if (roiChart) roiChart.destroy();
 
-        const years = [];
-        const cumulativeCash = [];
-        let cum = -cost;
-        for (let i = 0; i <= forecastYears; i++) {
-            if (i === 0) {
-                years.push('الاستثمار');
-                cumulativeCash.push(-cost);
-            } else {
-                cum += annualProfit;
-                years.push(`سنة ${i}`);
-                cumulativeCash.push(cum);
-            }
-        }
         const pointColors = cumulativeCash.map(val => val < 0 ? '#dc3545' : '#28a745');
 
         roiChart = new Chart(ctx, {
@@ -126,7 +102,7 @@
             data: {
                 labels: years,
                 datasets: [{
-                    label: 'التدفق النقدي التراكمي',
+                    label: T('s17'),
                     data: cumulativeCash,
                     borderColor: '#b8860b',
                     backgroundColor: 'rgba(184,134,11,0.1)',
@@ -166,8 +142,8 @@
     // ========== تصدير Excel احترافي ==========
     // ================================================================
     document.getElementById('exportExcelBtn').addEventListener('click', async function() {
-        if (!globalRoiData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-        showLoading('جاري إنشاء تقرير Excel...', 'إنشاء الأوراق والرسوم');
+        if (!globalRoiData) { alert(T('s18')); return; }
+        showLoading(T('s19'), T('s20'));
         try {
             const D = globalRoiData;
             const currency = D.currency;
@@ -180,46 +156,46 @@
             const PT = 'FF155724', NT = 'FF721C24';
             const nc = '#,##0;(#,##0);"-"';
 
-            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
-            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:FG.dir()},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
             function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
-            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
 
             // 1. غلاف التقرير
-            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const cv = workbook.addWorksheet(T('s21'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
             cv.getRow(2).height=80; cv.getRow(4).height=60;
             cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
-            bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
-            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
-            mh(cv,1,4,4,`تقرير تحليل ROI\n${companyName}`,DB,GL,18);
-            const inf=[['📋 الجهة',companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',currency],['📊 ROI',`${D.roi.toFixed(2)}%`],['⏱️ فترة الاسترداد',`${D.payback.toFixed(1)} سنة`]];
+            bc.value=T('s22');
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};
+            mh(cv,1,4,4,`${T('s23')}${companyName}`,DB,GL,18);
+            const inf=[[T('s24'),companyName],[T('s25'),new Date().toLocaleDateString(FG.locale())],[T('s26'),currency],['📊 ROI',`${D.roi.toFixed(2)}%`],[T('s27'),`${D.payback.toFixed(1)}${T('s28')}`]];
             let ir=6;
             inf.forEach(([l,v],idx)=>{
                 cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
                 const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
                 const bg=idx%2===0?AR:'FFFEFCF6';
-                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
-                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
                 cv.getRow(ir).height=28; ir++;
             });
 
             // 2. المدخلات
-            const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const inputsSheet = workbook.addWorksheet(T('s29'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             inputsSheet.getColumn(1).width=5; inputsSheet.getColumn(2).width=38; inputsSheet.getColumn(3).width=22; inputsSheet.getColumn(4).width=22; inputsSheet.getColumn(5).width=5;
-            mh(inputsSheet,1,5,1,'📋 جدول المدخلات والافتراضات الأساسية',DB,GL,14);
+            mh(inputsSheet,1,5,1,T('s30'),DB,GL,14);
             inputsSheet.getRow(1).height=40;
-            mh(inputsSheet,2,4,2,'البيانات الأساسية للاستثمار',SB,'FFFFFFFF',11);
+            mh(inputsSheet,2,4,2,T('s31'),SB,'FFFFFFFF',11);
             inputsSheet.getRow(2).height=28;
             const inputFields = [
-                ['تكلفة الاستثمار', D.cost, `${currency} ${D.cost.toFixed(0)}`],
-                ['صافي الربح السنوي', D.annualProfit, `${currency} ${D.annualProfit.toFixed(0)}`],
-                ['الفترة الزمنية للربح', D.period === 1 ? 'سنوي' : (D.period === 0.5 ? 'نصف سنوي' : (D.period === 0.25 ? 'ربع سنوي' : 'شهري')), ''],
-                ['عدد سنوات التوقع', D.forecastYears, ''],
+                [T('s32'), D.cost, `${currency} ${D.cost.toFixed(0)}`],
+                [T('s33'), D.annualProfit, `${currency} ${D.annualProfit.toFixed(0)}`],
+                [T('s34'), D.period === 1 ? T('s35') : (D.period === 0.5 ? T('s36') : (D.period === 0.25 ? T('s37') : T('s38'))), ''],
+                [T('s39'), D.forecastYears, ''],
                 ['ROI', D.roi, `${D.roi.toFixed(2)}%`],
-                ['فترة الاسترداد', D.payback, `${D.payback.toFixed(1)} سنة`],
-                ['العملة', currency, ''],
-                ['اسم الجهة', companyName, '']
+                [T('s40'), D.payback, `${D.payback.toFixed(1)}${T('s28')}`],
+                [T('s41'), currency, ''],
+                [T('s42'), companyName, '']
             ];
             let iRow=3;
             inputFields.forEach(([label,val,note],idx)=>{
@@ -227,24 +203,24 @@
                 const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
                 const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
                 lc.value=label; vc.value=val; nc.value=note;
-                ap(lc,cs(bg,DT,true,'right'));
+                ap(lc,cs(bg,DT,true,FG.start()));
                 ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?nc:null});
                 ap(nc,cs(bg,'00695C',false,'center'));
                 iRow++;
             });
 
             // 3. مؤشرات الأداء
-            const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const kpiSheet = workbook.addWorksheet(T('s43'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
-            mh(kpiSheet,1,6,1,'📊 لوحة مؤشرات الأداء الرئيسية',DB,GL,15);
+            mh(kpiSheet,1,6,1,T('s44'),DB,GL,15);
             kpiSheet.getRow(1).height=45;
-            mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('ar-EG')}`,HB,'FFFFFFFF',10);
+            mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString(FG.locale())}`,HB,'FFFFFFFF',10);
             kpiSheet.getRow(2).height=26;
             const kpis = [
                 { label: 'ROI', value: `${D.roi.toFixed(2)}%`, good: D.roi>0 },
-                { label: 'فترة الاسترداد', value: `${D.payback.toFixed(1)} سنة`, good: D.payback<5 },
-                { label: 'صافي الربح السنوي', value: `${currency} ${D.annualProfit.toFixed(0)}`, good: D.annualProfit>0 },
-                { label: 'تكلفة الاستثمار', value: `${currency} ${D.cost.toFixed(0)}`, good: true }
+                { label: T('s45'), value: `${D.payback.toFixed(1)}${T('s28')}`, good: D.payback<5 },
+                { label: T('s33'), value: `${currency} ${D.annualProfit.toFixed(0)}`, good: D.annualProfit>0 },
+                { label: T('s32'), value: `${currency} ${D.cost.toFixed(0)}`, good: true }
             ];
             let kRow=3;
             kpis.forEach((k,idx)=>{
@@ -257,24 +233,24 @@
                 const bg=k.good?PB:NB, tc=k.good?PT:NT;
                 [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
                 ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
-                lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:FG.start(),vertical:'middle',readingOrder:FG.dir()};
                 vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
                 kRow++;
             });
             kRow++;
             kpiSheet.mergeCells(kRow,2,kRow,5);
             const kFinal=kpiSheet.getCell(kRow,2);
-            kFinal.value=D.roi>0 ? '✅ استثمار مربح — يوصى بالمتابعة' : '⚠️ استثمار خاسر — يحتاج مراجعة';
+            kFinal.value=D.roi>0 ? T('s46') : T('s47');
             kFinal.font={name:'Arial',bold:true,size:13,color:{argb:D.roi>0?PT:'856404'}};
             kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:D.roi>0?PB:GB}};
-            kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
+            kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:FG.dir()};
             kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
             kpiSheet.getRow(kRow).height=40;
 
             // 4. الرسم البياني
-            const chartsSheet = workbook.addWorksheet('الرسم البياني', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const chartsSheet = workbook.addWorksheet(T('s48'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             chartsSheet.getColumn(1).width=5; chartsSheet.getColumn(2).width=50; chartsSheet.getColumn(3).width=5;
-            mh(chartsSheet,1,3,1,'📈 التدفق النقدي التراكمي',DB,GL,14);
+            mh(chartsSheet,1,3,1,T('s49'),DB,GL,14);
             chartsSheet.getRow(1).height=40;
             const chartContainer = document.querySelector('.chart-container');
             if (chartContainer) {
@@ -290,15 +266,15 @@
             }
 
             // 5. التفسير والتوصيات
-            const evalSheet = workbook.addWorksheet('التفسير والتوصيات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const evalSheet = workbook.addWorksheet(T('s50'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             evalSheet.getColumn(1).width=5; evalSheet.getColumn(2).width=50; evalSheet.getColumn(3).width=5;
-            mh(evalSheet,1,3,1,'📝 التفسير والتوصيات',DB,GL,14);
+            mh(evalSheet,1,3,1,T('s51'),DB,GL,14);
             evalSheet.getRow(1).height=45;
             const sections = [
-                { title: '1. ملخص الاستثمار', content: `الجهة: ${companyName}\nتكلفة الاستثمار: ${currency} ${D.cost.toFixed(0)}\nصافي الربح السنوي: ${currency} ${D.annualProfit.toFixed(0)}\nROI: ${D.roi.toFixed(2)}%\nفترة الاسترداد: ${D.payback.toFixed(1)} سنة` },
-                { title: '2. تفسير النتيجة', content: D.interpretation },
-                { title: '3. التوصيات', content: D.roi>15 ? '• استثمار ممتاز، يُنصح بالمضي قدماً.\n• يمكن التفكير في توسيع نطاق الاستثمار.' : (D.roi>5 ? '• استثمار جيد لكن يحتاج متابعة.\n• راقب التكاليف لتحسين العائد.' : '• استثمار ضعيف، يُنصح بإعادة التقييم أو البحث عن بدائل.') },
-                { title: '4. تنويه', content: 'هذا التحليل مبني على افتراضات تقديرية. النتائج الفعلية قد تختلف. يُنصح باستشارة خبير مالي قبل اتخاذ القرارات.' }
+                { title: T('s52'), content: `${T('s53')}${companyName}${T('s54')}${currency} ${D.cost.toFixed(0)}${T('s55')}${currency} ${D.annualProfit.toFixed(0)}\nROI: ${D.roi.toFixed(2)}${T('s56')}${D.payback.toFixed(1)}${T('s28')}` },
+                { title: T('s57'), content: D.interpretation },
+                { title: T('s58'), content: D.roiVerdict },
+                { title: T('s62'), content: T('s63') }
             ];
             let itRow=2;
             sections.forEach((sec,idx)=>{
@@ -309,7 +285,7 @@
                 tc3.value=sec.title;
                 tc3.font={name:'Arial',bold:true,size:12,color:{argb:GL}};
                 tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?HB:SB}};
-                tc3.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                tc3.alignment={horizontal:FG.start(),vertical:'middle',readingOrder:FG.dir()};
                 tc3.border={bottom:{style:'medium',color:{argb:G}}};
                 itRow++;
                 evalSheet.getRow(itRow).height=Math.max(60, sec.content.split('\n').length*18);
@@ -318,30 +294,30 @@
                 cc.value=sec.content;
                 cc.font={name:'Arial',size:10,color:{argb:DT}};
                 cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};
-                cc.alignment={horizontal:'right',vertical:'top',wrapText:true,readingOrder:'rtl'};
+                cc.alignment={horizontal:FG.start(),vertical:'top',wrapText:true,readingOrder:FG.dir()};
                 cc.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
             });
 
             const buffer = await workbook.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             const now = new Date();
-            const fileName = `تقرير_ROI_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+            const fileName = `${T('s64')}${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
             saveAs(blob, fileName);
-        } catch(err) { alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
+        } catch(err) { alert(T('s65') + err.message); } finally { hideLoading(); }
     });
 
     // ================================================================
     // ========== تصدير Word احترافي ==========
     // ================================================================
     document.getElementById('exportWordBtn').addEventListener('click', async function() {
-        if (!globalRoiData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-        showLoading('جاري إنشاء تقرير Word...', 'جمع البيانات والرسوم');
+        if (!globalRoiData) { alert(T('s18')); return; }
+        showLoading(T('s66'), T('s67'));
         try {
             const D = globalRoiData;
             const currency = D.currency;
             const companyName = D.companyName;
             const now = new Date();
-            const dateStr = now.toLocaleDateString('ar-EG');
+            const dateStr = now.toLocaleDateString(FG.locale());
 
             const chartContainer = document.querySelector('.chart-container');
             let chartImgBase64 = '';
@@ -353,50 +329,16 @@
                 chartImgBase64 = img.toDataURL('image/png');
             }
 
-            const fullHtml = `<!DOCTYPE html>
-            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
-            <head><meta charset='utf-8'><title>تقرير ROI - FAROUK GRUP</title>
-            <style>
-                body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;color:#333;}
-                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                .cover h1{font-size:32px;color:#b8860b;margin:0;}
-                .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                th{background:#fefcf6;color:#b8860b;}
-                .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
-                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
-                .highlight{font-size:2rem;font-weight:bold;}
-            </style></head>
-            <body>
-                <div class="cover">
-                    <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                    <h2>تقرير تحليل العائد على الاستثمار (ROI)</h2>
-                    <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
-                    <p>العملة: ${currency} | ROI: ${D.roi.toFixed(2)}%</p>
-                </div>
-                <h2 style="color:#b8860b;">المدخلات الأساسية</h2>
-                <table><tbody>
-                    <tr><th>تكلفة الاستثمار</th><td>${currency} ${D.cost.toFixed(0)}</td><th>صافي الربح السنوي</th><td>${currency} ${D.annualProfit.toFixed(0)}</td></tr>
-                    <tr><th>ROI</th><td>${D.roi.toFixed(2)}%</td><th>فترة الاسترداد</th><td>${D.payback.toFixed(1)} سنة</td></tr>
-                </tbody></table>
-                <h2 style="color:#b8860b;">📊 مؤشرات الأداء</h2>
-                <div style="margin:20px 0;padding:20px;background:${D.roi>0?'#d4edda':'#f8d7da'};border-radius:10px;text-align:center;">
-                    <span class="highlight" style="color:${D.roi>0?'#155724':'#721c24'};">${D.roi>0?'✅ استثمار مربح':'⚠️ استثمار خاسر'}</span>
-                </div>
-                <h2 style="color:#b8860b;">📈 الرسم البياني للتدفق النقدي التراكمي</h2>
-                <div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>
-                <h2 style="color:#b8860b;">💡 تفسير النتيجة</h2>
-                <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">
-                    <p>${D.interpretation}</p>
-                </div>
-                <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+            const fullHtml = `${T('s70')}${companyName}${T('s71')}${dateStr}${T('s72')}${currency} | ROI: ${D.roi.toFixed(2)}${T('s73')}${currency} ${D.cost.toFixed(0)}${T('s74')}${currency} ${D.annualProfit.toFixed(0)}</td></tr>
+                    <tr><th>ROI</th><td>${D.roi.toFixed(2)}${T('s75')}${D.payback.toFixed(1)}${T('s76')}${D.roi>0?'#d4edda':'#f8d7da'};border-radius:10px;text-align:center;">
+                    <span class="highlight" style="color:${D.roi>0?'#155724':'#721c24'};">${D.roi>0?T('s68'):T('s69')}${T('s77')}${chartImgBase64}${T('s78')}${D.interpretation}${T('s79')}${now.getFullYear()}</div>
             </body></html>`;
 
             const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `تقرير_ROI_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+            link.download = `${T('s64')}${companyName}_${now.toISOString().slice(0,10)}.doc`;
             link.click();
             URL.revokeObjectURL(link.href);
-        } catch(err) { alert('خطأ Word: ' + err.message); } finally { hideLoading(); }
+        } catch(err) { alert(T('s80') + err.message); } finally { hideLoading(); }
     });

@@ -21,7 +21,7 @@
             document.getElementById('toolService').dispatchEvent(new Event('change'));
 
             // ===== متغيرات التحكم =====
-            const PROXY_URL = 'https://falling-sound-3ffcgemini-proxyjs.faroukgrup.workers.dev/';
+            // الطلب يمرّ عبر Edge Function "ai-content" (التعليمات ومفتاح النموذج محفوظة على الخادم)
             let abortController = null;
             let generationInProgress = false;
             let generatedContent = '';
@@ -66,20 +66,16 @@
                 const wordCount = cleaned.split(/\s+/).length;
                 const charCount = cleaned.length;
                 const serviceNames = {
-                    reportAnalysis: 'تحليل تقرير',
-                    weeklyContent: 'خطة أسبوعية',
-                    monthlyContent: 'خطة شهرية',
-                    viralIdeas: 'أفكار فيروسية',
-                    buildContent: 'بناء محتوى',
-                    digitalProducts: 'منتجات رقمية',
-                    askQuestion: 'إجابة على سؤال',
-                    videoScript: 'نص فيديو'
+                    reportAnalysis: T('s1'),
+                    weeklyContent: T('s2'),
+                    monthlyContent: T('s3'),
+                    viralIdeas: T('s4'),
+                    buildContent: T('s5'),
+                    digitalProducts: T('s6'),
+                    askQuestion: T('s7'),
+                    videoScript: T('s8')
                 };
-                document.getElementById('kpiCards').innerHTML = `
-                    <div class="result-card"><i class="fas fa-tag"></i><h4>نوع الخدمة</h4><div class="value">${serviceNames[service] || service}</div></div>
-                    <div class="result-card"><i class="fas fa-file-word"></i><h4>عدد الكلمات</h4><div class="value">${wordCount}</div></div>
-                    <div class="result-card"><i class="fas fa-text-width"></i><h4>عدد الأحرف</h4><div class="value">${charCount}</div></div>
-                    <div class="result-card"><i class="fas fa-layer-group"></i><h4>عدد الأقسام</h4><div class="value">${sections.length}</div></div>
+                document.getElementById('kpiCards').innerHTML = `${T('s9')}${serviceNames[service] || service}${T('s10')}${wordCount}${T('s11')}${charCount}${T('s12')}${sections.length}</div></div>
                 `;
             }
 
@@ -92,44 +88,20 @@
             }
 
             // ===== الاتصال بالـ Proxy =====
-            async function callGroqViaProxy(prompt, signal) {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 30000);
-                const combinedSignal = signal ? combineSignals(signal, controller.signal) : controller.signal;
-
-                try {
-                    const response = await fetch(PROXY_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt }),
-                        signal: combinedSignal
+            async function callAIServer(payload, signal) {
+                return await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => reject(new Error(T('s14'))), 30000);
+                    if (signal) signal.addEventListener('abort', () => {
+                        clearTimeout(timeout);
+                        const e = new Error('aborted'); e.name = 'AbortError'; reject(e);
                     });
-                    clearTimeout(timeout);
-
-                    if (!response.ok) {
-                        const errData = await response.json().catch(() => ({}));
-                        throw new Error(errData.error || `HTTP ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    if (data.choices && data.choices[0]?.message?.content) {
-                        return data.choices[0].message.content;
-                    }
-                    throw new Error('استجابة غير متوقعة من الخادم');
-                } catch (err) {
-                    clearTimeout(timeout);
-                    if (err.name === 'AbortError' && !signal?.aborted) throw new Error('انتهت مهلة الاتصال');
-                    throw err;
-                }
+                    FG.ai(payload).then(content => {
+                        clearTimeout(timeout);
+                        if (content) resolve(content); else reject(new Error(T('s13')));
+                    }, err => { clearTimeout(timeout); reject(err); });
+                });
             }
 
-            function combineSignals(s1, s2) {
-                if (s1.aborted || s2.aborted) return AbortSignal.abort();
-                const controller = new AbortController();
-                s1.addEventListener('abort', () => controller.abort());
-                s2.addEventListener('abort', () => controller.abort());
-                return controller.signal;
-            }
 
             // ===== زر التوليد =====
             document.getElementById('generateBtn').addEventListener('click', async function() {
@@ -140,7 +112,7 @@
                 const count = document.getElementById('itemCount')?.value || 7;
 
                 if (!prompt) {
-                    alert('يرجى إدخال النص');
+                    alert(T('s15'));
                     return;
                 }
 
@@ -150,28 +122,16 @@
                 document.getElementById('cancelBtn').style.display = 'flex';
                 document.getElementById('initialMessage').style.display = 'none';
                 document.getElementById('resultsSection').style.display = 'none';
-                showLoading('جارٍ التوليد...', 'يرجى الانتظار');
-
-                let instruction = '';
-                if (service === 'reportAnalysis') instruction = `حلل التقرير التالي. الأقسام: ملخص تنفيذي، تحليل، نقاط قوة/ضعف، توصيات.`;
-                else if (service === 'weeklyContent') instruction = `خطة محتوى أسبوعية (${count} أيام).`;
-                else if (service === 'monthlyContent') instruction = `خطة شهرية (4 أسابيع).`;
-                else if (service === 'viralIdeas') instruction = `${count} أفكار فيروسية.`;
-                else if (service === 'buildContent') instruction = `محتوى كامل (مقدمة، 3 أقسام، خاتمة).`;
-                else if (service === 'digitalProducts') instruction = `${count} منتجات رقمية.`;
-                else if (service === 'askQuestion') instruction = `أجب بتفصيل.`;
-                else if (service === 'videoScript') instruction = `${count} نصوص فيديو.`;
-
-                const fullPrompt = `${instruction}\nالتفاصيل:\n${prompt}\nاللغة: العربية الفصحى. استخدم ### للعناوين.`;
+                showLoading(T('s16'), T('s17'));
 
                 try {
-                    const result = await callGroqViaProxy(fullPrompt, abortController.signal);
+                    const result = await callAIServer({ service, prompt, count }, abortController.signal);
                     generatedContent = result;
                     document.getElementById('resultsSection').style.display = 'block';
                     displayContent(result, service, count);
                 } catch (err) {
                     if (err.name === 'AbortError') {
-                        document.getElementById('aiOutput').innerHTML = '<p style="color:#fbbf24; text-align:center;">تم إلغاء الطلب.</p>';
+                        document.getElementById('aiOutput').innerHTML = T('s29');
                     } else {
                         document.getElementById('aiOutput').innerHTML = `<p style="color:#f87171; text-align:center;">${err.message}</p>`;
                     }
@@ -189,33 +149,19 @@
             // ===== تصدير Word =====
             document.getElementById('exportWordBtn').addEventListener('click', function() {
                 if (!generatedContent) {
-                    alert('لا يوجد محتوى لتصديره');
+                    alert(T('s30'));
                     return;
                 }
 
                 const contentHtml = document.getElementById('aiOutput').innerHTML;
-                const html = `<!DOCTYPE html>
-                <html dir="rtl">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>تقرير المحتوى الذكي</title>
-                    <style>
-                        body { font-family: 'Tajawal', sans-serif; padding: 20px; background: #fff; color: #333; }
-                        h3 { color: #b8860b; border-bottom: 2px solid #b8860b; padding-bottom: 8px; }
-                        .content-card { border: 1px solid #ddd; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
-                        .footer { margin-top: 30px; color: #888; text-align: center; border-top: 1px solid #ddd; padding-top: 15px; }
-                    </style>
-                </head>
-                <body>
-                    ${contentHtml}
-                    <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال | ${new Date().toLocaleDateString('ar-EG')}</div>
+                const html = `${T('s31')}${contentHtml}${T('s32')}${new Date().toLocaleDateString(FG.locale())}</div>
                 </body>
                 </html>`;
 
                 const blob = new Blob(['\uFEFF' + html], { type: 'application/msword' });
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(blob);
-                a.download = `تقرير_ذكي_${new Date().toISOString().slice(0,10)}.doc`;
+                a.download = `${T('s33')}${new Date().toISOString().slice(0,10)}.doc`;
                 a.click();
                 URL.revokeObjectURL(a.href);
             });

@@ -16,7 +16,7 @@
                         let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
                         calcDisplay.value = r;
                         currentCalcInput = r.toString();
-                    } catch (e) { calcDisplay.value = 'خطأ';
+                    } catch (e) { calcDisplay.value = T('s1');
                         currentCalcInput = ''; }
                     return;
                 }
@@ -72,7 +72,7 @@
             }
 
             // ===== الحساب الرئيسي =====
-            function computeValuation() {
+            async function computeValuation() {
                 const rev = parseFloat(document.getElementById('revenue').value) || 0;
                 const cogs = parseFloat(document.getElementById('cogs').value) || 0;
                 const opex = parseFloat(document.getElementById('opex').value) || 0;
@@ -86,77 +86,10 @@
                 const estYear = parseInt(document.getElementById('estYear').value) || 2018;
                 const leaseExpiry = parseInt(document.getElementById('leaseExpiry').value) || 2029;
 
-                const EBITDA = rev - cogs - opex;
-                const netProfit = EBITDA - depr - interest - taxes;
-                const enterpriseValue = EBITDA * multiplier;
-                const equityValue = enterpriseValue - totalDebt;
-                const fairValue = equityValue > 0 ? equityValue : 0;
-                const sharePrice = (fairValue * ownership) / 100;
-                const paybackYears = netProfit > 0 ? equityValue / netProfit : Infinity;
-                const efficiencyIndex = assetValue > 0 ? fairValue / assetValue : 0;
-
-                // عقد الإيجار
-                const currentYear = new Date().getFullYear();
-                const remainingLease = leaseExpiry - currentYear;
-                let leaseWarning = '';
-                let adjustedMultiplier = multiplier;
-                if (remainingLease < 3 && remainingLease >= 0) {
-                    adjustedMultiplier = Math.max(0.2, remainingLease / 10) * multiplier;
-                    leaseWarning =
-                        `⚠️ تنبيه: عقد الإيجار متبقي عليه ${remainingLease} سنة/سنوات فقط. تم تعديل المضاعف تلقائياً إلى ${adjustedMultiplier.toFixed(2)} ليعكس المخاطر العالية.`;
-                } else if (remainingLease < 0) {
-                    leaseWarning = '⛔ انتهى عقد الإيجار! يجب تجديده فوراً. تم اعتبار المضاعف 0.5.';
-                    adjustedMultiplier = 0.5;
-                }
-
-                const finalEV = EBITDA * adjustedMultiplier;
-                const finalEquity = finalEV - totalDebt;
-                const finalFairValue = finalEquity > 0 ? finalEquity : 0;
-
-                // ضخ رأس المال
                 const injectionEnabled = document.getElementById('capitalInjectionEnabled').checked;
-                let injectionImpact = null;
-                if (injectionEnabled) {
-                    const injectionAmount = parseFloat(document.getElementById('injectionAmount').value) || 0;
-                    const injectionROI = parseFloat(document.getElementById('injectionROI').value) || 20;
-                    const incrementalEBITDA = injectionAmount * (injectionROI / 100);
-                    const newEBITDA = EBITDA + incrementalEBITDA;
-                    const newEV = newEBITDA * adjustedMultiplier;
-                    const newEquity = newEV - totalDebt;
-                    injectionImpact = {
-                        newFairValue: newEquity > 0 ? newEquity : 0,
-                        incrementalEBITDA: incrementalEBITDA,
-                        newPayback: (netProfit + incrementalEBITDA) > 0 ? newEquity / (netProfit +
-                            incrementalEBITDA) : Infinity
-                    };
-                }
-
-                return {
-                    EBITDA,
-                    netProfit,
-                    enterpriseValue,
-                    equityValue,
-                    fairValue: finalFairValue,
-                    sharePrice,
-                    paybackYears,
-                    efficiencyIndex,
-                    assetValue,
-                    multiplier: adjustedMultiplier,
-                    remainingLease,
-                    leaseWarning,
-                    injectionImpact,
-                    rev,
-                    cogs,
-                    opex,
-                    depr,
-                    interest,
-                    taxes,
-                    totalDebt,
-                    ownership,
-                    estYear,
-                    leaseExpiry,
-                    originalMultiplier: multiplier
-                };
+                const injectionAmount = parseFloat(document.getElementById('injectionAmount').value) || 0;
+                const injectionROI = parseFloat(document.getElementById('injectionROI').value) || 20;
+                return await FG.calc('tool30', 'main', { rev, cogs, opex, depr, interest, taxes, totalDebt, assetValue, multiplier, ownership, estYear, leaseExpiry, injectionEnabled, injectionAmount, injectionROI });
             }
 
             // ===== عرض النتائج =====
@@ -167,12 +100,7 @@
 
                 // بطاقات KPI
                 document.getElementById('kpiCards').innerHTML = `
-                    <div class="result-card"><i class="fas fa-chart-bar"></i><h4>EBITDA</h4><div class="value">${currency}${res.EBITDA.toFixed(0)}</div></div>
-                    <div class="result-card"><i class="fas fa-building"></i><h4>قيمة الكيان (EV)</h4><div class="value">${currency}${(res.EBITDA * res.multiplier).toFixed(0)}</div><div class="unit">بالمضاعف ${res.multiplier.toFixed(2)}</div></div>
-                    <div class="result-card"><i class="fas fa-hand-holding-usd"></i><h4>القيمة العادلة</h4><div class="value">${currency}${res.fairValue.toFixed(0)}</div><div class="status ${res.fairValue > res.totalDebt ? 'status-good' : 'status-bad'}">${res.fairValue > 0 ? 'إيجابية' : 'سالبة'}</div></div>
-                    <div class="result-card"><i class="fas fa-user-check"></i><h4>سعر حصتك (${res.ownership}%)</h4><div class="value">${currency}${res.sharePrice.toFixed(0)}</div></div>
-                    <div class="result-card"><i class="fas fa-clock"></i><h4>فترة الاسترداد</h4><div class="value">${isFinite(res.paybackYears) ? res.paybackYears.toFixed(2)+' سنة' : 'لا نهائي'}</div></div>
-                    <div class="result-card"><i class="fas fa-balance-scale"></i><h4>مؤشر الكفاءة</h4><div class="value">${res.efficiencyIndex.toFixed(2)}</div><div class="status ${res.efficiencyIndex >= 1 ? 'status-good' : 'status-bad'}">${res.efficiencyIndex >= 1 ? 'مجدٍ' : 'غير مجدٍ'}</div></div>
+                    <div class="result-card"><i class="fas fa-chart-bar"></i><h4>EBITDA</h4><div class="value">${currency}${res.EBITDA.toFixed(0)}${T('s12')}${currency}${(res.EBITDA * res.multiplier).toFixed(0)}${T('s13')}${res.multiplier.toFixed(2)}${T('s14')}${currency}${res.fairValue.toFixed(0)}</div><div class="status ${res.fairValue > res.totalDebt ? 'status-good' : 'status-bad'}">${res.fairValue > 0 ? T('s6') : T('s7')}${T('s15')}${res.ownership}%)</h4><div class="value">${currency}${res.sharePrice.toFixed(0)}${T('s16')}${isFinite(res.paybackYears) ? res.paybackYears.toFixed(2)+T('s8') : T('s9')}${T('s17')}${res.efficiencyIndex.toFixed(2)}</div><div class="status ${res.efficiencyIndex >= 1 ? 'status-good' : 'status-bad'}">${res.efficiencyIndex >= 1 ? T('s10') : T('s11')}</div></div>
                 `;
 
                 // تحذير الإيجار
@@ -186,46 +114,39 @@
 
                 // بطاقة الكفاءة
                 const effCard = document.getElementById('efficiencyCard');
-                let effHtml = `<strong><i class="fas fa-info-circle"></i> مقارنة القيمة العادلة بالأصول:</strong> `;
+                let effHtml = `${T('s18')}`;
                 if (res.assetValue > 0) {
-                    effHtml += `القيمة السوقية للأصول ${currency}${res.assetValue.toFixed(0)} | `;
-                    effHtml += `القيمة العادلة ${currency}${res.fairValue.toFixed(0)} | `;
+                    effHtml += `${T('s19')}${currency}${res.assetValue.toFixed(0)} | `;
+                    effHtml += `${T('s20')}${currency}${res.fairValue.toFixed(0)} | `;
                     effHtml += res.fairValue >= res.assetValue ?
-                        '✅ المطعم يحقق قيمة أعلى من أصوله (تشغيل مربح)' :
-                        '❌ القيمة أقل من قيمة الأصول – المطعم غير مجدٍ تشغيلياً';
+                        T('s21') :
+                        T('s22');
                 } else {
-                    effHtml += 'لم يتم إدخال قيمة سوقية للأصول لإجراء المقارنة.';
+                    effHtml += T('s23');
                 }
 
                 // تأثير ضخ رأس المال
                 if (res.injectionImpact) {
                     const inj = res.injectionImpact;
-                    effHtml += `<br><br><strong>💉 بعد ضخ رأس المال:</strong> `;
-                    effHtml += `القيمة العادلة المتوقعة ${currency}${inj.newFairValue.toFixed(0)} | `;
+                    effHtml += `${T('s24')}`;
+                    effHtml += `${T('s25')}${currency}${inj.newFairValue.toFixed(0)} | `;
                     effHtml +=
-                        `فترة الاسترداد الجديدة ${isFinite(inj.newPayback) ? inj.newPayback.toFixed(2)+' سنة' : 'غير محسوبة'}`;
+                        `${T('s27')}${isFinite(inj.newPayback) ? inj.newPayback.toFixed(2)+T('s8') : T('s26')}`;
                 }
                 effCard.innerHTML = effHtml;
 
                 // جدول الحساسية
                 const sensDiv = document.getElementById('sensitivityTable');
-                const mults = [2, 2.5, 3, 3.5, 4];
                 let sensRows = '';
-                mults.forEach(m => {
-                    const ev = res.EBITDA * m;
-                    const eq = ev - res.totalDebt;
-                    const fair = eq > 0 ? eq : 0;
+                res.sens.forEach(({ m, ev, fair }) => {
                     sensRows += `<tr>
                         <td>${m}</td>
                         <td>${currency}${ev.toFixed(0)}</td>
                         <td>${currency}${fair.toFixed(0)}</td>
-                        <td>${currency}${((fair * res.ownership)/100).toFixed(0)}</td>
+                        <td>${currency}${(res.sens.find(s => s.m === m).share).toFixed(0)}</td>
                     </tr>`;
                 });
-                sensDiv.innerHTML = `
-                    <table>
-                        <thead><tr><th>المضاعف</th><th>قيمة الكيان</th><th>القيمة العادلة</th><th>سعر حصتك</th></tr></thead>
-                        <tbody>${sensRows}</tbody>
+                sensDiv.innerHTML = `${T('s28')}${sensRows}</tbody>
                     </table>
                 `;
 
@@ -234,19 +155,20 @@
             }
 
             // ===== ربط زر الحساب =====
-            document.getElementById('calculateBtn').addEventListener('click', function() {
-                const res = computeValuation();
+            document.getElementById('calculateBtn').addEventListener('click', async function() {
+                let res;
+                try { res = await computeValuation(); } catch (e) { FG.calcError(e); return; }
                 displayResults(res);
             });
 
             // ========== تصدير Excel ==========
             async function exportToFullExcel() {
-                if (!window.lastValuation) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-                showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والجداول');
+                if (!window.lastValuation) { alert(T('s29')); return; }
+                showLoading(T('s30'), T('s31'));
                 try {
                     const D = window.lastValuation;
                     const currency = document.getElementById('currencySelect').value;
-                    const name = document.getElementById('restaurantName').value || 'المطعم';
+                    const name = document.getElementById('restaurantName').value || T('s32');
 
                     const workbook = new ExcelJS.Workbook();
                     workbook.creator = 'FAROUK GRUP';
@@ -269,7 +191,7 @@
                     function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11,
                                 color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid',
                                 fgColor: { argb: bg } }, alignment: { horizontal: 'center',
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'thin', color: { argb: G } }, bottom: { style: 'thin',
                                     color: { argb: G } }, left: { style: 'thin', color: { argb: G } },
                                 right: { style: 'thin', color: { argb: G } } } }; }
@@ -277,7 +199,7 @@
                     function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial',
                                 bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern',
                                 pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h,
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, left: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, right: { style: 'hair',
@@ -291,13 +213,13 @@
                         tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true,
                             size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid',
                             fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle',
-                            wrapText: true, readingOrder: 'rtl' }; c.border = { top: { style: 'medium',
+                            wrapText: true, readingOrder: FG.dir() }; c.border = { top: { style: 'medium',
                                 color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } },
                             left: { style: 'medium', color: { argb: G } }, right: { style: 'medium',
                                 color: { argb: G } } }; }
 
                     // 1. غلاف التقرير
-                    const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true,
+                    const cv = workbook.addWorksheet(T('s33'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
                     for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
@@ -305,20 +227,20 @@
                     cv.getRow(4).height = 60;
                     cv.mergeCells(2, 1, 2, 4);
                     const bc = cv.getCell(2, 1);
-                    bc.value = 'مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+                    bc.value = T('s34');
                     bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
                     bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
                     bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                    readingOrder: 'rtl' };
+                    readingOrder: FG.dir() };
                     bc.border = { bottom: { style: 'thick', color: { argb: G } } };
-                    mh(cv, 1, 4, 4, `تقرير تقييم مطعم\n${name}`, DB, GL, 18);
+                    mh(cv, 1, 4, 4, `${T('s35')}${name}`, DB, GL, 18);
                     const inf = [
-                        ['📋 اسم المطعم', name],
-                        ['📅 التاريخ', new Date().toLocaleDateString('ar-EG')],
-                        ['💰 العملة', currency],
-                        ['📊 القيمة العادلة', `${currency}${D.fairValue.toFixed(0)}`],
+                        [T('s36'), name],
+                        [T('s37'), new Date().toLocaleDateString(FG.locale())],
+                        [T('s38'), currency],
+                        [T('s39'), `${currency}${D.fairValue.toFixed(0)}`],
                         ['📈 EBITDA', `${currency}${D.EBITDA.toFixed(0)}`],
-                        ['🔢 المضاعف المستخدم', `${D.multiplier.toFixed(2)}x`]
+                        [T('s40'), `${D.multiplier.toFixed(2)}x`]
                     ];
                     let ir = 6;
                     inf.forEach(([l, v], idx) => {
@@ -331,12 +253,12 @@
                         const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
                         ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         cv.getRow(ir).height = 28;
@@ -344,16 +266,16 @@
                     });
 
                     // 2. المدخلات
-                    const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true,
+                    const inputsSheet = workbook.addWorksheet(T('s41'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     inputsSheet.getColumn(1).width = 5;
                     inputsSheet.getColumn(2).width = 38;
                     inputsSheet.getColumn(3).width = 22;
                     inputsSheet.getColumn(4).width = 22;
                     inputsSheet.getColumn(5).width = 5;
-                    mh(inputsSheet, 1, 5, 1, '📋 جدول المدخلات والافتراضات الأساسية', DB, GL, 14);
+                    mh(inputsSheet, 1, 5, 1, T('s42'), DB, GL, 14);
                     inputsSheet.getRow(1).height = 40;
-                    mh(inputsSheet, 2, 4, 2, 'البيانات المالية السنوية', SB, W, 11);
+                    mh(inputsSheet, 2, 4, 2, T('s43'), SB, W, 11);
                     inputsSheet.getRow(2).height = 28;
 
                     let iRow = 3;
@@ -373,44 +295,44 @@
                         iRow++;
                     };
 
-                    addInputRow('إجمالي الإيرادات', D.rev);
-                    addInputRow('تكلفة البضاعة المباعة (COGS)', D.cogs);
-                    addInputRow('المصاريف التشغيلية (OPEX)', D.opex);
-                    addInputRow('الإهلاك والاستهلاك', D.depr);
-                    addInputRow('الفوائد المدفوعة', D.interest);
-                    addInputRow('الضرائب المدفوعة', D.taxes);
-                    addInputRow('إجمالي الديون القائمة', D.totalDebt);
-                    addInputRow('القيمة السوقية للأصول', D.assetValue);
-                    addInputRow('مضاعف السوق', D.originalMultiplier);
-                    addInputRow('نسبة الملكية', D.ownership, '%');
-                    addInputRow('سنة التأسيس', D.estYear);
-                    addInputRow('سنة انتهاء عقد الإيجار', D.leaseExpiry);
+                    addInputRow(T('s44'), D.rev);
+                    addInputRow(T('s45'), D.cogs);
+                    addInputRow(T('s46'), D.opex);
+                    addInputRow(T('s47'), D.depr);
+                    addInputRow(T('s48'), D.interest);
+                    addInputRow(T('s49'), D.taxes);
+                    addInputRow(T('s50'), D.totalDebt);
+                    addInputRow(T('s51'), D.assetValue);
+                    addInputRow(T('s52'), D.originalMultiplier);
+                    addInputRow(T('s53'), D.ownership, '%');
+                    addInputRow(T('s54'), D.estYear);
+                    addInputRow(T('s55'), D.leaseExpiry);
                     if (D.injectionImpact) {
-                        addInputRow('ضخ رأس مال (قيمة)', document.getElementById('injectionAmount').value || 0);
-                        addInputRow('ضخ رأس مال (عائد %)', document.getElementById('injectionROI').value || 0);
+                        addInputRow(T('s56'), document.getElementById('injectionAmount').value || 0);
+                        addInputRow(T('s57'), document.getElementById('injectionROI').value || 0);
                     }
 
                     // 3. مؤشرات الأداء
-                    const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true,
+                    const kpiSheet = workbook.addWorksheet(T('s58'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [5, 32, 22, 22, 22, 5].forEach((w, i) => kpiSheet.getColumn(i + 1).width = w);
-                    mh(kpiSheet, 1, 6, 1, '📊 لوحة المؤشرات الرئيسية', DB, GL, 15);
+                    mh(kpiSheet, 1, 6, 1, T('s59'), DB, GL, 15);
                     kpiSheet.getRow(1).height = 45;
-                    mh(kpiSheet, 2, 5, 2, `${name} | ${new Date().toLocaleDateString('ar-EG')}`, HB, W, 10);
+                    mh(kpiSheet, 2, 5, 2, `${name} | ${new Date().toLocaleDateString(FG.locale())}`, HB, W, 10);
                     kpiSheet.getRow(2).height = 26;
 
                     const kpis = [
                         { label: 'EBITDA', value: `${currency}${D.EBITDA.toFixed(0)}`, good: D.EBITDA > 0 },
-                        { label: 'القيمة العادلة', value: `${currency}${D.fairValue.toFixed(0)}`, good: D
+                        { label: T('s60'), value: `${currency}${D.fairValue.toFixed(0)}`, good: D
                                 .fairValue > 0 },
-                        { label: 'سعر الحصة', value: `${currency}${D.sharePrice.toFixed(0)}`, good: D
+                        { label: T('s61'), value: `${currency}${D.sharePrice.toFixed(0)}`, good: D
                                 .sharePrice > 0 },
-                        { label: 'فترة الاسترداد', value: isFinite(D.paybackYears) ? D.paybackYears.toFixed(
-                                2) + ' سنة' : 'لا نهائي', good: isFinite(D.paybackYears) && D
+                        { label: T('s62'), value: isFinite(D.paybackYears) ? D.paybackYears.toFixed(
+                                2) + T('s8') : T('s9'), good: isFinite(D.paybackYears) && D
                                 .paybackYears < 10 },
-                        { label: 'مؤشر الكفاءة', value: D.efficiencyIndex.toFixed(2), good: D
+                        { label: T('s63'), value: D.efficiencyIndex.toFixed(2), good: D
                                 .efficiencyIndex >= 1 },
-                        { label: 'المضاعف المستخدم', value: D.multiplier.toFixed(2) + 'x', good: D
+                        { label: T('s64'), value: D.multiplier.toFixed(2) + 'x', good: D
                                 .multiplier >= 2 }
                     ];
                     let kRow = 3;
@@ -438,29 +360,29 @@
                         ic.font = { name: 'Arial', bold: true, size: 14, color: { argb: '555555' } };
                         ic.alignment = { horizontal: 'center', vertical: 'middle' };
                         lc2.font = { name: 'Arial', bold: true, size: 11, color: { argb: DT } };
-                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        lc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                         vc3.font = { name: 'Arial', bold: true, size: 13, color: { argb: tc } };
                         vc3.alignment = { horizontal: 'center', vertical: 'middle' };
                         nc2.font = { name: 'Arial', size: 9, color: { argb: '444444' } };
-                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        nc2.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                         kRow++;
                     });
                     kRow++;
                     kpiSheet.mergeCells(kRow, 2, kRow, 5);
                     const kFinal = kpiSheet.getCell(kRow, 2);
-                    kFinal.value = D.fairValue > 0 ? '✅ التقييم إيجابي' : '⚠️ التقييم سلبي أو صفري';
+                    kFinal.value = D.fairValue > 0 ? T('s65') : T('s66');
                     kFinal.font = { name: 'Arial', bold: true, size: 13, color: { argb: D.fairValue > 0 ?
                             PT : '856404' } };
                     kFinal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: D.fairValue > 0 ?
                             PB : GB } };
-                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+                    kFinal.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() };
                     kFinal.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
                             color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
                         right: { style: 'medium', color: { argb: G } } };
                     kpiSheet.getRow(kRow).height = 40;
 
                     // 4. تحليل الحساسية
-                    const sensSheet = workbook.addWorksheet('تحليل الحساسية', { views: [{ rightToLeft: true,
+                    const sensSheet = workbook.addWorksheet(T('s67'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     sensSheet.getColumn(1).width = 5;
                     sensSheet.getColumn(2).width = 20;
@@ -468,55 +390,51 @@
                     sensSheet.getColumn(4).width = 22;
                     sensSheet.getColumn(5).width = 22;
                     sensSheet.getColumn(6).width = 5;
-                    mh(sensSheet, 1, 6, 1, '📈 تحليل الحساسية (تأثير المضاعف)', DB, GL, 14);
+                    mh(sensSheet, 1, 6, 1, T('s68'), DB, GL, 14);
                     sensSheet.getRow(1).height = 40;
-                    sensSheet.addRow(['المضاعف', 'قيمة الكيان', 'القيمة العادلة', 'سعر حصتك']);
-                    const mults = [2, 2.5, 3, 3.5, 4];
-                    mults.forEach(m => {
-                        const ev = D.EBITDA * m;
-                        const eq = ev - D.totalDebt;
-                        const fair = eq > 0 ? eq : 0;
-                        sensSheet.addRow([m, ev, fair, (fair * D.ownership) / 100]);
+                    sensSheet.addRow([T('s69'), T('s70'), T('s60'), T('s71')]);
+                    D.sens.forEach(({ m, ev, fair, share }) => {
+                        sensSheet.addRow([m, ev, fair, share]);
                     });
                     const sensHeader = sensSheet.getRow(2);
                     sensHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
                     sensHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
 
                     // 5. التوصيات
-                    const recSheet = workbook.addWorksheet('التوصيات', { views: [{ rightToLeft: true,
+                    const recSheet = workbook.addWorksheet(T('s72'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     recSheet.getColumn(1).width = 5;
                     recSheet.getColumn(2).width = 50;
                     recSheet.getColumn(3).width = 5;
-                    mh(recSheet, 1, 3, 1, '💡 التوصيات', DB, GL, 14);
+                    mh(recSheet, 1, 3, 1, T('s73'), DB, GL, 14);
                     recSheet.getRow(1).height = 40;
                     let recContent = '';
                     if (D.fairValue > 0) {
                         recContent =
-                            `✅ التقييم إيجابي: القيمة العادلة ${currency}${D.fairValue.toFixed(0)}\n`;
-                        recContent += `سعر الحصة (${D.ownership}%): ${currency}${D.sharePrice.toFixed(0)}\n`;
+                            `${T('s74')}${currency}${D.fairValue.toFixed(0)}\n`;
+                        recContent += `${T('s75')}${D.ownership}%): ${currency}${D.sharePrice.toFixed(0)}\n`;
                         if (D.leaseWarning) recContent += `⚠️ ${D.leaseWarning}\n`;
                         if (D.injectionImpact) {
-                            recContent += `💉 بعد ضخ رأس المال: القيمة العادلة المتوقعة ${currency}${D.injectionImpact.newFairValue.toFixed(0)}\n`;
+                            recContent += `${T('s76')}${currency}${D.injectionImpact.newFairValue.toFixed(0)}\n`;
                         }
-                        recContent += `\nيوصى بالتفاوض بناءً على هذا النطاق، مع مراعاة تحسين المؤشرات الضعيفة.`;
+                        recContent += `${T('s77')}`;
                     } else {
                         recContent =
-                            `🔴 التقييم سلبي أو صفري. تحتاج إلى مراجعة هيكل التكاليف، زيادة الإيرادات، أو تخفيض الديون.`;
+                            `${T('s78')}`;
                     }
                     recSheet.getCell(3, 2).value = recContent;
                     recSheet.getCell(3, 2).font = { name: 'Arial', size: 11 };
-                    recSheet.getCell(3, 2).alignment = { wrapText: true, readingOrder: 'rtl' };
+                    recSheet.getCell(3, 2).alignment = { wrapText: true, readingOrder: FG.dir() };
 
                     const buffer = await workbook.xlsx.writeBuffer();
                     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                     const now = new Date();
                     const fileName =
-                        `تقييم_مطعم_${name}_${now.toISOString().slice(0,10)}.xlsx`;
+                        `${T('s79')}${name}_${now.toISOString().slice(0,10)}.xlsx`;
                     saveAs(blob, fileName);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ أثناء إنشاء ملف Excel: ' + err.message);
+                    alert(T('s80') + err.message);
                 } finally {
                     hideLoading();
                 }
@@ -524,75 +442,37 @@
 
             // ========== تصدير Word ==========
             async function exportToWord() {
-                if (!window.lastValuation) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-                showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات');
+                if (!window.lastValuation) { alert(T('s29')); return; }
+                showLoading(T('s81'), T('s82'));
                 try {
                     const D = window.lastValuation;
                     const currency = document.getElementById('currencySelect').value;
-                    const name = document.getElementById('restaurantName').value || 'المطعم';
+                    const name = document.getElementById('restaurantName').value || T('s32');
                     const now = new Date();
-                    const dateStr = now.toLocaleDateString('ar-EG');
+                    const dateStr = now.toLocaleDateString(FG.locale());
 
                     let injectionHtml = '';
                     if (D.injectionImpact) {
-                        injectionHtml = `
-                            <h3 style="color:#b8860b;">💉 تأثير ضخ رأس المال</h3>
-                            <p>القيمة العادلة بعد الضخ: ${currency}${D.injectionImpact.newFairValue.toFixed(0)}</p>
-                            <p>فترة الاسترداد الجديدة: ${isFinite(D.injectionImpact.newPayback) ? D.injectionImpact.newPayback.toFixed(2)+' سنة' : 'غير محسوبة'}</p>
+                        injectionHtml = `${T('s84')}${currency}${D.injectionImpact.newFairValue.toFixed(0)}${T('s85')}${isFinite(D.injectionImpact.newPayback) ? D.injectionImpact.newPayback.toFixed(2)+T('s83') : T('s26')}</p>
                         `;
                     }
 
-                    const fullHtml = `<!DOCTYPE html>
-                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
-                    <head><meta charset='utf-8'><title>تقرير تقييم مطعم - FAROUK GRUP</title>
-                    <style>
-                        body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;}
-                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                        .cover h1{font-size:32px;color:#b8860b;margin:0;}
-                        .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-                        table{width:100%;border-collapse:collapse;margin:20px 0;direction:rtl;}
-                        th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                        th{background:#fefcf6;color:#b8860b;font-weight:bold;}
-                        .footer{text-align:center;margin-top:40px;padding-top:10px;border-top:1px dashed #b8860b;color:#888;font-size:10pt;}
-                        .rec{background:#f9f9f9;padding:15px;border-right:4px solid #b8860b;margin:20px 0;}
-                    </style></head>
-                    <body>
-                        <div class="cover">
-                            <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                            <h2>تقرير تقييم مطعم</h2>
-                            <p>اسم المطعم: ${name} | التاريخ: ${dateStr}</p>
-                            <p>العملة: ${currency}</p>
-                        </div>
-                        <h2 style="color:#b8860b;">📊 المؤشرات الرئيسية</h2>
-                        <table>
-                            <thead><tr><th>المؤشر</th><th>القيمة</th></tr></thead>
-                            <tbody>
-                                <tr><td>EBITDA</td><td>${currency}${D.EBITDA.toFixed(0)}</td></tr>
-                                <tr><td>القيمة العادلة</td><td>${currency}${D.fairValue.toFixed(0)}</td></tr>
-                                <tr><td>سعر حصة ${D.ownership}%</td><td>${currency}${D.sharePrice.toFixed(0)}</td></tr>
-                                <tr><td>فترة الاسترداد</td><td>${isFinite(D.paybackYears) ? D.paybackYears.toFixed(2)+' سنة' : 'لا نهائي'}</td></tr>
-                                <tr><td>مؤشر الكفاءة</td><td>${D.efficiencyIndex.toFixed(2)}</td></tr>
-                                <tr><td>المضاعف المستخدم</td><td>${D.multiplier.toFixed(2)}x</td></tr>
+                    const fullHtml = `${T('s88')}${name}${T('s89')}${dateStr}${T('s90')}${currency}${T('s91')}${currency}${D.EBITDA.toFixed(0)}${T('s92')}${currency}${D.fairValue.toFixed(0)}${T('s93')}${D.ownership}%</td><td>${currency}${D.sharePrice.toFixed(0)}${T('s94')}${isFinite(D.paybackYears) ? D.paybackYears.toFixed(2)+T('s83') : T('s9')}${T('s95')}${D.efficiencyIndex.toFixed(2)}${T('s96')}${D.multiplier.toFixed(2)}x</td></tr>
                             </tbody>
                         </table>
                         ${D.leaseWarning ? `<div style="background:#f8d7da;padding:10px;border-radius:8px;border-right:4px solid #dc3545;margin:20px 0;">${D.leaseWarning}</div>` : ''}
-                        ${injectionHtml}
-                        <div class="rec">
-                            <h3 style="color:#b8860b;">📌 التوصية</h3>
-                            <p>${D.fairValue > 0 ? '✅ التقييم إيجابي، يوصى بالمضي قدماً في المفاوضات بناءً على النطاق المعروض.' : '🔴 التقييم سلبي أو صفري، يجب مراجعة هيكل التكاليف أو زيادة الإيرادات.'}</p>
-                        </div>
-                        <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+                        ${injectionHtml}${T('s97')}${D.fairValue > 0 ? T('s86') : T('s87')}${T('s98')}${now.getFullYear()}</div>
                     </body></html>`;
 
                     const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
-                    link.download = `تقييم_مطعم_${name}_${now.toISOString().slice(0,10)}.doc`;
+                    link.download = `${T('s79')}${name}_${now.toISOString().slice(0,10)}.doc`;
                     link.click();
                     URL.revokeObjectURL(link.href);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ في إنشاء تقرير Word');
+                    alert(T('s99'));
                 } finally {
                     hideLoading();
                 }
@@ -606,8 +486,7 @@
             window.addEventListener('load', function() {
                 // تشغيل الحساب تلقائياً لعرض النتائج الافتراضية
                 setTimeout(function() {
-                    const res = computeValuation();
-                    displayResults(res);
+                    computeValuation().then(displayResults, FG.calcError);
                 }, 400);
             });
 

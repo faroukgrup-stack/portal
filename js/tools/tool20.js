@@ -15,14 +15,14 @@
 
             // ===== تعريف المجالات والمعايير (40 معياراً) =====
             const domains = [
-                { name: "الشركة الأم", range: [1, 4], criteria: ["الإخلاص للشركة والمحافظة على مصالحها", "الالتزام بأنظمة وسياسات الشركة", "المحافظة على ممتلكات الشركة", "المحافظة على أسرار الشركة"] },
-                { name: "الإدارة العليا", range: [5, 8], criteria: ["تفهم أهداف الإدارة العليا وسياستها", "تقبل انتقادات وتوجيهات الرؤساء", "الالتزام بتعليمات الإدارة العليا", "تقبل متطلبات العمل تحت الضغط"] },
-                { name: "القسم أو الشعبة", range: [9, 12], criteria: ["المعرفة بأساليب وإجراءات العمل", "الاهتمام بتطوير وتحسين مستوى العمل", "المرونة والتكيف في بيئة العمل", "التعاون مع الزملاء في العمل"] },
-                { name: "مجال التخصص", range: [13, 16], criteria: ["مستوى الكفاءة في مجال التخصص", "مواكبة أحدث التطورات في التخصص", "القدرة على استيعاب مستجدات مجال التخصص", "القدرة على نقل الخبرة في مجال التخصص"] },
-                { name: "القدرات والمهارات الإدارية", range: [17, 20], criteria: ["القدرة على التخطيط الجيد", "القدرة على اتخاذ القرارات", "القدرة على الإشراف الإداري", "القدرة على الإشراف الفني"] },
-                { name: "القدرات والمهارات العملية", range: [21, 28], criteria: ["الإبداع والابتكار في العمل", "المبادرة والمبادأة في العمل", "الدقة والترتيب والتنظيم في العمل", "القدرة على العمل بدون إشراف", "القدرة على العمل تحت الضغط", "الاهتمام بتطوير وتحسين أسلوب العمل", "القدرة على إيجاد حلول للمشكلات في العمل", "القدرة على تحمل مسئوليات أعلى في العمل"] },
-                { name: "الالتزام في العمل", range: [29, 34], criteria: ["الالتزام بقواعد وأساليب وإجراءات العمل", "الالتزام بتعليمات الرئيس المباشر في العمل", "الالتزام بمواعيد الدوام في العمل", "الالتزام بقواعد الوقاية والسلامة في العمل", "الالتزام بالقيافة والهندام في العمل", "الالتزام باللباس الرسمي في العمل"] },
-                { name: "السمات الشخصية والعلاقات", range: [35, 40], criteria: ["الاتزان وعدم الاندفاع في بيئة العمل", "سرعة البديهة وحُسن التصرف في العمل", "القدرة على تحمل المسؤولية في العمل", "العلاقة مع الزملاء في العمل", "العلاقة مع المرؤوسين في العمل", "العلاقة مع الجمهور في العمل"] }
+                { name: T('s1'), range: [1, 4], criteria: [T('s2'), T('s3'), T('s4'), T('s5')] },
+                { name: T('s6'), range: [5, 8], criteria: [T('s7'), T('s8'), T('s9'), T('s10')] },
+                { name: T('s11'), range: [9, 12], criteria: [T('s12'), T('s13'), T('s14'), T('s15')] },
+                { name: T('s16'), range: [13, 16], criteria: [T('s17'), T('s18'), T('s19'), T('s20')] },
+                { name: T('s21'), range: [17, 20], criteria: [T('s22'), T('s23'), T('s24'), T('s25')] },
+                { name: T('s26'), range: [21, 28], criteria: [T('s27'), T('s28'), T('s29'), T('s30'), T('s31'), T('s32'), T('s33'), T('s34')] },
+                { name: T('s35'), range: [29, 34], criteria: [T('s36'), T('s37'), T('s38'), T('s39'), T('s40'), T('s41')] },
+                { name: T('s42'), range: [35, 40], criteria: [T('s43'), T('s44'), T('s45'), T('s46'), T('s47'), T('s48')] }
             ];
 
             let allCriteria = [];
@@ -35,7 +35,7 @@
             });
             const totalQuestions = allCriteria.length; // 40
 
-            const optionLabels = { 1: "ضعيف", 2: "متوسط", 3: "جيد", 4: "جيد جداً", 5: "ممتاز" };
+            const optionLabels = { 1: T('s49'), 2: T('s50'), 3: T('s51'), 4: T('s52'), 5: T('s53') };
             let answers = new Array(totalQuestions).fill(null);
             const container = document.getElementById("questionsContainer");
 
@@ -146,130 +146,13 @@
             }
 
             // ===== دوال الحساب والتوصيات =====
-            function calculateTotalScore() {
-                let sum = 0;
-                for (let i = 0; i < totalQuestions; i++) {
-                    if (answers[i] === null) return null;
-                    sum += answers[i];
-                }
-                return sum;
-            }
-
-            function getDomainAverages() {
-                let domainResults = [];
-                let startIdx = 0;
-                domains.forEach(domain => {
-                    const count = domain.criteria.length;
-                    let sum = 0;
-                    let allAnswered = true;
-                    for (let i = startIdx; i < startIdx + count; i++) {
-                        if (answers[i] === null) { allAnswered = false; break; }
-                        sum += answers[i];
-                    }
-                    const avg = allAnswered ? (sum / count) : null;
-                    const maxPossible = count * 5;
-                    const achieved = allAnswered ? sum : 0;
-                    const percent = allAnswered ? (achieved / maxPossible) * 100 : 0;
-                    domainResults.push({
-                        name: domain.name,
-                        avg: avg,
-                        percent: percent,
-                        count: count,
-                        sum: sum,
-                        allAnswered: allAnswered
-                    });
-                    startIdx += count;
-                });
-                return domainResults;
-            }
-
-            function getInterpretation(score) {
-                const maxScore = totalQuestions * 5;
-                const percent = (score / maxScore) * 100;
-                if (percent >= 90) return { level: "ممتاز", message: "أداء متميز جداً، يستحق التقدير والترقية.", color: "#4ade80" };
-                else if (percent >= 75) return { level: "جيد جداً", message: "أداء عالٍ، مع بعض النقاط القابلة للتطوير.", color: "#facc15" };
-                else if (percent >= 60) return { level: "جيد", message: "أداء مقبول، يحتاج إلى تحسين في بعض المجالات.", color: "#fb923c" };
-                else if (percent >= 45) return { level: "متوسط", message: "أداء أقل من المتوقع، يحتاج إلى خطة تطوير.", color: "#f87171" };
-                else return { level: "ضعيف", message: "أداء غير مرضٍ، يتطلب تدخلاً عاجلاً.", color: "#ef4444" };
-            }
-
-            function getDomainSuggestion(domainName, level) {
-                const suggestions = {
-                    "الشركة الأم": {
-                        weak: "عقد دورات توعوية حول رؤية ورسالة الشركة، وتعزيز روح الانتماء عبر برامج الحوافز المعنوية والمادية.",
-                        medium: "تعزيز قنوات التواصل الداخلي لشرح السياسات، وإشراك الموظف في اتخاذ القرارات البسيطة التي تخص مصالح الشركة."
-                    },
-                    "الإدارة العليا": {
-                        weak: "تنظيم ورش عمل حول كيفية تقبل النقد البناء وإدارة الضغوط، مع توفير نموذج قيادي يحتذى به داخل الإدارة.",
-                        medium: "تحسين أسلوب التواصل بين الرؤساء والمرؤوسين، وعقد اجتماعات دورية لمناقشة التحديات وإيجاد الحلول المشتركة."
-                    },
-                    "القسم أو الشعبة": {
-                        weak: "تحديث إجراءات العمل بشكل دوري، وتوفير دليل إجراءات موحد، مع تشجيع ثقافة التعاون عبر أنشطة بناء الفريق.",
-                        medium: "تنظيم جلسات عصف ذهني داخل القسم، وتطبيق نظام التناوب الوظيفي لزيادة المرونة والمعرفة الإجرائية."
-                    },
-                    "مجال التخصص": {
-                        weak: "توفير برامج تدريبية مكثفة في التخصص، وحضور مؤتمرات متخصصة، وإنشاء مكتبة مراجع رقمية محدثة.",
-                        medium: "ربط الموظف بمرشد مهني (Mentor) في نفس التخصص، وتحفيزه على الحصول على شهادات مهنية معتمدة."
-                    },
-                    "القدرات والمهارات الإدارية": {
-                        weak: "التحاق الموظف بدورات في القيادة وإدارة المشاريع، مع تكليفه بمهام إشرافية بسيطة تحت التوجيه المباشر.",
-                        medium: "تطبيق أسلوب التقييم الذاتي للمهام الإدارية، وعقد جلسات تغذية راجعة (Feedback) دورية مع المشرف المباشر."
-                    },
-                    "القدرات والمهارات العملية": {
-                        weak: "تدريب عملي على رأس العمل، وتحديد أهداف أداء يومية، وتحفيز الموظف على تقديم حلول للمشكلات البسيطة أولاً بأول.",
-                        medium: "إطلاق مسابقات داخلية للإبداع والابتكار، ومنح الموظف صلاحيات أكبر في تنفيذ مهامه دون الرجوع المستمر للمشرف."
-                    },
-                    "الالتزام في العمل": {
-                        weak: "مراجعة لائحة الانضباط الوظيفي مع الموظف، وتطبيق نظام المكافآت والعقوبات بشكل واضح وعادل، ومتابعة الالتزام بالزي الرسمي.",
-                        medium: "تعزيز ثقافة القدوة من خلال المشرفين الملتزمين، وتذكير الموظف باستمرار بأهمية الالتزام بالوقت والإجراءات."
-                    },
-                    "السمات الشخصية والعلاقات": {
-                        weak: "إلحاق الموظف بدورات في الذكاء العاطفي ومهارات التواصل، وعقد جلسات توعية حول أهمية الاحترام المتبادل في بيئة العمل.",
-                        medium: "تشجيع الموظف على المشاركة في الفعاليات الاجتماعية داخل الشركة، وتدريبه على كيفية التعامل مع مختلف الشخصيات."
-                    }
-                };
-                const domainSuggest = suggestions[domainName];
-                if (!domainSuggest) return "مراجعة الأداء في هذا المجال وتحديد خطة تحسين بالتعاون مع المشرف.";
-                return domainSuggest[level] || domainSuggest.medium;
-            }
-
-            function generateRecommendations(domainAverages, totalScore) {
-                const maxScore = totalQuestions * 5;
-                const overallPercent = (totalScore / maxScore) * 100;
-                let recommendations = [];
-
-                if (overallPercent >= 90) {
-                    recommendations.push("🟢 أداؤك متميز في جميع المجالات. نوصي بالاستمرار في نفس المستوى، مع التركيز على نقل الخبرة للآخرين وتولي مهام قيادية أكبر.");
-                } else if (overallPercent >= 75) {
-                    recommendations.push("🟡 أداؤك جيد جداً. ركز على تعزيز نقاط القوة الحالية، خاصة في المجالات التي حصلت فيها على درجات أقل من 80%.");
-                } else if (overallPercent >= 60) {
-                    recommendations.push("🟠 أداؤك في حدود المقبول. نوصي بوضع خطة تطوير فردية تركز على المجالات التي تقل عن 60%.");
-                } else if (overallPercent >= 45) {
-                    recommendations.push("🔴 أداؤك يحتاج إلى تحسين كبير. نوصي بتدخل مكثف من المشرفين وتحديد أهداف قصيرة المدى قابلة للقياس.");
-                } else {
-                    recommendations.push("⛔ أداؤك غير مرضٍ. نوصي بجلسات تقييم أسبوعية، وتحديد أسباب الضعف، وربما إعادة توزيع المهام أو توفير تدريب مكثف.");
-                }
-
-                domainAverages.forEach(d => {
-                    if (!d.allAnswered) return;
-                    if (d.percent < 60) {
-                        let suggestion = `🔻 مجال "${d.name}" يعتبر **ضعيفاً** (${Math.round(d.percent)}%). `;
-                        suggestion += getDomainSuggestion(d.name, "weak");
-                        recommendations.push(suggestion);
-                    } else if (d.percent < 75) {
-                        let suggestion = `📌 مجال "${d.name}" يحتاج إلى **تحسين** (${Math.round(d.percent)}%). `;
-                        suggestion += getDomainSuggestion(d.name, "medium");
-                        recommendations.push(suggestion);
-                    } else {
-                        recommendations.push(`✅ مجال "${d.name}" يعتبر **قوياً** (${Math.round(d.percent)}%)، استمر في الحفاظ على هذا المستوى.`);
-                    }
-                });
-
-                return recommendations;
+            // الحساب والتفسير والتوصيات تتم على الخادم (Supabase Edge Function)
+            async function evaluateAll() {
+                return await FG.calc('tool20', 'evaluate', { answers });
             }
 
             // ===== عرض المودال =====
-            function showResultModal() {
+            async function showResultModal() {
                 for (let i = 0; i < totalQuestions; i++) {
                     if (answers[i] === null) {
                         const toast = document.getElementById("warningToast");
@@ -288,14 +171,13 @@
                     }
                 }
 
-                const totalScore = calculateTotalScore();
+                let E;
+                try { E = await evaluateAll(); } catch (e) { FG.calcError(e); return; }
+                const { totalScore, interpretation, domainAverages, recommendations } = E;
                 if (totalScore === null) return;
-                const interpretation = getInterpretation(totalScore);
-                const domainAverages = getDomainAverages();
-                const recommendations = generateRecommendations(domainAverages, totalScore);
 
                 const modal = document.getElementById("resultModal");
-                document.getElementById("modalScore").innerText = `${totalScore} نقطة (من 200)`;
+                document.getElementById("modalScore").innerText = `${totalScore}${T('s88')}`;
                 document.getElementById("modalInterpretation").innerHTML = `
                     <strong style="color: ${interpretation.color};">${interpretation.level}</strong><br>
                     ${interpretation.message}
@@ -339,22 +221,19 @@
                     }
                 }
 
-                showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والجداول');
+                showLoading(T('s89'), T('s90'));
                 try {
-                    const empName = document.getElementById("empName").value || "غير مدخل";
-                    const empId = document.getElementById("empId").value || "غير مدخل";
-                    const workPlace = document.getElementById("workPlace").value || "غير مدخل";
-                    const qualification = document.getElementById("qualification").value || "غير مدخل";
-                    const grade = document.getElementById("grade").value || "غير مدخل";
-                    const gradeDate = document.getElementById("gradeDate").value || "غير مدخل";
-                    const hireDate = document.getElementById("hireDate").value || "غير مدخل";
-                    const prevScore = document.getElementById("prevScore").value || "غير مدخل";
+                    const empName = document.getElementById("empName").value || T('s91');
+                    const empId = document.getElementById("empId").value || T('s91');
+                    const workPlace = document.getElementById("workPlace").value || T('s91');
+                    const qualification = document.getElementById("qualification").value || T('s91');
+                    const grade = document.getElementById("grade").value || T('s91');
+                    const gradeDate = document.getElementById("gradeDate").value || T('s91');
+                    const hireDate = document.getElementById("hireDate").value || T('s91');
+                    const prevScore = document.getElementById("prevScore").value || T('s91');
 
-                    const totalScore = calculateTotalScore();
+                    const { totalScore, interpretation, domainAverages, recommendations } = await evaluateAll();
                     if (totalScore === null) return;
-                    const interpretation = getInterpretation(totalScore);
-                    const domainAverages = getDomainAverages();
-                    const recommendations = generateRecommendations(domainAverages, totalScore);
 
                     const workbook = new ExcelJS.Workbook();
                     workbook.creator = 'FAROUK GRUP';
@@ -372,7 +251,7 @@
                     function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11,
                                 color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid',
                                 fgColor: { argb: bg } }, alignment: { horizontal: 'center',
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'thin', color: { argb: G } }, bottom: { style: 'thin',
                                     color: { argb: G } }, left: { style: 'thin', color: { argb: G } },
                                 right: { style: 'thin', color: { argb: G } } } }; }
@@ -380,7 +259,7 @@
                     function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial',
                                 bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern',
                                 pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h,
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, left: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, right: { style: 'hair',
@@ -394,13 +273,13 @@
                         tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true,
                             size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid',
                             fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle',
-                            wrapText: true, readingOrder: 'rtl' }; c.border = { top: { style: 'medium',
+                            wrapText: true, readingOrder: FG.dir() }; c.border = { top: { style: 'medium',
                                 color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } },
                             left: { style: 'medium', color: { argb: G } }, right: { style: 'medium',
                                 color: { argb: G } } }; }
 
                     // 1. غلاف التقرير
-                    const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true,
+                    const cv = workbook.addWorksheet(T('s92'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
                     for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
@@ -408,21 +287,21 @@
                     cv.getRow(4).height = 60;
                     cv.mergeCells(2, 1, 2, 4);
                     const bc = cv.getCell(2, 1);
-                    bc.value = 'مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+                    bc.value = T('s93');
                     bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
                     bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
                     bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                    readingOrder: 'rtl' };
+                    readingOrder: FG.dir() };
                     bc.border = { bottom: { style: 'thick', color: { argb: G } } };
-                    mh(cv, 1, 4, 4, `تقرير تقييم الموظف\n${empName}`, DB, GL, 18);
+                    mh(cv, 1, 4, 4, `${T('s94')}${empName}`, DB, GL, 18);
                     const inf = [
-                        ['📋 اسم الموظف', empName],
-                        ['📅 التاريخ', new Date().toLocaleDateString('ar-EG')],
-                        ['📊 الرقم الوظيفي', empId],
-                        ['🏢 مكان العمل', workPlace],
-                        ['📈 المؤهل العلمي', qualification],
-                        ['💼 المسمى الوظيفي', grade],
-                        ['⭐ التقييم السابق', prevScore]
+                        [T('s95'), empName],
+                        [T('s96'), new Date().toLocaleDateString(FG.locale())],
+                        [T('s97'), empId],
+                        [T('s98'), workPlace],
+                        [T('s99'), qualification],
+                        [T('s100'), grade],
+                        [T('s101'), prevScore]
                     ];
                     let ir = 6;
                     inf.forEach(([l, v], idx) => {
@@ -435,12 +314,12 @@
                         const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
                         ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         cv.getRow(ir).height = 28;
@@ -448,20 +327,20 @@
                     });
 
                     // 2. النتيجة الإجمالية
-                    const summarySheet = workbook.addWorksheet('النتيجة والتوصيات', { views: [{ rightToLeft: true,
+                    const summarySheet = workbook.addWorksheet(T('s102'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     summarySheet.getColumn(1).width = 5;
                     summarySheet.getColumn(2).width = 50;
                     summarySheet.getColumn(3).width = 5;
-                    mh(summarySheet, 1, 3, 1, '📊 النتيجة الإجمالية والتوصيات', DB, GL, 14);
+                    mh(summarySheet, 1, 3, 1, T('s103'), DB, GL, 14);
                     summarySheet.getRow(1).height = 40;
 
                     summarySheet.mergeCells(2, 2, 2, 2);
                     const sc = summarySheet.getCell(2, 2);
-                    sc.value = `النتيجة الإجمالية: ${totalScore} نقطة (من 200)  |  التقدير: ${interpretation.level}`;
+                    sc.value = `${T('s104')}${totalScore}${T('s105')}${interpretation.level}`;
                     sc.font = { name: 'Arial', bold: true, size: 14, color: { argb: interpretation.color } };
                     sc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AR } };
-                    sc.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+                    sc.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() };
                     sc.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
                             color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
                         right: { style: 'medium', color: { argb: G } } };
@@ -473,7 +352,7 @@
                     ic.font = { name: 'Arial', size: 11, color: { argb: DT } };
                     ic.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEFCF6' } };
                     ic.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                    readingOrder: 'rtl' };
+                    readingOrder: FG.dir() };
                     ic.border = { top: { style: 'hair' }, bottom: { style: 'hair', color: { argb: G } },
                         left: { style: 'hair' }, right: { style: 'hair' } };
                     summarySheet.getRow(3).height = 40;
@@ -482,10 +361,10 @@
                     let recRow = 5;
                     summarySheet.mergeCells(recRow, 2, recRow, 2);
                     const rt = summarySheet.getCell(recRow, 2);
-                    rt.value = '📌 التوصيات والتطوير المقترح';
+                    rt.value = T('s106');
                     rt.font = { name: 'Arial', bold: true, size: 12, color: { argb: GL } };
                     rt.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HB } };
-                    rt.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                    rt.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                     rt.border = { bottom: { style: 'medium', color: { argb: G } } };
                     summarySheet.getRow(recRow).height = 30;
                     recRow++;
@@ -498,7 +377,7 @@
                         rc.font = { name: 'Arial', size: 10, color: { argb: DT } };
                         rc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
                         rc.alignment = { horizontal: 'right', vertical: 'top', wrapText: true,
-                            readingOrder: 'rtl' };
+                            readingOrder: FG.dir() };
                         rc.border = { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                             right: { style: 'hair' } };
                         summarySheet.getRow(recRow).height = 22;
@@ -506,7 +385,7 @@
                     });
 
                     // 3. تفاصيل المعايير
-                    const detailSheet = workbook.addWorksheet('تفاصيل التقييم', { views: [{ rightToLeft: true,
+                    const detailSheet = workbook.addWorksheet(T('s107'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     detailSheet.getColumn(1).width = 5;
                     detailSheet.getColumn(2).width = 10;
@@ -515,9 +394,9 @@
                     detailSheet.getColumn(5).width = 20;
                     detailSheet.getColumn(6).width = 15;
                     detailSheet.getColumn(7).width = 5;
-                    mh(detailSheet, 1, 7, 1, '📋 تفاصيل التقييم حسب المعايير', DB, GL, 14);
+                    mh(detailSheet, 1, 7, 1, T('s108'), DB, GL, 14);
                     detailSheet.getRow(1).height = 40;
-                    detailSheet.addRow(['#', 'المجال', 'المعيار', 'التقدير', 'الدرجة']);
+                    detailSheet.addRow(['#', T('s109'), T('s110'), T('s111'), T('s112')]);
                     const detailHeader = detailSheet.getRow(2);
                     detailHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
                     detailHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
@@ -536,7 +415,7 @@
                                         4 ? 'FF28A745' : answer >= 3 ? 'FFED6C02' :
                                         'FFDC3545' } };
                             }
-                            Object.assign(cell, cs(bg, DT, false, col === 2 ? 'center' : 'right'));
+                            Object.assign(cell, cs(bg, DT, false, col === 2 ? 'center' : FG.start()));
                         });
                     });
 
@@ -544,11 +423,11 @@
                     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                     const now = new Date();
                     const fileName =
-                        `تقرير_تقييم_${empName}_${now.toISOString().slice(0,10)}.xlsx`;
+                        `${T('s113')}${empName}_${now.toISOString().slice(0,10)}.xlsx`;
                     saveAs(blob, fileName);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ أثناء إنشاء ملف Excel: ' + err.message);
+                    alert(T('s114') + err.message);
                 } finally {
                     hideLoading();
                 }
@@ -557,21 +436,18 @@
             // ============================================================
             // تصدير Word احترافي
             // ============================================================
-            function generateWordHTML() {
-                const empName = document.getElementById("empName").value || "غير مدخل";
-                const empId = document.getElementById("empId").value || "غير مدخل";
-                const workPlace = document.getElementById("workPlace").value || "غير مدخل";
-                const qualification = document.getElementById("qualification").value || "غير مدخل";
-                const grade = document.getElementById("grade").value || "غير مدخل";
-                const gradeDate = document.getElementById("gradeDate").value || "غير مدخل";
-                const hireDate = document.getElementById("hireDate").value || "غير مدخل";
-                const prevScore = document.getElementById("prevScore").value || "غير مدخل";
+            async function generateWordHTML() {
+                const empName = document.getElementById("empName").value || T('s91');
+                const empId = document.getElementById("empId").value || T('s91');
+                const workPlace = document.getElementById("workPlace").value || T('s91');
+                const qualification = document.getElementById("qualification").value || T('s91');
+                const grade = document.getElementById("grade").value || T('s91');
+                const gradeDate = document.getElementById("gradeDate").value || T('s91');
+                const hireDate = document.getElementById("hireDate").value || T('s91');
+                const prevScore = document.getElementById("prevScore").value || T('s91');
 
-                const totalScore = calculateTotalScore();
+                const { totalScore, interpretation, domainAverages, recommendations } = await evaluateAll();
                 if (totalScore === null) return null;
-                const interpretation = getInterpretation(totalScore);
-                const domainAverages = getDomainAverages();
-                const recommendations = generateRecommendations(domainAverages, totalScore);
 
                 let rows = "";
                 allCriteria.forEach((item, idx) => {
@@ -586,53 +462,7 @@
 
                 let recHtml = recommendations.map(r => `<li>${r}</li>`).join('');
 
-                return `
-                    <html dir="rtl">
-                    <head><meta charset="UTF-8">
-                        <style>
-                            body { font-family: 'Arial', sans-serif; padding: 30px; direction: rtl; }
-                            h1 { color: #0a1a2a; border-bottom: 3px solid #C4A747; padding-bottom: 10px; }
-                            .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                            .info-table td { padding: 8px 12px; border: 1px solid #ccc; }
-                            .info-table td:first-child { font-weight: bold; background: #f0f0f0; width: 25%; }
-                            .summary { background: #f9f9f9; padding: 15px; border-radius: 12px; margin: 20px 0; }
-                            .summary strong { color: #C4A747; }
-                            .rec-box { background: #f0f7ff; border-right: 5px solid #C4A747; padding: 15px; margin: 20px 0; border-radius: 10px; }
-                            .rec-box h3 { margin-top: 0; color: #0a1a2a; }
-                            .rec-box ul { padding-right: 20px; }
-                            .rec-box li { margin-bottom: 8px; }
-                            table.details { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-                            table.details th { background: #0a1a2a; color: white; padding: 8px; border: 1px solid #999; }
-                            table.details td { padding: 6px; border: 1px solid #999; }
-                            .footer { margin-top: 30px; font-size: 0.8rem; color: #555; text-align: center; }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>تقرير تقييم الموظف مع التوصيات</h1>
-                        <table class="info-table">
-                            <tr><td>الاسم</td><td>${empName}</td><td>الرقم الوظيفي</td><td>${empId}</td></tr>
-                            <tr><td>مكان العمل</td><td>${workPlace}</td><td>المؤهل العلمي</td><td>${qualification}</td></tr>
-                            <tr><td>المسمى الوظيفي</td><td>${grade}</td><td>تاريخ الدرجة</td><td>${gradeDate}</td></tr>
-                            <tr><td>تاريخ التعيين</td><td>${hireDate}</td><td>درجة التقييم السابق</td><td>${prevScore}</td></tr>
-                        </table>
-
-                        <div class="summary">
-                            <strong>النتيجة الإجمالية:</strong> ${totalScore} نقطة (من 200) &nbsp;|&nbsp;
-                            <strong>التقدير:</strong> <span style="color:${interpretation.color};">${interpretation.level}</span><br>
-                            <strong>التفسير:</strong> ${interpretation.message}
-                        </div>
-
-                        <div class="rec-box">
-                            <h3>📌 التوصيات والتطوير المقترح</h3>
-                            <ul>${recHtml}</ul>
-                        </div>
-
-                        <h2>تفاصيل التقييم حسب المعايير</h2>
-                        <table class="details">
-                            <thead><tr><th>#</th><th>المجال</th><th>المعيار</th><th>التقدير</th><th>الدرجة</th></tr></thead>
-                            <tbody>${rows}</tbody>
-                        </table>
-                        <div class="footer">تم إنشاء هذا التقرير بواسطة مجموعة فاروق للإستشارات والأعمال | ${new Date().toLocaleDateString('ar-EG')}</div>
+                return `${T('s115')}${empName}${T('s116')}${empId}${T('s117')}${workPlace}${T('s118')}${qualification}${T('s119')}${grade}${T('s120')}${gradeDate}${T('s121')}${hireDate}${T('s122')}${prevScore}${T('s123')}${totalScore}${T('s124')}${interpretation.color};">${interpretation.level}${T('s125')}${interpretation.message}${T('s126')}${recHtml}${T('s127')}${rows}${T('s128')}${new Date().toLocaleDateString(FG.locale())}</div>
                     </body>
                     </html>
                 `;
@@ -651,19 +481,19 @@
                     }
                 }
 
-                showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات');
+                showLoading(T('s129'), T('s130'));
                 try {
-                    const content = generateWordHTML();
-                    if (!content) { alert('يرجى إكمال التقييم أولاً.'); return; }
+                    const content = await generateWordHTML();
+                    if (!content) { alert(T('s131')); return; }
                     const blob = new Blob(['\uFEFF' + content], { type: 'application/msword' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
-                    link.download = `تقرير_تقييم_${document.getElementById('empName').value || 'موظف'}.doc`;
+                    link.download = `${T('s133')}${document.getElementById('empName').value || T('s132')}.doc`;
                     link.click();
                     URL.revokeObjectURL(link.href);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ في إنشاء تقرير Word: ' + err.message);
+                    alert(T('s134') + err.message);
                 } finally {
                     hideLoading();
                 }

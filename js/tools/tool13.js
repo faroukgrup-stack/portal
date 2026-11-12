@@ -12,7 +12,7 @@
                 let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/'));
                 calcDisplay.value = r;
                 currentCalcInput = r.toString();
-            } catch(e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
+            } catch(e) { calcDisplay.value = T('s1'); currentCalcInput = ''; }
             return;
         }
         currentCalcInput += v;
@@ -65,9 +65,7 @@
             const div = document.createElement('div');
             div.className = 'shift-row';
             div.innerHTML = `
-                <input type="number" id="shiftEmployees${i}" placeholder="عدد الموظفين" value="" min="0" step="1">
-                <input type="number" id="shiftHours${i}" placeholder="ساعات الوردية" value="" min="1" step="0.5">
-                <span style="color:#cfa776;font-weight:700;">الوردية ${i}</span>
+                <input type="number" id="shiftEmployees${i}${T('s2')}${i}${T('s3')}${i}</span>
                 ${i > 1 ? `<button class="remove-shift" onclick="removeShift(${i})"><i class="fas fa-times"></i></button>` : ''}
             `;
             container.appendChild(div);
@@ -90,9 +88,9 @@
     let laborChart;
     let globalLaborData = null;
 
-    document.getElementById('calculateBtn').addEventListener('click', function() {
+    document.getElementById('calculateBtn').addEventListener('click', async function() {
         const currency = document.getElementById('currencySelect').value;
-        const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+        const companyName = document.getElementById('companyName').value || T('s4');
 
         const monthlySales = parseFloat(document.getElementById('monthlySales').value) || 0;
         const avgBill = parseFloat(document.getElementById('avgBill').value) || 1;
@@ -101,102 +99,40 @@
         const targetPercent = parseFloat(document.getElementById('targetLaborPercent').value) || 25;
         const vacationType = document.getElementById('vacationDistribution').value;
 
-        let totalEmployees = 0;
-        let totalShiftHours = 0;
         const shiftsDetail = [];
         for (let i = 1; i <= shiftCount; i++) {
             const emp = parseInt(document.getElementById(`shiftEmployees${i}`)?.value) || 0;
             const hours = parseFloat(document.getElementById(`shiftHours${i}`)?.value) || 0;
-            totalEmployees += emp;
-            totalShiftHours += emp * hours;
             shiftsDetail.push({ shift: i, employees: emp, hours: hours });
         }
-
-        if (totalEmployees === 0 || totalShiftHours === 0) {
-            alert('الرجاء إدخال عدد الموظفين وساعات العمل لكل وردية');
+        let R;
+        try { R = await FG.calc('tool13', 'main', { monthlySales, avgBill, avgMonthlyWage, workingDays, targetPercent, vacationType, shiftsDetail }); } catch (e) { FG.calcError(e); return; }
+        if (R.invalid) {
+            alert(T('s5'));
             return;
         }
-
-        const weeksPerMonth = 4.33;
-        const daysPerMonth = workingDays * weeksPerMonth;
-
-        const monthlyLaborCost = totalEmployees * avgMonthlyWage;
-        const laborPercent = monthlySales ? (monthlyLaborCost / monthlySales) * 100 : 0;
-
-        const salesPerEmployee = totalEmployees ? monthlySales / totalEmployees : 0;
-        const dailyLaborCost = daysPerMonth ? monthlyLaborCost / daysPerMonth : 0;
-        const avgHoursPerEmployee = totalEmployees ? totalShiftHours / totalEmployees : 0;
-        const expectedCustomers = monthlySales / avgBill;
-        const customersPerEmployee = totalEmployees ? expectedCustomers / totalEmployees : 0;
-
-        const idealMin = targetPercent - 5;
-        const idealMax = targetPercent + 5;
-        let alertClass = '', alertMessage = '';
-        if (laborPercent < idealMin) {
-            alertClass = 'alert-warning';
-            alertMessage = `⚠️ نسبة العمالة (${laborPercent.toFixed(1)}%) أقل من المستوى المستهدف (${targetPercent}%). قد يكون الموظفون غير كافيين لخدمة المبيعات المتوقعة.`;
-        } else if (laborPercent > idealMax) {
-            alertClass = 'alert-danger';
-            alertMessage = `🔴 نسبة العمالة (${laborPercent.toFixed(1)}%) أعلى من المستوى المثالي (${targetPercent}%). هذا يشير إلى هدر في الرواتب.`;
-        } else {
-            alertClass = 'alert-success';
-            alertMessage = `✅ نسبة العمالة (${laborPercent.toFixed(1)}%) ضمن النطاق المثالي (${idealMin}-${idealMax}%).`;
-        }
-
-        let efficiencyRating = '';
-        if (laborPercent < 20) efficiencyRating = 'ممتاز';
-        else if (laborPercent <= 30) efficiencyRating = 'جيد';
-        else if (laborPercent <= 35) efficiencyRating = 'مرتفع';
-        else efficiencyRating = 'خطر';
+        const { totalEmployees, totalShiftHours, monthlyLaborCost, laborPercent, salesPerEmployee, dailyLaborCost, avgHoursPerEmployee, expectedCustomers, customersPerEmployee, idealMin, idealMax, alertClass, alertMessage, efficiencyRating } = R;
 
         document.getElementById('resultsSection').style.display = 'block';
         document.getElementById('initialMessage').style.display = 'none';
 
-        document.getElementById('resultsGrid').innerHTML = `
-            <div class="result-card"><i class="fas fa-user-friends"></i><div class="label">إجمالي الموظفين</div><div class="value">${totalEmployees}</div><div class="unit">موظف</div></div>
-            <div class="result-card"><i class="fas fa-money-bill-wave"></i><div class="label">تكلفة العمالة الشهرية</div><div class="value">${currency}${monthlyLaborCost.toLocaleString()}</div><div class="unit">تقريباً</div></div>
-            <div class="result-card"><i class="fas fa-percent"></i><div class="label">نسبة العمالة</div><div class="value">${laborPercent.toFixed(1)}%</div><div class="unit">من المبيعات</div></div>
-            <div class="result-card"><i class="fas fa-chart-bar"></i><div class="label">المبيعات لكل موظف</div><div class="value">${currency}${salesPerEmployee.toFixed(0)}</div><div class="unit">شهرياً</div></div>
-            <div class="result-card"><i class="fas fa-sun"></i><div class="label">تكلفة العمالة اليومية</div><div class="value">${currency}${dailyLaborCost.toFixed(0)}</div><div class="unit">يومياً</div></div>
-            <div class="result-card"><i class="fas fa-hourglass-half"></i><div class="label">متوسط ساعات العمل</div><div class="value">${avgHoursPerEmployee.toFixed(1)}</div><div class="unit">ساعة/موظف/يوم</div></div>
-            <div class="result-card"><i class="fas fa-users"></i><div class="label">العملاء المتوقعون</div><div class="value">${Math.round(expectedCustomers)}</div><div class="unit">عميل/شهر</div></div>
-            <div class="result-card"><i class="fas fa-user-check"></i><div class="label">عملاء لكل موظف</div><div class="value">${customersPerEmployee.toFixed(0)}</div><div class="unit">عميل/موظف</div></div>
-            <div class="result-card"><i class="fas fa-tachometer-alt"></i><div class="label">مؤشر الكفاءة</div><div class="value">${efficiencyRating}</div><div class="unit">${laborPercent.toFixed(1)}%</div></div>
+        document.getElementById('resultsGrid').innerHTML = `${T('s18')}${totalEmployees}${T('s19')}${currency}${monthlyLaborCost.toLocaleString()}${T('s20')}${laborPercent.toFixed(1)}${T('s21')}${currency}${salesPerEmployee.toFixed(0)}${T('s22')}${currency}${dailyLaborCost.toFixed(0)}${T('s23')}${avgHoursPerEmployee.toFixed(1)}${T('s24')}${Math.round(expectedCustomers)}${T('s25')}${customersPerEmployee.toFixed(0)}${T('s26')}${efficiencyRating}</div><div class="unit">${laborPercent.toFixed(1)}%</div></div>
         `;
 
         document.getElementById('evaluationAlert').innerHTML = `<div class="alert ${alertClass}">${alertMessage}</div>`;
 
-        let suggestions = '';
-        if (laborPercent > idealMax) {
-            suggestions += '<li>خفض عدد الموظفين في فترات الهدوء (حلل أوقات الذروة).</li>';
-            suggestions += '<li>دمج بعض المهام أو استخدام موظفين متعددي المهارات.</li>';
-            suggestions += '<li>زيادة المبيعات (التسويق) لخفض النسبة دون تغيير عدد الموظفين.</li>';
-        } else if (laborPercent < idealMin) {
-            suggestions += '<li>قد تحتاج إلى زيادة عدد الموظفين لخدمة العملاء بشكل أفضل.</li>';
-            suggestions += '<li>تأكد من أن المبيعات المستهدفة واقعية وقابلة للتحقيق.</li>';
-        } else {
-            suggestions += '<li>التوزيع الحالي جيد. استمر في مراقبة الأداء.</li>';
-        }
+        let suggestions = R.suggestions;
 
-        if (vacationType === 'staggered') {
-            suggestions += '<li>الإجازات المتداخلة تضمن تغطية جميع الأيام دون هدر. يفضل الاستمرار بهذا النظام.</li>';
-        } else {
-            suggestions += '<li>نظام الإجازات الموحدة قد يسبب نقصاً في التغطية يوم العطلة. فكر في اعتماد إجازات متداخلة.</li>';
-        }
-
-        const shiftAnalysis = shiftsDetail.map(s => `الوردية ${s.shift}: ${s.employees} موظفين، ${s.hours} ساعات.`).join('<br>');
-        suggestions += '<br><strong>توزيع الورديات الحالي:</strong><br>' + shiftAnalysis;
-
-        document.getElementById('suggestions').innerHTML = `<h4><i class="fas fa-lightbulb"></i> توصيات لتقليل الهدر وتحسين الكفاءة</h4><ul>${suggestions}</ul>`;
+        document.getElementById('suggestions').innerHTML = `${T('s39')}${suggestions}</ul>`;
 
         const ctx = document.getElementById('laborChart').getContext('2d');
         if (laborChart) laborChart.destroy();
         laborChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['المبيعات الشهرية', 'تكلفة العمالة'],
+                labels: [T('s40'), T('s41')],
                 datasets: [{
-                    label: `القيمة (${currency})`,
+                    label: `${T('s42')}${currency})`,
                     data: [monthlySales, monthlyLaborCost],
                     backgroundColor: ['#28a745', '#b8860b']
                 }]
@@ -217,7 +153,7 @@
         globalLaborData = {
             currency, companyName,
             monthlySales, avgBill, avgMonthlyWage, workingDays,
-            targetPercent, vacationType: vacationType === 'staggered' ? 'إجازات متداخلة' : 'جميع الموظفين نفس العطلة',
+            targetPercent, vacationType: vacationType === 'staggered' ? T('s43') : T('s44'),
             totalEmployees, totalShiftHours, monthlyLaborCost, laborPercent,
             salesPerEmployee, dailyLaborCost, avgHoursPerEmployee,
             expectedCustomers, customersPerEmployee, efficiencyRating,
@@ -230,8 +166,8 @@
     // ========== تصدير Excel احترافي ==========
     // ================================================================
     document.getElementById('exportExcelBtn').addEventListener('click', async function() {
-        if (!globalLaborData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-        showLoading('جاري إنشاء تقرير Excel...', 'إنشاء الأوراق والرسوم');
+        if (!globalLaborData) { alert(T('s45')); return; }
+        showLoading(T('s46'), T('s47'));
         try {
             const D = globalLaborData;
             const currency = D.currency;
@@ -244,45 +180,45 @@
             const PT = 'FF155724', NT = 'FF721C24';
             const nc = '#,##0;(#,##0);"-"';
 
-            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
-            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:FG.dir()},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
             function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
-            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
 
             // 1. غلاف التقرير
-            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const cv = workbook.addWorksheet(T('s48'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
             cv.getRow(2).height=80; cv.getRow(4).height=60;
             cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
-            bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
-            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
-            mh(cv,1,4,4,`تقرير تحليل تكلفة العمالة\n${companyName}`,DB,GL,18);
-            const inf=[['📋 الجهة',companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',currency],['📊 نسبة العمالة',`${D.laborPercent.toFixed(1)}%`],['👥 إجمالي الموظفين',D.totalEmployees]];
+            bc.value=T('s49');
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};
+            mh(cv,1,4,4,`${T('s50')}${companyName}`,DB,GL,18);
+            const inf=[[T('s51'),companyName],[T('s52'),new Date().toLocaleDateString(FG.locale())],[T('s53'),currency],[T('s54'),`${D.laborPercent.toFixed(1)}%`],[T('s55'),D.totalEmployees]];
             let ir=6;
             inf.forEach(([l,v],idx)=>{
                 cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
                 const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
                 const bg=idx%2===0?AR:'FFFEFCF6';
-                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
-                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
                 cv.getRow(ir).height=28; ir++;
             });
 
             // 2. المدخلات
-            const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const inputsSheet = workbook.addWorksheet(T('s56'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             inputsSheet.getColumn(1).width=5; inputsSheet.getColumn(2).width=38; inputsSheet.getColumn(3).width=22; inputsSheet.getColumn(4).width=22; inputsSheet.getColumn(5).width=5;
-            mh(inputsSheet,1,5,1,'📋 جدول المدخلات والافتراضات الأساسية',DB,GL,14);
+            mh(inputsSheet,1,5,1,T('s57'),DB,GL,14);
             inputsSheet.getRow(1).height=40;
-            mh(inputsSheet,2,4,2,'البيانات الأساسية',SB,'FFFFFFFF',11);
+            mh(inputsSheet,2,4,2,T('s58'),SB,'FFFFFFFF',11);
             inputsSheet.getRow(2).height=28;
             const inputFields = [
-                ['المبيعات الشهرية المستهدفة', D.monthlySales, `${currency} ${D.monthlySales.toFixed(0)}`],
-                ['متوسط الفاتورة للعميل', D.avgBill, `${currency} ${D.avgBill}`],
-                ['متوسط الأجر الشهري للموظف', D.avgMonthlyWage, `${currency} ${D.avgMonthlyWage}`],
-                ['أيام العمل في الأسبوع', D.workingDays, ''],
-                ['نسبة العمالة المستهدفة', `${D.targetPercent}%`, ''],
-                ['عدد الورديات', D.shiftsDetail.length, ''],
-                ['نظام الإجازات', D.vacationType, '']
+                [T('s59'), D.monthlySales, `${currency} ${D.monthlySales.toFixed(0)}`],
+                [T('s60'), D.avgBill, `${currency} ${D.avgBill}`],
+                [T('s61'), D.avgMonthlyWage, `${currency} ${D.avgMonthlyWage}`],
+                [T('s62'), D.workingDays, ''],
+                [T('s63'), `${D.targetPercent}%`, ''],
+                [T('s64'), D.shiftsDetail.length, ''],
+                [T('s65'), D.vacationType, '']
             ];
             let iRow=3;
             inputFields.forEach(([label,val,note],idx)=>{
@@ -290,36 +226,36 @@
                 const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
                 const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
                 lc.value=label; vc.value=val; nc.value=note;
-                ap(lc,cs(bg,DT,true,'right'));
+                ap(lc,cs(bg,DT,true,FG.start()));
                 ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?nc:null});
                 ap(nc,cs(bg,'00695C',false,'center'));
                 iRow++;
             });
 
             // 3. تفاصيل الورديات
-            const shiftsSheet = workbook.addWorksheet('تفاصيل الورديات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const shiftsSheet = workbook.addWorksheet(T('s66'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             shiftsSheet.getColumn(1).width=5; shiftsSheet.getColumn(2).width=20; shiftsSheet.getColumn(3).width=25; shiftsSheet.getColumn(4).width=25; shiftsSheet.getColumn(5).width=5;
-            mh(shiftsSheet,1,5,1,'🕒 تفاصيل الورديات',DB,GL,14);
+            mh(shiftsSheet,1,5,1,T('s67'),DB,GL,14);
             shiftsSheet.getRow(1).height=40;
-            shiftsSheet.addRow(['الوردية', 'عدد الموظفين', 'ساعات الوردية', 'إجمالي ساعات العمل']);
+            shiftsSheet.addRow([T('s68'), T('s69'), T('s70'), T('s71')]);
             D.shiftsDetail.forEach(s => { shiftsSheet.addRow([s.shift, s.employees, s.hours, s.employees * s.hours]); });
             const shiftHeader = shiftsSheet.getRow(2);
             shiftHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
             shiftHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
 
             // 4. مؤشرات الأداء
-            const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const kpiSheet = workbook.addWorksheet(T('s72'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
-            mh(kpiSheet,1,6,1,'📊 لوحة مؤشرات الأداء الرئيسية',DB,GL,15);
+            mh(kpiSheet,1,6,1,T('s73'),DB,GL,15);
             kpiSheet.getRow(1).height=45;
-            mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('ar-EG')}`,HB,'FFFFFFFF',10);
+            mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString(FG.locale())}`,HB,'FFFFFFFF',10);
             kpiSheet.getRow(2).height=26;
             const kpis = [
-                { label: 'نسبة العمالة', value: `${D.laborPercent.toFixed(1)}%`, good: D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax },
-                { label: 'تكلفة العمالة الشهرية', value: `${currency} ${D.monthlyLaborCost.toFixed(0)}`, good: true },
-                { label: 'المبيعات لكل موظف', value: `${currency} ${D.salesPerEmployee.toFixed(0)}`, good: true },
-                { label: 'متوسط ساعات العمل', value: `${D.avgHoursPerEmployee.toFixed(1)} ساعة`, good: true },
-                { label: 'العملاء لكل موظف', value: D.customersPerEmployee.toFixed(0), good: true }
+                { label: T('s74'), value: `${D.laborPercent.toFixed(1)}%`, good: D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax },
+                { label: T('s75'), value: `${currency} ${D.monthlyLaborCost.toFixed(0)}`, good: true },
+                { label: T('s76'), value: `${currency} ${D.salesPerEmployee.toFixed(0)}`, good: true },
+                { label: T('s77'), value: `${D.avgHoursPerEmployee.toFixed(1)}${T('s78')}`, good: true },
+                { label: T('s79'), value: D.customersPerEmployee.toFixed(0), good: true }
             ];
             let kRow=3;
             kpis.forEach((k,idx)=>{
@@ -332,24 +268,24 @@
                 const bg=k.good?PB:NB, tc=k.good?PT:NT;
                 [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
                 ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
-                lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:FG.start(),vertical:'middle',readingOrder:FG.dir()};
                 vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
                 kRow++;
             });
             kRow++;
             kpiSheet.mergeCells(kRow,2,kRow,5);
             const kFinal=kpiSheet.getCell(kRow,2);
-            kFinal.value=D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax ? '✅ النسبة ضمن النطاق المثالي' : '⚠️ النسبة خارج النطاق المثالي';
+            kFinal.value=D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax ? T('s80') : T('s81');
             kFinal.font={name:'Arial',bold:true,size:13,color:{argb:D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax?PT:'856404'}};
             kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax?PB:GB}};
-            kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
+            kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:FG.dir()};
             kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
             kpiSheet.getRow(kRow).height=40;
 
             // 5. الرسم البياني
-            const chartsSheet = workbook.addWorksheet('الرسم البياني', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const chartsSheet = workbook.addWorksheet(T('s82'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             chartsSheet.getColumn(1).width=5; chartsSheet.getColumn(2).width=50; chartsSheet.getColumn(3).width=5;
-            mh(chartsSheet,1,3,1,'📈 المبيعات مقابل تكلفة العمالة',DB,GL,14);
+            mh(chartsSheet,1,3,1,T('s83'),DB,GL,14);
             chartsSheet.getRow(1).height=40;
             const chartContainer = document.querySelector('.chart-container');
             if (chartContainer) {
@@ -365,34 +301,34 @@
             }
 
             // 6. التوصيات
-            const recSheet = workbook.addWorksheet('التوصيات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const recSheet = workbook.addWorksheet(T('s84'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             recSheet.getColumn(1).width=5; recSheet.getColumn(2).width=50; recSheet.getColumn(3).width=5;
-            mh(recSheet,1,3,1,'💡 التوصيات',DB,GL,14);
+            mh(recSheet,1,3,1,T('s85'),DB,GL,14);
             recSheet.getRow(1).height=40;
             recSheet.getCell(3,2).value = D.suggestionsHtml.replace(/<[^>]*>/g, '\n').replace(/•/g, '-');
             recSheet.getCell(3,2).font = { name: 'Arial', size: 11 };
-            recSheet.getCell(3,2).alignment = { wrapText: true, readingOrder: 'rtl' };
+            recSheet.getCell(3,2).alignment = { wrapText: true, readingOrder: FG.dir() };
 
             const buffer = await workbook.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             const now = new Date();
-            const fileName = `تقرير_عمالة_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+            const fileName = `${T('s86')}${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
             saveAs(blob, fileName);
-        } catch(err) { alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
+        } catch(err) { alert(T('s87') + err.message); } finally { hideLoading(); }
     });
 
     // ================================================================
     // ========== تصدير Word احترافي ==========
     // ================================================================
     document.getElementById('exportWordBtn').addEventListener('click', async function() {
-        if (!globalLaborData) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-        showLoading('جاري إنشاء تقرير Word...', 'جمع البيانات والرسوم');
+        if (!globalLaborData) { alert(T('s45')); return; }
+        showLoading(T('s88'), T('s89'));
         try {
             const D = globalLaborData;
             const currency = D.currency;
             const companyName = D.companyName;
             const now = new Date();
-            const dateStr = now.toLocaleDateString('ar-EG');
+            const dateStr = now.toLocaleDateString(FG.locale());
 
             const chartContainer = document.querySelector('.chart-container');
             let chartImgBase64 = '';
@@ -416,50 +352,16 @@
                 if (count % 2 === 0 || index === kpiCards.length - 1) { kpiRows += `<tr>${row}</tr>`; row = ''; }
             });
 
-            const fullHtml = `<!DOCTYPE html>
-            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
-            <head><meta charset='utf-8'><title>تقرير تكلفة العمالة - FAROUK GRUP</title>
-            <style>
-                body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;color:#333;}
-                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                .cover h1{font-size:32px;color:#b8860b;margin:0;}
-                .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                th{background:#fefcf6;color:#b8860b;}
-                .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
-                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
-            </style></head>
-            <body>
-                <div class="cover">
-                    <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                    <h2>تقرير تحليل تكلفة العمالة المثالية</h2>
-                    <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
-                    <p>العملة: ${currency} | نسبة العمالة: ${D.laborPercent.toFixed(1)}%</p>
-                </div>
-                <h2 style="color:#b8860b;">المدخلات الأساسية</h2>
-                <table><tbody>
-                    <tr><th>المبيعات الشهرية</th><td>${currency} ${D.monthlySales}</td><th>متوسط الفاتورة</th><td>${currency} ${D.avgBill}</td></tr>
-                    <tr><th>متوسط الأجر الشهري</th><td>${currency} ${D.avgMonthlyWage}</td><th>أيام العمل</th><td>${D.workingDays}</td></tr>
-                    <tr><th>نسبة العمالة المستهدفة</th><td>${D.targetPercent}%</td><th>عدد الورديات</th><td>${D.shiftsDetail.length}</td></tr>
-                </tbody></table>
-                <h2 style="color:#b8860b;">📊 مؤشرات الأداء</h2>
-                <table>${kpiRows}</table>
-                <h2 style="color:#b8860b;">📈 الرسم البياني</h2>
-                <div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>
-                <h2 style="color:#b8860b;">💡 التوصيات</h2>
-                <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">
-                    <ul>${D.suggestionsHtml}</ul>
-                </div>
-                <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+            const fullHtml = `${T('s90')}${companyName}${T('s91')}${dateStr}${T('s92')}${currency}${T('s93')}${D.laborPercent.toFixed(1)}${T('s94')}${currency} ${D.monthlySales}${T('s95')}${currency} ${D.avgBill}${T('s96')}${currency} ${D.avgMonthlyWage}${T('s97')}${D.workingDays}${T('s98')}${D.targetPercent}${T('s99')}${D.shiftsDetail.length}${T('s100')}${kpiRows}${T('s101')}${chartImgBase64}${T('s102')}${D.suggestionsHtml}${T('s103')}${now.getFullYear()}</div>
             </body></html>`;
 
             const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `تقرير_عمالة_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+            link.download = `${T('s86')}${companyName}_${now.toISOString().slice(0,10)}.doc`;
             link.click();
             URL.revokeObjectURL(link.href);
-        } catch(err) { alert('خطأ Word: ' + err.message); } finally { hideLoading(); }
+        } catch(err) { alert(T('s104') + err.message); } finally { hideLoading(); }
     });
 
     // ===== تهيئة أولية =====

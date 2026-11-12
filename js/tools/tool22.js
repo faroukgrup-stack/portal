@@ -12,7 +12,7 @@
                 let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/'));
                 calcDisplay.value = r;
                 currentCalcInput = r.toString();
-            } catch(e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
+            } catch(e) { calcDisplay.value = T('s1'); currentCalcInput = ''; }
             return;
         }
         currentCalcInput += v;
@@ -92,7 +92,7 @@
         const cost = parseFloat(document.getElementById('dishCost').value);
         const units = parseInt(document.getElementById('dishUnits').value);
         if (!name || isNaN(price) || isNaN(cost) || isNaN(units) || price <= 0 || cost < 0 || units < 0) {
-            alert('الرجاء إدخال بيانات صحيحة (اسم، سعر >0، تكلفة >=0، مبيعات >=0)');
+            alert(T('s2'));
             return;
         }
         dishes.push({ name, price, cost, units });
@@ -106,7 +106,7 @@
     }
 
     function removeDish(index) {
-        if (confirm('هل أنت متأكد من حذف هذا الطبق؟')) {
+        if (confirm(T('s3'))) {
             dishes.splice(index, 1);
             renderDishesTable();
             document.getElementById('resultsArea').style.display = 'none';
@@ -116,7 +116,7 @@
 
     function clearAllDishes() {
         if (dishes.length === 0) return;
-        if (confirm('سيتم حذف جميع الأطباق. هل أنت متأكد؟')) {
+        if (confirm(T('s4'))) {
             dishes = [];
             renderDishesTable();
             document.getElementById('resultsArea').style.display = 'none';
@@ -135,7 +135,7 @@
     document.getElementById('importExcelBtn').addEventListener('click', function() {
         const fileInput = document.getElementById('excelFileInput');
         if (fileInput.files.length === 0) {
-            alert('الرجاء اختيار ملف Excel أولاً.');
+            alert(T('s5'));
             return;
         }
         const reader = new FileReader();
@@ -158,15 +158,15 @@
                     imported++;
                 }
                 if (imported === 0) {
-                    alert('لم يتم استيراد أي بيانات. تأكد من أن الأعمدة هي: الاسم، السعر، التكلفة، المبيعات (أول 4 أعمدة).');
+                    alert(T('s6'));
                 } else {
                     renderDishesTable();
                     document.getElementById('resultsArea').style.display = 'none';
                     document.getElementById('initialMessage').style.display = 'block';
-                    alert(`تم استيراد ${imported} طبق بنجاح.`);
+                    alert(`${T('s7')}${imported}${T('s8')}`);
                 }
             } catch (err) {
-                alert('حدث خطأ أثناء قراءة الملف: ' + err.message);
+                alert(T('s9') + err.message);
             }
         };
         reader.readAsArrayBuffer(fileInput.files[0]);
@@ -175,70 +175,33 @@
 
 
     // ===== التحليل (مصفوفة BCG) =====
-    function analyzeMenu() {
+    async function analyzeMenu() {
         if (dishes.length < 2) {
-            alert('يرجى إضافة على الأقل طبقين للتحليل.');
+            alert(T('s10'));
             return;
         }
 
-        const totalUnits = dishes.reduce((sum, d) => sum + d.units, 0);
-        const avgProfit = dishes.reduce((sum, d) => sum + (d.price - d.cost), 0) / dishes.length;
-        const avgPopularity = 100 / dishes.length;
-
-        const results = dishes.map((dish) => {
-            const margin = dish.price - dish.cost;
-            const popularity = totalUnits > 0 ? (dish.units / totalUnits) * 100 : 0;
-            const isProfitable = margin >= avgProfit;
-            const isPopular = popularity >= avgPopularity;
-            let category, recommendation, badgeClass;
-            if (isProfitable && isPopular) {
-                category = 'نجم (Star)';
-                badgeClass = 'badge-star';
-                recommendation = '✅ استمر في الترويج، حافظ على الجودة وثبت السعر. اعتبره مصدر الربح الرئيسي.';
-            } else if (isProfitable && !isPopular) {
-                category = 'علامة استفهام (Question Mark)';
-                badgeClass = 'badge-question';
-                recommendation = '❓ حسّن التسويق، أو غيّر السعر لزيادة الطلب، أو قدّم عروضاً ترويجية. استثمر بحذر.';
-            } else if (!isProfitable && isPopular) {
-                category = 'بقرة نقدية (Cash Cow)';
-                badgeClass = 'badge-cash';
-                recommendation = '🐄 ارفع السعر قليلاً، أو خفّض التكلفة لتحسين الهامش. حافظ على المبيعات مع تحسين الربحية.';
-            } else {
-                category = 'كلب (Dog)';
-                badgeClass = 'badge-dog';
-                recommendation = '🐕 فكّر في حذفه، أو أعد تصميمه، أو غيّر مكوناته. إذا لم يكن له قيمة استراتيجية، تخلص منه.';
-            }
-            return { ...dish, margin, popularity, category, badgeClass, recommendation };
-        });
+        let R;
+        try { R = await FG.calc('tool22', 'main', { dishes }); } catch (e) { FG.calcError(e); return; }
+        const { results, avgProfit, avgPopularity, totalRevenue, totalCost, totalProfit } = R;
 
         document.getElementById('initialMessage').style.display = 'none';
         document.getElementById('resultsArea').style.display = 'block';
 
         const categories = {
-            'نجم (Star)': 0,
-            'علامة استفهام (Question Mark)': 0,
-            'بقرة نقدية (Cash Cow)': 0,
-            'كلب (Dog)': 0
+            [T('s11')]: 0,
+            [T('s13')]: 0,
+            [T('s15')]: 0,
+            [T('s17')]: 0
         };
-        let totalRevenue = 0, totalCost = 0;
         results.forEach(r => {
             categories[r.category] = (categories[r.category] || 0) + 1;
-            totalRevenue += r.price * r.units;
-            totalCost += r.cost * r.units;
         });
-        const totalProfit = totalRevenue - totalCost;
 
         document.getElementById('summaryCards').innerHTML = `
-            <div class="summary-card"><div class="number">${results.length}</div><div class="label">عدد الأطباق</div></div>
-            <div class="summary-card"><div class="number">${categories['نجم (Star)']}</div><div class="label">نجوم ⭐</div></div>
-            <div class="summary-card"><div class="number">${categories['علامة استفهام (Question Mark)']}</div><div class="label">علامات استفهام ❓</div></div>
-            <div class="summary-card"><div class="number">${categories['بقرة نقدية (Cash Cow)']}</div><div class="label">أبقار نقدية 🐄</div></div>
-            <div class="summary-card"><div class="number">${categories['كلب (Dog)']}</div><div class="label">كلاب 🐕</div></div>
-            <div class="summary-card"><div class="number">${totalRevenue.toFixed(0)}</div><div class="label">الإيرادات</div></div>
-            <div class="summary-card"><div class="number">${totalProfit.toFixed(0)}</div><div class="label">صافي الربح</div></div>
-        `;
+            <div class="summary-card"><div class="number">${results.length}${T('s19')}${categories[T('s11')]}${T('s20')}${categories[T('s13')]}${T('s21')}${categories[T('s15')]}${T('s22')}${categories[T('s17')]}${T('s23')}${totalRevenue.toFixed(0)}${T('s24')}${totalProfit.toFixed(0)}${T('s25')}`;
 
-        let recHtml = `<table><thead><tr><th>الطبق</th><th>هامش الربح</th><th>نسبة المبيعات</th><th>التصنيف (BCG)</th><th>التوصية</th></tr></thead><tbody>`;
+        let recHtml = `${T('s26')}`;
         results.forEach(r => {
             recHtml += `<tr>
                 <td>${r.name}</td>
@@ -255,9 +218,9 @@
         if (menuChartInstance) menuChartInstance.destroy();
 
         const colors = results.map(r => {
-            if (r.category.includes('نجم')) return '#28a745';
-            if (r.category.includes('علامة استفهام')) return '#ffc107';
-            if (r.category.includes('بقرة')) return '#17a2b8';
+            if (r.category.includes(T('s27'))) return '#28a745';
+            if (r.category.includes(T('s28'))) return '#ffc107';
+            if (r.category.includes(T('s29'))) return '#17a2b8';
             return '#dc3545';
         });
 
@@ -265,7 +228,7 @@
             type: 'scatter',
             data: {
                 datasets: [{
-                    label: 'الأطباق',
+                    label: T('s30'),
                     data: results.map((r, i) => ({ x: r.popularity, y: r.margin })),
                     backgroundColor: colors,
                     pointRadius: 10,
@@ -290,13 +253,13 @@
                 },
                 scales: {
                     x: {
-                        title: { display: true, text: 'الشعبية (نسبة المبيعات %)', color: '#aab7d4' },
+                        title: { display: true, text: T('s31'), color: '#aab7d4' },
                         ticks: { color: '#aab7d4' },
                         grid: { color: 'rgba(180,133,84,0.15)' },
                         beginAtZero: true
                     },
                     y: {
-                        title: { display: true, text: 'هامش الربح (وحدة نقدية)', color: '#aab7d4' },
+                        title: { display: true, text: T('s32'), color: '#aab7d4' },
                         ticks: { color: '#aab7d4' },
                         grid: { color: 'rgba(180,133,84,0.15)' },
                         beginAtZero: true
@@ -315,12 +278,12 @@
     // ========== تصدير Excel احترافي ==========
     // ================================================================
     document.getElementById('exportExcelBtn').addEventListener('click', async function() {
-        if (!window.lastMenuResults) { alert('الرجاء إجراء التحليل أولاً (اضغط على "تحليل القائمة").'); return; }
-        showLoading('جاري إنشاء تقرير Excel...', 'إنشاء الأوراق والرسوم');
+        if (!window.lastMenuResults) { alert(T('s33')); return; }
+        showLoading(T('s34'), T('s35'));
         try {
             const res = window.lastMenuResults;
             const currency = document.getElementById('currencySelect').value;
-            const companyName = document.getElementById('companyName').value || 'الجهة';
+            const companyName = document.getElementById('companyName').value || T('s36');
 
             const workbook = new ExcelJS.Workbook();
             workbook.creator = 'FAROUK GRUP';
@@ -329,37 +292,37 @@
             const PT = 'FF155724', NT = 'FF721C24';
             const nc = '#,##0;(#,##0);"-"';
 
-            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
-            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:FG.dir()},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
             function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
-            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
 
             // 1. غلاف التقرير
-            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const cv = workbook.addWorksheet(T('s37'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
             cv.getRow(2).height=80; cv.getRow(4).height=60;
             cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
-            bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
-            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
-            mh(cv,1,4,4,`تقرير هندسة قوائم الطعام\n${companyName}`,DB,GL,18);
-            const inf=[['📋 الجهة',companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',currency],['📊 عدد الأطباق',res.results.length],['⭐ عدد النجوم',res.categories['نجم (Star)']]];
+            bc.value=T('s38');
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};
+            mh(cv,1,4,4,`${T('s39')}${companyName}`,DB,GL,18);
+            const inf=[[T('s40'),companyName],[T('s41'),new Date().toLocaleDateString(FG.locale())],[T('s42'),currency],[T('s43'),res.results.length],[T('s44'),res.categories[T('s11')]]];
             let ir=6;
             inf.forEach(([l,v],idx)=>{
                 cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
                 const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
                 const bg=idx%2===0?AR:'FFFEFCF6';
-                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
-                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
                 cv.getRow(ir).height=28; ir++;
             });
 
             // 2. المدخلات
-            const inputsSheet = workbook.addWorksheet('المدخلات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const inputsSheet = workbook.addWorksheet(T('s45'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             inputsSheet.getColumn(1).width=5; inputsSheet.getColumn(2).width=30; inputsSheet.getColumn(3).width=20; inputsSheet.getColumn(4).width=20; inputsSheet.getColumn(5).width=20; inputsSheet.getColumn(6).width=5;
-            mh(inputsSheet,1,6,1,'📋 قائمة الأطباق المدخلة',DB,GL,14);
+            mh(inputsSheet,1,6,1,T('s46'),DB,GL,14);
             inputsSheet.getRow(1).height=40;
             const headerRow = inputsSheet.getRow(3);
-            ['#','الطبق','سعر البيع','التكلفة','المبيعات'].forEach((h,i)=>{const c=headerRow.getCell(i+2);c.value=h;ap(c,hs(HB,GL));});
+            ['#',T('s47'),T('s48'),T('s49'),T('s50')].forEach((h,i)=>{const c=headerRow.getCell(i+2);c.value=h;ap(c,hs(HB,GL));});
             dishes.forEach((d,idx)=>{
                 const r=idx+4;
                 inputsSheet.getRow(r).height=24;
@@ -371,18 +334,18 @@
             });
 
             // 3. مصفوفة BCG
-            const matrixSheet = workbook.addWorksheet('مصفوفة BCG', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const matrixSheet = workbook.addWorksheet(T('s51'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             matrixSheet.getColumn(1).width=5; matrixSheet.getColumn(2).width=25; matrixSheet.getColumn(3).width=18; matrixSheet.getColumn(4).width=18; matrixSheet.getColumn(5).width=18; matrixSheet.getColumn(6).width=16; matrixSheet.getColumn(7).width=40; matrixSheet.getColumn(8).width=5;
-            mh(matrixSheet,1,8,1,'📊 تحليل مصفوفة BCG',DB,GL,14);
+            mh(matrixSheet,1,8,1,T('s52'),DB,GL,14);
             matrixSheet.getRow(1).height=40;
-            const mHeaders = ['الطبق','هامش الربح','نسبة المبيعات','التصنيف','التوصية'];
+            const mHeaders = [T('s47'),T('s53'),T('s54'),T('s55'),T('s56')];
             const mRow = matrixSheet.getRow(3);
             mHeaders.forEach((h,i)=>{const c=mRow.getCell(i+2);c.value=h;ap(c,hs(HB,GL));});
             res.results.forEach((r,idx)=>{
                 const row=idx+4;
                 matrixSheet.getRow(row).height=24;
                 const bg=idx%2===0?AR:'FFFEFCF6';
-                const catColor = r.category.includes('نجم')?'FF28A745':r.category.includes('علامة استفهام')?'FFD39C0B':r.category.includes('بقرة')?'FF17A2B8':'FFDC3545';
+                const catColor = r.category.includes(T('s27'))?'FF28A745':r.category.includes(T('s28'))?'FFD39C0B':r.category.includes(T('s29'))?'FF17A2B8':'FFDC3545';
                 [r.name, r.margin, r.popularity, r.category, r.recommendation].forEach((val,j)=>{
                     const c=matrixSheet.getCell(row,j+2);c.value=val;
                     ap(c,{...cs(bg,DT,false,j===3?'center':'right'),numFmt:typeof val==='number'?nc:null});
@@ -391,29 +354,29 @@
             });
 
             // 4. ملخص
-            const summarySheet = workbook.addWorksheet('ملخص', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const summarySheet = workbook.addWorksheet(T('s57'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             summarySheet.getColumn(1).width=5; summarySheet.getColumn(2).width=30; summarySheet.getColumn(3).width=25; summarySheet.getColumn(4).width=5;
-            mh(summarySheet,1,4,1,'📊 ملخص التحليل',DB,GL,14);
+            mh(summarySheet,1,4,1,T('s58'),DB,GL,14);
             summarySheet.getRow(1).height=40;
             const sumData = [
-                ['عدد الأطباق', res.results.length],
-                ['نجوم (Stars)', res.categories['نجم (Star)']],
-                ['علامات استفهام (Question Marks)', res.categories['علامة استفهام (Question Mark)']],
-                ['أبقار نقدية (Cash Cows)', res.categories['بقرة نقدية (Cash Cow)']],
-                ['كلاب (Dogs)', res.categories['كلب (Dog)']],
-                ['إجمالي الإيرادات', `${currency} ${res.totalRevenue.toFixed(0)}`],
-                ['إجمالي التكاليف', `${currency} ${res.totalCost.toFixed(0)}`],
-                ['صافي الربح', `${currency} ${res.totalProfit.toFixed(0)}`]
+                [T('s59'), res.results.length],
+                [T('s60'), res.categories[T('s11')]],
+                [T('s61'), res.categories[T('s13')]],
+                [T('s62'), res.categories[T('s15')]],
+                [T('s63'), res.categories[T('s17')]],
+                [T('s64'), `${currency} ${res.totalRevenue.toFixed(0)}`],
+                [T('s65'), `${currency} ${res.totalCost.toFixed(0)}`],
+                [T('s66'), `${currency} ${res.totalProfit.toFixed(0)}`]
             ];
-            summarySheet.addRow(['المؤشر','القيمة']);
+            summarySheet.addRow([T('s67'),T('s68')]);
             sumData.forEach(row=>summarySheet.addRow(row));
             summarySheet.getRow(2).font={bold:true,color:{argb:'FFFFFFFF'}};
             summarySheet.getRow(2).fill={type:'pattern',pattern:'solid',fgColor:{argb:G}};
 
             // 5. الرسوم البيانية
-            const chartsSheet = workbook.addWorksheet('الرسوم البيانية', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const chartsSheet = workbook.addWorksheet(T('s69'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             chartsSheet.getColumn(1).width=5; chartsSheet.getColumn(2).width=50; chartsSheet.getColumn(3).width=5;
-            mh(chartsSheet,1,3,1,'📈 المخطط البياني (مصفوفة BCG)',DB,GL,14);
+            mh(chartsSheet,1,3,1,T('s70'),DB,GL,14);
             chartsSheet.getRow(1).height=40;
             const chartContainer = document.querySelector('.chart-container');
             if (chartContainer) {
@@ -429,17 +392,17 @@
             }
 
             // 6. التوصيات
-            const recSheet = workbook.addWorksheet('التوصيات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const recSheet = workbook.addWorksheet(T('s71'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             recSheet.getColumn(1).width=5; recSheet.getColumn(2).width=50; recSheet.getColumn(3).width=5;
-            mh(recSheet,1,3,1,'💡 التوصيات الاستراتيجية',DB,GL,14);
+            mh(recSheet,1,3,1,T('s72'),DB,GL,14);
             recSheet.getRow(1).height=40;
-            const starCount = res.categories['نجم (Star)'];
-            const dogCount = res.categories['كلب (Dog)'];
+            const starCount = res.categories[T('s11')];
+            const dogCount = res.categories[T('s17')];
             const recs = [
-                { title: '⭐ النجوم', content: `عدد النجوم: ${starCount}. استمر في الترويج وثبت الأسعار. هذه الأطباق هي مصدر الربح الرئيسي.` },
-                { title: '❓ علامات الاستفهام', content: 'حسّن التسويق، غيّر السعر، أو قدّم عروضاً ترويجية. استثمر بحذر مع مراقبة الأداء.' },
-                { title: '🐄 الأبقار النقدية', content: 'ارفع السعر قليلاً أو خفّض التكلفة لتحسين الهامش. حافظ على المبيعات مع تحسين الربحية.' },
-                { title: '🐕 الكلاب', content: `عدد الكلاب: ${dogCount}. فكّر في حذفها أو إعادة تصميمها. إذا لم يكن لها قيمة استراتيجية، تخلص منها.` }
+                { title: T('s73'), content: `${T('s74')}${starCount}${T('s75')}` },
+                { title: T('s76'), content: T('s77') },
+                { title: T('s78'), content: T('s79') },
+                { title: T('s80'), content: `${T('s81')}${dogCount}${T('s82')}` }
             ];
             let itRow=2;
             recs.forEach(sec=>{
@@ -450,7 +413,7 @@
                 tc3.value=sec.title;
                 tc3.font={name:'Arial',bold:true,size:12,color:{argb:GL}};
                 tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:HB}};
-                tc3.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                tc3.alignment={horizontal:'right',vertical:'middle',readingOrder:FG.dir()};
                 tc3.border={bottom:{style:'medium',color:{argb:G}}};
                 itRow++;
                 recSheet.getRow(itRow).height=Math.max(40, sec.content.split('\n').length*18);
@@ -459,30 +422,30 @@
                 cc.value=sec.content;
                 cc.font={name:'Arial',size:10,color:{argb:DT}};
                 cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};
-                cc.alignment={horizontal:'right',vertical:'top',wrapText:true,readingOrder:'rtl'};
+                cc.alignment={horizontal:'right',vertical:'top',wrapText:true,readingOrder:FG.dir()};
                 cc.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
             });
 
             const buffer = await workbook.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             const now = new Date();
-            const fileName = `هندسة_قائمة_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+            const fileName = `${T('s83')}${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
             saveAs(blob, fileName);
-        } catch(err) { alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
+        } catch(err) { alert(T('s84') + err.message); } finally { hideLoading(); }
     });
 
     // ================================================================
     // ========== تصدير Word احترافي ==========
     // ================================================================
     document.getElementById('exportWordBtn').addEventListener('click', async function() {
-        if (!window.lastMenuResults) { alert('الرجاء إجراء التحليل أولاً (اضغط على "تحليل القائمة").'); return; }
-        showLoading('جاري إنشاء تقرير Word...', 'جمع البيانات والرسوم');
+        if (!window.lastMenuResults) { alert(T('s33')); return; }
+        showLoading(T('s85'), T('s86'));
         try {
             const res = window.lastMenuResults;
             const currency = document.getElementById('currencySelect').value;
-            const companyName = document.getElementById('companyName').value || 'الجهة';
+            const companyName = document.getElementById('companyName').value || T('s36');
             const now = new Date();
-            const dateStr = now.toLocaleDateString('ar-EG');
+            const dateStr = now.toLocaleDateString(FG.locale());
 
             const chartContainer = document.querySelector('.chart-container');
             let chartImgBase64 = '';
@@ -496,8 +459,8 @@
 
             let tableRows = '';
             res.results.forEach(r => {
-                const badgeColor = r.category.includes('نجم')?'#28a745':r.category.includes('علامة استفهام')?'#ffc107':r.category.includes('بقرة')?'#17a2b8':'#dc3545';
-                const textColor = r.category.includes('نجم')||r.category.includes('بقرة')?'white':'#111';
+                const badgeColor = r.category.includes(T('s27'))?'#28a745':r.category.includes(T('s28'))?'#ffc107':r.category.includes(T('s29'))?'#17a2b8':'#dc3545';
+                const textColor = r.category.includes(T('s27'))||r.category.includes(T('s29'))?'white':'#111';
                 tableRows += `<tr>
                     <td style="border:1px solid #b8860b;padding:8px;text-align:center;">${r.name}</td>
                     <td style="border:1px solid #b8860b;padding:8px;text-align:center;">${r.margin.toFixed(2)}</td>
@@ -507,56 +470,16 @@
                 </tr>`;
             });
 
-            const fullHtml = `<!DOCTYPE html>
-            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
-            <head><meta charset='utf-8'><title>هندسة قوائم الطعام - FAROUK GRUP</title>
-            <style>
-                body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;color:#333;}
-                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                .cover h1{font-size:32px;color:#b8860b;margin:0;}
-                .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                th{background:#fefcf6;color:#b8860b;font-weight:bold;}
-                .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
-                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
-                .summary{background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;margin:20px 0;}
-            </style></head>
-            <body>
-                <div class="cover">
-                    <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                    <h2>🧮 تقرير هندسة قوائم الطعام (مصفوفة BCG)</h2>
-                    <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
-                    <p>العملة: ${currency}</p>
-                </div>
-                <div class="summary">
-                    <h3 style="color:#b8860b;">📊 ملخص التحليل</h3>
-                    <p>عدد الأطباق: <strong>${res.results.length}</strong> | النجوم: <strong>${res.categories['نجم (Star)']}</strong> | علامات استفهام: <strong>${res.categories['علامة استفهام (Question Mark)']}</strong> | أبقار نقدية: <strong>${res.categories['بقرة نقدية (Cash Cow)']}</strong> | كلاب: <strong>${res.categories['كلب (Dog)']}</strong></p>
-                    <p>إجمالي الإيرادات: ${currency} ${res.totalRevenue.toFixed(0)} | صافي الربح: ${currency} ${res.totalProfit.toFixed(0)}</p>
-                </div>
-                <h2 style="color:#b8860b;">📈 الرسم البياني (مصفوفة BCG)</h2>
-                <div style="text-align:center;"><img src="${chartImgBase64}" class="chart-img" /></div>
-                <h2 style="color:#b8860b;">📋 تحليل كل طبق</h2>
-                <table>
-                    <thead><tr><th>الطبق</th><th>هامش الربح</th><th>نسبة المبيعات</th><th>التصنيف</th><th>التوصية</th></tr></thead>
-                    <tbody>${tableRows}</tbody>
-                </table>
-                <h2 style="color:#b8860b;">💡 التوصيات الاستراتيجية</h2>
-                <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">
-                    <p><strong>⭐ النجوم (${res.categories['نجم (Star)']}):</strong> استمر في الترويج وثبت الأسعار. هذه الأطباق هي مصدر الربح الرئيسي.</p>
-                    <p><strong>❓ علامات الاستفهام (${res.categories['علامة استفهام (Question Mark)']}):</strong> حسّن التسويق، غيّر السعر، أو قدّم عروضاً ترويجية. استثمر بحذر.</p>
-                    <p><strong>🐄 الأبقار النقدية (${res.categories['بقرة نقدية (Cash Cow)']}):</strong> ارفع السعر قليلاً أو خفّض التكلفة لتحسين الهامش.</p>
-                    <p><strong>🐕 الكلاب (${res.categories['كلب (Dog)']}):</strong> فكّر في حذفها أو إعادة تصميمها. إذا لم يكن لها قيمة استراتيجية، تخلص منها.</p>
-                </div>
-                <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+            const fullHtml = `${T('s87')}${companyName}${T('s88')}${dateStr}${T('s89')}${currency}${T('s90')}${res.results.length}${T('s91')}${res.categories[T('s11')]}${T('s92')}${res.categories[T('s13')]}${T('s93')}${res.categories[T('s15')]}${T('s94')}${res.categories[T('s17')]}${T('s95')}${currency} ${res.totalRevenue.toFixed(0)}${T('s96')}${currency} ${res.totalProfit.toFixed(0)}${T('s97')}${chartImgBase64}${T('s98')}${tableRows}${T('s99')}${res.categories[T('s11')]}${T('s100')}${res.categories[T('s13')]}${T('s101')}${res.categories[T('s15')]}${T('s102')}${res.categories[T('s17')]}${T('s103')}${now.getFullYear()}</div>
             </body></html>`;
 
             const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `هندسة_قائمة_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+            link.download = `${T('s83')}${companyName}_${now.toISOString().slice(0,10)}.doc`;
             link.click();
             URL.revokeObjectURL(link.href);
-        } catch(err) { alert('خطأ Word: ' + err.message); } finally { hideLoading(); }
+        } catch(err) { alert(T('s104') + err.message); } finally { hideLoading(); }
     });
 
     // ===== تهيئة أولية =====

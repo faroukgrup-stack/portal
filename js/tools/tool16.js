@@ -4,10 +4,10 @@
     // ===== الوقت والتاريخ =====
     function updateDateTime() {
         const now = new Date();
-        document.getElementById('currentDate').innerText = now.toLocaleDateString('ar-EG', {
+        document.getElementById('currentDate').innerText = now.toLocaleDateString(FG.locale(), {
             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
-        document.getElementById('currentTime').innerText = now.toLocaleTimeString('ar-EG', {
+        document.getElementById('currentTime').innerText = now.toLocaleTimeString(FG.locale(), {
             hour: '2-digit', minute: '2-digit', second: '2-digit'
         });
     }
@@ -107,7 +107,7 @@
             case '-': result = prev - curr; break;
             case '*': result = prev * curr; break;
             case '/':
-                if (curr === 0) { showError('خطأ رياضي: القسمة على صفر'); return; }
+                if (curr === 0) { showError(T('s1')); return; }
                 result = prev / curr;
                 break;
             default: return;
@@ -166,7 +166,7 @@
 
     function calculateSquareRoot() {
         let value = parseFloat(currentInput);
-        if (value < 0) { showError('لا يمكن حساب الجذر لعدد سالب'); return; }
+        if (value < 0) { showError(T('s2')); return; }
         let res = Math.sqrt(value);
         res = Math.round(res * 1000000000) / 1000000000;
         currentInput = res.toString();
@@ -177,7 +177,7 @@
 
     function calculateReciprocal() {
         let value = parseFloat(currentInput);
-        if (value === 0) { showError('لا يمكن القسمة على الصفر'); return; }
+        if (value === 0) { showError(T('s3')); return; }
         let res = 1 / value;
         res = Math.round(res * 1000000000) / 1000000000;
         currentInput = res.toString();
@@ -188,10 +188,10 @@
 
     function power() {
         let base = parseFloat(currentInput);
-        let exponent = prompt('أدخل قيمة الأس (القوة):', '2');
+        let exponent = prompt(T('s4'), '2');
         if (exponent === null || exponent.trim() === '') return;
         let exp = parseFloat(exponent);
-        if (isNaN(exp)) { showError('قيمة غير صالحة'); return; }
+        if (isNaN(exp)) { showError(T('s5')); return; }
         let res = Math.pow(base, exp);
         res = Math.round(res * 1000000000) / 1000000000;
         currentInput = res.toString();
@@ -202,7 +202,7 @@
 
     function log10() {
         let val = parseFloat(currentInput);
-        if (val <= 0) { showError('اللوغاريتم للأعداد الموجبة فقط'); return; }
+        if (val <= 0) { showError(T('s6')); return; }
         let res = Math.log10(val);
         res = Math.round(res * 1000000000) / 1000000000;
         currentInput = res.toString();
@@ -214,7 +214,7 @@
     function factorial() {
         let n = parseInt(currentInput);
         if (isNaN(n) || n < 0 || n > 170) {
-            showError('يجب إدخال عدد صحيح موجب (أقل من 170)');
+            showError(T('s7'));
             return;
         }
         let fact = 1;
@@ -225,63 +225,61 @@
         updateDisplay();
     }
 
-    function applyTax() {
-        let rate = prompt('أدخل نسبة الضريبة المضافة (%) (مثال: 15):', '15');
+    async function applyTax() {
+        let rate = prompt(T('s8'), '15');
         if (rate === null || rate.trim() === '') return;
         let r = parseFloat(rate);
         if (isNaN(r)) return;
         let amount = parseFloat(currentInput);
-        let taxValue = amount * (r / 100);
-        let result = amount + taxValue;
-        result = Math.round(result * 100) / 100;
-        history.unshift({ text: `${amount} + ضريبة ${r}% = ${result}`, type: 'مالية' });
+        let result;
+        try { result = (await FG.calc('tool16', 'fin', { kind: 'tax', amount, r })).result; } catch (e) { FG.calcError(e); return; }
+        history.unshift({ text: `${amount}${T('s9')}${r}% = ${result}`, type: 'مالية' });
         currentInput = result.toString();
         updateDisplay();
         filterHistory();
     }
 
-    function applyDiscount() {
-        let rate = prompt('أدخل نسبة الخصم (%) (مثال: 10):', '10');
+    async function applyDiscount() {
+        let rate = prompt(T('s10'), '10');
         if (rate === null || rate.trim() === '') return;
         let r = parseFloat(rate);
         if (isNaN(r)) return;
         let amount = parseFloat(currentInput);
-        let discountValue = amount * (r / 100);
-        let result = amount - discountValue;
-        result = Math.round(result * 100) / 100;
-        history.unshift({ text: `${amount} - خصم ${r}% = ${result}`, type: 'مالية' });
+        let result;
+        try { result = (await FG.calc('tool16', 'fin', { kind: 'discount', amount, r })).result; } catch (e) { FG.calcError(e); return; }
+        history.unshift({ text: `${amount}${T('s11')}${r}% = ${result}`, type: 'مالية' });
         currentInput = result.toString();
         updateDisplay();
         filterHistory();
     }
 
-    function calculateROI() {
+    async function calculateROI() {
         let cost = parseFloat(currentInput);
-        if (cost === 0) { showError('يجب أن تكون التكلفة أكبر من صفر'); return; }
-        let revenue = prompt('أدخل العائد الإجمالي المتوقع:', cost * 1.2);
+        if (cost === 0) { showError(T('s12')); return; }
+        let revenue = prompt(T('s13'), cost * 1.2);
         if (revenue === null || revenue.trim() === '') return;
         let rev = parseFloat(revenue);
         if (isNaN(rev)) return;
-        let roi = ((rev - cost) / cost) * 100;
-        roi = Math.round(roi * 100) / 100;
-        history.unshift({ text: `ROI (تكلفة:${cost}, عائد:${rev}) = %${roi}`, type: 'مالية' });
+        let roi;
+        try { roi = (await FG.calc('tool16', 'fin', { kind: 'roi', cost, rev })).result; } catch (e) { FG.calcError(e); return; }
+        history.unshift({ text: `${T('s14')}${cost}${T('s15')}${rev}) = %${roi}`, type: 'مالية' });
         currentInput = roi.toString();
         updateDisplay();
         filterHistory();
     }
 
-    function calculateSimpleInterest() {
+    async function calculateSimpleInterest() {
         let principal = parseFloat(currentInput);
-        let rate = prompt('معدل الفائدة السنوي المتوقع (%)', '5');
+        let rate = prompt(T('s16'), '5');
         if (rate === null || rate.trim() === '') return;
         let r = parseFloat(rate) / 100;
-        let time = prompt('المدة الزمنية (بالسنوات)', '1');
+        let time = prompt(T('s17'), '1');
         if (time === null || time.trim() === '') return;
         let t = parseFloat(time);
         if (isNaN(r) || isNaN(t)) return;
-        let interest = principal * r * t;
-        interest = Math.round(interest * 100) / 100;
-        history.unshift({ text: `فائدة (${principal}×${r*100}%×${t}سنة) = ${interest}`, type: 'مالية' });
+        let interest;
+        try { interest = (await FG.calc('tool16', 'fin', { kind: 'interest', principal, r, t })).result; } catch (e) { FG.calcError(e); return; }
+        history.unshift({ text: `${T('s18')}${principal}×${r*100}%×${t}${T('s19')}${interest}`, type: 'مالية' });
         currentInput = interest.toString();
         updateDisplay();
         filterHistory();
@@ -303,7 +301,7 @@
     function renderHistory(filteredList) {
         historyTableBody.innerHTML = '';
         if (filteredList.length === 0) {
-            historyTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#aab7d4;padding:1.5rem 0;">لا توجد عمليات مسجلة</td></tr>`;
+            historyTableBody.innerHTML = `${T('s20')}`;
             return;
         }
         filteredList.forEach((item, index) => {
@@ -313,13 +311,9 @@
             let badgeClass = item.type === 'مالية' ? 'badge-finance' : 'badge-math';
             let tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><span class="badge ${badgeClass}">${item.type}</span></td>
+                <td><span class="badge ${badgeClass}">${item.type === 'مالية' ? T('x_fin') : item.type}</span></td>
                 <td class="td-operation">${operationStr}</td>
-                <td class="td-result">${resultStr}</td>
-                <td>
-                    <div class="action-btns">
-                        <button class="icon-btn restore" title="استخدام النتيجة" onclick="restoreResult('${resultStr}')"><i class="fas fa-reply"></i></button>
-                        <button class="icon-btn delete" title="حذف القيد" onclick="deleteHistoryItem(${index})"><i class="fas fa-trash"></i></button>
+                <td class="td-result">${resultStr}${T('s21')}${resultStr}${T('s22')}${index})"><i class="fas fa-trash"></i></button>
                     </div>
                 </td>
             `;
@@ -352,15 +346,15 @@
     }
 
     function clearHistory() {
-        if (confirm("هل أنت متأكد من مسح كافة سجلات الحسابات؟")) {
+        if (confirm(T('s23'))) {
             history = [];
             filterHistory();
         }
     }
 
     function exportHistory() {
-        if (history.length === 0) { showError("السجل فارغ"); return; }
-        let csv = 'النوع,العملية المنجزة,النتيجة\n';
+        if (history.length === 0) { showError(T('s24')); return; }
+        let csv = T('s25');
         history.forEach(item => {
             let parts = item.text.split('=');
             let op = parts[0].trim().replace(/"/g, '""');
@@ -370,7 +364,7 @@
         let blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
         let link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `سجل_حسابات_مجموعة_فاروق_${new Date().toISOString().slice(0,10)}.csv`;
+        link.download = `${T('s26')}${new Date().toISOString().slice(0,10)}.csv`;
         link.click();
     }
 
@@ -378,8 +372,8 @@
     // ========== تصدير Excel احترافي ==========
     // ================================================================
     document.getElementById('exportExcelBtn').addEventListener('click', async function() {
-        if (history.length === 0) { alert('الرجاء إجراء بعض العمليات الحسابية أولاً.'); return; }
-        showLoading('جاري إنشاء تقرير Excel...', 'إنشاء الأوراق');
+        if (history.length === 0) { alert(T('s27')); return; }
+        showLoading(T('s28'), T('s29'));
         try {
             const workbook = new ExcelJS.Workbook();
             workbook.creator = 'FAROUK GRUP';
@@ -387,35 +381,35 @@
             const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA';
             const PT = 'FF155724', NT = 'FF721C24';
 
-            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:FG.dir()},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
             function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
-            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
 
             // 1. غلاف التقرير
-            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const cv = workbook.addWorksheet(T('s30'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
             cv.getRow(2).height=80; cv.getRow(4).height=60;
             cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
-            bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
-            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
-            mh(cv,1,4,4,`تقرير العمليات الحسابية\n${new Date().toLocaleDateString('ar-EG')}`,DB,GL,18);
-            const inf=[['📋 عدد العمليات',history.length],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['⏰ الوقت',new Date().toLocaleTimeString('ar-EG')]];
+            bc.value=T('s31');
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};
+            mh(cv,1,4,4,`${T('s32')}${new Date().toLocaleDateString(FG.locale())}`,DB,GL,18);
+            const inf=[[T('s33'),history.length],[T('s34'),new Date().toLocaleDateString(FG.locale())],[T('s35'),new Date().toLocaleTimeString(FG.locale())]];
             let ir=6;
             inf.forEach(([l,v],idx)=>{
                 cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
                 const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
                 const bg=idx%2===0?AR:'FFFEFCF6';
-                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
-                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
                 cv.getRow(ir).height=28; ir++;
             });
 
             // 2. سجل العمليات
-            const logSheet = workbook.addWorksheet('سجل العمليات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const logSheet = workbook.addWorksheet(T('s36'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             logSheet.getColumn(1).width = 5; logSheet.getColumn(2).width = 20; logSheet.getColumn(3).width = 50; logSheet.getColumn(4).width = 30; logSheet.getColumn(5).width = 5;
-            mh(logSheet,1,5,1,'📋 سجل العمليات الحسابية',DB,GL,14);
+            mh(logSheet,1,5,1,T('s37'),DB,GL,14);
             logSheet.getRow(1).height=40;
-            logSheet.addRow(['#', 'النوع', 'العملية المنجزة', 'النتيجة']);
+            logSheet.addRow(['#', T('s38'), T('s39'), T('s40')]);
             const headerRow = logSheet.getRow(2);
             headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
             headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
@@ -427,19 +421,19 @@
             });
 
             // 3. ملخص إحصائي
-            const sumSheet = workbook.addWorksheet('ملخص إحصائي', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const sumSheet = workbook.addWorksheet(T('s41'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             sumSheet.getColumn(1).width = 5; sumSheet.getColumn(2).width = 35; sumSheet.getColumn(3).width = 30; sumSheet.getColumn(4).width = 5;
-            mh(sumSheet,1,4,1,'📊 ملخص إحصائي',DB,GL,14);
+            mh(sumSheet,1,4,1,T('s42'),DB,GL,14);
             sumSheet.getRow(1).height=40;
             const mathCount = history.filter(i => i.type !== 'مالية').length;
             const finCount = history.filter(i => i.type === 'مالية').length;
             const sumData = [
-                ['إجمالي العمليات', history.length],
-                ['عمليات رياضية أساسية', mathCount],
-                ['عمليات مالية متقدمة', finCount],
-                ['تاريخ التقرير', new Date().toLocaleDateString('ar-EG')]
+                [T('s43'), history.length],
+                [T('s44'), mathCount],
+                [T('s45'), finCount],
+                [T('s46'), new Date().toLocaleDateString(FG.locale())]
             ];
-            sumSheet.addRow(['المؤشر', 'القيمة']);
+            sumSheet.addRow([T('s47'), T('s48')]);
             sumData.forEach(row => sumSheet.addRow(row));
             sumSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFFFF' } };
             sumSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
@@ -447,20 +441,20 @@
             const buffer = await workbook.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             const now = new Date();
-            const fileName = `سجل_حسابات_${now.toISOString().slice(0,10)}.xlsx`;
+            const fileName = `${T('s49')}${now.toISOString().slice(0,10)}.xlsx`;
             saveAs(blob, fileName);
-        } catch(err) { alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
+        } catch(err) { alert(T('s50') + err.message); } finally { hideLoading(); }
     });
 
     // ================================================================
     // ========== تصدير Word احترافي ==========
     // ================================================================
     document.getElementById('exportWordBtn').addEventListener('click', async function() {
-        if (history.length === 0) { alert('الرجاء إجراء بعض العمليات الحسابية أولاً.'); return; }
-        showLoading('جاري إنشاء تقرير Word...', 'جمع البيانات');
+        if (history.length === 0) { alert(T('s27')); return; }
+        showLoading(T('s51'), T('s52'));
         try {
             const now = new Date();
-            const dateStr = now.toLocaleDateString('ar-EG');
+            const dateStr = now.toLocaleDateString(FG.locale());
 
             let tableRows = '';
             history.forEach((item, idx) => {
@@ -482,47 +476,16 @@
             const mathCount = history.filter(i => i.type !== 'مالية').length;
             const finCount = history.filter(i => i.type === 'مالية').length;
 
-            const fullHtml = `<!DOCTYPE html>
-            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
-            <head><meta charset='utf-8'><title>تقرير الحاسبة المالية - FAROUK GRUP</title>
-            <style>
-                body{font-family:'Arial','Tajawal',sans-serif;direction:rtl;margin:2rem;background:#fff;color:#333;}
-                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                .cover h1{font-size:32px;color:#b8860b;margin:0;}
-                .cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-                .cover p{color:#666;}
-                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                th{background:#fefcf6;color:#b8860b;font-weight:bold;}
-                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
-                .summary{background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;margin:20px 0;}
-            </style></head>
-            <body>
-                <div class="cover">
-                    <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                    <h2>📋 تقرير العمليات الحسابية والمالية</h2>
-                    <p>التاريخ: ${dateStr} | الوقت: ${now.toLocaleTimeString('ar-EG')}</p>
-                </div>
-                <div class="summary">
-                    <h3 style="color:#b8860b;">📊 ملخص العمليات</h3>
-                    <p>إجمالي العمليات: <strong>${history.length}</strong></p>
-                    <p>عمليات رياضية أساسية: <strong>${mathCount}</strong></p>
-                    <p>عمليات مالية متقدمة: <strong>${finCount}</strong></p>
-                </div>
-                <h2 style="color:#b8860b;">📋 سجل العمليات الكامل</h2>
-                <table>
-                    <thead><tr><th>#</th><th>النوع</th><th>العملية المنجزة</th><th>النتيجة</th></tr></thead>
-                    <tbody>${tableRows}</tbody>
-                </table>
-                <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+            const fullHtml = `${T('s53')}${dateStr}${T('s54')}${now.toLocaleTimeString(FG.locale())}${T('s55')}${history.length}${T('s56')}${mathCount}${T('s57')}${finCount}${T('s58')}${tableRows}${T('s59')}${now.getFullYear()}</div>
             </body></html>`;
 
             const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `تقرير_حسابات_${now.toISOString().slice(0,10)}.doc`;
+            link.download = `${T('s60')}${now.toISOString().slice(0,10)}.doc`;
             link.click();
             URL.revokeObjectURL(link.href);
-        } catch(err) { alert('خطأ Word: ' + err.message); } finally { hideLoading(); }
+        } catch(err) { alert(T('s61') + err.message); } finally { hideLoading(); }
     });
 
     // ===== دعم لوحة المفاتيح =====

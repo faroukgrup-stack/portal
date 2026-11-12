@@ -15,39 +15,39 @@
 
             // ===== الأسئلة (26 عبارة) =====
             const questionsList = [
-                "تفرض أن الموظفين يجب عليهم أن يخبروك بما يرغبون فيه من عملهم وسيفعلون ذلك؟",
-                "تعتقد أن الاحتفاظ بالموظفين هو وظيفة قسم الموارد البشرية أو مختصي التعويضات؟",
-                "تعد المسارات المهنية للموظفين من شأنهم هم وليست من شأنك؟",
-                "تعد معرفة الموظفين باحترامك لهم أمرًا مسلما به ولهذا أنت لا تحتاج إلى أن تظهر ذلك؟",
-                "تعتقد أنه يجب على الموظفين أن يخبروك إذا لم يشعروا بالتحدي في عملهم؟",
-                "تتوقع من الموظفين ترك حياتهم الشخصية عند الباب والشعور بأن حياتهم العملية فحسب في موضع اهتمامك؟",
-                "تتجنب مناقشة الخيارات المهنية مع الموظفين خاصة عندما لا تكون الترقيات متاحة بسهولة؟",
-                "توظف بصفة أساسية بناءً على المهارات العملية أو الفنية؟",
-                "تمنح معلومات للموظفين عندما تكون هناك حاجة إلى معرفتها فحسب؟",
-                "تعتقد أنك هنا لتأدية الوظيفة وأنه ليس على الموظفين أن يحبوك؟",
-                "تعتقد أنك لست في العمل لك تحظى بالمرح؟",
-                "تخشى أنك إذا قدمت الموظفين إلى آخرين في شبكتك، فإنهم قد يغرونهم بترك؟",
-                "تشعر أنه ليس لديك وقت للإرشاد؟",
-                "هل تدرك فعلاً كم يكلفك فقدان الموظفين الأكفاء والمتميزين؟",
-                "تميل إلى اكتناز الأشخاص الجيدين بدلا من مساعدتهم على السعي وراء فرص أخرى؟",
-                "تتفق على أننا لا نملك رفاهية محبة ما نقوم به؟",
-                "تفشل في التشكيك في السياسات لصالح موظفيك؟",
-                "تعتبر العمل الجيد مكافأة في حد ذاته؟",
-                "تعتقد أنك إذا لم تتحكم في الأشخاص والكيفية والأماكن والوقت فإن العمل لن يتم على نحو جيد؟",
-                "تتجنب منح تقييم سلبي أو تصحيح لموظفيك؟",
-                "تعتبر نفسك منشغلا للغاية إلى حد يمنعك من أن تكون مستمعا جيدا؟",
-                "تنظر إلى قيم الموظفين على أنها شأنهم الخاص وبهذا لا تناقشها إلا نادرا؟",
-                "تعتقد أن مبادرات البرامج الصحية للموظفين تكاليف غير ضرورية؟",
-                "تعتقد أن الاختلافات بين الأجيال لا علاقة لها بمكان العمل؟",
-                "تعتقد أنه يجب على الموظفين عادة انتظارك لتملي عليهم ما يقومون به؟",
-                "تصر على أن مشاركة الموظفين والاحتفاظ بهم ليست مهارات قيادة جوهرية ولا تحتاج إلى تمضية وقت لتحسينها؟"
+                T('s1'),
+                T('s2'),
+                T('s3'),
+                T('s4'),
+                T('s5'),
+                T('s6'),
+                T('s7'),
+                T('s8'),
+                T('s9'),
+                T('s10'),
+                T('s11'),
+                T('s12'),
+                T('s13'),
+                T('s14'),
+                T('s15'),
+                T('s16'),
+                T('s17'),
+                T('s18'),
+                T('s19'),
+                T('s20'),
+                T('s21'),
+                T('s22'),
+                T('s23'),
+                T('s24'),
+                T('s25'),
+                T('s26')
             ];
 
             const optionLabels = {
-                1: "دائمًا / نعم",
-                2: "في الغالب / كثيرًا",
-                3: "أحيانًا",
-                4: "مطلقًا / لا"
+                1: T('s27'),
+                2: T('s28'),
+                3: T('s29'),
+                4: T('s30')
             };
 
             const totalQuestions = questionsList.length;
@@ -139,72 +139,13 @@
             }
 
             // ===== حساب النتيجة والتوصيات =====
-            function calculateTotalScore() {
-                let sum = 0;
-                for (let i = 0; i < totalQuestions; i++) {
-                    if (answers[i] === null) return null;
-                    sum += answers[i];
-                }
-                return sum;
-            }
-
-            function getInterpretation(score) {
-                if (score >= 80 && score <= 104) {
-                    return {
-                        level: "ممتاز - عقلية الاحتفاظ بالمواهب",
-                        message: "أحسنت. أنت تملك عقلية نهج محبة الموظفين، وعلى الأرجح أنك تتخذ العديد من الأفعال اللازمة لحث الموهوبين لديك على المشاركة والاحتفاظ بهم. استمر في تعزيز ثقافة الثقة والتطوير.",
-                        color: "#4ade80"
-                    };
-                } else if (score >= 53 && score <= 79) {
-                    return {
-                        level: "متوسط - خطر خسارة الموهوبين",
-                        message: "احذر. أنت في خطر خسارة أفضل موظفيك. قد يكون بعضهم تركوك بالفعل، قيم الموقف واتخذ إجراء قبل أن تخسر المزيد من الموهوبين. ركز على تحسين التواصل والثقة.",
-                        color: "#fb923c"
-                    };
-                } else if (score >= 38 && score <= 52) {
-                    return {
-                        level: "منخفض - إنذار عاجل",
-                        message: "انتبه. أنت معرض بنسبة كبيرة لخطر خسارة الموظفين الموهوبين. قد يكون لديك صراع مع معتقداتك وأفعالك، وقد تكون عقبة في طريق أن تحظى بأشخاص مشاركين يرغبون في البقاء معك. تحتاج إلى اتخاذ فعل فوري ومركز.",
-                        color: "#f87171"
-                    };
-                } else {
-                    return {
-                        level: "حرج للغاية",
-                        message: "نتيجة منخفضة جداً. أنت تعاني من خلل جذري في قيادتك تجاه الفريق. غادر معظم المواهب أو هم على وشك الرحيل. نوصي بتغيير فوري في فلسفتك الإدارية، وطلب تدريب قيادي مكثف.",
-                        color: "#ef4444"
-                    };
-                }
-            }
-
-            function generateRecommendations(score) {
-                const recs = [];
-                if (score >= 80) {
-                    recs.push("🟢 أداؤك القيادي ممتاز. استمر في تعزيز ثقافة الثقة، وكن قدوة في التواصل المفتوح والاعتراف بإنجازات الفريق.");
-                    recs.push("🎯 ركز على تطوير مهارات الإرشاد (Mentoring) ونقل الخبرة للقادة الجدد في مؤسستك.");
-                } else if (score >= 53) {
-                    recs.push("🟡 أنت في منطقة الخطر. حدد أولويات التحسين: ابدأ بتحسين التواصل اليومي مع فريقك واطلب آرائهم بانتظام.");
-                    recs.push("📌 اعمل على بناء الثقة من خلال الشفافية في القرارات، وخصص وقتاً للاستماع الفعال لكل موظف.");
-                    recs.push("🔹 راجع سياسات التطوير المهني وتأكد من وجود مسارات واضحة للنمو الوظيفي.");
-                } else if (score >= 38) {
-                    recs.push("🔴 أنت بحاجة إلى تدخل عاجل. ابدأ بجلسات فردية مع كل موظف لفهم دوافعهم وتحدياتهم.");
-                    recs.push("⚡ قم بتقييم ثقافة الفريق وعزز روح الانتماء من خلال أنشطة بناء الفريق والاعتراف بالإنجازات.");
-                    recs.push("📈 استشر خبيراً في القيادة التنظيمية لوضع خطة تطوير شاملة لمهاراتك القيادية.");
-                } else {
-                    recs.push("⛔ حالتك حرجة. نوصي بتغيير جذري في فلسفتك الإدارية، والبدء ببرنامج تدريبي مكثف في القيادة.");
-                    recs.push("🔄 فوض بعض الصلاحيات لفريقك، واعمل على بناء الثقة عبر المشاركة في اتخاذ القرارات.");
-                    recs.push("📅 حدد أهدافاً قصيرة المدى قابلة للقياس لتحسين المناخ الداخلي، وتابع تنفيذها أسبوعياً.");
-                }
-                if (score <= 60) {
-                    recs.push("💡 انتبه لعلامات الإنهاك الوظيفي لدى فريقك، وقدم الدعم النفسي والمرونة في العمل.");
-                }
-                if (score <= 45) {
-                    recs.push("🚨 قد يكون هناك خلل في هيكل الحوافز، راجعه وعدّله بما يتناسب مع تطلعات الفريق.");
-                }
-                return recs;
+            // الحساب والتفسير والتوصيات تتم على الخادم (Supabase Edge Function)
+            async function evaluateAll() {
+                return await FG.calc('tool21', 'evaluate', { answers });
             }
 
             // ===== عرض المودال =====
-            function showResultModal() {
+            async function showResultModal() {
                 for (let i = 0; i < totalQuestions; i++) {
                     if (answers[i] === null) {
                         const toast = document.getElementById("warningToast");
@@ -223,13 +164,13 @@
                     }
                 }
 
-                const totalScore = calculateTotalScore();
+                let E;
+                try { E = await evaluateAll(); } catch (e) { FG.calcError(e); return; }
+                const { totalScore, interpretation, recommendations } = E;
                 if (totalScore === null) return;
-                const interpretation = getInterpretation(totalScore);
-                const recommendations = generateRecommendations(totalScore);
 
                 const modal = document.getElementById("resultModal");
-                document.getElementById("modalScore").innerText = `${totalScore} نقطة (من 104)`;
+                document.getElementById("modalScore").innerText = `${totalScore}${T('s52')}`;
                 document.getElementById("modalInterpretation").innerHTML = `
                     <strong style="color: ${interpretation.color};">${interpretation.level}</strong><br>
                     ${interpretation.message}
@@ -272,12 +213,10 @@
                     }
                 }
 
-                showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والجداول');
+                showLoading(T('s53'), T('s54'));
                 try {
-                    const totalScore = calculateTotalScore();
+                    const { totalScore, interpretation, recommendations } = await evaluateAll();
                     if (totalScore === null) return;
-                    const interpretation = getInterpretation(totalScore);
-                    const recommendations = generateRecommendations(totalScore);
 
                     const workbook = new ExcelJS.Workbook();
                     workbook.creator = 'FAROUK GRUP';
@@ -295,7 +234,7 @@
                     function hs(bg = HB, tc = GL) { return { font: { name: 'Arial', bold: true, size: 11,
                                 color: { argb: tc } }, fill: { type: 'pattern', pattern: 'solid',
                                 fgColor: { argb: bg } }, alignment: { horizontal: 'center',
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'thin', color: { argb: G } }, bottom: { style: 'thin',
                                     color: { argb: G } }, left: { style: 'thin', color: { argb: G } },
                                 right: { style: 'thin', color: { argb: G } } } }; }
@@ -303,7 +242,7 @@
                     function cs(bg = W, tc = DT, b = false, h = 'center') { return { font: { name: 'Arial',
                                 bold: b, size: 10, color: { argb: tc } }, fill: { type: 'pattern',
                                 pattern: 'solid', fgColor: { argb: bg } }, alignment: { horizontal: h,
-                                vertical: 'middle', wrapText: true, readingOrder: 'rtl' }, border: { top: {
+                                vertical: 'middle', wrapText: true, readingOrder: FG.dir() }, border: { top: {
                                     style: 'hair', color: { argb: 'FFCCCCCC' } }, bottom: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, left: { style: 'hair',
                                     color: { argb: 'FFCCCCCC' } }, right: { style: 'hair',
@@ -317,13 +256,13 @@
                         tc); const c = ws.getCell(r, fc); c.value = text; c.font = { name: 'Arial', bold: true,
                             size: fs, color: { argb: tc2 } }; c.fill = { type: 'pattern', pattern: 'solid',
                             fgColor: { argb: bg } }; c.alignment = { horizontal: 'center', vertical: 'middle',
-                            wrapText: true, readingOrder: 'rtl' }; c.border = { top: { style: 'medium',
+                            wrapText: true, readingOrder: FG.dir() }; c.border = { top: { style: 'medium',
                                 color: { argb: G } }, bottom: { style: 'medium', color: { argb: G } },
                             left: { style: 'medium', color: { argb: G } }, right: { style: 'medium',
                                 color: { argb: G } } }; }
 
                     // 1. غلاف التقرير
-                    const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true,
+                    const cv = workbook.addWorksheet(T('s55'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
                     for (let r = 1; r <= 40; r++) cv.getRow(r).height = 22;
@@ -331,18 +270,18 @@
                     cv.getRow(4).height = 60;
                     cv.mergeCells(2, 1, 2, 4);
                     const bc = cv.getCell(2, 1);
-                    bc.value = 'مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+                    bc.value = T('s56');
                     bc.font = { name: 'Arial', bold: true, size: 28, color: { argb: GL } };
                     bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
                     bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                    readingOrder: 'rtl' };
+                    readingOrder: FG.dir() };
                     bc.border = { bottom: { style: 'thick', color: { argb: G } } };
-                    mh(cv, 1, 4, 4, 'تقرير مقياس تقييم الإداري', DB, GL, 18);
+                    mh(cv, 1, 4, 4, T('s57'), DB, GL, 18);
                     const inf = [
-                        ['📋 التقييم', 'مقياس تحديد الإداري'],
-                        ['📅 التاريخ', new Date().toLocaleDateString('ar-EG')],
-                        ['📊 النتيجة', `${totalScore} نقطة (من 104)`],
-                        ['🏷️ التقدير', interpretation.level]
+                        [T('s58'), T('s59')],
+                        [T('s60'), new Date().toLocaleDateString(FG.locale())],
+                        [T('s61'), `${totalScore}${T('s52')}`],
+                        [T('s62'), interpretation.level]
                     ];
                     let ir = 6;
                     inf.forEach(([l, v], idx) => {
@@ -355,12 +294,12 @@
                         const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
                         ap(lc, { font: { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         ap(vc, { font: { name: 'Arial', size: 11, color: { argb: DT } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' },
+                            alignment: { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() },
                             border: { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                                 right: { style: 'hair' } } });
                         cv.getRow(ir).height = 28;
@@ -368,20 +307,20 @@
                     });
 
                     // 2. النتيجة والتوصيات
-                    const summarySheet = workbook.addWorksheet('النتيجة والتوصيات', { views: [{ rightToLeft: true,
+                    const summarySheet = workbook.addWorksheet(T('s63'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     summarySheet.getColumn(1).width = 5;
                     summarySheet.getColumn(2).width = 50;
                     summarySheet.getColumn(3).width = 5;
-                    mh(summarySheet, 1, 3, 1, '📊 النتيجة الإجمالية والتوصيات', DB, GL, 14);
+                    mh(summarySheet, 1, 3, 1, T('s64'), DB, GL, 14);
                     summarySheet.getRow(1).height = 40;
 
                     summarySheet.mergeCells(2, 2, 2, 2);
                     const sc = summarySheet.getCell(2, 2);
-                    sc.value = `النتيجة الإجمالية: ${totalScore} نقطة (من 104)  |  التقدير: ${interpretation.level}`;
+                    sc.value = `${T('s65')}${totalScore}${T('s66')}${interpretation.level}`;
                     sc.font = { name: 'Arial', bold: true, size: 14, color: { argb: interpretation.color } };
                     sc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AR } };
-                    sc.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+                    sc.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() };
                     sc.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
                             color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
                         right: { style: 'medium', color: { argb: G } } };
@@ -393,7 +332,7 @@
                     ic.font = { name: 'Arial', size: 11, color: { argb: DT } };
                     ic.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEFCF6' } };
                     ic.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                    readingOrder: 'rtl' };
+                    readingOrder: FG.dir() };
                     ic.border = { top: { style: 'hair' }, bottom: { style: 'hair', color: { argb: G } },
                         left: { style: 'hair' }, right: { style: 'hair' } };
                     summarySheet.getRow(3).height = 40;
@@ -401,10 +340,10 @@
                     let recRow = 5;
                     summarySheet.mergeCells(recRow, 2, recRow, 2);
                     const rt = summarySheet.getCell(recRow, 2);
-                    rt.value = '📌 التوصيات والتطوير المقترح';
+                    rt.value = T('s67');
                     rt.font = { name: 'Arial', bold: true, size: 12, color: { argb: GL } };
                     rt.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HB } };
-                    rt.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                    rt.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                     rt.border = { bottom: { style: 'medium', color: { argb: G } } };
                     summarySheet.getRow(recRow).height = 30;
                     recRow++;
@@ -417,7 +356,7 @@
                         rc.font = { name: 'Arial', size: 10, color: { argb: DT } };
                         rc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
                         rc.alignment = { horizontal: 'right', vertical: 'top', wrapText: true,
-                            readingOrder: 'rtl' };
+                            readingOrder: FG.dir() };
                         rc.border = { top: { style: 'hair' }, bottom: { style: 'hair' }, left: { style: 'hair' },
                             right: { style: 'hair' } };
                         summarySheet.getRow(recRow).height = 22;
@@ -425,7 +364,7 @@
                     });
 
                     // 3. تفاصيل العبارات
-                    const detailSheet = workbook.addWorksheet('تفاصيل التقييم', { views: [{ rightToLeft: true,
+                    const detailSheet = workbook.addWorksheet(T('s68'), { views: [{ rightToLeft: FG.isRTL(),
                             showGridLines: false }] });
                     detailSheet.getColumn(1).width = 5;
                     detailSheet.getColumn(2).width = 10;
@@ -433,9 +372,9 @@
                     detailSheet.getColumn(4).width = 20;
                     detailSheet.getColumn(5).width = 15;
                     detailSheet.getColumn(6).width = 5;
-                    mh(detailSheet, 1, 6, 1, '📋 تفاصيل التقييم حسب العبارات', DB, GL, 14);
+                    mh(detailSheet, 1, 6, 1, T('s69'), DB, GL, 14);
                     detailSheet.getRow(1).height = 40;
-                    detailSheet.addRow(['#', 'العبارة', 'التقدير', 'الدرجة']);
+                    detailSheet.addRow(['#', T('s70'), T('s71'), T('s72')]);
                     const detailHeader = detailSheet.getRow(2);
                     detailHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
                     detailHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
@@ -454,7 +393,7 @@
                                         3 ? 'FF28A745' : answer >= 2 ? 'FFED6C02' :
                                         'FFDC3545' } };
                             }
-                            Object.assign(cell, cs(bg, DT, false, col === 2 ? 'center' : 'right'));
+                            Object.assign(cell, cs(bg, DT, false, col === 2 ? 'center' : FG.start()));
                         });
                     });
 
@@ -462,11 +401,11 @@
                     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                     const now = new Date();
                     const fileName =
-                        `تقرير_مقياس_تقييم_الإداري_${now.toISOString().slice(0,10)}.xlsx`;
+                        `${T('s73')}${now.toISOString().slice(0,10)}.xlsx`;
                     saveAs(blob, fileName);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ أثناء إنشاء ملف Excel: ' + err.message);
+                    alert(T('s74') + err.message);
                 } finally {
                     hideLoading();
                 }
@@ -475,17 +414,18 @@
             // ============================================================
             // تصدير Word احترافي
             // ============================================================
-            function generateWordHTML() {
+            async function generateWordHTML() {
                 let totalScore = 0;
                 let allAnswered = true;
                 for (let i = 0; i < totalQuestions; i++) {
                     if (answers[i] === null) { allAnswered = false; break; }
                     totalScore += answers[i];
                 }
-                const interpretation = allAnswered ? getInterpretation(totalScore) : { level: "غير مكتمل",
-                    message: "لم يتم الإجابة على جميع العبارات.", color: "#888" };
-                const recommendations = allAnswered ? generateRecommendations(totalScore) :
-                ["يرجى إكمال التقييم للحصول على توصيات."];
+                const E = allAnswered ? await evaluateAll() : null;
+                const interpretation = allAnswered ? E.interpretation : { level: T('s75'),
+                    message: T('s76'), color: "#888" };
+                const recommendations = allAnswered ? E.recommendations :
+                [T('s77')];
 
                 let rows = "";
                 questionsList.forEach((q, idx) => {
@@ -499,41 +439,7 @@
 
                 let recHtml = recommendations.map(r => `<li>${r}</li>`).join('');
 
-                return `
-                    <html dir="rtl">
-                    <head><meta charset="UTF-8">
-                        <style>
-                            body { font-family: 'Arial', sans-serif; padding: 30px; direction: rtl; }
-                            h1 { color: #0a1a2a; border-bottom: 3px solid #C4A747; padding-bottom: 10px; }
-                            .summary { background: #f9f9f9; padding: 15px; border-radius: 12px; margin: 20px 0; }
-                            .summary strong { color: #C4A747; }
-                            .rec-box { background: #f0f7ff; border-right: 5px solid #C4A747; padding: 15px; margin: 20px 0; border-radius: 10px; }
-                            .rec-box h3 { margin-top: 0; color: #0a1a2a; }
-                            .rec-box ul { padding-right: 20px; }
-                            .rec-box li { margin-bottom: 8px; }
-                            table.details { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-                            table.details th { background: #0a1a2a; color: white; padding: 8px; border: 1px solid #999; }
-                            table.details td { padding: 6px; border: 1px solid #999; }
-                            .footer { margin-top: 30px; font-size: 0.8rem; color: #555; text-align: center; }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>تقرير مقياس تحديد الإداري</h1>
-                        <div class="summary">
-                            <strong>النتيجة الإجمالية:</strong> ${allAnswered ? totalScore + ' نقطة (من 104)' : 'غير مكتملة'} &nbsp;|&nbsp;
-                            <strong>التقدير:</strong> <span style="color:${interpretation.color};">${interpretation.level}</span><br>
-                            <strong>التفسير:</strong> ${interpretation.message}
-                        </div>
-                        <div class="rec-box">
-                            <h3>📌 التوصيات والتطوير المقترح</h3>
-                            <ul>${recHtml}</ul>
-                        </div>
-                        <h2>تفاصيل التقييم حسب العبارات</h2>
-                        <table class="details">
-                            <thead><tr><th>#</th><th>العبارة</th><th>التقدير</th><th>الدرجة</th></tr></thead>
-                            <tbody>${rows}</tbody>
-                        </table>
-                        <div class="footer">تم إنشاء هذا التقرير بواسطة مجموعة فاروق للإستشارات والأعمال | ${new Date().toLocaleDateString('ar-EG')}</div>
+                return `${T('s79')}${allAnswered ? totalScore + T('s52') : T('s78')}${T('s80')}${interpretation.color};">${interpretation.level}${T('s81')}${interpretation.message}${T('s82')}${recHtml}${T('s83')}${rows}${T('s84')}${new Date().toLocaleDateString(FG.locale())}</div>
                     </body>
                     </html>
                 `;
@@ -552,19 +458,19 @@
                     }
                 }
 
-                showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات');
+                showLoading(T('s85'), T('s86'));
                 try {
-                    const content = generateWordHTML();
-                    if (!content) { alert('يرجى إكمال التقييم أولاً.'); return; }
+                    const content = await generateWordHTML();
+                    if (!content) { alert(T('s87')); return; }
                     const blob = new Blob(['\uFEFF' + content], { type: 'application/msword' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
-                    link.download = `تقرير_مقياس_تقييم_الإداري.doc`;
+                    link.download = `${T('s88')}`;
                     link.click();
                     URL.revokeObjectURL(link.href);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ في إنشاء تقرير Word: ' + err.message);
+                    alert(T('s89') + err.message);
                 } finally {
                     hideLoading();
                 }

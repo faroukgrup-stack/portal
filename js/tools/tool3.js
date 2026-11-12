@@ -7,7 +7,7 @@ let currentCalcInput = '';
 function handleCalc(v) {
     if (v === 'C') { currentCalcInput = ''; calcDisplay.value = ''; return; }
     if (v === '⌫') { currentCalcInput = currentCalcInput.slice(0, -1); calcDisplay.value = currentCalcInput; return; }
-    if (v === '=') { try { let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/')); calcDisplay.value = r; currentCalcInput = r.toString(); } catch(e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; } return; }
+    if (v === '=') { try { let r = eval(currentCalcInput.replace(/×/g,'*').replace(/÷/g,'/')); calcDisplay.value = r; currentCalcInput = r.toString(); } catch(e) { calcDisplay.value = T('s1'); currentCalcInput = ''; } return; }
     currentCalcInput += v; calcDisplay.value = currentCalcInput;
 }
 document.querySelectorAll('.calc-btn').forEach(btn => {
@@ -29,7 +29,7 @@ document.addEventListener('keydown', function(e) {
 const equipmentContainer = document.getElementById('equipmentContainer');
 function addEquipmentRow(name = '', power = '', cost = '', space = '') {
     const row = document.createElement('div'); row.className = 'equipment-row';
-    row.innerHTML = `<input type="text" class="eq-name" placeholder="اسم المعدة" value="${name}"><input type="number" class="eq-power" placeholder="القدرة (kW)" value="${power}" step="0.1" min="0"><input type="number" class="eq-cost" placeholder="السعر" value="${cost}" step="100" min="0"><input type="number" class="eq-space" placeholder="المساحة (م²)" value="${space}" step="0.1" min="0"><button class="remove-equipment" onclick="this.parentElement.remove()">×</button>`;
+    row.innerHTML = `${T('s2')}${name}${T('s3')}${power}${T('s4')}${cost}${T('s5')}${space}" step="0.1" min="0"><button class="remove-equipment" onclick="this.parentElement.remove()">×</button>`;
     equipmentContainer.appendChild(row);
 }
 addEquipmentRow('', '', '', ''); addEquipmentRow('', '', '', '');
@@ -46,21 +46,16 @@ function getEquipmentData() {
     });
     return equipment;
 }
-function calculateEquipmentTotals() {
-    const equipment = getEquipmentData();
-    let totalPower = 0, totalCost = 0, totalSpace = 0;
-    equipment.forEach(eq => { totalPower += eq.power; totalCost += eq.cost; totalSpace += eq.space; });
-    return { totalPower, totalCost, totalSpace };
-}
-function updatePowerAlert() {
+function equipmentForServer() { return getEquipmentData(); }
+async function updatePowerAlert() {
     const electricalCapacity = parseFloat(document.getElementById('electricalCapacity').value) || 200;
-    const { totalPower } = calculateEquipmentTotals();
-    const requiredAmps = (totalPower * 1000) / 220;
+    let P; try { P = await FG.calc('tool3', 'power', { equipment: equipmentForServer(), electricalCapacity }); } catch (e) { return; }
+    const requiredAmps = P.requiredAmps;
     const powerAlert = document.getElementById('powerAlert');
-    if (requiredAmps > electricalCapacity) {
+    if (P.over) {
         powerAlert.style.display = 'block';
         powerAlert.className = 'alert alert-danger';
-        powerAlert.innerHTML = `⚠️ تحذير: إجمالي القدرة المطلوبة (${requiredAmps.toFixed(0)} أمبير) أعلى من قدرة الموقع (${electricalCapacity} أمبير).`;
+        powerAlert.innerHTML = `${T('s6')}${requiredAmps.toFixed(0)}${T('s7')}${electricalCapacity}${T('s8')}`;
     } else { powerAlert.style.display = 'none'; }
 }
 document.getElementById('electricalCapacity').addEventListener('input', updatePowerAlert);
@@ -68,9 +63,9 @@ equipmentContainer.addEventListener('input', updatePowerAlert);
 
 // ===== الحساب الرئيسي =====
 let financeChart, riskChart;
-function calculateAll() {
+async function calculateAll() {
     const currency = document.getElementById('currencySelect').value;
-    const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+    const companyName = document.getElementById('companyName').value || T('s9');
     const seats = parseFloat(document.getElementById('seats').value) || 50;
     const hoursOpen = parseFloat(document.getElementById('hoursOpen').value) || 12;
     const totalArea = parseFloat(document.getElementById('totalArea').value) || 150;
@@ -79,7 +74,9 @@ function calculateAll() {
     const waterAvailabilityText = document.getElementById('waterAvailability').options[document.getElementById('waterAvailability').selectedIndex].text;
     const ventilationText = document.getElementById('ventilation').options[document.getElementById('ventilation').selectedIndex].text;
     const deliveryAccessText = document.getElementById('deliveryAccess').options[document.getElementById('deliveryAccess').selectedIndex].text;
-    const { totalPower, totalCost: equipmentCost, totalSpace } = calculateEquipmentTotals();
+    const equipment = getEquipmentData();
+    const waterValue = document.getElementById('waterAvailability').value;
+    const ventilationValue = document.getElementById('ventilation').value;
     const turnoverRate = parseFloat(document.getElementById('turnoverRate').value) || 2;
     const peakHours = parseFloat(document.getElementById('peakHours').value) || 4;
     const occupancyRate = parseFloat(document.getElementById('occupancyRate').value) / 100 || 0.7;
@@ -94,104 +91,38 @@ function calculateAll() {
     const licensesCost = parseFloat(document.getElementById('licensesCost').value) || 5000;
     const workingCapital = parseFloat(document.getElementById('workingCapital').value) || 15000;
 
-    const kitchenArea = totalArea * (kitchenPercent / 100);
-    const remainingArea = totalArea - kitchenArea;
-    const diningArea = remainingArea * 0.75;
-    const seatDensity = diningArea / seats;
-    const maxCustomersDaily = seats * turnoverRate;
-    const actualCustomersDaily = maxCustomersDaily * occupancyRate;
-    const monthlyRevenue = actualCustomersDaily * avgMealPrice * 26;
-    const monthlyFoodCost = monthlyRevenue * foodCostPercent;
-    const monthlyLaborCost = employeesCount * avgSalary;
-    const monthlyFixedCosts = monthlyRent + otherOpCost;
-    const totalMonthlyExpenses = monthlyFoodCost + monthlyLaborCost + monthlyFixedCosts;
-    const netProfit = monthlyRevenue - totalMonthlyExpenses;
-    const totalInvestment = constructionCost + licensesCost + equipmentCost + workingCapital;
-    const monthlyDepreciation = equipmentCost / (equipmentLife * 12);
-    const netProfitAfterDepreciation = netProfit - monthlyDepreciation;
-    const accountingProfit = netProfitAfterDepreciation;
-    const contributionPerMeal = avgMealPrice * (1 - foodCostPercent);
-    const breakEvenMeals = (monthlyFixedCosts + monthlyLaborCost) / contributionPerMeal;
-    const breakEvenRevenue = breakEvenMeals * avgMealPrice;
-    const revenuePerSeat = monthlyRevenue / seats;
-    const primeCost = monthlyFoodCost + monthlyLaborCost;
-    const primePercent = (primeCost / monthlyRevenue) * 100;
-    const laborCostPercent = (monthlyLaborCost / monthlyRevenue) * 100;
-    const fixedCostPercent = (monthlyFixedCosts / monthlyRevenue) * 100;
-    const riskRevenue = monthlyRevenue * 0.8;
-    const riskProfit = riskRevenue - (riskRevenue * foodCostPercent) - monthlyLaborCost - monthlyFixedCosts - monthlyDepreciation;
-    const paybackMonths = (accountingProfit > 0) ? totalInvestment / accountingProfit : Infinity;
-
-    const warnings = [];
-    if (seatDensity < 1.2) warnings.push("⚠️ الكراسي كثيرة والمساحة ضيقة (كثافة مرتفعة)");
-    if (seats / employeesCount < 8) warnings.push("⚠️ عدد الموظفين مرتفع مقارنة بعدد الكراسي");
-    if (primePercent > 65) warnings.push("⚠️ Prime Cost مرتفع (>65%)");
-    if (accountingProfit < 0) warnings.push("🔴 المشروع خاسر حسب التقديرات الحالية");
-    if (monthlyFixedCosts < monthlyRevenue * 0.15) warnings.push("⚠️ التكاليف الثابتة منخفضة جداً (<15% من الإيرادات)");
-    if (laborCostPercent < 15) warnings.push("⚠️ نسبة تكلفة العمالة منخفضة جداً (<15%)");
-    if (totalInvestment / seats > 5000) warnings.push("💡 استثمار مرتفع لكل كرسي، تأكد من جدوى ذلك");
-
-    // التقييم الفني
-    let technicalScore = 0; const requiredAmps = (totalPower * 1000) / 220;
-    if (electricalCapacity >= requiredAmps * 1.2) technicalScore += 40; else if (electricalCapacity >= requiredAmps) technicalScore += 30; else if (electricalCapacity >= requiredAmps * 0.8) technicalScore += 15; else technicalScore += 5;
-    if (waterAvailabilityText.includes('مناسب')) technicalScore += 15; else if (waterAvailabilityText.includes('تطوير')) technicalScore += 5;
-    if (ventilationText.includes('مناسب')) technicalScore += 15; else if (ventilationText.includes('تطوير')) technicalScore += 5;
-    if (seatDensity >= 1.2 && seatDensity <= 1.8) technicalScore += 15; else if (seatDensity >= 1.0 && seatDensity < 1.2) technicalScore += 8; else if (seatDensity > 1.8 && seatDensity <= 2.2) technicalScore += 8;
-    if (totalSpace <= kitchenArea * 0.5) technicalScore += 15; else if (totalSpace <= kitchenArea * 0.7) technicalScore += 8;
-    technicalScore = Math.min(technicalScore, 100);
-    let technicalRating = '', technicalColor = '';
-    if (technicalScore >= 85) { technicalRating = '🟢 ممتاز'; technicalColor = 'alert-success'; }
-    else if (technicalScore >= 70) { technicalRating = '🟡 جيد'; technicalColor = 'alert-warning'; }
-    else if (technicalScore >= 50) { technicalRating = '🟠 متوسط'; technicalColor = 'alert-warning'; }
-    else { technicalRating = '🔴 ضعيف'; technicalColor = 'alert-danger'; }
-
-    // التقييم المالي
-    let financialScore = 0;
-    if (primePercent <= 55) financialScore += 30; else if (primePercent <= 65) financialScore += 20; else if (primePercent <= 75) financialScore += 10;
-    if (accountingProfit > 0) { const profitMargin = accountingProfit / monthlyRevenue; if (profitMargin >= 0.2) financialScore += 30; else if (profitMargin >= 0.1) financialScore += 20; else if (profitMargin >= 0.05) financialScore += 15; else financialScore += 10; }
-    if (accountingProfit > 0 && totalInvestment > 0) { if (paybackMonths <= 12) financialScore += 20; else if (paybackMonths <= 24) financialScore += 15; else if (paybackMonths <= 36) financialScore += 10; else financialScore += 5; } else if (accountingProfit <= 0) { financialScore = Math.max(0, financialScore - 10); }
-    const maxMonthlyMeals = maxCustomersDaily * 26;
-    if (breakEvenMeals <= maxMonthlyMeals * 0.5) financialScore += 20; else if (breakEvenMeals <= maxMonthlyMeals * 0.7) financialScore += 15; else if (breakEvenMeals <= maxMonthlyMeals * 0.9) financialScore += 10; else if (breakEvenMeals <= maxMonthlyMeals) financialScore += 5;
-    financialScore = Math.min(financialScore, 100);
-    let financialRating = '', financialColor = '';
-    if (financialScore >= 85) { financialRating = '🟢 ممتاز'; financialColor = 'alert-success'; }
-    else if (financialScore >= 70) { financialRating = '🟡 جيد'; financialColor = 'alert-warning'; }
-    else if (financialScore >= 50) { financialRating = '🟠 متوسط'; financialColor = 'alert-warning'; }
-    else { financialRating = '🔴 ضعيف'; financialColor = 'alert-danger'; }
+    let R;
+    try { R = await FG.calc('tool3', 'main', { seats, hoursOpen, totalArea, kitchenPercent, electricalCapacity, waterValue, ventilationValue, equipment, turnoverRate, peakHours, occupancyRate, avgMealPrice, foodCostPercent, employeesCount, avgSalary, monthlyRent, otherOpCost, equipmentLife, constructionCost, licensesCost, workingCapital }); } catch (e) { FG.calcError(e); return; }
+    const { totalPower, equipmentCost, totalSpace, kitchenArea, diningArea, seatDensity, maxCustomersDaily, actualCustomersDaily,
+        monthlyRevenue, monthlyFoodCost, monthlyLaborCost, monthlyFixedCosts, totalMonthlyExpenses, netProfit, totalInvestment, monthlyDepreciation,
+        netProfitAfterDepreciation, accountingProfit, contributionPerMeal, breakEvenMeals, breakEvenRevenue, revenuePerSeat, primeCost, primePercent,
+        laborCostPercent, fixedCostPercent, riskRevenue, riskProfit, paybackMonths, warnings, technicalScore, technicalRating, technicalColor,
+        financialScore, financialRating, financialColor, profitMarginPct, marginOfSafetyPct } = R;
 
     // عرض النتائج
     document.getElementById('initialMessage').style.display = 'none';
     document.getElementById('resultsSection').style.display = 'block';
-    document.getElementById('kpiCards').innerHTML = `
-        <div class="result-card"><i class="fas fa-dollar-sign"></i><h4>الإيرادات الشهرية</h4><div class="value">${currency}${Math.round(monthlyRevenue)}</div></div>
-        <div class="result-card"><i class="fas fa-file-invoice"></i><h4>صافي الربح (بعد الإهلاك)</h4><div class="value">${currency}${Math.round(accountingProfit)}</div><div class="status ${accountingProfit > 0 ? 'status-good' : 'status-bad'}">${accountingProfit > 0 ? 'مربح' : 'خاسر'}</div></div>
-        <div class="result-card"><i class="fas fa-chart-line"></i><h4>نقطة التعادل (إيرادات)</h4><div class="value">${currency}${Math.round(breakEvenRevenue)}</div></div>
-        <div class="result-card"><i class="fas fa-hand-holding-usd"></i><h4>فترة الاسترداد</h4><div class="value">${paybackMonths === Infinity ? '∞' : paybackMonths.toFixed(1)}</div><div class="unit">شهر</div></div>
-    `;
+    document.getElementById('kpiCards').innerHTML = `${T('s25')}${currency}${Math.round(monthlyRevenue)}${T('s26')}${currency}${Math.round(accountingProfit)}</div><div class="status ${accountingProfit > 0 ? 'status-good' : 'status-bad'}">${accountingProfit > 0 ? T('s23') : T('s24')}${T('s27')}${currency}${Math.round(breakEvenRevenue)}${T('s28')}${paybackMonths === Infinity ? '∞' : paybackMonths.toFixed(1)}${T('s29')}`;
     if (warnings.length > 0) {
         document.getElementById('warnings').style.display = 'block';
-        document.getElementById('warnings').innerHTML = `<strong>⚠️ تحذيرات:</strong><br>${warnings.join('<br>')}`;
+        document.getElementById('warnings').innerHTML = `${T('s30')}${warnings.join('<br>')}`;
         document.getElementById('warnings').className = 'alert alert-warning';
     } else { document.getElementById('warnings').style.display = 'none'; }
-    document.getElementById('projectRatingCard').innerHTML = `
-        <h3><i class="fas fa-star"></i> تقييم المشروع</h3>
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-            <div style="flex: 1; min-width: 200px;"><h4>التقييم الفني</h4><div class="alert ${technicalColor}" style="font-size:1.2rem;">${technicalRating}</div><p>الدرجة الفنية: ${technicalScore}/100</p></div>
-            <div style="flex: 1; min-width: 200px;"><h4>التقييم المالي</h4><div class="alert ${financialColor}" style="font-size:1.2rem;">${financialRating}</div><p>الدرجة المالية: ${financialScore}/100</p></div>
+    document.getElementById('projectRatingCard').innerHTML = `${T('s31')}${technicalColor}" style="font-size:1.2rem;">${technicalRating}${T('s32')}${technicalScore}${T('s33')}${financialColor}" style="font-size:1.2rem;">${financialRating}${T('s34')}${financialScore}/100</p></div>
         </div>
     `;
     if (financeChart) financeChart.destroy();
     const ctx1 = document.getElementById('financeChart').getContext('2d');
     financeChart = new Chart(ctx1, {
         type: 'bar',
-        data: { labels: ['الإيرادات', 'تكلفة الطعام', 'الرواتب', 'التكاليف الثابتة', 'صافي الربح'], datasets: [{ label: `القيمة (${currency})`, data: [monthlyRevenue, monthlyFoodCost, monthlyLaborCost, monthlyFixedCosts, accountingProfit], backgroundColor: ['#28a745', '#ffc107', '#17a2b8', '#fd7e14', '#b8860b'] }] },
+        data: { labels: [T('s35'), T('s36'), T('s37'), T('s38'), T('s39')], datasets: [{ label: `${T('s40')}${currency})`, data: [monthlyRevenue, monthlyFoodCost, monthlyLaborCost, monthlyFixedCosts, accountingProfit], backgroundColor: ['#28a745', '#ffc107', '#17a2b8', '#fd7e14', '#b8860b'] }] },
         options: { responsive: true, maintainAspectRatio: false }
     });
     if (riskChart) riskChart.destroy();
     const ctx2 = document.getElementById('riskChart').getContext('2d');
     riskChart = new Chart(ctx2, {
         type: 'bar',
-        data: { labels: ['عادي', 'انخفاض 20%'], datasets: [{ label: `صافي الربح (${currency})`, data: [accountingProfit, riskProfit], backgroundColor: ['#28a745', '#dc3545'] }] },
+        data: { labels: [T('s41'), T('s42')], datasets: [{ label: `${T('s43')}${currency})`, data: [accountingProfit, riskProfit], backgroundColor: ['#28a745', '#dc3545'] }] },
         options: { responsive: true, maintainAspectRatio: false }
     });
 
@@ -208,7 +139,7 @@ function calculateAll() {
         breakEvenMeals, breakEvenRevenue, revenuePerSeat, primeCost, primePercent,
         laborCostPercent, fixedCostPercent, riskRevenue, riskProfit, paybackMonths,
         warnings, technicalScore, technicalRating, technicalColor,
-        financialScore, financialRating, financialColor
+        financialScore, financialRating, financialColor, profitMarginPct, marginOfSafetyPct
     };
 }
 document.getElementById('calculateBtn').addEventListener('click', calculateAll);
@@ -217,13 +148,13 @@ document.getElementById('calculateBtn').addEventListener('click', calculateAll);
 // ========== تصدير Word احترافي (متطابق مع المالي) ==========
 // ================================================================
 async function exportToWord() {
-    if (document.getElementById('resultsSection').style.display === 'none') { alert('الرجاء إجراء التحليل أولاً.'); return; }
-    showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات والرسوم البيانية');
+    if (document.getElementById('resultsSection').style.display === 'none') { alert(T('s44')); return; }
+    showLoading(T('s45'), T('s46'));
     try {
         const currency = document.getElementById('currencySelect').value;
-        const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+        const companyName = document.getElementById('companyName').value || T('s9');
         const res = window.lastResults;
-        if (!res) { alert('الرجاء إجراء التحليل أولاً.'); hideLoading(); return; }
+        if (!res) { alert(T('s44')); hideLoading(); return; }
 
         // التقاط صور الرسوم البيانية
         const chart1 = document.getElementById('financeChart');
@@ -246,7 +177,7 @@ async function exportToWord() {
         // جدول المعدات
         let equipHTML = '';
         res.equipment.forEach(eq => {
-            if (eq.name) equipHTML += `<tr><td>${eq.name}</td><td>${eq.power} kW</td><td>${currency} ${eq.cost}</td><td>${eq.space} م²</td></tr>`;
+            if (eq.name) equipHTML += `<tr><td>${eq.name}</td><td>${eq.power} kW</td><td>${currency} ${eq.cost}</td><td>${eq.space}${T('s47')}`;
         });
 
         // بطاقات KPI
@@ -266,66 +197,27 @@ async function exportToWord() {
         const ratingHTML = document.getElementById('projectRatingCard').innerHTML;
         const warningsHTML = document.getElementById('warnings').innerHTML;
         const now = new Date();
-        const dateStr = now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+        const dateStr = now.toLocaleDateString(FG.locale(), { year: 'numeric', month: 'long', day: 'numeric' });
 
-        const fullHtml = `<!DOCTYPE html>
-        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head><meta charset='utf-8'><title>تقرير الجدوى الفنية - FAROUK GRUP</title>
-        <style>
-            body{font-family:'Arial',sans-serif;direction:rtl;margin:2rem;background:#fff;color:#333;}
-            .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-            .cover h1{font-size:32px;color:#b8860b;margin:0;}.cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-            table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-            th{background:#fefcf6;color:#b8860b;}
-            .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
-            .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
-        </style></head>
-        <body>
-            <div class="cover">
-                <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                <h2>تقرير الجدوى الفنية المتقدمة للمطاعم</h2>
-                <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
-                <p>العملة: ${currency}</p>
-            </div>
-            <h2 style="color:#b8860b;">المدخلات الأساسية</h2>
-            <table>
-                <tr><th>نوع المطبخ</th><td>${kitchenType}</td><th>عدد الكراسي</th><td>${res.seats}</td></tr>
-                <tr><th>نموذج الخدمة</th><td>${serviceModel}</td><th>ساعات العمل</th><td>${res.hoursOpen} ساعة/يوم</td></tr>
-                <tr><th>فترات التشغيل</th><td>${shifts}</td><th>المساحة الإجمالية</th><td>${res.totalArea} م²</td></tr>
-                <tr><th>نسبة المطبخ</th><td>${res.kitchenPercent}%</td><th>قدرة الكهرباء</th><td>${res.electricalCapacity} أمبير</td></tr>
-                <tr><th>المياه</th><td>${water}</td><th>التهوية</th><td>${ventilation}</td></tr>
-                <tr><th>سهولة التوصيل</th><td>${delivery}</td><th></th><td></td></tr>
-            </table>
-            <h3 style="color:#b8860b;">المعدات</h3>
-            <table><thead><tr><th>المعدة</th><th>القدرة (kW)</th><th>التكلفة</th><th>المساحة (م²)</th></tr></thead><tbody>${equipHTML}</tbody></table>
-            <h2 style="color:#b8860b;">مؤشرات الأداء الرئيسية</h2>
-            <table>${kpiRows}</table>
-            ${warningsHTML ? `<div style="background:#fff3cd;padding:15px;border-radius:10px;border-right:4px solid #ffc107;margin:20px 0;">${warningsHTML}</div>` : ''}
-            <h2 style="color:#b8860b;">📈 الرسوم البيانية</h2>
-            <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;">
-                <div style="flex:1;min-width:300px;"><h3>تحليل الأداء المالي</h3><img src="${img1}" class="chart-img"/></div>
-                <div style="flex:1;min-width:300px;"><h3>تحليل المخاطر</h3><img src="${img2}" class="chart-img"/></div>
-            </div>
-            <h2 style="color:#b8860b;">💡 تقييم المشروع والتوصيات</h2>
-            <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">${ratingHTML}</div>
-            <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+        const fullHtml = `${T('s48')}${companyName}${T('s49')}${dateStr}${T('s50')}${currency}${T('s51')}${kitchenType}${T('s52')}${res.seats}${T('s53')}${serviceModel}${T('s54')}${res.hoursOpen}${T('s55')}${shifts}${T('s56')}${res.totalArea}${T('s57')}${res.kitchenPercent}${T('s58')}${res.electricalCapacity}${T('s59')}${water}${T('s60')}${ventilation}${T('s61')}${delivery}${T('s62')}${equipHTML}${T('s63')}${kpiRows}</table>
+            ${warningsHTML ? `<div style="background:#fff3cd;padding:15px;border-radius:10px;border-right:4px solid #ffc107;margin:20px 0;">${warningsHTML}</div>` : ''}${T('s64')}${img1}${T('s65')}${img2}${T('s66')}${ratingHTML}${T('s67')}${now.getFullYear()}</div>
         </body></html>`;
 
         const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `تقرير_فني_مطعم_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+        link.download = `${T('s68')}${companyName}_${now.toISOString().slice(0,10)}.doc`;
         link.click();
         URL.revokeObjectURL(link.href);
-    } catch (error) { console.error(error); alert('خطأ في إنشاء تقرير Word'); } finally { hideLoading(); }
+    } catch (error) { console.error(error); alert(T('s69')); } finally { hideLoading(); }
 }
 
 // ================================================================
 // ========== تصدير Excel احترافي (متطابق مع المالي) ==========
 // ================================================================
 async function exportToFullExcel() {
-    if (!window.lastResults) { alert('الرجاء إجراء التحليل أولاً (اضغط على "احسب الدراسة الفنية").'); return; }
-    showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والرسوم البيانية');
+    if (!window.lastResults) { alert(T('s70')); return; }
+    showLoading(T('s71'), T('s72'));
     try {
         const res = window.lastResults;
         const currency = res.currency;
@@ -337,66 +229,66 @@ async function exportToFullExcel() {
         const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA', GB = 'FFFFF3CD';
         const PT = 'FF155724', NT = 'FF721C24';
 
-        function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
-        function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+        function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+        function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:FG.dir()},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
         function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
-        function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+        function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
 
         // 1. غلاف التقرير
-        const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+        const cv = workbook.addWorksheet(T('s73'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
         [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
         cv.getRow(2).height=80; cv.getRow(4).height=60;
         cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
-        bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
-        bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
-        mh(cv,1,4,4,`تقرير الجدوى الفنية المتقدمة للمطاعم\n${companyName}`,DB,GL,18);
-        const inf=[['📋 الجهة',companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',currency],['📊 صافي الربح',`${currency} ${res.accountingProfit.toFixed(0)}`],['📈 فترة الاسترداد',res.paybackMonths===Infinity?'غير محددة':`${res.paybackMonths.toFixed(1)} شهر`]];
+        bc.value=T('s74');
+        bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};
+        mh(cv,1,4,4,`${T('s75')}${companyName}`,DB,GL,18);
+        const inf=[[T('s76'),companyName],[T('s77'),new Date().toLocaleDateString(FG.locale())],[T('s78'),currency],[T('s79'),`${currency} ${res.accountingProfit.toFixed(0)}`],[T('s80'),res.paybackMonths===Infinity?T('s81'):`${res.paybackMonths.toFixed(1)}${T('s82')}`]];
         let ir=6;
         inf.forEach(([l,v],idx)=>{
             cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
             const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
             const bg=idx%2===0?AR:'FFFEFCF6';
-            ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
-            ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+            ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+            ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
             cv.getRow(ir).height=28; ir++;
         });
 
         // 2. المدخلات والافتراضات
-        const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true, showGridLines: false }] });
+        const inputsSheet = workbook.addWorksheet(T('s83'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
         inputsSheet.getColumn(1).width=5; inputsSheet.getColumn(2).width=38; inputsSheet.getColumn(3).width=22; inputsSheet.getColumn(4).width=22; inputsSheet.getColumn(5).width=5;
-        mh(inputsSheet,1,5,1,'📋 جدول المدخلات والافتراضات الأساسية',DB,GL,14);
+        mh(inputsSheet,1,5,1,T('s84'),DB,GL,14);
         inputsSheet.getRow(1).height=40;
-        mh(inputsSheet,2,4,2,'البيانات الأساسية للمشروع',SB,'FFFFFFFF',11);
+        mh(inputsSheet,2,4,2,T('s85'),SB,'FFFFFFFF',11);
         inputsSheet.getRow(2).height=28;
         const inputFields = [
-            ['نوع المطبخ', document.getElementById('kitchenType').options[document.getElementById('kitchenType').selectedIndex].text, ''],
-            ['عدد الكراسي', res.seats, ''],
-            ['نموذج الخدمة', document.getElementById('serviceModel').options[document.getElementById('serviceModel').selectedIndex].text, ''],
-            ['ساعات العمل اليومية', res.hoursOpen, 'ساعة'],
-            ['فترات التشغيل', document.getElementById('shifts').options[document.getElementById('shifts').selectedIndex].text, ''],
-            ['المساحة الإجمالية', res.totalArea, 'م²'],
-            ['نسبة المطبخ', res.kitchenPercent, '%'],
-            ['قدرة الكهرباء', res.electricalCapacity, 'أمبير'],
-            ['مصدر المياه', res.waterAvailabilityText, ''],
-            ['نظام التهوية', res.ventilationText, ''],
-            ['سهولة التوصيل', res.deliveryAccessText, ''],
-            ['عدد المعدات', res.equipment.length, ''],
-            ['إجمالي قدرة المعدات', res.totalPower, 'kW'],
-            ['إجمالي تكلفة المعدات', `${currency} ${res.equipmentCost.toFixed(0)}`, ''],
-            ['مساحة المعدات', res.totalSpace, 'م²'],
-            ['معدل دوران الطاولة', res.turnoverRate, ''],
-            ['ساعات الذروة', res.peakHours, ''],
-            ['نسبة الإشغال', res.occupancyRate*100, '%'],
-            ['متوسط سعر الوجبة', `${currency} ${res.avgMealPrice}`, ''],
-            ['تكلفة الطعام', res.foodCostPercent*100, '%'],
-            ['عدد الموظفين', res.employeesCount, ''],
-            ['متوسط الراتب', `${currency} ${res.avgSalary}`, ''],
-            ['الإيجار الشهري', `${currency} ${res.monthlyRent}`, ''],
-            ['مصاريف تشغيل أخرى', `${currency} ${res.otherOpCost}`, ''],
-            ['العمر الإنتاجي للمعدات', res.equipmentLife, 'سنة'],
-            ['تكلفة الديكور', `${currency} ${res.constructionCost}`, ''],
-            ['التراخيص', `${currency} ${res.licensesCost}`, ''],
-            ['رأس المال العامل', `${currency} ${res.workingCapital}`, '']
+            [T('s86'), document.getElementById('kitchenType').options[document.getElementById('kitchenType').selectedIndex].text, ''],
+            [T('s87'), res.seats, ''],
+            [T('s88'), document.getElementById('serviceModel').options[document.getElementById('serviceModel').selectedIndex].text, ''],
+            [T('s89'), res.hoursOpen, T('s90')],
+            [T('s91'), document.getElementById('shifts').options[document.getElementById('shifts').selectedIndex].text, ''],
+            [T('s92'), res.totalArea, T('s93')],
+            [T('s94'), res.kitchenPercent, '%'],
+            [T('s95'), res.electricalCapacity, T('s96')],
+            [T('s97'), res.waterAvailabilityText, ''],
+            [T('s98'), res.ventilationText, ''],
+            [T('s99'), res.deliveryAccessText, ''],
+            [T('s100'), res.equipment.length, ''],
+            [T('s101'), res.totalPower, 'kW'],
+            [T('s102'), `${currency} ${res.equipmentCost.toFixed(0)}`, ''],
+            [T('s103'), res.totalSpace, T('s93')],
+            [T('s104'), res.turnoverRate, ''],
+            [T('s105'), res.peakHours, ''],
+            [T('s106'), res.occupancyRate*100, '%'],
+            [T('s107'), `${currency} ${res.avgMealPrice}`, ''],
+            [T('s108'), res.foodCostPercent*100, '%'],
+            [T('s109'), res.employeesCount, ''],
+            [T('s110'), `${currency} ${res.avgSalary}`, ''],
+            [T('s111'), `${currency} ${res.monthlyRent}`, ''],
+            [T('s112'), `${currency} ${res.otherOpCost}`, ''],
+            [T('s113'), res.equipmentLife, T('s114')],
+            [T('s115'), `${currency} ${res.constructionCost}`, ''],
+            [T('s116'), `${currency} ${res.licensesCost}`, ''],
+            [T('s117'), `${currency} ${res.workingCapital}`, '']
         ];
         let iRow=3;
         inputFields.forEach(([label,val,note],idx)=>{
@@ -404,26 +296,26 @@ async function exportToFullExcel() {
             const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
             const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
             lc.value=label; vc.value=val; nc.value=note;
-            ap(lc,cs(bg,DT,true,'right'));
+            ap(lc,cs(bg,DT,true,FG.start()));
             ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?'#,##0':null});
             ap(nc,cs(bg,'00695C',false,'center'));
             iRow++;
         });
 
         // 3. مؤشرات الأداء
-        const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true, showGridLines: false }] });
+        const kpiSheet = workbook.addWorksheet(T('s118'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
         [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
-        mh(kpiSheet,1,6,1,'📊 لوحة مؤشرات الأداء الرئيسية',DB,GL,15);
+        mh(kpiSheet,1,6,1,T('s119'),DB,GL,15);
         kpiSheet.getRow(1).height=45;
-        mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('ar-EG')}`,HB,'FFFFFFFF',10);
+        mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString(FG.locale())}`,HB,'FFFFFFFF',10);
         kpiSheet.getRow(2).height=26;
         const kpis = [
-            { label: 'الإيرادات الشهرية', value: `${currency} ${Math.round(res.monthlyRevenue)}`, good: true },
-            { label: 'صافي الربح', value: `${currency} ${Math.round(res.accountingProfit)}`, good: res.accountingProfit>0 },
-            { label: 'نقطة التعادل', value: `${currency} ${Math.round(res.breakEvenRevenue)}`, good: true },
-            { label: 'فترة الاسترداد', value: res.paybackMonths===Infinity?'غير محددة':`${res.paybackMonths.toFixed(1)} شهر`, good: res.paybackMonths<24 },
+            { label: T('s120'), value: `${currency} ${Math.round(res.monthlyRevenue)}`, good: true },
+            { label: T('s39'), value: `${currency} ${Math.round(res.accountingProfit)}`, good: res.accountingProfit>0 },
+            { label: T('s121'), value: `${currency} ${Math.round(res.breakEvenRevenue)}`, good: true },
+            { label: T('s122'), value: res.paybackMonths===Infinity?T('s81'):`${res.paybackMonths.toFixed(1)}${T('s82')}`, good: res.paybackMonths<24 },
             { label: 'Prime Cost', value: `${res.primePercent.toFixed(1)}%`, good: res.primePercent<65 },
-            { label: 'هامش الربح', value: `${((res.accountingProfit/res.monthlyRevenue)*100).toFixed(1)}%`, good: res.accountingProfit>0 }
+            { label: T('s123'), value: `${res.profitMarginPct.toFixed(1)}%`, good: res.accountingProfit>0 }
         ];
         let kRow=3;
         kpis.forEach((k,idx)=>{
@@ -436,47 +328,47 @@ async function exportToFullExcel() {
             const bg=k.good?PB:NB, tc=k.good?PT:NT;
             [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
             ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
-            lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+            lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:FG.start(),vertical:'middle',readingOrder:FG.dir()};
             vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
             kRow++;
         });
         kRow++;
         kpiSheet.mergeCells(kRow,2,kRow,5);
         const kFinal=kpiSheet.getCell(kRow,2);
-        kFinal.value=res.accountingProfit>0?'✅ المشروع مجدٍ مالياً (ربح موجب)':'⚠️ المشروع غير مجدٍ (خسارة)';
+        kFinal.value=res.accountingProfit>0?T('s124'):T('s125');
         kFinal.font={name:'Arial',bold:true,size:13,color:{argb:res.accountingProfit>0?PT:'856404'}};
         kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:res.accountingProfit>0?PB:GB}};
-        kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
+        kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:FG.dir()};
         kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
         kpiSheet.getRow(kRow).height=40;
 
         // 4. الملخص المالي
-        const summarySheet = workbook.addWorksheet('الملخص المالي', { views: [{ rightToLeft: true, showGridLines: false }] });
+        const summarySheet = workbook.addWorksheet(T('s126'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
         summarySheet.getColumn(1).width=5; summarySheet.getColumn(2).width=35; summarySheet.getColumn(3).width=25; summarySheet.getColumn(4).width=25; summarySheet.getColumn(5).width=5;
-        mh(summarySheet,1,5,1,'📋 الملخص المالي والفني',DB,GL,14);
+        mh(summarySheet,1,5,1,T('s127'),DB,GL,14);
         summarySheet.getRow(1).height=40;
         const summData = [
-            ['الاستثمار الإجمالي', `${currency} ${res.totalInvestment.toFixed(0)}`, '', ''],
-            ['الإيرادات الشهرية', `${currency} ${res.monthlyRevenue.toFixed(0)}`, 'التقييم الفني', `${res.technicalScore}/100 (${res.technicalRating})`],
-            ['إجمالي التكاليف', `${currency} ${res.totalMonthlyExpenses.toFixed(0)}`, 'التقييم المالي', `${res.financialScore}/100 (${res.financialRating})`],
-            ['صافي الربح', `${currency} ${res.accountingProfit.toFixed(0)}`, 'نقطة التعادل', `${currency} ${res.breakEvenRevenue.toFixed(0)}`],
-            ['فترة الاسترداد', res.paybackMonths===Infinity?'غير محددة':`${res.paybackMonths.toFixed(1)} شهر`, 'هامش الأمان', `${((res.monthlyRevenue - res.breakEvenRevenue) / res.monthlyRevenue * 100).toFixed(1)}%`]
+            [T('s128'), `${currency} ${res.totalInvestment.toFixed(0)}`, '', ''],
+            [T('s129'), `${currency} ${res.monthlyRevenue.toFixed(0)}`, T('s130'), `${res.technicalScore}/100 (${res.technicalRating})`],
+            [T('s131'), `${currency} ${res.totalMonthlyExpenses.toFixed(0)}`, T('s132'), `${res.financialScore}/100 (${res.financialRating})`],
+            [T('s133'), `${currency} ${res.accountingProfit.toFixed(0)}`, T('s134'), `${currency} ${res.breakEvenRevenue.toFixed(0)}`],
+            [T('s135'), res.paybackMonths===Infinity?T('s136'):`${res.paybackMonths.toFixed(1)}${T('s137')}`, T('s138'), `${res.marginOfSafetyPct.toFixed(1)}%`]
         ];
         let sRow=2;
         summData.forEach(([l1,v1,l2,v2],idx)=>{
             summarySheet.getRow(sRow).height=30;
             const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
-            const c1=summarySheet.getCell(sRow,2); c1.value=l1; ap(c1,cs(bg,DT,true,'right'));
+            const c1=summarySheet.getCell(sRow,2); c1.value=l1; ap(c1,cs(bg,DT,true,FG.start()));
             const c2=summarySheet.getCell(sRow,3); c2.value=v1; ap(c2,{...cs(bg,'0000FF',false,'center'),numFmt:typeof v1==='number'?'#,##0':null});
-            if(l2){ const c3=summarySheet.getCell(sRow,4); c3.value=l2; ap(c3,cs(bg,DT,true,'right'));
+            if(l2){ const c3=summarySheet.getCell(sRow,4); c3.value=l2; ap(c3,cs(bg,DT,true,FG.start()));
             const c4=summarySheet.getCell(sRow,5); c4.value=v2; ap(c4,cs(bg,'00695C',false,'center')); }
             sRow++;
         });
 
         // 5. الرسوم البيانية
-        const chartsSheet = workbook.addWorksheet('الرسوم البيانية', { views: [{ rightToLeft: true, showGridLines: false }] });
+        const chartsSheet = workbook.addWorksheet(T('s139'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
         chartsSheet.getColumn(1).width=5; chartsSheet.getColumn(2).width=50; chartsSheet.getColumn(3).width=5;
-        mh(chartsSheet,1,3,1,'📊 الرسوم البيانية للمشروع',DB,GL,14);
+        mh(chartsSheet,1,3,1,T('s140'),DB,GL,14);
         chartsSheet.getRow(1).height=40;
         const chartContainer = document.querySelectorAll('.chart-container');
         if (chartContainer.length) {
@@ -493,16 +385,16 @@ async function exportToFullExcel() {
         }
 
         // 6. التقييم والتوصيات
-        const evalSheet = workbook.addWorksheet('التقييم والتوصيات', { views: [{ rightToLeft: true, showGridLines: false }] });
+        const evalSheet = workbook.addWorksheet(T('s141'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
         evalSheet.getColumn(1).width=5; evalSheet.getColumn(2).width=50; evalSheet.getColumn(3).width=5;
-        mh(evalSheet,1,3,1,'📝 التقييم والتوصيات',DB,GL,14);
+        mh(evalSheet,1,3,1,T('s142'),DB,GL,14);
         evalSheet.getRow(1).height=45;
-        const warningsText = res.warnings && res.warnings.length ? res.warnings.join('\n') : 'لا توجد تحذيرات حالياً.';
+        const warningsText = res.warnings && res.warnings.length ? res.warnings.join('\n') : T('s143');
         const sections = [
-            { title: '1. التقييم الفني والمالي', content: `الدرجة الفنية: ${res.technicalScore}/100 (${res.technicalRating})\nالدرجة المالية: ${res.financialScore}/100 (${res.financialRating})` },
-            { title: '2. التحذيرات', content: warningsText },
-            { title: '3. التوصيات', content: res.accountingProfit>0 ? '• المشروع مجدٍ فنياً ومالياً، يُنصح بالمضي قدماً.\n• راقب Prime Cost للحفاظ على الربحية.\n• تأكد من توفير رأس المال العامل المطلوب.' : '• المشروع غير مجدٍ بالشكل الحالي.\n• ابحث عن خفض التكاليف أو زيادة الإيرادات.\n• أعد تقييم الافتراضات (الإشغال، الأسعار، التكاليف).' },
-            { title: '4. تنويه', content: 'هذا التحليل مبني على افتراضات تقديرية. النتائج الفعلية قد تختلف. يُنصح باستشارة خبير مالي وفني.' }
+            { title: T('s144'), content: `${T('s145')}${res.technicalScore}/100 (${res.technicalRating}${T('s146')}${res.financialScore}/100 (${res.financialRating})` },
+            { title: T('s147'), content: warningsText },
+            { title: T('s148'), content: res.accountingProfit>0 ? T('s149') : T('s150') },
+            { title: T('s151'), content: T('s152') }
         ];
         let itRow=2;
         sections.forEach((sec,idx)=>{
@@ -513,7 +405,7 @@ async function exportToFullExcel() {
             tc3.value=sec.title;
             tc3.font={name:'Arial',bold:true,size:12,color:{argb:GL}};
             tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?HB:SB}};
-            tc3.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+            tc3.alignment={horizontal:FG.start(),vertical:'middle',readingOrder:FG.dir()};
             tc3.border={bottom:{style:'medium',color:{argb:G}}};
             itRow++;
             evalSheet.getRow(itRow).height=Math.max(60, sec.content.split('\n').length*18);
@@ -522,16 +414,16 @@ async function exportToFullExcel() {
             cc.value=sec.content;
             cc.font={name:'Arial',size:10,color:{argb:DT}};
             cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};
-            cc.alignment={horizontal:'right',vertical:'top',wrapText:true,readingOrder:'rtl'};
+            cc.alignment={horizontal:FG.start(),vertical:'top',wrapText:true,readingOrder:FG.dir()};
             cc.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
         });
 
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const now = new Date();
-        const fileName = `تقرير_فني_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+        const fileName = `${T('s153')}${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
         saveAs(blob, fileName);
-    } catch(err) { console.error(err); alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
+    } catch(err) { console.error(err); alert(T('s154') + err.message); } finally { hideLoading(); }
 }
 
 // ===== شاشة تحميل التصدير =====
@@ -549,7 +441,7 @@ if (!document.getElementById('exportLoading')) {
     const loadDiv = document.createElement('div');
     loadDiv.className = 'export-loading';
     loadDiv.id = 'exportLoading';
-    loadDiv.innerHTML = `<div class="export-loading-box"><i class="fas fa-spinner"></i><h3 id="loadingTitle">جاري الإنشاء...</h3><p id="loadingMsg">يرجى الانتظار</p></div>`;
+    loadDiv.innerHTML = `${T('s155')}`;
     document.body.appendChild(loadDiv);
 }
 

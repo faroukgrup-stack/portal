@@ -13,7 +13,7 @@
                 let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
                 calcDisplay.value = r;
                 currentCalcInput = r.toString();
-            } catch (e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
+            } catch (e) { calcDisplay.value = T('s1'); currentCalcInput = ''; }
             return;
         }
         currentCalcInput += v;
@@ -104,9 +104,9 @@
     // ===== الحساب الرئيسي =====
     let myCashChart;
 
-    function calculateAll() {
+    async function calculateAll() {
         const currency = document.getElementById('currencySelect').value;
-        const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+        const companyName = document.getElementById('companyName').value || T('s2');
 
         // قراءة المدخلات
         const marketValue = parseFloat(document.getElementById('marketValue').value) || 0;
@@ -127,153 +127,28 @@
         const years = parseInt(document.getElementById('years').value) || 20;
 
         // تحويل النسب
-        const taxRate = taxRatePercent / 100;
-        const assessedDiscount = assessedDiscountPercent / 100;
-        const rentIncrease = rentIncreasePercent / 100;
-        const landAppreciation = landAppreciationPercent / 100;
-        const discountRate = discountRatePercent / 100;
-        const reinvestRate = reinvestRatePercent / 100;
-        const ltv = ltvPercent / 100;
-        const interestRate = interestRatePercent / 100;
-
-        // التكلفة الإجمالية
-        const totalInvestment = marketValue + purchaseCosts;
-
-        // خدمة الدين
-        let loanAmount = 0, annualDebtService = 0, equity = totalInvestment;
-        if (ltv > 0) {
-            loanAmount = totalInvestment * ltv;
-            equity = totalInvestment - loanAmount;
-            const monthlyRate = interestRate / 12;
-            const totalPayments = loanTerm * 12;
-            const monthlyPayment = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, totalPayments) / (Math.pow(1 + monthlyRate, totalPayments) - 1);
-            annualDebtService = monthlyPayment * 12;
-        }
-
-        // القيمة الخاضعة للضريبة
-        const assessedValue = marketValue * (1 - assessedDiscount);
-
-        // الإيرادات السنوية الأساسية
-        const annualRentBase = rentPerUnit * units * 12 * occupancy;
-        const annualExpenses = monthlyExpenses * 12 + assessedValue * taxRate;
-        const noiBeforeDebt = annualRentBase - annualExpenses;
-
-        // التدفقات النقدية
-        let cashFlows = [-equity];
-        for (let i = 1; i <= years; i++) {
-            const rentThisYear = annualRentBase * Math.pow(1 + rentIncrease, i - 1);
-            const noi = rentThisYear - annualExpenses;
-            const cf = noi - annualDebtService;
-            cashFlows.push(cf);
-        }
-        // القيمة النهائية
-        const terminalValue = marketValue * Math.pow(1 + landAppreciation, years);
-        let remainingLoan = 0;
-        if (loanAmount > 0 && years < loanTerm) {
-            const monthlyRate = interestRate / 12;
-            const totalPayments = loanTerm * 12;
-            const paymentsMade = years * 12;
-            remainingLoan = loanAmount * (Math.pow(1 + monthlyRate, totalPayments) - Math.pow(1 + monthlyRate, paymentsMade)) / (Math.pow(1 + monthlyRate, totalPayments) - 1);
-        }
-        const netTerminalValue = terminalValue - remainingLoan;
-        cashFlows[years] += netTerminalValue;
-
-        // NPV
-        let npv = 0;
-        for (let i = 0; i <= years; i++) {
-            npv += cashFlows[i] / Math.pow(1 + discountRate, i);
-        }
-
-        // IRR
-        function calculateIRR(cf) {
-            let low = -0.99, high = 10;
-            for (let iter = 0; iter < 1000; iter++) {
-                let mid = (low + high) / 2;
-                let npvMid = 0;
-                for (let i = 0; i < cf.length; i++) {
-                    npvMid += cf[i] / Math.pow(1 + mid, i);
-                }
-                if (Math.abs(npvMid) < 1e-6) return mid;
-                if (npvMid > 0) low = mid;
-                else high = mid;
-            }
-            return (low + high) / 2;
-        }
-        const irr = calculateIRR(cashFlows);
-
-        // MIRR
-        function calculateMIRR(cf, financeRate, reinvestRate) {
-            let negPV = 0, posFV = 0;
-            for (let i = 0; i < cf.length; i++) {
-                if (cf[i] < 0) negPV += cf[i] / Math.pow(1 + financeRate, i);
-                else posFV += cf[i] * Math.pow(1 + reinvestRate, cf.length - 1 - i);
-            }
-            if (negPV === 0) return NaN;
-            return Math.pow(-posFV / negPV, 1 / (cf.length - 1)) - 1;
-        }
-        const mirr = calculateMIRR(cashFlows, discountRate, reinvestRate);
-
-        // فترة الاسترداد
-        let cumulative = 0, paybackYear = null, fractional = 0;
-        for (let i = 0; i < cashFlows.length; i++) {
-            cumulative += cashFlows[i];
-            if (cumulative >= 0 && paybackYear === null) {
-                paybackYear = i;
-                let prev = cumulative - cashFlows[i];
-                fractional = -prev / cashFlows[i];
-                break;
-            }
-        }
-        const paybackPeriod = paybackYear !== null ? paybackYear - 1 + fractional : null;
-
-        // PI
-        const pvFuture = cashFlows.slice(1).reduce((acc, val, idx) => acc + val / Math.pow(1 + discountRate, idx + 1), 0);
-        const pi = pvFuture / Math.abs(cashFlows[0]);
-
-        // Cash on Cash
-        const cashOnCash = (cashFlows[1] / Math.abs(cashFlows[0])) * 100;
-
-        // ROI
-        const totalProfit = cumulative - Math.abs(cashFlows[0]);
-        const roi = (totalProfit / Math.abs(cashFlows[0])) * 100;
+        let R;
+        try { R = await FG.calc('tool5', 'main', { marketValue, units, rentPerUnit, monthlyExpenses, occupancy, taxRatePercent, assessedDiscountPercent, rentIncreasePercent, landAppreciationPercent, purchaseCosts, ltvPercent, interestRatePercent, loanTerm, discountRatePercent, reinvestRatePercent, years }); } catch (e) { FG.calcError(e); return; }
+        let { taxRate, assessedDiscount, rentIncrease, landAppreciation, discountRate, reinvestRate, ltv, interestRate, totalInvestment, loanAmount, annualDebtService, equity, assessedValue, annualRentBase, annualExpenses, noiBeforeDebt, cashFlows, terminalValue, remainingLoan, netTerminalValue, npv, irr, mirr, cumulative, paybackYear, fractional, paybackPeriod, pvFuture, pi, cashOnCash, totalProfit, roi, score, ratingText, ratingClass, ratingIcon } = R;
 
         // عرض النتائج
         document.getElementById('initialMessage').style.display = 'none';
         document.getElementById('resultsSection').style.display = 'block';
 
-        document.getElementById('kpiCards').innerHTML = `
-            <div class="result-card"><i class="fas fa-coins"></i><h4>صافي القيمة الحالية (NPV)</h4><div class="value">${currency} ${npv.toFixed(0)}</div><div class="unit">${npv > 0 ? 'مربح' : npv < 0 ? 'خاسر' : 'محايد'}</div></div>
-            <div class="result-card"><i class="fas fa-percent"></i><h4>معدل العائد الداخلي (IRR)</h4><div class="value">${(irr*100).toFixed(2)}%</div><div class="unit">${irr > discountRate ? '> معدل الخصم' : irr < discountRate ? '< معدل الخصم' : '= معدل الخصم'}</div></div>
-            <div class="result-card"><i class="fas fa-chart-pie"></i><h4>معدل العائد المعدل (MIRR)</h4><div class="value">${(mirr*100).toFixed(2)}%</div><div class="unit">بمعدل إعادة ${reinvestRatePercent}%</div></div>
-            <div class="result-card"><i class="fas fa-clock"></i><h4>فترة الاسترداد</h4><div class="value">${paybackPeriod !== null ? paybackPeriod.toFixed(1) : 'لا توجد'}</div><div class="unit">سنة</div></div>
-            <div class="result-card"><i class="fas fa-chart-line"></i><h4>مؤشر الربحية (PI)</h4><div class="value">${pi.toFixed(2)}</div><div class="unit">${pi > 1 ? 'مربح' : pi < 1 ? 'غير مربح' : 'محايد'}</div></div>
-            <div class="result-card"><i class="fas fa-hand-holding-usd"></i><h4>العائد النقدي (Cash on Cash)</h4><div class="value">${cashOnCash.toFixed(2)}%</div><div class="unit">العام الأول</div></div>
-            <div class="result-card"><i class="fas fa-chart-bar"></i><h4>العائد على الاستثمار (ROI)</h4><div class="value">${roi.toFixed(2)}%</div><div class="unit">إجمالي</div></div>
-            ${ltv > 0 ? `<div class="result-card"><i class="fas fa-percent"></i><h4>الرافعة المالية (LTV)</h4><div class="value">${(ltv*100).toFixed(0)}%</div><div class="unit">قرض: ${currency} ${loanAmount.toFixed(0)}</div></div>` : ''}
+        document.getElementById('kpiCards').innerHTML = `${T('s13')}${currency} ${npv.toFixed(0)}</div><div class="unit">${npv > 0 ? T('s3') : npv < 0 ? T('s4') : T('s5')}${T('s14')}${(irr*100).toFixed(2)}%</div><div class="unit">${irr > discountRate ? T('s6') : irr < discountRate ? T('s7') : T('s8')}${T('s15')}${(mirr*100).toFixed(2)}${T('s16')}${reinvestRatePercent}${T('s17')}${paybackPeriod !== null ? paybackPeriod.toFixed(1) : T('s9')}${T('s18')}${pi.toFixed(2)}</div><div class="unit">${pi > 1 ? T('s3') : pi < 1 ? T('s10') : T('s5')}${T('s19')}${cashOnCash.toFixed(2)}${T('s20')}${roi.toFixed(2)}${T('s21')}${ltv > 0 ? `${T('s11')}${(ltv*100).toFixed(0)}${T('s12')}${currency} ${loanAmount.toFixed(0)}</div></div>` : ''}
         `;
 
         // تقييم المشروع
-        let score = 0;
-        if (npv > 0) score += 30;
-        if (irr > discountRate) score += 30;
-        if (pi > 1) score += 20;
-        if (paybackPeriod !== null && paybackPeriod < years / 2) score += 20;
-        let ratingText = '', ratingClass = '', ratingIcon = '';
-        if (score >= 80) { ratingText = 'ممتاز'; ratingClass = 'status-good'; ratingIcon = '🟢'; }
-        else if (score >= 50) { ratingText = 'متوسط'; ratingClass = 'status-warning'; ratingIcon = '🟡'; }
-        else { ratingText = 'عالي المخاطر'; ratingClass = 'status-bad'; ratingIcon = '🔴'; }
-        document.getElementById('projectRating').innerHTML = `
-            <h3><i class="fas fa-star" style="color:var(--accent-soft);"></i> تقييم المشروع</h3>
-            <div style="font-size:2rem; font-weight:900;">${score}/100</div>
+        document.getElementById('projectRating').innerHTML = `${T('s25')}${score}/100</div>
             <div class="status ${ratingClass}" style="font-size:1.2rem; margin-top:0.5rem;">${ratingIcon} ${ratingText}</div>
         `;
 
         // جدول التدفقات
-        let tableHtml = '<table><thead><tr><th>السنة</th><th>التدفق النقدي للمستثمر (' + currency + ')</th><th>التراكمي (' + currency + ')</th></tr></thead><tbody>';
+        let tableHtml = T('s26') + currency + T('s27') + currency + ')</th></tr></thead><tbody>';
         let cum = 0;
         for (let i = 0; i <= years; i++) {
             cum += cashFlows[i];
-            const yearLabel = (i === 0) ? 'الاستثمار' : i;
+            const yearLabel = (i === 0) ? T('s28') : i;
             tableHtml += `<tr><td>${yearLabel}</td><td class="${cashFlows[i] < 0 ? 'negative' : 'positive'}">${currency} ${cashFlows[i].toFixed(0)}</td><td class="${cum < 0 ? 'negative' : 'positive'}">${currency} ${cum.toFixed(0)}</td></tr>`;
         }
         tableHtml += '</tbody></table>';
@@ -282,14 +157,11 @@
         // ملخص فترة الاسترداد
         const paybackSummary = document.getElementById('paybackSummary');
         if (paybackPeriod !== null) {
-            paybackSummary.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-                    <span><i class="fas fa-check-circle" style="color:var(--accent-soft);"></i> يتحقق الربح بعد <strong>${paybackPeriod.toFixed(1)} سنة</strong> من الاستثمار.</span>
-                    <span class="value" style="font-size:1.2rem;">💵 التدفق التراكمي النهائي: ${currency} ${cum.toFixed(0)}</span>
+            paybackSummary.innerHTML = `${T('s29')}${paybackPeriod.toFixed(1)}${T('s30')}${currency} ${cum.toFixed(0)}</span>
                 </div>
             `;
         } else {
-            paybackSummary.innerHTML = `<span><i class="fas fa-times-circle" style="color:#f87171;"></i> لا يتم استرداد رأس المال خلال فترة التقييم.</span>`;
+            paybackSummary.innerHTML = `${T('s31')}`;
         }
 
         // الرسم البياني
@@ -310,15 +182,15 @@
             data: {
                 labels: labels,
                 datasets: [
-                    { label: 'التدفق السنوي', data: cfData, borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', tension: 0.1, yAxisID: 'y' },
-                    { label: 'التراكمي', data: cumData, borderColor: '#b8860b', backgroundColor: 'rgba(184,134,11,0.1)', tension: 0.1, yAxisID: 'y1' }
+                    { label: T('s32'), data: cfData, borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', tension: 0.1, yAxisID: 'y' },
+                    { label: T('s33'), data: cumData, borderColor: '#b8860b', backgroundColor: 'rgba(184,134,11,0.1)', tension: 0.1, yAxisID: 'y1' }
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
                 scales: {
-                    y: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'التدفق السنوي', color: '#aab7d4' }, grid: { color: 'rgba(180,133,84,0.1)' }, ticks: { color: '#aab7d4' } },
-                    y1: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'التراكمي', color: '#aab7d4' }, grid: { color: 'rgba(180,133,84,0.1)' }, ticks: { color: '#aab7d4' } }
+                    y: { type: 'linear', display: true, position: 'right', title: { display: true, text: T('s34'), color: '#aab7d4' }, grid: { color: 'rgba(180,133,84,0.1)' }, ticks: { color: '#aab7d4' } },
+                    y1: { type: 'linear', display: true, position: 'left', title: { display: true, text: T('s33'), color: '#aab7d4' }, grid: { color: 'rgba(180,133,84,0.1)' }, ticks: { color: '#aab7d4' } }
                 },
                 plugins: { legend: { labels: { color: '#f0f4fa' } } }
             }
@@ -326,11 +198,7 @@
 
         // تحليل الحساسية (جدول سريع)
         const sensTable = document.getElementById('sensitivityTable');
-        sensTable.innerHTML = `
-            <table>
-                <thead><tr><th>السيناريو</th><th>NPV (${currency})</th><th>IRR (%)</th><th>PI</th></tr></thead>
-                <tbody>
-                    <tr><td>الأساسي</td><td>${npv.toFixed(0)}</td><td>${(irr*100).toFixed(2)}</td><td>${pi.toFixed(2)}</td></tr>
+        sensTable.innerHTML = `${T('s35')}${currency}${T('s36')}${npv.toFixed(0)}</td><td>${(irr*100).toFixed(2)}</td><td>${pi.toFixed(2)}</td></tr>
                 </tbody>
             </table>
         `;
@@ -388,13 +256,13 @@
     // ================================================================
     document.getElementById('exportWordBtn').addEventListener('click', async function() {
         if (document.getElementById('resultsSection').style.display === 'none') {
-            alert('الرجاء إجراء التحليل أولاً.');
+            alert(T('s37'));
             return;
         }
-        showLoading('جاري إنشاء تقرير Word...', 'جمع البيانات والرسوم');
+        showLoading(T('s38'), T('s39'));
         try {
             const data = window.lastRealEstateResults;
-            if (!data) { alert('الرجاء إجراء التحليل أولاً.'); hideLoading(); return; }
+            if (!data) { alert(T('s37')); hideLoading(); return; }
             const inp = data.inputs;
             const out = data.outputs;
             const currency = inp.currency;
@@ -426,60 +294,19 @@
             const paybackHTML = document.getElementById('paybackSummary').innerHTML;
             const sensHTML = document.getElementById('sensitivityTable').innerHTML;
             const now = new Date();
-            const dateStr = now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+            const dateStr = now.toLocaleDateString(FG.locale(), { year: 'numeric', month: 'long', day: 'numeric' });
 
-            const fullHtml = `<!DOCTYPE html>
-            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-            <head><meta charset='utf-8'><title>تقرير الاستثمار العقاري - FAROUK GRUP</title>
-            <style>
-                body{font-family:'Arial',sans-serif;direction:rtl;margin:2rem;background:#fff;color:#333;}
-                .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                .cover h1{font-size:32px;color:#b8860b;margin:0;}.cover h2{font-size:24px;color:#b48554;margin:5px 0;}
-                table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #b8860b;padding:8px;text-align:center;}
-                th{background:#fefcf6;color:#b8860b;}
-                .chart-img{max-width:100%;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
-                .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
-            </style></head>
-            <body>
-                <div class="cover">
-                    <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                    <h2>تقرير الاستثمار العقاري</h2>
-                    <p>الجهة: ${companyName} | التاريخ: ${dateStr}</p>
-                    <p>العملة: ${currency}</p>
-                </div>
-                <h2 style="color:#b8860b;">المدخلات الأساسية</h2>
-                <table>
-                    <tr><th>قيمة العقار</th><td>${currency} ${inp.marketValue}</td><th>عدد الوحدات</th><td>${inp.units}</td></tr>
-                    <tr><th>الإيجار الشهري للوحدة</th><td>${currency} ${inp.rentPerUnit}</td><th>المصاريف الشهرية</th><td>${currency} ${inp.monthlyExpenses}</td></tr>
-                    <tr><th>نسبة الإشغال</th><td>${(inp.occupancy*100).toFixed(0)}%</td><th>الضريبة العقارية</th><td>${inp.taxRatePercent}%</td></tr>
-                    <tr><th>خصم التقييم</th><td>${inp.assessedDiscountPercent}%</td><th>زيادة الإيجار السنوية</th><td>${inp.rentIncreasePercent}%</td></tr>
-                    <tr><th>ارتفاع قيمة الأرض</th><td>${inp.landAppreciationPercent}%</td><th>رسوم شراء إضافية</th><td>${currency} ${inp.purchaseCosts}</td></tr>
-                    <tr><th>معدل الخصم</th><td>${inp.discountRatePercent}%</td><th>معدل إعادة الاستثمار</th><td>${inp.reinvestRatePercent}%</td></tr>
-                    <tr><th>عدد السنوات</th><td>${inp.years}</td><td></td><td></td></tr>
-                    ${inp.ltvPercent > 0 ? `<tr><th>نسبة القرض (LTV)</th><td>${inp.ltvPercent}%</td><th>سعر الفائدة</th><td>${inp.interestRatePercent}%</td></tr><tr><th>مدة القرض</th><td>${inp.loanTerm} سنة</td><td></td><td></td></tr>` : ''}
-                </table>
-                <h2 style="color:#b8860b;">مؤشرات الأداء الرئيسية</h2>
-                <table>${kpiRows}</table>
-                <h2 style="color:#b8860b;">تقييم المشروع</h2>
-                <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">${ratingHTML}</div>
-                <h2 style="color:#b8860b;">📈 الرسم البياني للتدفقات النقدية</h2>
-                <div style="text-align:center;"><img src="${chartImg}" class="chart-img" /></div>
-                <h2 style="color:#b8860b;">📊 التدفقات النقدية السنوية</h2>
-                ${tableHTML}
-                <h2 style="color:#b8860b;">🔍 تحليل الحساسية</h2>
-                ${sensHTML}
-                <h2 style="color:#b8860b;">💰 فترة الاسترداد</h2>
-                <div style="background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;">${paybackHTML}</div>
-                <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+            const fullHtml = `${T('s44')}${companyName}${T('s45')}${dateStr}${T('s46')}${currency}${T('s47')}${currency} ${inp.marketValue}${T('s48')}${inp.units}${T('s49')}${currency} ${inp.rentPerUnit}${T('s50')}${currency} ${inp.monthlyExpenses}${T('s51')}${(inp.occupancy*100).toFixed(0)}${T('s52')}${inp.taxRatePercent}${T('s53')}${inp.assessedDiscountPercent}${T('s54')}${inp.rentIncreasePercent}${T('s55')}${inp.landAppreciationPercent}${T('s56')}${currency} ${inp.purchaseCosts}${T('s57')}${inp.discountRatePercent}${T('s58')}${inp.reinvestRatePercent}${T('s59')}${inp.years}</td><td></td><td></td></tr>
+                    ${inp.ltvPercent > 0 ? `${T('s40')}${inp.ltvPercent}${T('s41')}${inp.interestRatePercent}${T('s42')}${inp.loanTerm}${T('s43')}` : ''}${T('s60')}${kpiRows}${T('s61')}${ratingHTML}${T('s62')}${chartImg}${T('s63')}${tableHTML}${T('s64')}${sensHTML}${T('s65')}${paybackHTML}${T('s66')}${now.getFullYear()}</div>
             </body></html>`;
 
             const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `تقرير_عقار_${companyName}_${now.toISOString().slice(0,10)}.doc`;
+            link.download = `${T('s67')}${companyName}_${now.toISOString().slice(0,10)}.doc`;
             link.click();
             URL.revokeObjectURL(link.href);
-        } catch (err) { alert('خطأ في Word: ' + err.message); } finally { hideLoading(); }
+        } catch (err) { alert(T('s68') + err.message); } finally { hideLoading(); }
     });
 
     // ================================================================
@@ -487,10 +314,10 @@
     // ================================================================
     document.getElementById('exportFullExcelBtn').addEventListener('click', async function() {
         if (!window.lastRealEstateResults) {
-            alert('الرجاء إجراء التحليل أولاً (اضغط على "احسب العائد").');
+            alert(T('s69'));
             return;
         }
-        showLoading('جاري إنشاء تقرير Excel...', 'إنشاء الأوراق والرسوم');
+        showLoading(T('s70'), T('s71'));
         try {
             const data = window.lastRealEstateResults;
             const inp = data.inputs;
@@ -504,54 +331,54 @@
             const AR = 'FFF5F0E8', DT = 'FF1A1A1A', PB = 'FFD4EDDA', NB = 'FFF8D7DA', GB = 'FFFFF3CD';
             const PT = 'FF155724', NT = 'FF721C24';
 
-            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
-            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:'rtl'},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
+            function hs(bg=HB, tc=GL){return{font:{name:'Arial',bold:true,size:11,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()},border:{top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}}};}
+            function cs(bg='FFFFFFFF',tc=DT,b=false,h='center'){return{font:{name:'Arial',bold:b,size:10,color:{argb:tc}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:h,vertical:'middle',wrapText:true,readingOrder:FG.dir()},border:{top:{style:'hair',color:{argb:'FFCCCCCC'}},bottom:{style:'hair',color:{argb:'FFCCCCCC'}},left:{style:'hair',color:{argb:'FFCCCCCC'}},right:{style:'hair',color:{argb:'FFCCCCCC'}}}};}
             function ap(c,s){if(s.font)c.font=s.font;if(s.fill)c.fill=s.fill;if(s.alignment)c.alignment=s.alignment;if(s.border)c.border=s.border;if(s.numFmt)c.numFmt=s.numFmt;}
-            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
+            function mh(ws,fc,tc,r,text,bg=HB,tc2=GL,fs=12){ws.mergeCells(r,fc,r,tc);const c=ws.getCell(r,fc);c.value=text;c.font={name:'Arial',bold:true,size:fs,color:{argb:tc2}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};c.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};}
 
             // 1. غلاف التقرير
-            const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const cv = workbook.addWorksheet(T('s72'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             [8,45,35,8].forEach((w,i)=>cv.getColumn(i+1).width=w);
             cv.getRow(2).height=80; cv.getRow(4).height=60;
             cv.mergeCells(2,1,2,4); const bc=cv.getCell(2,1);
-            bc.value='مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
-            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:'rtl'};
-            mh(cv,1,4,4,`تقرير الاستثمار العقاري\n${companyName}`,DB,GL,18);
-            const inf=[['📋 الجهة',companyName],['📅 التاريخ',new Date().toLocaleDateString('ar-EG')],['💰 العملة',currency],['📊 NPV',`${currency} ${out.npv.toFixed(0)}`],['📈 IRR',`${(out.irr*100).toFixed(2)}%`]];
+            bc.value=T('s73');
+            bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};
+            mh(cv,1,4,4,`${T('s74')}${companyName}`,DB,GL,18);
+            const inf=[[T('s75'),companyName],[T('s76'),new Date().toLocaleDateString(FG.locale())],[T('s77'),currency],['📊 NPV',`${currency} ${out.npv.toFixed(0)}`],['📈 IRR',`${(out.irr*100).toFixed(2)}%`]];
             let ir=6;
             inf.forEach(([l,v],idx)=>{
                 cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
                 const lc=cv.getCell(ir,1), vc=cv.getCell(ir,3); lc.value=l; vc.value=v;
                 const bg=idx%2===0?AR:'FFFEFCF6';
-                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
-                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:'rtl'},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(lc,{font:{name:'Arial',bold:true,size:11,color:{argb:'00695C'}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'right',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
+                ap(vc,{font:{name:'Arial',size:11,color:{argb:DT}},fill:{type:'pattern',pattern:'solid',fgColor:{argb:bg}},alignment:{horizontal:'center',vertical:'middle',readingOrder:FG.dir()},border:{top:{style:'hair'},bottom:{style:'hair'},left:{style:'hair'},right:{style:'hair'}}});
                 cv.getRow(ir).height=28; ir++;
             });
 
             // 2. المدخلات
-            const inputsSheet = workbook.addWorksheet('المدخلات والافتراضات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const inputsSheet = workbook.addWorksheet(T('s78'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             inputsSheet.getColumn(1).width=5; inputsSheet.getColumn(2).width=38; inputsSheet.getColumn(3).width=22; inputsSheet.getColumn(4).width=22; inputsSheet.getColumn(5).width=5;
-            mh(inputsSheet,1,5,1,'📋 جدول المدخلات والافتراضات الأساسية',DB,GL,14);
+            mh(inputsSheet,1,5,1,T('s79'),DB,GL,14);
             inputsSheet.getRow(1).height=40;
-            mh(inputsSheet,2,4,2,'البيانات الأساسية للمشروع',SB,'FFFFFFFF',11);
+            mh(inputsSheet,2,4,2,T('s80'),SB,'FFFFFFFF',11);
             inputsSheet.getRow(2).height=28;
             const inputFields = [
-                ['قيمة العقار', inp.marketValue, ''],
-                ['عدد الوحدات', inp.units, ''],
-                ['الإيجار الشهري للوحدة', inp.rentPerUnit, ''],
-                ['المصاريف الشهرية', inp.monthlyExpenses, ''],
-                ['نسبة الإشغال', (inp.occupancy*100).toFixed(0), '%'],
-                ['الضريبة العقارية', inp.taxRatePercent, '%'],
-                ['خصم التقييم', inp.assessedDiscountPercent, '%'],
-                ['زيادة الإيجار السنوية', inp.rentIncreasePercent, '%'],
-                ['ارتفاع قيمة الأرض', inp.landAppreciationPercent, '%'],
-                ['رسوم شراء إضافية', inp.purchaseCosts, ''],
-                ['نسبة القرض (LTV)', inp.ltvPercent, '%'],
-                ['سعر الفائدة', inp.interestRatePercent, '%'],
-                ['مدة القرض', inp.loanTerm, 'سنة'],
-                ['معدل الخصم', inp.discountRatePercent, '%'],
-                ['معدل إعادة الاستثمار', inp.reinvestRatePercent, '%'],
-                ['عدد السنوات', inp.years, '']
+                [T('s81'), inp.marketValue, ''],
+                [T('s82'), inp.units, ''],
+                [T('s83'), inp.rentPerUnit, ''],
+                [T('s84'), inp.monthlyExpenses, ''],
+                [T('s85'), (inp.occupancy*100).toFixed(0), '%'],
+                [T('s86'), inp.taxRatePercent, '%'],
+                [T('s87'), inp.assessedDiscountPercent, '%'],
+                [T('s88'), inp.rentIncreasePercent, '%'],
+                [T('s89'), inp.landAppreciationPercent, '%'],
+                [T('s90'), inp.purchaseCosts, ''],
+                [T('s91'), inp.ltvPercent, '%'],
+                [T('s92'), inp.interestRatePercent, '%'],
+                [T('s93'), inp.loanTerm, T('s94')],
+                [T('s95'), inp.discountRatePercent, '%'],
+                [T('s96'), inp.reinvestRatePercent, '%'],
+                [T('s97'), inp.years, '']
             ];
             let iRow=3;
             inputFields.forEach(([label,val,note],idx)=>{
@@ -559,24 +386,24 @@
                 const bg=idx%2===0?'FFFEFCF6':'FFFFFFFF';
                 const lc=inputsSheet.getCell(iRow,2), vc=inputsSheet.getCell(iRow,3), nc=inputsSheet.getCell(iRow,4);
                 lc.value=label; vc.value=val; nc.value=note;
-                ap(lc,cs(bg,DT,true,'right'));
+                ap(lc,cs(bg,DT,true,FG.start()));
                 ap(vc,{...cs(bg,'0000FF',false,'center'),numFmt:typeof val==='number'?'#,##0':null});
                 ap(nc,cs(bg,'00695C',false,'center'));
                 iRow++;
             });
 
             // 3. مؤشرات الأداء
-            const kpiSheet = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const kpiSheet = workbook.addWorksheet(T('s98'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             [5,32,22,22,22,5].forEach((w,i)=>kpiSheet.getColumn(i+1).width=w);
-            mh(kpiSheet,1,6,1,'📊 لوحة مؤشرات الأداء الرئيسية',DB,GL,15);
+            mh(kpiSheet,1,6,1,T('s99'),DB,GL,15);
             kpiSheet.getRow(1).height=45;
-            mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString('ar-EG')}`,HB,'FFFFFFFF',10);
+            mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString(FG.locale())}`,HB,'FFFFFFFF',10);
             kpiSheet.getRow(2).height=26;
             const kpis = [
                 { label: 'NPV', value: `${currency} ${out.npv.toFixed(0)}`, good: out.npv>0 },
                 { label: 'IRR', value: `${(out.irr*100).toFixed(2)}%`, good: out.irr>out.discountRate },
                 { label: 'MIRR', value: `${(out.mirr*100).toFixed(2)}%`, good: true },
-                { label: 'فترة الاسترداد', value: out.paybackPeriod!==null?out.paybackPeriod.toFixed(1)+' سنة':'غير محددة', good: out.paybackPeriod!==null&&out.paybackPeriod<inp.years/2 },
+                { label: T('s100'), value: out.paybackPeriod!==null?out.paybackPeriod.toFixed(1)+T('s101'):T('s102'), good: out.paybackPeriod!==null&&out.paybackPeriod<inp.years/2 },
                 { label: 'PI', value: out.pi.toFixed(2), good: out.pi>1 },
                 { label: 'Cash on Cash', value: `${out.cashOnCash.toFixed(2)}%`, good: out.cashOnCash>0 }
             ];
@@ -591,30 +418,30 @@
                 const bg=k.good?PB:NB, tc=k.good?PT:NT;
                 [ic,lc2,vc3,nc2].forEach(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}}; c.border={top:{style:'thin',color:{argb:G}},bottom:{style:'thin',color:{argb:G}},left:{style:'thin',color:{argb:G}},right:{style:'thin',color:{argb:G}}};});
                 ic.font={name:'Arial',bold:true,size:14,color:{argb:'555555'}}; ic.alignment={horizontal:'center',vertical:'middle'};
-                lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                lc2.font={name:'Arial',bold:true,size:11,color:{argb:DT}}; lc2.alignment={horizontal:FG.start(),vertical:'middle',readingOrder:FG.dir()};
                 vc3.font={name:'Arial',bold:true,size:13,color:{argb:tc}}; vc3.alignment={horizontal:'center',vertical:'middle'};
                 kRow++;
             });
             kRow++;
             kpiSheet.mergeCells(kRow,2,kRow,5);
             const kFinal=kpiSheet.getCell(kRow,2);
-            kFinal.value=out.npv>0?'✅ المشروع مجدٍ مالياً (NPV موجب)':'⚠️ المشروع غير مجدٍ (NPV سالب)';
+            kFinal.value=out.npv>0?T('s103'):T('s104');
             kFinal.font={name:'Arial',bold:true,size:13,color:{argb:out.npv>0?PT:'856404'}};
             kFinal.fill={type:'pattern',pattern:'solid',fgColor:{argb:out.npv>0?PB:GB}};
-            kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:'rtl'};
+            kFinal.alignment={horizontal:'center',vertical:'middle',readingOrder:FG.dir()};
             kFinal.border={top:{style:'medium',color:{argb:G}},bottom:{style:'medium',color:{argb:G}},left:{style:'medium',color:{argb:G}},right:{style:'medium',color:{argb:G}}};
             kpiSheet.getRow(kRow).height=40;
 
             // 4. التدفقات النقدية
-            const cashSheet = workbook.addWorksheet('التدفقات النقدية', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const cashSheet = workbook.addWorksheet(T('s105'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             cashSheet.getColumn(1).width=5; cashSheet.getColumn(2).width=15; cashSheet.getColumn(3).width=20; cashSheet.getColumn(4).width=20; cashSheet.getColumn(5).width=5;
-            mh(cashSheet,1,5,1,'📋 التدفقات النقدية السنوية',DB,GL,14);
+            mh(cashSheet,1,5,1,T('s106'),DB,GL,14);
             cashSheet.getRow(1).height=40;
-            cashSheet.addRow(['السنة', `التدفق النقدي (${currency})`, `التراكمي (${currency})`]);
+            cashSheet.addRow([T('s107'), `${T('s108')}${currency})`, `${T('s109')}${currency})`]);
             let cum=0;
             for (let i=0; i<=inp.years; i++) {
                 cum += out.cashFlows[i];
-                cashSheet.addRow([i===0?'الاستثمار':i, out.cashFlows[i], cum]);
+                cashSheet.addRow([i===0?T('s28'):i, out.cashFlows[i], cum]);
             }
             cashSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFFFF' } };
             cashSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
@@ -622,19 +449,19 @@
             cashSheet.getColumn(3).numFmt = '#,##0';
 
             // 5. تحليل الحساسية
-            const sensSheet = workbook.addWorksheet('تحليل الحساسية', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const sensSheet = workbook.addWorksheet(T('s110'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             sensSheet.getColumn(1).width=5; sensSheet.getColumn(2).width=25; sensSheet.getColumn(3).width=22; sensSheet.getColumn(4).width=22; sensSheet.getColumn(5).width=5;
-            mh(sensSheet,1,5,1,'🔍 تحليل الحساسية (السيناريوهات)',DB,GL,14);
+            mh(sensSheet,1,5,1,T('s111'),DB,GL,14);
             sensSheet.getRow(1).height=40;
-            sensSheet.addRow(['السيناريو', `NPV (${currency})`, 'IRR (%)', 'PI']);
-            sensSheet.addRow(['الأساسي', out.npv, (out.irr*100).toFixed(2), out.pi.toFixed(2)]);
+            sensSheet.addRow([T('s112'), `NPV (${currency})`, 'IRR (%)', 'PI']);
+            sensSheet.addRow([T('s113'), out.npv, (out.irr*100).toFixed(2), out.pi.toFixed(2)]);
             sensSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFFFF' } };
             sensSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
 
             // 6. الرسوم البيانية
-            const chartsSheet = workbook.addWorksheet('الرسوم البيانية', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const chartsSheet = workbook.addWorksheet(T('s114'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             chartsSheet.getColumn(1).width=5; chartsSheet.getColumn(2).width=50; chartsSheet.getColumn(3).width=5;
-            mh(chartsSheet,1,3,1,'📊 الرسم البياني للتدفقات النقدية',DB,GL,14);
+            mh(chartsSheet,1,3,1,T('s115'),DB,GL,14);
             chartsSheet.getRow(1).height=40;
             const chartCanvas = document.getElementById('cashChart');
             if (chartCanvas) {
@@ -650,15 +477,15 @@
             }
 
             // 7. التقييم والتوصيات
-            const evalSheet = workbook.addWorksheet('التقييم والتوصيات', { views: [{ rightToLeft: true, showGridLines: false }] });
+            const evalSheet = workbook.addWorksheet(T('s116'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
             evalSheet.getColumn(1).width=5; evalSheet.getColumn(2).width=50; evalSheet.getColumn(3).width=5;
-            mh(evalSheet,1,3,1,'📝 التقييم والتوصيات',DB,GL,14);
+            mh(evalSheet,1,3,1,T('s117'),DB,GL,14);
             evalSheet.getRow(1).height=45;
             const sections = [
-                { title: '1. تقييم المشروع', content: `الدرجة: ${out.score}/100\nالتصنيف: ${out.ratingText}` },
-                { title: '2. فترة الاسترداد', content: out.paybackPeriod!==null ? `يتم استرداد رأس المال خلال ${out.paybackPeriod.toFixed(1)} سنة.` : 'لا يتم استرداد رأس المال خلال فترة التقييم.' },
-                { title: '3. التوصيات', content: out.npv>0 ? '• المشروع مجدٍ مالياً، يُنصح بالمضي قدماً.\n• راقب نسبة الإشغال والتكاليف التشغيلية.\n• احتفظ بهامش أمان للطوارئ.' : '• المشروع غير مجدٍ بالشكل الحالي.\n• ابحث عن خفض التكاليف أو زيادة الإيرادات.\n• أعد تقييم الافتراضات (الإيجار، الإشغال، التمويل).' },
-                { title: '4. تنويه', content: 'هذا التحليل مبني على افتراضات تقديرية. النتائج الفعلية قد تختلف. يُنصح باستشارة خبير مالي وعقاري.' }
+                { title: T('s118'), content: `${T('s119')}${out.score}${T('s120')}${out.ratingText}` },
+                { title: T('s121'), content: out.paybackPeriod!==null ? `${T('s122')}${out.paybackPeriod.toFixed(1)}${T('s123')}` : T('s124') },
+                { title: T('s125'), content: out.npv>0 ? T('s126') : T('s127') },
+                { title: T('s128'), content: T('s129') }
             ];
             let itRow=2;
             sections.forEach((sec,idx)=>{
@@ -669,7 +496,7 @@
                 tc3.value=sec.title;
                 tc3.font={name:'Arial',bold:true,size:12,color:{argb:GL}};
                 tc3.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2===0?HB:SB}};
-                tc3.alignment={horizontal:'right',vertical:'middle',readingOrder:'rtl'};
+                tc3.alignment={horizontal:FG.start(),vertical:'middle',readingOrder:FG.dir()};
                 tc3.border={bottom:{style:'medium',color:{argb:G}}};
                 itRow++;
                 evalSheet.getRow(itRow).height=Math.max(60, sec.content.split('\n').length*18);
@@ -678,16 +505,16 @@
                 cc.value=sec.content;
                 cc.font={name:'Arial',size:10,color:{argb:DT}};
                 cc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFEFCF6'}};
-                cc.alignment={horizontal:'right',vertical:'top',wrapText:true,readingOrder:'rtl'};
+                cc.alignment={horizontal:FG.start(),vertical:'top',wrapText:true,readingOrder:FG.dir()};
                 cc.border={top:{style:'hair'},bottom:{style:'hair',color:{argb:G}},left:{style:'hair'},right:{style:'hair'}};
             });
 
             const buffer = await workbook.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             const now = new Date();
-            const fileName = `تقرير_عقار_${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
+            const fileName = `${T('s67')}${companyName}_${now.toISOString().slice(0,10)}.xlsx`;
             saveAs(blob, fileName);
-        } catch(err) { alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
+        } catch(err) { alert(T('s130') + err.message); } finally { hideLoading(); }
     });
 
     // ===== تهيئة أولية =====

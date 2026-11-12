@@ -14,7 +14,7 @@
                         let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
                         calcDisplay.value = r;
                         currentCalcInput = r.toString();
-                    } catch (e) { calcDisplay.value = 'خطأ'; currentCalcInput = ''; }
+                    } catch (e) { calcDisplay.value = T('s1'); currentCalcInput = ''; }
                     return;
                 }
                 currentCalcInput += v;
@@ -65,9 +65,9 @@
             window.lastResults = null;
 
             // ===== الحساب الرئيسي =====
-            function calculateCACCLV() {
+            async function calculateCACCLV() {
                 const currency = document.getElementById('currencySelect').value;
-                const company = document.getElementById('companyName').value || 'الجهة';
+                const company = document.getElementById('companyName').value || T('s2');
 
                 const marketingSpend = parseFloat(document.getElementById('marketingSpend').value) || 0;
                 const newCustomers = parseInt(document.getElementById('newCustomers').value) || 1;
@@ -77,34 +77,13 @@
                 const profitMargin = parseFloat(document.getElementById('profitMargin').value) || 0;
 
                 if (marketingSpend <= 0 || newCustomers <= 0 || avgOrder <= 0 || visitsPerYear <= 0 || lifespan <= 0 || profitMargin <= 0) {
-                    alert('الرجاء إدخال قيم موجبة لجميع الحقول.');
+                    alert(T('s3'));
                     return;
                 }
 
-                const cac = marketingSpend / newCustomers;
-                const annualRevenuePerCustomer = avgOrder * visitsPerYear;
-                const lifetimeRevenue = annualRevenuePerCustomer * lifespan;
-                const clv = lifetimeRevenue * (profitMargin / 100);
-                const ratio = clv / cac;
-
-                let status, badgeClass, recommendation;
-                if (ratio >= 4) {
-                    status = 'ممتاز';
-                    badgeClass = 'badge-excellent';
-                    recommendation = `✅ نسبة ${ratio.toFixed(2)} تعني أن كل دولار تنفقه على التسويق يعود عليك بأكثر من 4 دولارات أرباح. استراتيجيتك التسويقية ممتازة ومستدامة. استمر في الاستثمار وابحث عن فرص للتوسع.`;
-                } else if (ratio >= 3) {
-                    status = 'جيد جداً';
-                    badgeClass = 'badge-good';
-                    recommendation = `✅ نسبة ${ratio.toFixed(2)} تعني أن استثمارك التسويقي مجدٍ. يمكنك تحسين الأداء بزيادة متوسط قيمة الطلب أو تحسين الاحتفاظ بالعملاء.`;
-                } else if (ratio >= 2) {
-                    status = 'متوسط';
-                    badgeClass = 'badge-fair';
-                    recommendation = `🟡 نسبة ${ratio.toFixed(2)} تشير إلى أن العائد ليس كافياً. راجع قنوات التسويق، أو حاول خفض التكاليف، أو زيادة متوسط العمر الافتراضي للعميل.`;
-                } else {
-                    status = 'ضعيف';
-                    badgeClass = 'badge-poor';
-                    recommendation = `🔴 نسبة ${ratio.toFixed(2)} تعني أنك تخسر أموالك في التسويق. أنت بحاجة إلى إعادة هيكلة جذرية: خفض تكلفة الاستحواذ، رفع الأسعار، أو تحسين ولاء العملاء.`;
-                }
+                let R;
+                try { R = await FG.calc('tool23', 'main', { marketingSpend, newCustomers, avgOrder, visitsPerYear, lifespan, profitMargin }); } catch (e) { FG.calcError(e); return; }
+                const { cac, clv, ratio, status, badgeClass, recommendation } = R;
 
                 displayResults({
                     cac, clv, ratio, status, badgeClass, recommendation, currency, company,
@@ -118,44 +97,12 @@
 
                 document.getElementById('summaryCards').innerHTML = `
                     <div class="summary-card">
-                        <div class="number">${data.currency}${data.cac.toFixed(2)}</div>
-                        <div class="label">تكلفة الاستحواذ (CAC)</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="number">${data.currency}${data.clv.toFixed(2)}</div>
-                        <div class="label">القيمة الدائمة (CLV)</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="number">${data.ratio.toFixed(2)}x</div>
-                        <div class="label">نسبة CLV / CAC</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="number"><span class="badge ${data.badgeClass}">${data.status}</span></div>
-                        <div class="label">التصنيف</div>
-                    </div>
+                        <div class="number">${data.currency}${data.cac.toFixed(2)}${T('s15')}${data.currency}${data.clv.toFixed(2)}${T('s16')}${data.ratio.toFixed(2)}${T('s17')}${data.badgeClass}">${data.status}${T('s18')}`;
+
+                document.getElementById('recommendationBox').innerHTML = `${T('s19')}${data.recommendation}</p>
                 `;
 
-                document.getElementById('recommendationBox').innerHTML = `
-                    <h4><i class="fas fa-lightbulb" style="color:#cfa776;"></i> التوصية الاستراتيجية</h4>
-                    <p>${data.recommendation}</p>
-                `;
-
-                document.getElementById('detailsTable').innerHTML = `
-                    <table>
-                        <thead><tr><th>المؤشر</th><th>القيمة</th><th>الشرح</th></tr></thead>
-                        <tbody>
-                            <tr><td>إجمالي مصاريف التسويق</td><td>${data.currency}${data.marketingSpend}</td><td>المبلغ المنفق على الإعلانات والعروض شهرياً</td></tr>
-                            <tr><td>عدد العملاء الجدد</td><td>${data.newCustomers}</td><td>عدد العملاء الذين تم جلبهم خلال الشهر</td></tr>
-                            <tr><td>تكلفة الاستحواذ (CAC)</td><td>${data.currency}${data.cac.toFixed(2)}</td><td>المصاريف ÷ عدد العملاء الجدد</td></tr>
-                            <tr><td>متوسط قيمة الطلب</td><td>${data.currency}${data.avgOrder}</td><td>متوسط ما ينفقه العميل في كل زيارة</td></tr>
-                            <tr><td>الزيارات السنوية</td><td>${data.visitsPerYear}</td><td>عدد مرات الشراء في السنة</td></tr>
-                            <tr><td>سنوات البقاء</td><td>${data.lifespan}</td><td>متوسط المدة التي يبقى فيها العميل</td></tr>
-                            <tr><td>هامش الربح</td><td>${data.profitMargin}%</td><td>نسبة الربح الصافي من كل عملية بيع</td></tr>
-                            <tr><td><strong>القيمة الدائمة (CLV)</strong></td><td><strong>${data.currency}${data.clv.toFixed(2)}</strong></td><td>الإيرادات × هامش الربح طوال فترة العميل</td></tr>
-                            <tr><td><strong>نسبة CLV / CAC</strong></td><td><strong>${data.ratio.toFixed(2)}x</strong></td><td>مؤشر الجدوى (يفضل أن تكون ≥ 3)</td></tr>
-                        </tbody>
-                    </table>
-                `;
+                document.getElementById('detailsTable').innerHTML = `${T('s20')}${data.currency}${data.marketingSpend}${T('s21')}${data.newCustomers}${T('s22')}${data.currency}${data.cac.toFixed(2)}${T('s23')}${data.currency}${data.avgOrder}${T('s24')}${data.visitsPerYear}${T('s25')}${data.lifespan}${T('s26')}${data.profitMargin}${T('s27')}${data.currency}${data.clv.toFixed(2)}${T('s28')}${data.ratio.toFixed(2)}${T('s29')}`;
 
                 const ctx = document.getElementById('cacClvChart').getContext('2d');
                 if (chartInstance) chartInstance.destroy();
@@ -163,9 +110,9 @@
                 chartInstance = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: ['تكلفة الاستحواذ (CAC)', 'القيمة الدائمة (CLV)'],
+                        labels: [T('s30'), T('s31')],
                         datasets: [{
-                            label: 'القيمة بالعملة',
+                            label: T('s32'),
                             data: [data.cac, data.clv],
                             backgroundColor: ['rgba(220,53,69,0.7)', 'rgba(40,167,69,0.7)'],
                             borderColor: ['#dc3545', '#28a745'],
@@ -206,10 +153,10 @@
             // ========== تصدير Excel احترافي ==========
             async function exportExcel() {
                 if (!window.lastResults) {
-                    alert('الرجاء إجراء الحساب أولاً.');
+                    alert(T('s33'));
                     return;
                 }
-                showLoading('جاري إنشاء تقرير Excel الاحترافي...', 'إنشاء الأوراق والتنسيق');
+                showLoading(T('s34'), T('s35'));
                 try {
                     const data = window.lastResults;
                     const currency = data.currency;
@@ -227,7 +174,7 @@
                         return {
                             font: { name: 'Arial', bold: true, size: 11, color: { argb: tc } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'rtl' },
+                            alignment: { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: FG.dir() },
                             border: {
                                 top: { style: 'thin', color: { argb: G } },
                                 bottom: { style: 'thin', color: { argb: G } },
@@ -241,7 +188,7 @@
                         return {
                             font: { name: 'Arial', bold: bold, size: 10, color: { argb: tc } },
                             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } },
-                            alignment: { horizontal: h, vertical: 'middle', wrapText: true, readingOrder: 'rtl' },
+                            alignment: { horizontal: h, vertical: 'middle', wrapText: true, readingOrder: FG.dir() },
                             border: {
                                 top: { style: 'hair', color: { argb: 'FFCCCCCC' } },
                                 bottom: { style: 'hair', color: { argb: 'FFCCCCCC' } },
@@ -257,7 +204,7 @@
                         c.value = text;
                         c.font = { name: 'Arial', bold: true, size: fs, color: { argb: tc2 } };
                         c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
-                        c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'rtl' };
+                        c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: FG.dir() };
                         c.border = {
                             top: { style: 'medium', color: { argb: G } },
                             bottom: { style: 'medium', color: { argb: G } },
@@ -267,28 +214,28 @@
                     }
 
                     // 1. غلاف التقرير
-                    const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true, showGridLines: false }] });
+                    const cv = workbook.addWorksheet(T('s36'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
                     [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
                     for (let r = 1; r <= 30; r++) cv.getRow(r).height = 22;
                     cv.getRow(2).height = 80;
                     cv.getRow(4).height = 60;
                     cv.mergeCells(2, 1, 2, 4);
                     const bc = cv.getCell(2, 1);
-                    bc.value = 'مجموعة فاروق للاستشارات والأعمال\nFAROUK GRUP';
+                    bc.value = T('s37');
                     bc.font = { name: 'Arial', bold: true, size: 26, color: { argb: GL } };
                     bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
-                    bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'rtl' };
+                    bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: FG.dir() };
                     bc.border = { bottom: { style: 'thick', color: { argb: G } } };
-                    mh(cv, 1, 4, 4, `تقرير تحليل CAC و CLV\n${company}`, DB, GL, 18);
+                    mh(cv, 1, 4, 4, `${T('s38')}${company}`, DB, GL, 18);
 
                     const inf = [
-                        ['📋 الجهة', company],
-                        ['📅 التاريخ', new Date().toLocaleDateString('ar-EG')],
-                        ['💰 العملة', currency],
+                        [T('s39'), company],
+                        [T('s40'), new Date().toLocaleDateString(FG.locale())],
+                        [T('s41'), currency],
                         ['📊 CAC', `${currency}${data.cac.toFixed(2)}`],
                         ['📈 CLV', `${currency}${data.clv.toFixed(2)}`],
-                        ['🔢 النسبة', `${data.ratio.toFixed(2)}x`],
-                        ['🏷️ التصنيف', data.status]
+                        [T('s42'), `${data.ratio.toFixed(2)}x`],
+                        [T('s43'), data.status]
                     ];
                     let ir = 6;
                     inf.forEach(([l, v], idx) => {
@@ -299,27 +246,27 @@
                         const bg = idx % 2 === 0 ? AR : 'FFFEFCF6';
                         lc.font = { name: 'Arial', bold: true, size: 11, color: { argb: '00695C' } };
                         lc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
-                        lc.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        lc.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                         vc.font = { name: 'Arial', size: 11, color: { argb: DT } };
                         vc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
-                        vc.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+                        vc.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() };
                         cv.getRow(ir).height = 28;
                         ir++;
                     });
 
                     // 2. التفاصيل
-                    const ws = workbook.addWorksheet('تفاصيل CAC_CLV', { views: [{ rightToLeft: true, showGridLines: false }] });
+                    const ws = workbook.addWorksheet(T('s44'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
                     ws.getColumn(1).width = 5;
                     ws.getColumn(2).width = 32;
                     ws.getColumn(3).width = 22;
                     ws.getColumn(4).width = 45;
 
-                    mh(ws, 1, 4, 1, `تقرير CAC و CLV - ${company}`, DB, GL, 16);
+                    mh(ws, 1, 4, 1, `${T('s45')}${company}`, DB, GL, 16);
                     ws.getRow(1).height = 40;
-                    mh(ws, 1, 4, 2, `العملة: ${currency}  |  تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG')}`, HB, GL, 11);
+                    mh(ws, 1, 4, 2, `${T('s46')}${currency}${T('s47')}${new Date().toLocaleDateString(FG.locale())}`, HB, GL, 11);
                     ws.getRow(2).height = 28;
 
-                    const headers = ['#', 'المؤشر', 'القيمة', 'الشرح'];
+                    const headers = ['#', T('s48'), T('s49'), T('s50')];
                     headers.forEach((h, idx) => {
                         const cell = ws.getCell(3, idx + 1);
                         cell.value = h;
@@ -328,16 +275,16 @@
                     ws.getRow(3).height = 28;
 
                     const rows = [
-                        ['1', 'إجمالي مصاريف التسويق', `${currency}${data.marketingSpend}`, 'المبلغ المنفق على الإعلانات والعروض شهرياً'],
-                        ['2', 'عدد العملاء الجدد', data.newCustomers, 'عدد العملاء الذين تم جلبهم خلال الشهر'],
-                        ['3', 'تكلفة الاستحواذ (CAC)', `${currency}${data.cac.toFixed(2)}`, 'المصاريف ÷ عدد العملاء الجدد'],
-                        ['4', 'متوسط قيمة الطلب', `${currency}${data.avgOrder}`, 'متوسط ما ينفقه العميل في كل زيارة'],
-                        ['5', 'الزيارات السنوية', data.visitsPerYear, 'عدد مرات الشراء في السنة'],
-                        ['6', 'سنوات البقاء', data.lifespan, 'متوسط المدة التي يبقى فيها العميل'],
-                        ['7', 'هامش الربح', `${data.profitMargin}%`, 'نسبة الربح الصافي من كل عملية بيع'],
-                        ['8', 'القيمة الدائمة (CLV)', `${currency}${data.clv.toFixed(2)}`, 'الإيرادات × هامش الربح طوال فترة العميل'],
-                        ['9', 'نسبة CLV / CAC', `${data.ratio.toFixed(2)}x`, 'مؤشر الجدوى (يفضل أن تكون ≥ 3)'],
-                        ['10', 'التصنيف', data.status, data.recommendation]
+                        ['1', T('s51'), `${currency}${data.marketingSpend}`, T('s52')],
+                        ['2', T('s53'), data.newCustomers, T('s54')],
+                        ['3', T('s30'), `${currency}${data.cac.toFixed(2)}`, T('s55')],
+                        ['4', T('s56'), `${currency}${data.avgOrder}`, T('s57')],
+                        ['5', T('s58'), data.visitsPerYear, T('s59')],
+                        ['6', T('s60'), data.lifespan, T('s61')],
+                        ['7', T('s62'), `${data.profitMargin}%`, T('s63')],
+                        ['8', T('s31'), `${currency}${data.clv.toFixed(2)}`, T('s64')],
+                        ['9', T('s65'), `${data.ratio.toFixed(2)}x`, T('s66')],
+                        ['10', T('s67'), data.status, data.recommendation]
                     ];
 
                     rows.forEach((r, i) => {
@@ -348,14 +295,14 @@
                         r.forEach((val, colIdx) => {
                             const cell = ws.getCell(rowNum, colIdx + 1);
                             cell.value = val;
-                            Object.assign(cell, cs(bg, DT, false, colIdx === 0 || colIdx === 2 ? 'center' : 'right'));
-                            if (colIdx === 3) cell.alignment.horizontal = 'right';
+                            Object.assign(cell, cs(bg, DT, false, colIdx === 0 || colIdx === 2 ? 'center' : FG.start()));
+                            if (colIdx === 3) cell.alignment.horizontal = FG.start();
                         });
                         if (r[0] === '10') {
                             const statusCell = ws.getCell(rowNum, 3);
-                            if (data.status === 'ممتاز') statusCell.font = { name: 'Arial', bold: true, size: 10, color: { argb: 'FF28A745' } };
-                            else if (data.status === 'جيد جداً') statusCell.font = { name: 'Arial', bold: true, size: 10, color: { argb: 'FF17A2B8' } };
-                            else if (data.status === 'متوسط') statusCell.font = { name: 'Arial', bold: true, size: 10, color: { argb: 'FFD39C0B' } };
+                            if (data.status === T('s4')) statusCell.font = { name: 'Arial', bold: true, size: 10, color: { argb: 'FF28A745' } };
+                            else if (data.status === T('s7')) statusCell.font = { name: 'Arial', bold: true, size: 10, color: { argb: 'FF17A2B8' } };
+                            else if (data.status === T('s9')) statusCell.font = { name: 'Arial', bold: true, size: 10, color: { argb: 'FFD39C0B' } };
                             else statusCell.font = { name: 'Arial', bold: true, size: 10, color: { argb: 'FFDC3545' } };
                         }
                     });
@@ -364,24 +311,24 @@
                     const footerRow = rows.length + 5;
                     ws.mergeCells(footerRow, 1, footerRow, 4);
                     const footerCell = ws.getCell(footerRow, 1);
-                    footerCell.value = 'تم إنشاء التقرير بواسطة مجموعة فاروق للاستشارات والأعمال';
+                    footerCell.value = T('s68');
                     footerCell.font = { name: 'Arial', size: 9, color: { argb: 'FF888888' } };
-                    footerCell.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+                    footerCell.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() };
                     ws.getRow(footerRow).height = 28;
 
                     // 3. التوصيات
-                    const recSheet = workbook.addWorksheet('التوصيات', { views: [{ rightToLeft: true, showGridLines: false }] });
+                    const recSheet = workbook.addWorksheet(T('s69'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
                     recSheet.getColumn(1).width = 5;
                     recSheet.getColumn(2).width = 70;
                     recSheet.getColumn(3).width = 5;
-                    mh(recSheet, 1, 3, 1, '📋 التوصية الاستراتيجية', DB, GL, 14);
+                    mh(recSheet, 1, 3, 1, T('s70'), DB, GL, 14);
                     recSheet.getRow(1).height = 40;
                     recSheet.mergeCells(3, 2, 3, 2);
                     const recCell = recSheet.getCell(3, 2);
                     recCell.value = data.recommendation;
                     recCell.font = { name: 'Arial', size: 11, color: { argb: DT } };
                     recCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEFCF6' } };
-                    recCell.alignment = { horizontal: 'right', vertical: 'top', wrapText: true, readingOrder: 'rtl' };
+                    recCell.alignment = { horizontal: FG.start(), vertical: 'top', wrapText: true, readingOrder: FG.dir() };
                     recCell.border = {
                         top: { style: 'thin', color: { argb: G } },
                         bottom: { style: 'thin', color: { argb: G } },
@@ -395,7 +342,7 @@
                     saveAs(blob, `CAC_CLV_${company}_${new Date().toISOString().slice(0,10)}.xlsx`);
                 } catch (err) {
                     console.error(err);
-                    alert('خطأ أثناء إنشاء ملف Excel: ' + err.message);
+                    alert(T('s71') + err.message);
                 } finally {
                     hideLoading();
                 }
@@ -404,10 +351,10 @@
             // ========== تصدير Word ==========
             async function exportWord() {
                 if (!window.lastResults) {
-                    alert('الرجاء إجراء الحساب أولاً.');
+                    alert(T('s33'));
                     return;
                 }
-                showLoading('جاري إنشاء تقرير Word الاحترافي...', 'جمع البيانات والرسوم البيانية');
+                showLoading(T('s72'), T('s73'));
                 try {
                     const data = window.lastResults;
                     const currency = data.currency;
@@ -424,85 +371,9 @@
                     }
 
                     const now = new Date();
-                    const dateStr = now.toLocaleDateString('ar-EG');
+                    const dateStr = now.toLocaleDateString(FG.locale());
 
-                    const fullHtml = `<!DOCTYPE html>
-                    <html dir="rtl">
-                    <head><meta charset="utf-8"><title>تقرير CAC و CLV - FAROUK GRUP</title>
-                    <style>
-                        body{font-family:'Tajawal',Arial,sans-serif;margin:2rem;background:#fff;color:#333;direction:rtl;}
-                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                        .cover h1{font-size:28px;color:#b8860b;margin:0;}
-                        .cover h2{font-size:20px;color:#b48554;margin:8px 0;}
-                        table{width:100%;border-collapse:collapse;margin:20px 0;}
-                        th,td{border:1px solid #b8860b;padding:10px;text-align:center;}
-                        th{background:#fefcf6;color:#b8860b;font-weight:bold;}
-                        .highlight{font-weight:bold;color:#b8860b;}
-                        .rec{background:#fefcf6;padding:15px;border-radius:10px;border-right:4px solid #b8860b;margin:20px 0;}
-                        .chart-img{max-width:100%;height:auto;border:1px solid #b8860b;border-radius:10px;margin:20px 0;}
-                        .footer{text-align:center;margin-top:40px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
-                        .kpi-table td{padding:15px;vertical-align:top;}
-                        .kpi-value{font-size:1.5rem;font-weight:900;color:#b8860b;}
-                    </style></head>
-                    <body>
-                        <div class="cover">
-                            <h1>مجموعة فاروق للاستشارات والأعمال</h1>
-                            <h2>تقرير تحليل CAC و CLV</h2>
-                            <p>الجهة: ${company} | التاريخ: ${dateStr}</p>
-                            <p>العملة: ${currency}</p>
-                        </div>
-
-                        <h2 style="color:#b8860b;">📊 ملخص المؤشرات</h2>
-                        <table class="kpi-table">
-                            <tr>
-                                <td>
-                                    <div>تكلفة الاستحواذ (CAC)</div>
-                                    <div class="kpi-value">${currency}${data.cac.toFixed(2)}</div>
-                                </td>
-                                <td>
-                                    <div>القيمة الدائمة (CLV)</div>
-                                    <div class="kpi-value">${currency}${data.clv.toFixed(2)}</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div>نسبة CLV / CAC</div>
-                                    <div class="kpi-value">${data.ratio.toFixed(2)}x</div>
-                                </td>
-                                <td>
-                                    <div>التصنيف</div>
-                                    <div class="kpi-value">${data.status}</div>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <h2 style="color:#b8860b;">📈 الرسم البياني</h2>
-                        <div style="text-align:center;">
-                            ${chartImgBase64 ? `<img src="${chartImgBase64}" class="chart-img" />` : '<p>لا يتوفر رسم بياني</p>'}
-                        </div>
-
-                        <h2 style="color:#b8860b;">📄 تفاصيل الحساب</h2>
-                        <table>
-                            <thead><tr><th>المؤشر</th><th>القيمة</th><th>الشرح</th></tr></thead>
-                            <tbody>
-                                <tr><td>إجمالي مصاريف التسويق</td><td>${currency}${data.marketingSpend}</td><td>المبلغ المنفق على الإعلانات والعروض شهرياً</td></tr>
-                                <tr><td>عدد العملاء الجدد</td><td>${data.newCustomers}</td><td>عدد العملاء الذين تم جلبهم خلال الشهر</td></tr>
-                                <tr><td class="highlight">تكلفة الاستحواذ (CAC)</td><td class="highlight">${currency}${data.cac.toFixed(2)}</td><td>المصاريف ÷ عدد العملاء الجدد</td></tr>
-                                <tr><td>متوسط قيمة الطلب</td><td>${currency}${data.avgOrder}</td><td>متوسط ما ينفقه العميل في كل زيارة</td></tr>
-                                <tr><td>الزيارات السنوية</td><td>${data.visitsPerYear}</td><td>عدد مرات الشراء في السنة</td></tr>
-                                <tr><td>سنوات البقاء</td><td>${data.lifespan}</td><td>متوسط المدة التي يبقى فيها العميل</td></tr>
-                                <tr><td>هامش الربح</td><td>${data.profitMargin}%</td><td>نسبة الربح الصافي من كل عملية بيع</td></tr>
-                                <tr><td class="highlight">القيمة الدائمة (CLV)</td><td class="highlight">${currency}${data.clv.toFixed(2)}</td><td>الإيرادات × هامش الربح طوال فترة العميل</td></tr>
-                                <tr><td class="highlight">نسبة CLV / CAC</td><td class="highlight">${data.ratio.toFixed(2)}x</td><td>مؤشر الجدوى (يفضل أن تكون ≥ 3)</td></tr>
-                            </tbody>
-                        </table>
-
-                        <div class="rec">
-                            <h3 style="color:#b8860b;margin-top:0;">📌 التوصية الاستراتيجية</h3>
-                            <p>${data.recommendation}</p>
-                        </div>
-
-                        <div class="footer">تم الإنشاء بواسطة مجموعة فاروق للاستشارات والأعمال © ${now.getFullYear()}</div>
+                    const fullHtml = `${T('s75')}${company}${T('s76')}${dateStr}${T('s77')}${currency}${T('s78')}${currency}${data.cac.toFixed(2)}${T('s79')}${currency}${data.clv.toFixed(2)}${T('s80')}${data.ratio.toFixed(2)}${T('s81')}${data.status}${T('s82')}${chartImgBase64 ? `<img src="${chartImgBase64}" class="chart-img" />` : T('s74')}${T('s83')}${currency}${data.marketingSpend}${T('s84')}${data.newCustomers}${T('s85')}${currency}${data.cac.toFixed(2)}${T('s86')}${currency}${data.avgOrder}${T('s87')}${data.visitsPerYear}${T('s88')}${data.lifespan}${T('s89')}${data.profitMargin}${T('s90')}${currency}${data.clv.toFixed(2)}${T('s91')}${data.ratio.toFixed(2)}${T('s92')}${data.recommendation}${T('s93')}${now.getFullYear()}</div>
                     </body></html>`;
 
                     const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
@@ -513,7 +384,7 @@
                     URL.revokeObjectURL(link.href);
                 } catch (error) {
                     console.error(error);
-                    alert('خطأ في إنشاء تقرير Word');
+                    alert(T('s94'));
                 } finally {
                     hideLoading();
                 }

@@ -16,7 +16,7 @@
                         let r = eval(currentCalcInput.replace(/×/g, '*').replace(/÷/g, '/'));
                         calcDisplay.value = r;
                         currentCalcInput = r.toString();
-                    } catch (e) { calcDisplay.value = 'خطأ';
+                    } catch (e) { calcDisplay.value = T('s1');
                         currentCalcInput = ''; }
                     return;
                 }
@@ -80,7 +80,7 @@
 
             // ===== رسوم بيانية =====
             function renderCharts(currency, netRevenue, fixedCosts, totalVariableCost, netProfit, monthlyCustomers, avgBill,
-                breakevenCustomers, contributionMarginRatio) {
+                breakevenCustomers, contributionMarginRatio, LN) {
                 if (window.pieChart) { window.pieChart.destroy();
                     window.pieChart = null; }
                 if (window.lineChart) { window.lineChart.destroy();
@@ -92,7 +92,7 @@
                         window.pieChart = new Chart(pieCtx, {
                             type: 'pie',
                             data: {
-                                labels: ['تكاليف ثابتة', 'تكاليف متغيرة', 'صافي الربح'],
+                                labels: [T('s2'), T('s3'), T('s4')],
                                 datasets: [{
                                     data: [fixedCosts, totalVariableCost, netProfit > 0 ? netProfit :
                                         0
@@ -115,24 +115,15 @@
                     }
                     const lineCtx = document.getElementById('breakevenChart')?.getContext('2d');
                     if (lineCtx) {
-                        const maxX = Math.max(monthlyCustomers, breakevenCustomers) * 1.5 || 100;
-                        const xVals = [],
-                            revLine = [],
-                            costLine = [];
-                        for (let i = 0; i <= 20; i++) {
-                            let c = (i / 20) * maxX;
-                            xVals.push(c.toFixed(0));
-                            revLine.push(c * avgBill);
-                            costLine.push(fixedCosts + c * avgBill * (1 - contributionMarginRatio));
-                        }
+                        const xVals = LN.xVals, revLine = LN.revLine, costLine = LN.costLine;
                         window.lineChart = new Chart(lineCtx, {
                             type: 'line',
                             data: {
                                 labels: xVals,
                                 datasets: [
-                                    { label: 'الإيرادات', data: revLine, borderColor: '#28a745',
+                                    { label: T('s5'), data: revLine, borderColor: '#28a745',
                                         tension: 0.1 },
-                                    { label: 'التكاليف الكلية', data: costLine, borderColor: '#dc3545',
+                                    { label: T('s6'), data: costLine, borderColor: '#dc3545',
                                         tension: 0.1 }
                                 ]
                             },
@@ -147,7 +138,7 @@
                                     }
                                 },
                                 scales: {
-                                    x: { title: { display: true, text: 'عدد العملاء' } },
+                                    x: { title: { display: true, text: T('s7') } },
                                     y: { title: { display: true, text: currency } }
                                 }
                             }
@@ -157,9 +148,9 @@
             }
 
             // ===== الحساب الرئيسي =====
-            document.getElementById('calculateBtn').addEventListener('click', function() {
+            document.getElementById('calculateBtn').addEventListener('click', async function() {
                 const currency = document.getElementById('currencySelect').value;
-                const companyName = document.getElementById('companyName').value || 'الجهة المستفيدة';
+                const companyName = document.getElementById('companyName').value || T('s8');
 
                 const dailyCustomers = parseFloat(document.getElementById('dailyCustomers').value) || 0;
                 const avgBill = parseFloat(document.getElementById('avgBill').value) || 0;
@@ -193,215 +184,86 @@
                     deliveryPct, deliverySalesPct, wastePct, vatPct, initialInvestment, footTraffic, entryRate,
                     purchaseRate, tables, seatsPerTable, sessionMinutes, hoursOpen, currency, companyName };
 
-                const monthlyCustomers = dailyCustomers * workingDays;
-                const netRevenue = monthlyCustomers * avgBill;
-                const totalSalaryCost = salaries * (1 + employeeBurden);
-                const fixedCosts = rent + totalSalaryCost + utilities + internet + maintenance + marketing + otherFixed;
-
-                const foodSales = netRevenue * 0.7;
-                const drinkSales = netRevenue * 0.3;
-                const deliverySales = netRevenue * deliverySalesPct;
-                const foodCost = foodSales * foodCostPct;
-                const drinkCost = drinkSales * drinkCostPct;
-                const packagingCost = netRevenue * packagingPct;
-                const deliveryCommission = deliverySales * deliveryPct;
-                const wasteCost = (foodCost + drinkCost) * wastePct;
-                const totalVariableCost = foodCost + drinkCost + packagingCost + deliveryCommission + wasteCost;
-                const totalOperatingCost = fixedCosts + totalVariableCost;
-                const profitBeforeTax = netRevenue - totalOperatingCost;
-                const incomeTax = profitBeforeTax > 0 ? profitBeforeTax * 0.25 : 0;
-                const netProfit = profitBeforeTax - incomeTax;
-                const profitMargin = (netProfit / netRevenue) * 100;
-
-                const contributionMargin = netRevenue - totalVariableCost;
-                const contributionMarginRatio = contributionMargin / netRevenue;
-                const breakevenRevenue = fixedCosts / contributionMarginRatio;
-                const breakevenCustomers = fixedCosts / (avgBill * contributionMarginRatio);
-                const breakevenDays = breakevenCustomers / dailyCustomers;
-
-                const annualProfit = netProfit * 12;
-                const paybackYears = initialInvestment / annualProfit;
-                const paybackMonths = paybackYears * 12;
-
-                const foodCostRatio = foodCost / netRevenue;
-                const laborCostRatio = totalSalaryCost / netRevenue;
-                const rentRatio = rent / netRevenue;
-
-                const totalSeats = tables * seatsPerTable;
-                const sessionsPerDay = hoursOpen * 60 / sessionMinutes;
-                const maxDailyCustomers = totalSeats * sessionsPerDay;
-                const occupancyRate = (dailyCustomers / maxDailyCustomers) * 100;
-                const marginOfSafety = ((netRevenue - breakevenRevenue) / netRevenue) * 100;
-                const operatingLeverage = contributionMargin / profitBeforeTax;
-
-                const avgVarCostPerCustomer = totalVariableCost / monthlyCustomers;
-                const customersFromLocation = footTraffic * entryRate * purchaseRate;
-
-                currentResults = { netRevenue, fixedCosts, totalVariableCost, netProfit, profitMargin, foodCost,
-                    drinkCost, packagingCost, deliveryCommission, wasteCost, totalOperatingCost, foodCostRatio,
-                    laborCostRatio, rentRatio, totalSalaryCost, rent, utilities, internet, maintenance, marketing,
-                    otherFixed, breakevenRevenue, breakevenCustomers, breakevenDays, paybackYears, paybackMonths,
-                    annualProfit, marginOfSafety, operatingLeverage, occupancyRate, maxDailyCustomers,
-                    customersFromLocation, avgVarCostPerCustomer, totalSeats, sessionsPerDay, monthlyCustomers,
-                    contributionMarginRatio
-                };
+                let R;
+                try { R = await FG.calc('tool2', 'main', currentInputs); } catch (e) { FG.calcError(e); return; }
+                currentResults = R.currentResults;
+                const { netRevenue, fixedCosts, totalVariableCost, netProfit, profitMargin, foodCost, drinkCost, packagingCost, deliveryCommission, wasteCost, totalOperatingCost, foodCostRatio, laborCostRatio, rentRatio, totalSalaryCost, breakevenRevenue, breakevenCustomers, breakevenDays, paybackYears, paybackMonths, annualProfit, marginOfSafety, operatingLeverage, occupancyRate, maxDailyCustomers, customersFromLocation, avgVarCostPerCustomer, totalSeats, sessionsPerDay, monthlyCustomers, contributionMarginRatio } = currentResults;
 
                 document.getElementById('initialMessage').style.display = 'none';
                 document.getElementById('resultsSection').style.display = 'block';
 
-                document.getElementById('kpiCards').innerHTML = `
-                    <div class="result-card"><i class="fas fa-dollar-sign"></i><h4>الإيرادات</h4><div class="value">${currency}${netRevenue.toFixed(0)}</div></div>
-                    <div class="result-card"><i class="fas fa-file-invoice"></i><h4>ثابتة</h4><div class="value">${currency}${fixedCosts.toFixed(0)}</div></div>
-                    <div class="result-card"><i class="fas fa-boxes"></i><h4>متغيرة</h4><div class="value">${currency}${totalVariableCost.toFixed(0)}</div></div>
-                    <div class="result-card"><i class="fas fa-chart-line"></i><h4>صافي الربح</h4><div class="value">${currency}${netProfit.toFixed(0)}</div><div class="status ${netProfit>0?'status-good':netProfit<0?'status-bad':'status-warning'}">${netProfit>0?'مربح':netProfit<0?'خاسر':'محايد'}</div></div>
-                    <div class="result-card"><i class="fas fa-percent"></i><h4>هامش الربح</h4><div class="value">${profitMargin.toFixed(1)}%</div></div>
+                document.getElementById('kpiCards').innerHTML = `${T('s12')}${currency}${netRevenue.toFixed(0)}${T('s13')}${currency}${fixedCosts.toFixed(0)}${T('s14')}${currency}${totalVariableCost.toFixed(0)}${T('s15')}${currency}${netProfit.toFixed(0)}</div><div class="status ${netProfit>0?'status-good':netProfit<0?'status-bad':'status-warning'}">${netProfit>0?T('s9'):netProfit<0?T('s10'):T('s11')}${T('s16')}${profitMargin.toFixed(1)}%</div></div>
                 `;
 
-                const alerts = [];
-                if (foodCostRatio > 0.35) alerts.push('⚠️ تكلفة الطعام مرتفعة >35%');
-                if (laborCostRatio > 0.30) alerts.push('⚠️ تكلفة العمالة مرتفعة >30%');
-                if (wastePct > 0.05) alerts.push(`⚠️ الهدر مرتفع ${(wastePct*100).toFixed(1)}%`);
-                if (profitMargin < 10 && netProfit > 0) alerts.push('⚠️ هامش الربح منخفض <10%');
-                if (netProfit < 0) alerts.push('🔴 المشروع خاسر');
-                if (occupancyRate < 30) alerts.push('⚠️ الإشغال منخفض <30%');
-                if (marginOfSafety < 10 && netProfit > 0) alerts.push('⚠️ هامش الأمان ضيق <10%');
-                if (alerts.length === 0) alerts.push('✅ المؤشرات جيدة');
+                const alerts = R.alerts;
                 document.getElementById('smartAlerts').innerHTML =
-                    `<strong><i class="fas fa-exclamation-triangle" style="color:#cfa776;"></i> تحذيرات:</strong><br> ${alerts.join('<br>')}`;
+                    `${T('s25')}${alerts.join('<br>')}`;
 
-                document.getElementById('costBreakdownTable').innerHTML = `
-                    <table><thead><tr><th>البند</th><th>القيمة (${currency})</th><th>%</th></tr></thead><tbody>
-                        <tr><td>إيجار</td><td>${currency}${rent.toFixed(0)}</td><td>${(rent/netRevenue*100).toFixed(1)}%</td></tr>
-                        <tr><td>رواتب (بعد التحميل)</td><td>${currency}${totalSalaryCost.toFixed(0)}</td><td>${(totalSalaryCost/netRevenue*100).toFixed(1)}%</td></tr>
-                        <tr><td>فواتير</td><td>${currency}${utilities.toFixed(0)}</td><td>${(utilities/netRevenue*100).toFixed(1)}%</td></tr>
-                        <tr><td>إنترنت</td><td>${currency}${internet.toFixed(0)}</td><td>${(internet/netRevenue*100).toFixed(1)}%</td></tr>
-                        <tr><td>صيانة</td><td>${currency}${maintenance.toFixed(0)}</td><td>${(maintenance/netRevenue*100).toFixed(1)}%</td></tr>
-                        <tr><td>تسويق</td><td>${currency}${marketing.toFixed(0)}</td><td>${(marketing/netRevenue*100).toFixed(1)}%</td></tr>
-                        <tr><td>مصاريف أخرى</td><td>${currency}${otherFixed.toFixed(0)}</td><td>${(otherFixed/netRevenue*100).toFixed(1)}%</td></tr>
-                        <tr><td>تكلفة الطعام</td><td>${currency}${foodCost.toFixed(0)}</td><td>${(foodCost/netRevenue*100).toFixed(1)}%</td></tr>
-                        <tr><td>تكلفة المشروبات</td><td>${currency}${drinkCost.toFixed(0)}</td><td>${(drinkCost/netRevenue*100).toFixed(1)}%</td></tr>
-                        <tr><td>تغليف</td><td>${currency}${packagingCost.toFixed(0)}</td><td>${(packagingCost/netRevenue*100).toFixed(1)}%</td></tr>
-                        <tr><td>عمولة التوصيل</td><td>${currency}${deliveryCommission.toFixed(0)}</td><td>${(deliveryCommission/netRevenue*100).toFixed(1)}%</td></tr>
-                        <tr><td>الهدر</td><td>${currency}${wasteCost.toFixed(0)}</td><td>${(wasteCost/netRevenue*100).toFixed(1)}%</td></tr>
-                        <tr style="background:rgba(180,133,84,0.15);font-weight:900;"><td>الإجمالي</td><td>${currency}${totalOperatingCost.toFixed(0)}</td><td>${(totalOperatingCost/netRevenue*100).toFixed(1)}%</td></tr>
+                document.getElementById('costBreakdownTable').innerHTML = `${T('s26')}${currency}${T('s27')}${currency}${rent.toFixed(0)}</td><td>${(rent/netRevenue*100).toFixed(1)}${T('s28')}${currency}${totalSalaryCost.toFixed(0)}</td><td>${(totalSalaryCost/netRevenue*100).toFixed(1)}${T('s29')}${currency}${utilities.toFixed(0)}</td><td>${(utilities/netRevenue*100).toFixed(1)}${T('s30')}${currency}${internet.toFixed(0)}</td><td>${(internet/netRevenue*100).toFixed(1)}${T('s31')}${currency}${maintenance.toFixed(0)}</td><td>${(maintenance/netRevenue*100).toFixed(1)}${T('s32')}${currency}${marketing.toFixed(0)}</td><td>${(marketing/netRevenue*100).toFixed(1)}${T('s33')}${currency}${otherFixed.toFixed(0)}</td><td>${(otherFixed/netRevenue*100).toFixed(1)}${T('s34')}${currency}${foodCost.toFixed(0)}</td><td>${(foodCost/netRevenue*100).toFixed(1)}${T('s35')}${currency}${drinkCost.toFixed(0)}</td><td>${(drinkCost/netRevenue*100).toFixed(1)}${T('s36')}${currency}${packagingCost.toFixed(0)}</td><td>${(packagingCost/netRevenue*100).toFixed(1)}${T('s37')}${currency}${deliveryCommission.toFixed(0)}</td><td>${(deliveryCommission/netRevenue*100).toFixed(1)}${T('s38')}${currency}${wasteCost.toFixed(0)}</td><td>${(wasteCost/netRevenue*100).toFixed(1)}${T('s39')}${currency}${totalOperatingCost.toFixed(0)}</td><td>${(totalOperatingCost/netRevenue*100).toFixed(1)}%</td></tr>
                     </tbody></table>
                 `;
 
                 document.getElementById('paybackCard').innerHTML =
-                    `<span><i class="fas fa-clock"></i> استرداد: <strong>${paybackYears.toFixed(1)} سنة</strong> (≈ ${paybackMonths.toFixed(0)} شهر)</span>`;
+                    `${T('s40')}${paybackYears.toFixed(1)}${T('s41')}${paybackMonths.toFixed(0)}${T('s42')}`;
 
-                const scenarios = [{ name: 'متفائل', mult: 1.4 }, { name: 'واقعي', mult: 1.0 }, { name: 'متشائم',
-                    mult: 0.6 }];
-                let sensRows = '';
-                scenarios.forEach(s => {
-                    const cust = dailyCustomers * s.mult;
-                    const rev = cust * workingDays * avgBill;
-                    const food = rev * 0.7 * foodCostPct;
-                    const drink = rev * 0.3 * drinkCostPct;
-                    const pack = rev * packagingPct;
-                    const deliv = rev * deliverySalesPct * deliveryPct;
-                    const waste = (food + drink) * wastePct;
-                    const varCost = food + drink + pack + deliv + waste;
-                    const pbt = rev - fixedCosts - varCost;
-                    const tax = pbt > 0 ? pbt * 0.25 : 0;
-                    const profit = pbt - tax;
-                    sensRows +=
-                        `<tr><td>${s.name}</td><td>${cust.toFixed(0)}</td><td>${currency}${rev.toFixed(0)}</td><td class="${profit>=0?'positive':'negative'}">${currency}${profit.toFixed(0)}</td><td>${(profit/rev*100).toFixed(1)}%</td></tr>`;
-                });
+                let sensRows = R.sensRows;
                 document.getElementById('sensitivityTable').innerHTML =
-                    `<table><thead><tr><th>السيناريو</th><th>العملاء</th><th>الإيرادات</th><th>صافي الربح</th><th>هامش الربح</th></tr></thead><tbody>${sensRows}</tbody></table>`;
+                    `${T('s46')}${sensRows}</tbody></table>`;
 
-                let healthScore = 0;
-                healthScore += foodCostRatio <= 0.3 ? 25 : (foodCostRatio <= 0.35 ? 20 : 10);
-                healthScore += laborCostRatio <= 0.25 ? 25 : (laborCostRatio <= 0.3 ? 20 : 10);
-                healthScore += rentRatio <= 0.08 ? 25 : (rentRatio <= 0.12 ? 20 : 10);
-                healthScore += profitMargin >= 15 ? 25 : (profitMargin >= 10 ? 20 : 10);
-                let healthStatus = '',
-                    healthColor = '';
-                if (healthScore >= 80) { healthStatus = 'ممتاز 🟢';
-                    healthColor = 'status-good'; } else if (healthScore >= 60) { healthStatus = 'جيد 🟡';
-                    healthColor = 'status-warning'; } else { healthStatus = 'ضعيف 🔴';
-                    healthColor = 'status-bad'; }
-                document.getElementById('healthScoreCard').innerHTML = `
-                    <table style="width:100%"><thead><tr><th>المؤشر</th><th>القيمة</th><th>التقييم</th></tr></thead><tbody>
-                        <tr><td>Food Cost</td><td>${(foodCostRatio*100).toFixed(1)}%</td><td>${foodCostRatio<=0.3?'✅ جيد':(foodCostRatio<=0.35?'⚠️ متوسط':'❌ مرتفع')}</td></tr>
-                        <tr><td>Labor Cost</td><td>${(laborCostRatio*100).toFixed(1)}%</td><td>${laborCostRatio<=0.25?'✅ جيد':(laborCostRatio<=0.3?'⚠️ متوسط':'❌ مرتفع')}</td></tr>
-                        <tr><td>Rent Ratio</td><td>${(rentRatio*100).toFixed(1)}%</td><td>${rentRatio<=0.08?'✅ جيد':(rentRatio<=0.12?'⚠️ متوسط':'❌ مرتفع')}</td></tr>
-                        <tr><td>Net Profit</td><td>${profitMargin.toFixed(1)}%</td><td>${profitMargin>=15?'✅ جيد':(profitMargin>=10?'⚠️ متوسط':'❌ ضعيف')}</td></tr>
-                        <tr style="background:rgba(180,133,84,0.12);"><td colspan="2">الدرجة</td><td><span class="status ${healthColor}">${healthScore}/100 (${healthStatus})</span></td></tr>
+                const { healthScore, healthStatus, healthColor } = R;
+                document.getElementById('healthScoreCard').innerHTML = `${T('s54')}${(foodCostRatio*100).toFixed(1)}%</td><td>${R.grades.food}</td></tr>
+                        <tr><td>Labor Cost</td><td>${(laborCostRatio*100).toFixed(1)}%</td><td>${R.grades.labor}</td></tr>
+                        <tr><td>Rent Ratio</td><td>${(rentRatio*100).toFixed(1)}%</td><td>${R.grades.rent}</td></tr>
+                        <tr><td>Net Profit</td><td>${profitMargin.toFixed(1)}%</td><td>${R.grades.profit}${T('s55')}${healthColor}">${healthScore}/100 (${healthStatus})</span></td></tr>
                     </tbody></table>
                 `;
 
-                document.getElementById('shutdownCard').innerHTML = avgBill < avgVarCostPerCustomer ?
-                    `⚠️ خطر إغلاق مؤقت` :
-                    `✅ لا خطر إغلاق فوري`;
+                document.getElementById('shutdownCard').innerHTML = R.grades.shutdown ?
+                    `${T('s56')}` :
+                    `${T('s57')}`;
                 document.getElementById('operatingLeverageCard').innerHTML =
-                    `الرافعة: ${!isNaN(operatingLeverage)&&isFinite(operatingLeverage)?operatingLeverage.toFixed(2):'غير محددة'}`;
+                    `${T('s59')}${!isNaN(operatingLeverage)&&isFinite(operatingLeverage)?operatingLeverage.toFixed(2):T('s58')}`;
                 document.getElementById('marginOfSafetyCard').innerHTML =
-                    `هامش الأمان: ${marginOfSafety.toFixed(1)}%`;
+                    `${T('s60')}${marginOfSafety.toFixed(1)}%`;
                 document.getElementById('capacityCard').innerHTML =
-                    `الطاقة القصوى: ${maxDailyCustomers.toFixed(0)} عميل/يوم<br>الإشغال: ${occupancyRate.toFixed(1)}%`;
+                    `${T('s61')}${maxDailyCustomers.toFixed(0)}${T('s62')}${occupancyRate.toFixed(1)}%`;
                 document.getElementById('efficiencyCard').innerHTML =
-                    `لكل كرسي: ${currency}${(netRevenue/totalSeats).toFixed(0)}<br>لكل موظف: ${currency}${(netRevenue/Math.max(1,Math.ceil(salaries/3000))).toFixed(0)}`;
+                    `${T('s63')}${currency}${R.revPerSeat.toFixed(0)}${T('s64')}${currency}${R.revPerEmployee.toFixed(0)}`;
 
-                document.getElementById('monteCarloResults').innerHTML = `اضغط "تشغيل" للمحاكاة.`;
+                document.getElementById('monteCarloResults').innerHTML = `${T('s65')}`;
                 document.getElementById('breakevenSummary').innerHTML =
-                    `<span>🎯 التعادل: ${currency}${breakevenRevenue.toFixed(0)}</span><span style="margin-right:1rem;">👥 ${breakevenCustomers.toFixed(0)} عميل</span>`;
+                    `${T('s66')}${currency}${breakevenRevenue.toFixed(0)}</span><span style="margin-right:1rem;">👥 ${breakevenCustomers.toFixed(0)}${T('s67')}`;
 
                 renderCharts(currency, netRevenue, fixedCosts, totalVariableCost, netProfit, monthlyCustomers, avgBill,
-                    breakevenCustomers, contributionMarginRatio);
+                    breakevenCustomers, contributionMarginRatio, R.line);
             });
 
             // ===== قيمة المطعم =====
-            document.getElementById('calcValuationBtn').addEventListener('click', function() {
-                if (!currentResults) { alert('الرجاء الحساب أولاً'); return; }
+            document.getElementById('calcValuationBtn').addEventListener('click', async function() {
+                if (!currentResults) { alert(T('s68')); return; }
                 const currency = currentInputs.currency;
                 const multiple = parseFloat(document.getElementById('valuationMultiple').value) || 3;
-                const valuation = currentResults.annualProfit * multiple;
+                let valuation;
+                try { valuation = (await FG.calc('tool2', 'valuation', { annualProfit: currentResults.annualProfit, multiple })).valuation; } catch (e) { FG.calcError(e); return; }
                 document.getElementById('valuationCard').innerHTML =
-                    `<span>القيمة: <strong>${currency}${valuation.toFixed(0)}</strong> (مضاعف ${multiple})</span>`;
+                    `${T('s69')}${currency}${valuation.toFixed(0)}${T('s70')}${multiple})</span>`;
             });
 
             // ===== مونت كارلو =====
-            document.getElementById('runMonteCarloBtn').addEventListener('click', function() {
-                if (!currentInputs) { alert('الرجاء الحساب أولاً'); return; }
+            document.getElementById('runMonteCarloBtn').addEventListener('click', async function() {
+                if (!currentInputs) { alert(T('s68')); return; }
                 const i = currentInputs;
-                const fixedCosts = i.rent + i.salaries * (1 + i.employeeBurden) + i.utilities + i.internet + i
-                .maintenance + i.marketing + i.otherFixed;
-                const profits = [];
-                for (let s = 0; s < 1000; s++) {
-                    const custF = 0.7 + Math.random() * 0.6;
-                    const billF = 0.85 + Math.random() * 0.3;
-                    const cust = i.dailyCustomers * custF;
-                    const bill = i.avgBill * billF;
-                    const rev = cust * i.workingDays * bill;
-                    const food = rev * 0.7 * i.foodCostPct * (0.9 + Math.random() * 0.2);
-                    const drink = rev * 0.3 * i.drinkCostPct * (0.9 + Math.random() * 0.2);
-                    const pack = rev * i.packagingPct;
-                    const deliv = rev * i.deliverySalesPct * i.deliveryPct;
-                    const waste = (food + drink) * i.wastePct;
-                    const varCost = food + drink + pack + deliv + waste;
-                    const pbt = rev - fixedCosts - varCost;
-                    const tax = pbt > 0 ? pbt * 0.25 : 0;
-                    profits.push(pbt - tax);
-                }
-                profits.sort((a, b) => a - b);
-                const mean = profits.reduce((a, b) => a + b, 0) / 1000;
-                const p5 = profits[50],
-                    p95 = profits[950];
-                const probProfit = (profits.filter(p => p > 0).length / 10).toFixed(1);
-                document.getElementById('monteCarloResults').innerHTML = `
-                    <table style="width:100%;"><tr><td>المتوسط</td><td>${i.currency}${mean.toFixed(0)}</td></tr>
-                    <tr><td>أسوأ 5%</td><td>${i.currency}${p5.toFixed(0)}</td></tr>
-                    <tr><td>أفضل 5%</td><td>${i.currency}${p95.toFixed(0)}</td></tr>
-                    <tr><td>احتمال الربح</td><td>${probProfit}%</td></tr></table>
+                let MC;
+                try { MC = await FG.calc('tool2', 'montecarlo', i); } catch (e) { FG.calcError(e); return; }
+                const { mean, p5, p95, probProfit } = MC;
+                document.getElementById('monteCarloResults').innerHTML = `${T('s71')}${i.currency}${mean.toFixed(0)}${T('s72')}${i.currency}${p5.toFixed(0)}${T('s73')}${i.currency}${p95.toFixed(0)}${T('s74')}${probProfit}%</td></tr></table>
                 `;
             });
 
             // ===== تصدير Excel =====
             async function exportToFullExcel() {
-                if (!currentResults || !currentInputs) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-                showLoading('جاري إنشاء Excel...', '');
+                if (!currentResults || !currentInputs) { alert(T('s75')); return; }
+                showLoading(T('s76'), '');
                 try {
                     const R = currentResults,
                         I = currentInputs;
@@ -420,29 +282,29 @@
                         c.font = { name: 'Arial', bold: true, size: fs, color: { argb: tc2 } };
                         c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
                         c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true,
-                        readingOrder: 'rtl' };
+                        readingOrder: FG.dir() };
                         c.border = { top: { style: 'medium', color: { argb: G } }, bottom: { style: 'medium',
                                 color: { argb: G } }, left: { style: 'medium', color: { argb: G } },
                             right: { style: 'medium', color: { argb: G } } };
                     }
 
-                    const cv = workbook.addWorksheet('غلاف التقرير', { views: [{ rightToLeft: true }] });
+                    const cv = workbook.addWorksheet(T('s77'), { views: [{ rightToLeft: FG.isRTL() }] });
                     [8, 45, 35, 8].forEach((w, i) => cv.getColumn(i + 1).width = w);
                     cv.getRow(2).height = 70;
                     cv.getRow(4).height = 50;
                     cv.mergeCells(2, 1, 2, 4);
                     const bc = cv.getCell(2, 1);
-                    bc.value = 'FAROUK GRUP\nتقرير تحليل المطعم';
+                    bc.value = T('s78');
                     bc.font = { name: 'Arial', bold: true, size: 24, color: { argb: GL } };
                     bc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: DB } };
-                    bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: 'rtl' };
-                    mh(cv, 1, 4, 4, `تقرير تحليل تكاليف المطعم\n${companyName}`, DB, GL, 16);
+                    bc.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true, readingOrder: FG.dir() };
+                    mh(cv, 1, 4, 4, `${T('s79')}${companyName}`, DB, GL, 16);
                     const inf = [
-                        ['الجهة', companyName],
-                        ['التاريخ', new Date().toLocaleDateString('ar-EG')],
-                        ['العملة', currency],
-                        ['صافي الربح', `${currency} ${R.netProfit.toFixed(0)}`],
-                        ['هامش الربح', `${R.profitMargin.toFixed(1)}%`]
+                        [T('s80'), companyName],
+                        [T('s81'), new Date().toLocaleDateString(FG.locale())],
+                        [T('s82'), currency],
+                        [T('s4'), `${currency} ${R.netProfit.toFixed(0)}`],
+                        [T('s83'), `${R.profitMargin.toFixed(1)}%`]
                     ];
                     let ir = 6;
                     inf.forEach(([l, v], idx) => {
@@ -455,88 +317,88 @@
                         const bg = idx % 2 === 0 ? 'FFF5F0E8' : 'FFFEFCF6';
                         lc.font = { name: 'Arial', bold: true, size: 10, color: { argb: '00695C' } };
                         lc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
-                        lc.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
+                        lc.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: FG.dir() };
                         vc.font = { name: 'Arial', size: 10, color: { argb: 'FF1A1A1A' } };
                         vc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
-                        vc.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+                        vc.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() };
                         cv.getRow(ir).height = 26;
                         ir++;
                     });
 
-                    const ish = workbook.addWorksheet('المدخلات', { views: [{ rightToLeft: true }] });
+                    const ish = workbook.addWorksheet(T('s84'), { views: [{ rightToLeft: FG.isRTL() }] });
                     ish.getColumn(1).width = 35;
                     ish.getColumn(2).width = 20;
-                    mh(ish, 1, 2, 1, 'المدخلات الأساسية', DB, GL, 13);
+                    mh(ish, 1, 2, 1, T('s85'), DB, GL, 13);
                     const infields = [
-                        ['عدد العملاء اليومي', I.dailyCustomers],
-                        ['متوسط الفاتورة', I.avgBill],
-                        ['أيام العمل', I.workingDays],
-                        ['الإيجار', I.rent],
-                        ['الرواتب (صافي)', I.salaries],
-                        ['معامل تكلفة الموظف', (I.employeeBurden * 100) + '%'],
-                        ['فواتير', I.utilities],
-                        ['إنترنت', I.internet],
-                        ['صيانة', I.maintenance],
-                        ['تسويق', I.marketing],
-                        ['مصاريف أخرى', I.otherFixed],
-                        ['تكلفة الطعام', (I.foodCostPct * 100) + '%'],
-                        ['تكلفة المشروبات', (I.drinkCostPct * 100) + '%'],
-                        ['تغليف', (I.packagingPct * 100) + '%'],
-                        ['عمولة التوصيل', (I.deliveryPct * 100) + '%'],
-                        ['نسبة مبيعات التوصيل', (I.deliverySalesPct * 100) + '%'],
-                        ['نسبة الهدر', (I.wastePct * 100) + '%'],
-                        ['ضريبة القيمة المضافة', (I.vatPct * 100) + '%'],
-                        ['الاستثمار الأولي', I.initialInvestment]
+                        [T('s86'), I.dailyCustomers],
+                        [T('s87'), I.avgBill],
+                        [T('s88'), I.workingDays],
+                        [T('s89'), I.rent],
+                        [T('s90'), I.salaries],
+                        [T('s91'), (I.employeeBurden * 100) + '%'],
+                        [T('s92'), I.utilities],
+                        [T('s93'), I.internet],
+                        [T('s94'), I.maintenance],
+                        [T('s95'), I.marketing],
+                        [T('s96'), I.otherFixed],
+                        [T('s97'), (I.foodCostPct * 100) + '%'],
+                        [T('s98'), (I.drinkCostPct * 100) + '%'],
+                        [T('s99'), (I.packagingPct * 100) + '%'],
+                        [T('s100'), (I.deliveryPct * 100) + '%'],
+                        [T('s101'), (I.deliverySalesPct * 100) + '%'],
+                        [T('s102'), (I.wastePct * 100) + '%'],
+                        [T('s103'), (I.vatPct * 100) + '%'],
+                        [T('s104'), I.initialInvestment]
                     ];
                     infields.forEach(([l, v]) => ish.addRow([l, v]));
                     ish.getRow(2).font = { bold: true, color: { argb: 'FFFFFF' } };
                     ish.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
 
-                    const ksh = workbook.addWorksheet('مؤشرات الأداء', { views: [{ rightToLeft: true }] });
+                    const ksh = workbook.addWorksheet(T('s105'), { views: [{ rightToLeft: FG.isRTL() }] });
                     ksh.getColumn(1).width = 30;
                     ksh.getColumn(2).width = 20;
-                    mh(ksh, 1, 2, 1, 'مؤشرات الأداء', DB, GL, 13);
+                    mh(ksh, 1, 2, 1, T('s106'), DB, GL, 13);
                     const kpis = [
-                        ['الإيرادات الشهرية', `${currency} ${R.netRevenue.toFixed(0)}`],
-                        ['التكاليف الثابتة', `${currency} ${R.fixedCosts.toFixed(0)}`],
-                        ['التكاليف المتغيرة', `${currency} ${R.totalVariableCost.toFixed(0)}`],
-                        ['صافي الربح', `${currency} ${R.netProfit.toFixed(0)}`],
-                        ['هامش الربح', `${R.profitMargin.toFixed(1)}%`],
-                        ['نقطة التعادل (إيرادات)', `${currency} ${R.breakevenRevenue.toFixed(0)}`],
-                        ['فترة الاسترداد', `${R.paybackYears.toFixed(1)} سنة`],
-                        ['هامش الأمان', `${R.marginOfSafety.toFixed(1)}%`]
+                        [T('s107'), `${currency} ${R.netRevenue.toFixed(0)}`],
+                        [T('s108'), `${currency} ${R.fixedCosts.toFixed(0)}`],
+                        [T('s109'), `${currency} ${R.totalVariableCost.toFixed(0)}`],
+                        [T('s4'), `${currency} ${R.netProfit.toFixed(0)}`],
+                        [T('s83'), `${R.profitMargin.toFixed(1)}%`],
+                        [T('s110'), `${currency} ${R.breakevenRevenue.toFixed(0)}`],
+                        [T('s111'), `${R.paybackYears.toFixed(1)}${T('s112')}`],
+                        [T('s113'), `${R.marginOfSafety.toFixed(1)}%`]
                     ];
                     kpis.forEach(k => ksh.addRow(k));
                     ksh.getRow(2).font = { bold: true, color: { argb: 'FFFFFF' } };
                     ksh.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
 
-                    const csh = workbook.addWorksheet('تفصيل التكاليف', { views: [{ rightToLeft: true }] });
+                    const csh = workbook.addWorksheet(T('s114'), { views: [{ rightToLeft: FG.isRTL() }] });
                     csh.getColumn(1).width = 30;
                     csh.getColumn(2).width = 20;
                     csh.getColumn(3).width = 20;
-                    mh(csh, 1, 3, 1, 'تفصيل التكاليف', DB, GL, 13);
+                    mh(csh, 1, 3, 1, T('s114'), DB, GL, 13);
                     const costs = [
-                        ['إيجار', R.rent, (R.rent / R.netRevenue * 100).toFixed(1) + '%'],
-                        ['رواتب', R.totalSalaryCost, (R.totalSalaryCost / R.netRevenue * 100).toFixed(1) + '%'],
-                        ['فواتير', I.utilities, (I.utilities / R.netRevenue * 100).toFixed(1) + '%'],
-                        ['إنترنت', I.internet, (I.internet / R.netRevenue * 100).toFixed(1) + '%'],
-                        ['صيانة', I.maintenance, (I.maintenance / R.netRevenue * 100).toFixed(1) + '%'],
-                        ['تسويق', I.marketing, (I.marketing / R.netRevenue * 100).toFixed(1) + '%'],
-                        ['أخرى', I.otherFixed, (I.otherFixed / R.netRevenue * 100).toFixed(1) + '%'],
-                        ['طعام', R.foodCost, (R.foodCost / R.netRevenue * 100).toFixed(1) + '%'],
-                        ['مشروبات', R.drinkCost, (R.drinkCost / R.netRevenue * 100).toFixed(1) + '%'],
-                        ['تغليف', R.packagingCost, (R.packagingCost / R.netRevenue * 100).toFixed(1) + '%'],
-                        ['توصيل', R.deliveryCommission, (R.deliveryCommission / R.netRevenue * 100).toFixed(1) +
+                        [T('s115'), R.rent, (R.rent / R.netRevenue * 100).toFixed(1) + '%'],
+                        [T('s116'), R.totalSalaryCost, (R.totalSalaryCost / R.netRevenue * 100).toFixed(1) + '%'],
+                        [T('s92'), I.utilities, (I.utilities / R.netRevenue * 100).toFixed(1) + '%'],
+                        [T('s93'), I.internet, (I.internet / R.netRevenue * 100).toFixed(1) + '%'],
+                        [T('s94'), I.maintenance, (I.maintenance / R.netRevenue * 100).toFixed(1) + '%'],
+                        [T('s95'), I.marketing, (I.marketing / R.netRevenue * 100).toFixed(1) + '%'],
+                        [T('s117'), I.otherFixed, (I.otherFixed / R.netRevenue * 100).toFixed(1) + '%'],
+                        [T('s118'), R.foodCost, (R.foodCost / R.netRevenue * 100).toFixed(1) + '%'],
+                        [T('s119'), R.drinkCost, (R.drinkCost / R.netRevenue * 100).toFixed(1) + '%'],
+                        [T('s99'), R.packagingCost, (R.packagingCost / R.netRevenue * 100).toFixed(1) + '%'],
+                        [T('s120'), R.deliveryCommission, (R.deliveryCommission / R.netRevenue * 100).toFixed(1) +
                             '%'
                         ],
-                        ['هدر', R.wasteCost, (R.wasteCost / R.netRevenue * 100).toFixed(1) + '%']
+                        [T('s121'), R.wasteCost, (R.wasteCost / R.netRevenue * 100).toFixed(1) + '%']
                     ];
                     costs.forEach(c => csh.addRow(c));
                     csh.getRow(2).font = { bold: true, color: { argb: 'FFFFFF' } };
                     csh.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
 
-                    const chsh = workbook.addWorksheet('الرسوم', { views: [{ rightToLeft: true }] });
-                    mh(chsh, 1, 3, 1, 'الرسوم البيانية', DB, GL, 13);
+                    const chsh = workbook.addWorksheet(T('s122'), { views: [{ rightToLeft: FG.isRTL() }] });
+                    mh(chsh, 1, 3, 1, T('s123'), DB, GL, 13);
                     const pieCanvas = document.getElementById('costPieChart');
                     const lineCanvas = document.getElementById('breakevenChart');
                     if (pieCanvas) {
@@ -552,14 +414,14 @@
 
                     const buffer = await workbook.xlsx.writeBuffer();
                     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                    saveAs(blob, `تقرير_مطعم_${companyName}_${new Date().toISOString().slice(0,10)}.xlsx`);
-                } catch (err) { alert('خطأ Excel: ' + err.message); } finally { hideLoading(); }
+                    saveAs(blob, `${T('s124')}${companyName}_${new Date().toISOString().slice(0,10)}.xlsx`);
+                } catch (err) { alert(T('s125') + err.message); } finally { hideLoading(); }
             }
 
             // ===== تصدير Word =====
             async function exportToWord() {
-                if (!currentResults || !currentInputs) { alert('الرجاء إجراء التحليل أولاً.'); return; }
-                showLoading('جاري إنشاء Word...', '');
+                if (!currentResults || !currentInputs) { alert(T('s75')); return; }
+                showLoading(T('s126'), '');
                 try {
                     const R = currentResults,
                         I = currentInputs;
@@ -574,14 +436,10 @@
                     if (lineCanvas) { const c = await html2canvas(lineCanvas, { scale: 2, backgroundColor: '#ffffff' });
                         lineImg = c.toDataURL('image/png'); }
 
-                    const kpiRows = `
-                        <tr><td style="border:1px solid #b8860b;padding:8px;background:#fefcf6;"><h4>الإيرادات</h4><div style="font-size:1.2rem;color:#b8860b;">${currency}${R.netRevenue.toFixed(0)}</div></td>
-                        <td style="border:1px solid #b8860b;padding:8px;background:#fefcf6;"><h4>ثابتة</h4><div style="font-size:1.2rem;color:#b8860b;">${currency}${R.fixedCosts.toFixed(0)}</div></td></tr>
-                        <tr><td style="border:1px solid #b8860b;padding:8px;background:#fefcf6;"><h4>متغيرة</h4><div style="font-size:1.2rem;color:#b8860b;">${currency}${R.totalVariableCost.toFixed(0)}</div></td>
-                        <td style="border:1px solid #b8860b;padding:8px;background:#fefcf6;"><h4>صافي الربح</h4><div style="font-size:1.2rem;color:#b8860b;">${currency}${R.netProfit.toFixed(0)}</div></td></tr>
+                    const kpiRows = `${T('s127')}${currency}${R.netRevenue.toFixed(0)}${T('s128')}${currency}${R.fixedCosts.toFixed(0)}${T('s129')}${currency}${R.totalVariableCost.toFixed(0)}${T('s130')}${currency}${R.netProfit.toFixed(0)}</div></td></tr>
                     `;
                     let costRows = '';
-                    ['إيجار', 'رواتب', 'فواتير', 'إنترنت', 'صيانة', 'تسويق', 'أخرى', 'طعام', 'مشروبات', 'تغليف', 'توصيل', 'هدر']
+                    [T('s115'), T('s116'), T('s92'), T('s93'), T('s94'), T('s95'), T('s117'), T('s118'), T('s119'), T('s99'), T('s120'), T('s121')]
                     .forEach((n, i) => {
                         const vals = [R.rent, R.totalSalaryCost, I.utilities, I.internet, I.maintenance, I
                             .marketing, I.otherFixed, R.foodCost, R.drinkCost, R.packagingCost, R
@@ -591,35 +449,20 @@
                             `<tr><td>${n}</td><td>${currency}${vals[i].toFixed(0)}</td><td>${(vals[i]/R.netRevenue*100).toFixed(1)}%</td></tr>`;
                     });
 
-                    const fullHtml = `<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><style>
-                        body{font-family:'Tajawal',sans-serif;margin:2rem;background:#fff;color:#333;}
-                        .cover{text-align:center;border-bottom:4px solid #b8860b;margin-bottom:30px;padding-bottom:20px;}
-                        .cover h1{color:#b8860b;font-size:28px;}.cover h2{color:#b48554;font-size:20px;}
-                        table{width:100%;border-collapse:collapse;margin:16px 0;} th,td{border:1px solid #b8860b;padding:6px;text-align:center;}
-                        th{background:#fefcf6;color:#b8860b;} .chart-img{max-width:100%;border:1px solid #b8860b;margin:8px;}
-                        .footer{text-align:center;margin-top:30px;color:#888;border-top:1px dashed #b8860b;padding-top:10px;}
-                    </style></head><body>
-                    <div class="cover"><h1>FAROUK GRUP</h1><h2>تقرير تحليل تكاليف المطعم</h2>
-                    <p>الجهة: ${companyName} | ${new Date().toLocaleDateString('ar-EG')}</p></div>
-                    <h2>مؤشرات الأداء</h2><table>${kpiRows}</table>
+                    const fullHtml = `${T('s133')}${companyName} | ${new Date().toLocaleDateString(FG.locale())}${T('s134')}${kpiRows}</table>
                     <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;">
-                        ${pieImg ? `<div style="flex:1;min-width:260px;"><h3>توزيع التكاليف</h3><img src="${pieImg}" class="chart-img"/></div>` : ''}
-                        ${lineImg ? `<div style="flex:1;min-width:260px;"><h3>نقطة التعادل</h3><img src="${lineImg}" class="chart-img"/></div>` : ''}
-                    </div>
-                    <h2>تفصيل التكاليف</h2><table><thead><tr><th>البند</th><th>القيمة</th><th>%</th></tr></thead><tbody>${costRows}</tbody></table>
-                    <h2>نقطة التعادل</h2><p>إيرادات التعادل: ${currency}${R.breakevenRevenue.toFixed(0)} (${R.breakevenCustomers.toFixed(0)} عميل)</p>
-                    <h2>فترة الاسترداد</h2><p>${R.paybackYears.toFixed(1)} سنة (${R.paybackMonths.toFixed(0)} شهر)</p>
-                    <h2>مؤشر صحة المطعم</h2><p>هامش الأمان: ${R.marginOfSafety.toFixed(1)}% | الإشغال: ${R.occupancyRate.toFixed(1)}%</p>
+                        ${pieImg ? `${T('s131')}${pieImg}" class="chart-img"/></div>` : ''}
+                        ${lineImg ? `${T('s132')}${lineImg}" class="chart-img"/></div>` : ''}${T('s135')}${costRows}${T('s136')}${currency}${R.breakevenRevenue.toFixed(0)} (${R.breakevenCustomers.toFixed(0)}${T('s137')}${R.paybackYears.toFixed(1)}${T('s138')}${R.paybackMonths.toFixed(0)}${T('s139')}${R.marginOfSafety.toFixed(1)}${T('s140')}${R.occupancyRate.toFixed(1)}%</p>
                     <div class="footer">© ${new Date().getFullYear()} FAROUK GRUP</div>
                     </body></html>`;
 
                     const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
-                    link.download = `تقرير_مطعم_${companyName}_${new Date().toISOString().slice(0,10)}.doc`;
+                    link.download = `${T('s124')}${companyName}_${new Date().toISOString().slice(0,10)}.doc`;
                     link.click();
                     URL.revokeObjectURL(link.href);
-                } catch (err) { alert('خطأ Word: ' + err.message); } finally { hideLoading(); }
+                } catch (err) { alert(T('s141') + err.message); } finally { hideLoading(); }
             }
 
             document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
