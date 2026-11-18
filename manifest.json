@@ -1,23 +1,23 @@
 {
+  "id": "/",
   "name": "المنصة الشاملة - The Comprehensive Platform",
-  "short_name": "FG Platform",
-  "description": "المنصة الشاملة للإدارة والاستشارات من مجموعة فاروق",
-  "start_url": "index.html",
+  "short_name": "المنصة الشاملة",
+  "description": "المنصة الشاملة للأدوات المالية والإدارية - FAROUK GRUP",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#0b0e17",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#000000",
   "theme_color": "#000000",
+  "categories": ["business", "finance", "productivity"],
   "icons": [
-    {
-      "src": "icon.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
   ]
 }

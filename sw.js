@@ -1,5 +1,5 @@
 // 1. تغيير رقم الإصدار هنا في كل مرة تعدل فيها الموقع (v1, v2, v3...)
-const CACHE_NAME = 'fg-store-v10-supabase'; 
+const CACHE_NAME = 'fg-store-v12-v72'; 
 
 const ASSETS = [
   './',
@@ -17,6 +17,19 @@ const ASSETS = [
   './js/app.js',
   './manifest.json',
   './icon.png',
+  // V7.2: الأيقونات الجديدة (خلفية سوداء + شعار ذهبي) + الحاوية الجانبية + دليل الاستخدام بصيغة JSON
+  './favicon.ico',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/icon-maskable-192.png',
+  './icons/icon-maskable-512.png',
+  './icons/apple-touch-icon.png',
+  './icons/favicon-32.png',
+  './css/fg-dock.css',
+  './js/fg-dock.js',
+  './data/guide-ar.json',
+  './data/guide-en.json',
+  './data/guide-tr.json',
   './tools/tool1.html',
   './js/tools/tool1.js',
   './tools/tool2.html',
@@ -121,6 +134,8 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   // طلبات Supabase (الحسابات/الدخول/الترجمات) لا تُخزَّن أبداً في الكاش
   if (e.request.method !== 'GET' || e.request.url.includes('.supabase.co')) return;
+  // صفحة الإدارة وطلبات المواقع الأخرى (بوابة الدفع) لا تمر عبر الكاش
+  if (e.request.url.includes('admin.html') || new URL(e.request.url).origin !== self.location.origin) return;
   e.respondWith(
     fetch(e.request).catch(() => {
       return caches.match(e.request);

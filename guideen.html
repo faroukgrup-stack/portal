@@ -1,7 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" data-guide-lang="en">
 <head>
     <meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png"/>
+<link rel="shortcut icon" href="favicon.ico"/>
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#000000"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="apple-mobile-web-app-title" content="المنصة الشاملة"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>User Guide – Comprehensive Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
@@ -18,11 +28,12 @@
             <h1><i class="fas fa-book-open"></i> Comprehensive User Guide</h1>
             <p>Search for any tool or browse the list below</p>
         </header>
+        <div class="guide-intro"><i class="fas fa-circle-info"></i> <span>Each tool is explained in order: what it is and when to use it, what the abbreviations mean, step-by-step field entry, the formulas, and how to read the results. Inside any tool: hover over a field to see what it means, use the side calculator to insert a result straight into a field, and click the robot to ask the smart assistant how to fill in the tool.</span></div>
 
         <!-- Search -->
         <div class="search-wrapper">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Search tool name ..." autofocus>
+            <input type="text" id="searchInput" placeholder="Search by tool name or a term such as WACC or break-even ..." autofocus>
         </div>
 
         <!-- No results message -->
@@ -31,12 +42,13 @@
         </div>
 
         <!-- Tools list -->
+        <div class="guide-actions"><button type="button" id="expandAll" class="ga-btn"></button><button type="button" id="collapseAll" class="ga-btn"></button></div>
         <div class="tools-grid" id="toolsContainer"></div>
 
         <!-- Footer -->
         <footer>© 2026 <span>FAROUK GRUP</span> · All rights reserved</footer>
     </div>
 
-    <script src="js/pages/guideen.js" defer></script>
+    <script src="js/pages/guide-render.js" defer></script>
 </body>
 </html>

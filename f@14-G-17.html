@@ -1,7 +1,18 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" id="htmlTag">
 <head>
+    <script>try{if(window.top!==window.self&&window.top.location.origin===location.origin)window.top.location.replace(location.href);}catch(e){}</script>
     <meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png"/>
+<link rel="shortcut icon" href="favicon.ico"/>
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#000000"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="apple-mobile-web-app-title" content="المنصة الشاملة"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="metaTitle">التسجيل أو تجديد الاشتراك | المنصة الشاملة - FAROUK GRUP</title>
     <meta name="description" content="اشتراك جديد أو تجديد اشتراكك في المنصة الشاملة من مجموعة فاروق.">
@@ -512,9 +523,9 @@
                     </div>
                 </div>
                 <div class="field-group">
-                    <label id="labelRenewPass">كلمة المرور</label>
+                    <label id="labelRenewPass">كلمة المرور الحالية لحسابك</label>
                     <div class="password-group">
-                        <input type="password" id="renewPassword" placeholder="كلمة المرور" required>
+                        <input type="password" id="renewPassword" placeholder="كلمة المرور التي تدخل بها إلى المنصة" required>
                         <button type="button" class="toggle-pass-modal" id="toggleRenewPass">
                             <i class="fas fa-eye" id="renewEyeIcon"></i>
                         </button>
@@ -580,8 +591,8 @@
                 labelRenewEmail: 'البريد الإلكتروني',
                 placeholderRenewEmail: 'بريدك المسجل',
                 hintRenewDomains: 'نطاقات مسموحة: gmail.com, yahoo.com, outlook.com ...',
-                labelRenewPass: 'كلمة المرور',
-                placeholderRenewPass: 'كلمة المرور',
+                labelRenewPass: 'كلمة المرور الحالية لحسابك',
+                placeholderRenewPass: 'كلمة المرور التي تدخل بها إلى المنصة',
                 btnRenewSubmit: 'تجديد الاشتراك',
                 btnCloseRenew: 'إلغاء',
                 activating: 'جاري التفعيل...',
@@ -623,8 +634,8 @@
                 labelRenewEmail: 'Email Address',
                 placeholderRenewEmail: 'Your registered email',
                 hintRenewDomains: 'Allowed domains: gmail.com, yahoo.com, outlook.com ...',
-                labelRenewPass: 'Password',
-                placeholderRenewPass: 'Password',
+                labelRenewPass: 'Your current account password',
+                placeholderRenewPass: 'The password you use to sign in',
                 btnRenewSubmit: 'Renew Subscription',
                 btnCloseRenew: 'Cancel',
                 activating: 'Activating...',
@@ -666,8 +677,8 @@
                 labelRenewEmail: 'E-posta Adresi',
                 placeholderRenewEmail: 'Kayıtlı e-postanız',
                 hintRenewDomains: 'İzin verilen alan adları: gmail.com, yahoo.com, outlook.com ...',
-                labelRenewPass: 'Şifre',
-                placeholderRenewPass: 'Şifre',
+                labelRenewPass: 'Hesabınızın mevcut şifresi',
+                placeholderRenewPass: 'Platforma giriş yaptığınız şifre',
                 btnRenewSubmit: 'Aboneliği Yenile',
                 btnCloseRenew: 'İptal',
                 activating: 'Etkinleştiriliyor...',
@@ -814,6 +825,7 @@
             return parts.length === 2 ? parts[1].toLowerCase().trim() : '';
         }
 
+        function escHtmlReg(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
         async function sendYearlyRequest(formData, btn, msgBox, successCallback) {
             btn.disabled = true;
             const originalHTML = btn.innerHTML;
@@ -823,19 +835,26 @@
             msgBox.className = 'msg-box';
 
             try {
-                const r = await sbReg.functions.invoke('register', { body: Object.assign({ mode: 'year', lang: currentLang }, formData) });
+                // V7.2: توكن رابط إتمام الاشتراك (?t=...) الذي يصل للمشترك بعد الدفع في Entervia
+                const linkToken = new URLSearchParams(location.search).get('t') || '';
+                const r = await sbReg.functions.invoke('register', { body: Object.assign({ mode: 'year', lang: currentLang, t: linkToken }, formData) });
                 if (r.error && !r.data) throw r.error;
                 const data = r.data || {};
 
                 msgBox.style.display = 'block';
-                if (data.status === 'success') {
+                if (data.status === 'pending') {
+                    // V7.2: الطلب بانتظار تحقق الإدارة من الدفع
+                    msgBox.className = 'msg-box exists';
+                    msgBox.innerHTML = `<i class="fas fa-hourglass-half"></i> ${escHtmlReg(data.message)}`;
+                    if (successCallback) successCallback();
+                } else if (data.status === 'success') {
                     msgBox.className = 'msg-box success';
-                    msgBox.innerHTML = `<i class="fas fa-check-circle"></i> ${data.message}<br>
+                    msgBox.innerHTML = `<i class="fas fa-check-circle"></i> ${escHtmlReg(data.message)}<br>
                         <a href="${data.loginUrl || 'https://portal.farouk-grup.com/'}" target="_blank" class="login-link">${t.goToLogin}</a>`;
                     if (successCallback) successCallback();
                 } else if (data.status === 'exists') {
                     msgBox.className = 'msg-box exists';
-                    msgBox.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${data.message}<br>
+                    msgBox.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${escHtmlReg(data.message)}<br>
                         <a href="${data.renewLink || '#'}" target="_blank" class="renew-link">${t.clickToRenew}</a>`;
                 } else {
                     msgBox.className = 'msg-box error';
@@ -919,7 +938,7 @@
                 return;
             }
 
-            const formData = { email: email, password: password, txId: txId };
+            const formData = { email: email, password: password, txId: txId, txRef: txId };
 
             sendYearlyRequest(formData, document.getElementById('renewSubmitBtn'), msgBox, function() {
                 document.getElementById('renewForm').reset();

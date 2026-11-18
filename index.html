@@ -2,9 +2,18 @@
 <html lang="ar" dir="rtl" class="fg-loading">
 <head>
     <meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png"/>
+<link rel="shortcut icon" href="favicon.ico"/>
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#000000"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="apple-mobile-web-app-title" content="المنصة الشاملة"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>المنصة الشاملة - مجموعة فاروق للإستشارات والأعمال</title>
-    <link rel="manifest" href="manifest.json">
+    <title>المنصة الشاملة</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -43,7 +52,7 @@
             <button class="login-btn" id="loginBtn" data-i18n="loginBtn"><i class="fas fa-sign-in-alt"></i> دخول</button>
             <a href="https://wa.me/905550196682" target="_blank" class="whatsapp-link" data-i18n="forgotPass"><i class="fab fa-whatsapp"></i> نسيت كلمة المرور؟ اضغط هنا</a>
             <!-- رابط الإشتراك مع id لتغييره حسب اللغة -->
-            <a id="subscribeLink" href="https://portal.farouk-grup.com/finance-hub" target="_blank" class="whatsapp-link" data-i18n="subscribe"><i class="fas fa-star"></i> للإشتراك بالمنصة؟ اضغط هنا</a>
+            <a id="subscribeLink" href="https://www.entervia.co/checkout/77" class="whatsapp-link js-pay" data-pay="new" data-i18n="subscribe"><i class="fas fa-star"></i> للإشتراك بالمنصة؟ اضغط هنا</a>
             <div class="error-msg" id="errorMsg"></div>
         </div>
     </div>
@@ -54,7 +63,7 @@
             <i class="fas fa-exclamation-triangle" style="font-size:2.5rem; color:#fbbf24; margin-bottom:0.5rem;"></i>
             <h2 id="sessionExpiredTitle" data-i18n="sessionExpiredTitle">⚠️ انتهت صلاحية الجلسة</h2>
             <p id="sessionExpiredMsg" data-i18n="sessionExpiredMsg">انتهت مدة الجلسة (24 ساعة). الرجاء تسجيل الدخول مجدداً.</p>
-            <a href="https://www.entervia.co/checkout/77" target="_blank" class="renew-link" id="renewLinkBtn" style="display:none;" data-i18n="renewSubscription">
+            <a href="https://www.entervia.co/checkout/77" class="renew-link js-pay" data-pay="renew" id="renewLinkBtn" style="display:none;" data-i18n="renewSubscription">
                 <i class="fas fa-sync-alt"></i> تجديد الإشتراك
             </a>
             <button class="relogin-btn" id="reloginBtn" data-i18n="backToLogin">
@@ -113,7 +122,7 @@
                 <div><i class="fas fa-calendar-alt"></i> <span id="currentDate"></span></div>
                 <div><i class="fas fa-clock"></i> <span id="currentTime"></span></div>
             </div>
-            <div class="header-title" data-i18n="headerTitle">مجموعة فاروق للاستشارات والأعمال</div>
+            <div class="header-title" data-i18n="headerTitle">المنصة الشاملة</div>
             <div class="user-profile">
                 <span class="user-name"><i class="fas fa-user-tie"></i> <span id="userNameDisplay">مدير العمليات</span></span>
                 <button class="settings-btn" id="settingsBtn"><i class="fas fa-cog"></i> <span data-i18n="settings">الإعدادات</span></button>
@@ -148,7 +157,7 @@
                 <div class="services-grid">
                     <!-- المهام -->
                     <div class="service-block">
-                        <div class="panel-header"><i class="fas fa-tasks"></i> <span data-i18n="tasks">إدارة المهام</span></div>
+                        <div class="panel-header"><i class="fas fa-tasks"></i> <span data-i18n="tasks">إدارة المهام</span> <span class="sync-status" id="syncStatus" aria-live="polite"></span></div>
                         <div class="input-group">
                             <input type="text" id="todoInput" data-i18n-placeholder="addTask" placeholder="أضف مهمة جديدة...">
                             <button class="btn-primary" id="addTodoBtn"><i class="fas fa-plus"></i> <span data-i18n="add">إضافة</span></button>
@@ -217,16 +226,32 @@
 
         <!-- الروابط السريعة -->
         <div class="quick-links-panel">
-            <div class="quick-links-title"><i class="fas fa-link"></i> <span data-i18n="quickLinks">الوصول السريع لمنصات المجموعة (الإصدار 7.0)</span></div>
+            <div class="quick-links-title"><i class="fas fa-link"></i> <span data-i18n="quickLinks">الوصول السريع لمنصات المجموعة (الإصدار 7.2)</span></div>
             <div class="links-row">
                 <a href="https://www.farouk-grup.com/" target="_blank" class="link-btn" data-i18n="officialSite">الموقع الرسمي</a>
-                <a href="https://www.entervia.co/checkout/77" target="_blank" class="link-btn" data-i18n="renew">تجديد الإشتراك</a>
+                <a href="https://www.entervia.co/checkout/77" class="link-btn js-pay" data-pay="renew" data-i18n="renew">تجديد الإشتراك</a>
                 <a href="#" id="surveyLink" target="_blank" class="link-btn" data-i18n="rate">★ تقييم المنصة</a>
                 <a href="mailto:faroukgrup@gmail.com" class="link-btn"><i class="fas fa-envelope"></i> <span data-i18n="email">البريد</span></a>
             </div>
         </div>
 
         <footer><p><span data-i18n="footer">جميع الحقوق محفوظة © 2026</span> <span data-i18n="footerBrand">FAROUK GRUP</span></p></footer>
+    </div>
+
+    <!-- V7.2: الاشتراك/التجديد داخل نافذة منبثقة بدلاً من صفحة خارجية -->
+    <div class="pay-overlay" id="payOverlay" role="dialog" aria-modal="true" aria-labelledby="payTitle">
+        <div class="pay-card">
+            <div class="pay-head">
+                <h2 id="payTitle"><i class="fas fa-crown"></i> <span>تجديد الاشتراك</span></h2>
+                <button type="button" class="pay-x" id="payClose" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+            </div>
+            <p class="pay-note" id="payNote" data-i18n="payNote">أكمل الدفع في النموذج أدناه. بعد اعتماد الدفع تصلك رسالة على بريدك فيها رابط إتمام الاشتراك.</p>
+            <div class="pay-frame-wrap">
+                <div class="pay-loading" id="payLoading"><i class="fas fa-circle-notch fa-spin"></i></div>
+                <iframe id="payFrame" title="checkout" src="about:blank" allow="payment *" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            </div>
+            <a class="pay-open" id="payOpen" href="https://www.entervia.co/checkout/77" target="_blank" rel="noopener"><i class="fas fa-up-right-from-square"></i> <span data-i18n="payOpenWindow">فتح صفحة الدفع في نافذة جديدة</span></a>
+        </div>
     </div>
 
     <!-- Supabase: المصادقة + النصوص + قائمة الأدوات (لا توجد معادلات مالية في المتصفح) -->
