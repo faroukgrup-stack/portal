@@ -195,7 +195,7 @@
             font-size: 0.95rem;
             line-height: 1.8;
             display: none;
-            white-space: pre-wrap;
+            white-space: normal;   /* V7.2: المحتوى أصبح HTML منظماً (عناوين وجداول وقوائم) */
             overflow-x: auto;
         }
         .tool-content.open {
@@ -281,3 +281,19 @@
             .tool-content { font-size: 0.85rem; }
         }
     
+/* ===== V7.2: دليل الاستخدام المنظم ===== */
+.collapsible-header { width: 100%; background: none; border: 0; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+.collapsible-header .tool-num { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 30px; border-radius: 8px; background: rgba(207,167,118,.16); color: #e2c5a3; font-size: .85rem; margin-inline-end: 8px; }
+.guide-intro { display: flex; gap: 10px; align-items: flex-start; background: rgba(207,167,118,.08); border: 1px solid rgba(207,167,118,.25); border-radius: 14px; padding: 12px 16px; margin: 0 0 1rem; color: #d0d9e8; line-height: 1.8; font-size: .95rem; }
+.guide-intro i { color: #cfa776; margin-top: 5px; }
+.guide-actions { display: flex; gap: 8px; justify-content: flex-end; margin: 0 0 .8rem; }
+.ga-btn { background: transparent; border: 1px solid rgba(207,167,118,.35); color: #e2c5a3; border-radius: 999px; padding: 6px 14px; cursor: pointer; font: inherit; font-size: .85rem; }
+.ga-btn:hover { background: rgba(207,167,118,.12); }
+.tool-content p { margin: .4rem 0 .7rem; }
+.tool-content ul, .tool-content ol { margin: .3rem 0 .8rem; padding-inline-start: 1.4rem; }
+.tool-content li { margin: .25rem 0; }
+.tool-content th, .tool-content td { padding: 7px 9px; border: 1px solid rgba(255,255,255,.08); vertical-align: top; text-align: start; }
+.tool-content th { background: rgba(207,167,118,.12); color: #e2c5a3; }
+.tool-content code { direction: ltr; unicode-bidi: isolate; background: rgba(255,255,255,.06); padding: 1px 6px; border-radius: 5px; font-family: Consolas, monospace; font-size: .88em; }
+.tool-content .formula, .tool-content pre { direction: ltr; text-align: left; background: rgba(10,14,23,.6); border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 8px 12px; white-space: pre-wrap; font-family: Consolas, monospace; font-size: .88rem; }
+.tool-content .open-tool a { display: inline-flex; gap: 6px; align-items: center; color: #111; background: linear-gradient(135deg, #b48554, #e2c5a3); padding: 8px 16px; border-radius: 10px; text-decoration: none; font-weight: 700; }
