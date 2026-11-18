@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>لوحة الإدارة — المنصة الشاملة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  :root { --gold: #e8b95c; --gold-d: #b48554; --bg: #07090f; --card: #0f1524; --line: rgba(232,185,92,.25); --tx: #f0f4fa; --mut: #9fb0cc; --ok: #22c55e; --bad: #ef4444; --warn: #fbbf24; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Tajawal', system-ui, sans-serif; background: var(--bg); color: var(--tx); min-height: 100vh; }
+  header { display: flex; align-items: center; gap: 12px; padding: 14px 22px; border-bottom: 1px solid var(--line); background: #0b0f1b; position: sticky; top: 0; z-index: 5; }
+  header img { width: 40px; height: 40px; border-radius: 8px; }
+  header h1 { font-size: 1.15rem; margin: 0; color: var(--gold); }
+  header .sp { flex: 1; }
+  button, input, select, textarea { font-family: inherit; }
+  .btn { border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--tx); padding: 8px 14px; border-radius: 9px; cursor: pointer; font-weight: 700; font-size: .9rem; display: inline-flex; gap: 6px; align-items: center; }
+  .btn:hover { background: rgba(232,185,92,.12); }
+  .btn.gold { background: linear-gradient(135deg, #c9963e, #e8b95c); color: #111; border-color: transparent; }
+  .btn.ok { background: #15803d; border-color: transparent; color: #fff; }
+  .btn.bad { background: #b91c1c; border-color: transparent; color: #fff; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  main { max-width: 1250px; margin: 0 auto; padding: 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 18px; }
+  .login { max-width: 430px; margin: 10vh auto; text-align: center; }
+  .login input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: #060911; color: #fff; margin: 12px 0; font-size: 1rem; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .tab { padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--mut); cursor: pointer; font-weight: 700; }
+  .tab.on { background: rgba(232,185,92,.16); color: var(--gold); }
+  .tab .badge { background: var(--warn); color: #111; border-radius: 999px; padding: 0 7px; margin-inline-start: 6px; font-size: .8rem; }
+  .bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+  .bar input, .bar select { padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line); background: #060911; color: #fff; }
+  .note { color: var(--mut); font-size: .88rem; line-height: 1.7; margin: 0 0 12px; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { padding: 9px 10px; border-bottom: 1px solid rgba(255,255,255,.06); text-align: start; vertical-align: middle; }
+  th { color: var(--gold); font-weight: 800; background: rgba(232,185,92,.06); white-space: nowrap; }
+  td.ltr { direction: ltr; text-align: right; unicode-bidi: plaintext; }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: .78rem; font-weight: 700; }
+  .pill.g { background: rgba(34,197,94,.15); color: #86efac; } .pill.r { background: rgba(239,68,68,.15); color: #fca5a5; } .pill.y { background: rgba(251,191,36,.15); color: #fde68a; } .pill.b { background: rgba(96,165,250,.15); color: #bfdbfe; }
+  .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .toast { position: fixed; bottom: 20px; inset-inline-start: 50%; transform: translateX(50%); background: #111827; border: 1px solid var(--line); padding: 12px 18px; border-radius: 12px; display: none; z-index: 50; max-width: 90vw; }
+  .toast.show { display: block; } .toast.err { border-color: var(--bad); color: #fecaca; }
+  .empty { text-align: center; color: var(--mut); padding: 30px; }
+  .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+  .grid-form input { padding: 9px 10px; border-radius: 9px; border: 1px solid var(--line); background: #060911; color: #fff; width: 100%; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <img src="icons/icon-192.png" alt="">
+  <h1>لوحة الإدارة — المنصة الشاملة</h1>
+  <span class="sp"></span>
+  <button class="btn hidden" id="logoutBtn"><i class="fas fa-right-from-bracket"></i> خروج</button>
+</header>
+
+<main>
+  <!-- الدخول بمفتاح الإدارة -->
+  <section class="card login" id="loginCard">
+    <h2 style="color:var(--gold);margin-top:0"><i class="fas fa-user-shield"></i> دخول المدير</h2>
+    <p class="note">أدخل مفتاح الإدارة (السر ADMIN_KEY في Supabase). يُحفظ في هذه النافذة فقط ويُحذف عند إغلاقها.</p>
+    <form id="loginForm"><input type="password" id="keyInput" autocomplete="off" placeholder="ADMIN_KEY" dir="ltr" required>
+    <button class="btn gold" style="width:100%;justify-content:center" type="submit"><i class="fas fa-key"></i> دخول</button></form>
+  </section>
+
+  <section id="app" class="hidden">
+    <div class="tabs">
+      <button class="tab on" data-tab="claims"><i class="fas fa-hourglass-half"></i> طلبات بانتظار التحقق <span class="badge" id="pendBadge">0</span></button>
+      <button class="tab" data-tab="users"><i class="fas fa-users"></i> المشتركون</button>
+      <button class="tab" data-tab="payments"><i class="fas fa-receipt"></i> سجل الدفعات</button>
+    </div>
+
+    <!-- الطلبات -->
+    <div class="card" id="tab-claims">
+      <p class="note"><b>طريقة التحقق:</b> قارن البريد ورقم العملية في الطلب مع الطلبات المدفوعة في لوحة Entervia (أو إيصال الدفع الذي وصل بريدك). عند المطابقة اضغط «اعتماد» فيُفعَّل الاشتراك سنة كاملة (من تاريخ الانتهاء الحالي إن كان مستقبلياً، وإلا من اليوم) ويُسجَّل في سجل الدفعات. «رابط موقَّع» = وصل المشترك عبر رابط إتمام الاشتراك الذي يحمل التوكن.</p>
+      <div class="bar">
+        <select id="claimStatus"><option value="pending">بانتظار التحقق</option><option value="approved">معتمدة</option><option value="rejected">مرفوضة</option></select>
+        <button class="btn" id="reloadClaims"><i class="fas fa-rotate"></i> تحديث</button>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>البريد</th><th>الاسم</th><th>رقم العملية</th><th>النوع</th><th>التحقق</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="claimsBody"></tbody></table></div>
+    </div>
+
+    <!-- المشتركون -->
+    <div class="card hidden" id="tab-users">
+      <div class="bar">
+        <input type="search" id="userSearch" placeholder="بحث بالبريد أو الاسم" style="min-width:260px">
+        <select id="userFilter"><option value="">الكل</option><option value="active">فعّال</option><option value="expired">منتهٍ</option><option value="frozen">مجمَّد</option></select>
+        <button class="btn" id="reloadUsers"><i class="fas fa-rotate"></i> تحديث</button>
+        <span class="note" id="userCount" style="margin:0"></span>
+      </div>
+      <details style="margin-bottom:14px"><summary class="btn" style="list-style:none"><i class="fas fa-user-plus"></i> إضافة مشترك يدوياً</summary>
+        <form id="addForm" class="grid-form" style="margin-top:12px">
+          <input id="addEmail" type="email" placeholder="البريد" dir="ltr" required>
+          <input id="addName" type="text" placeholder="الاسم الكامل">
+          <input id="addPass" type="text" placeholder="كلمة مرور مؤقتة (6+)" dir="ltr" required minlength="6">
+          <input id="addExp" type="date" required>
+          <button class="btn gold" type="submit"><i class="fas fa-plus"></i> إضافة</button>
+        </form>
+      </details>
+      <div class="table-wrap"><table><thead><tr><th>البريد</th><th>الاسم</th><th>تاريخ الانتهاء</th><th>المتبقي</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+    </div>
+
+    <!-- الدفعات -->
+    <div class="card hidden" id="tab-payments">
+      <div class="bar">
+        <input type="search" id="payEmail" placeholder="تصفية بالبريد (اختياري)" dir="ltr">
+        <button class="btn" id="reloadPays"><i class="fas fa-rotate"></i> تحديث</button>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>البريد</th><th>رقم العملية</th><th>النوع</th><th>الانتهاء الجديد</th></tr></thead><tbody id="paysBody"></tbody></table></div>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="js/fg-config.js"></script>
+<script>
+(function () {
+  "use strict";
+  var CFG = window.FG_CONFIG || {};
+  var FN = CFG.SUPABASE_URL + "/functions/v1/admin";
+  var KEY_ST = "fg_admin_key";
+  var users = [];
+  function $(id) { return document.getElementById(id); }
+  function esc(v) { return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function toast(msg, err) { var t = $("toast"); t.textContent = msg; t.className = "toast show" + (err ? " err" : ""); clearTimeout(t._h); t._h = setTimeout(function () { t.className = "toast"; }, 4200); }
+  function fmtDT(s) { if (!s) return "—"; var d = new Date(s); return isNaN(d) ? esc(s) : d.toLocaleString("ar-EG", { dateStyle: "medium", timeStyle: "short" }); }
+
+  async function call(fn, extra) {
+    var key = sessionStorage.getItem(KEY_ST) || "";
+    var r = await fetch(FN, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: CFG.SUPABASE_ANON_KEY, Authorization: "Bearer " + CFG.SUPABASE_ANON_KEY, "x-admin-key": key },
+      body: JSON.stringify(Object.assign({ fn: fn }, extra || {}))
+    });
+    var d = await r.json().catch(function () { return {}; });
+    if (r.status === 401) { logout(); throw new Error("مفتاح الإدارة غير صحيح"); }
+    if (d.status !== "success") throw new Error(d.message || ("HTTP " + r.status));
+    return d;
+  }
+
+  /* ── الدخول ── */
+  $("loginForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    sessionStorage.setItem(KEY_ST, $("keyInput").value.trim());
+    try { await call("listClaims", { limit: 1 }); start(); }
+    catch (err) { sessionStorage.removeItem(KEY_ST); toast(err.message, true); }
+  });
+  function logout() { sessionStorage.removeItem(KEY_ST); $("app").classList.add("hidden"); $("logoutBtn").classList.add("hidden"); $("loginCard").classList.remove("hidden"); }
+  $("logoutBtn").addEventListener("click", logout);
+  function start() {
+    $("loginCard").classList.add("hidden"); $("app").classList.remove("hidden"); $("logoutBtn").classList.remove("hidden");
+    loadClaims(); loadUsers();
+  }
+
+  /* ── التبويبات ── */
+  document.querySelectorAll(".tab").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll(".tab").forEach(function (x) { x.classList.toggle("on", x === b); });
+      ["claims", "users", "payments"].forEach(function (n) { $("tab-" + n).classList.toggle("hidden", n !== b.dataset.tab); });
+      if (b.dataset.tab === "payments") loadPays();
+    });
+  });
+
+  /* ── الطلبات ── */
+  async function loadClaims() {
+    var st = $("claimStatus").value;
+    $("claimsBody").innerHTML = '<tr><td colspan="8" class="empty"><i class="fas fa-circle-notch fa-spin"></i></td></tr>';
+    try {
+      var d = await call("listClaims", { status: st });
+      var rows = d.data || [];
+      if (st === "pending") $("pendBadge").textContent = rows.length;
+      $("claimsBody").innerHTML = rows.length ? rows.map(function (c) {
+        var stp = c.status === "pending" ? '<span class="pill y">بانتظار</span>' : c.status === "approved" ? '<span class="pill g">معتمد حتى ' + esc(c.new_expiry || "") + "</span>" : '<span class="pill r">مرفوض</span>';
+        var act = c.status === "pending" ? '<div class="actions"><button class="btn ok" data-ok="' + esc(c.id) + '"><i class="fas fa-check"></i> اعتماد</button><button class="btn bad" data-no="' + esc(c.id) + '"><i class="fas fa-xmark"></i> رفض</button></div>' : esc(c.admin_note || "");
+        return "<tr><td>" + fmtDT(c.created_at) + '</td><td class="ltr">' + esc(c.email) + "</td><td>" + esc(c.full_name || "") + '</td><td class="ltr">' + esc(c.tx_ref || "—") +
+          "</td><td>" + (c.is_renewal ? '<span class="pill b">تجديد</span>' : '<span class="pill g">جديد</span>') + "</td><td>" + (c.token_ok ? '<span class="pill g">رابط موقَّع</span>' : '<span class="pill y">بدون توكن</span>') +
+          "</td><td>" + stp + "</td><td>" + act + "</td></tr>";
+      }).join("") : '<tr><td colspan="8" class="empty">لا توجد طلبات</td></tr>';
+    } catch (err) { $("claimsBody").innerHTML = '<tr><td colspan="8" class="empty">' + esc(err.message) + "</td></tr>"; }
+  }
+  $("claimStatus").addEventListener("change", loadClaims);
+  $("reloadClaims").addEventListener("click", loadClaims);
+  $("claimsBody").addEventListener("click", async function (e) {
+    var ok = e.target.closest("[data-ok]"), no = e.target.closest("[data-no]");
+    if (!ok && !no) return;
+    var id = (ok || no).getAttribute(ok ? "data-ok" : "data-no");
+    var note = null;
+    if (ok && !confirm("تأكيد: هل طابقت هذا الطلب مع دفعة مستلمة في Entervia؟ سيُفعَّل الاشتراك سنة كاملة.")) return;
+    if (no) { note = prompt("سبب الرفض (اختياري):", ""); if (note === null) return; }
+    (ok || no).disabled = true;
+    try { var d = await call(ok ? "approveClaim" : "rejectClaim", { id: id, note: note }); toast(d.message); loadClaims(); loadUsers(); }
+    catch (err) { toast(err.message, true); (ok || no).disabled = false; }
+  });
+
+  /* ── المشتركون ── */
+  function userState(u) { return u.frozen ? "frozen" : (u.daysLeft > 0 ? "active" : "expired"); }
+  async function loadUsers() {
+    try { var d = await call("getUsers"); users = d.data || []; renderUsers(); }
+    catch (err) { $("usersBody").innerHTML = '<tr><td colspan="6" class="empty">' + esc(err.message) + "</td></tr>"; }
+  }
+  function renderUsers() {
+    var q = $("userSearch").value.trim().toLowerCase(), f = $("userFilter").value;
+    var list = users.filter(function (u) {
+      return (!q || (u.username + " " + u.fullName).toLowerCase().indexOf(q) !== -1) && (!f || userState(u) === f);
+    });
+    $("userCount").textContent = list.length + " من " + users.length;
+    $("usersBody").innerHTML = list.length ? list.map(function (u) {
+      var s = userState(u);
+      var pill = s === "active" ? '<span class="pill g">فعّال</span>' : s === "frozen" ? '<span class="pill r">مجمَّد</span>' : '<span class="pill y">منتهٍ</span>';
+      return '<tr><td class="ltr">' + esc(u.username) + "</td><td>" + esc(u.fullName) + "</td><td>" + esc(u.expiryDate) + "</td><td>" + esc(u.daysLeft) + "</td><td>" + pill +
+        '</td><td><div class="actions"><button class="btn" data-ext="' + esc(u.username) + '"><i class="fas fa-calendar-plus"></i> تمديد سنة</button>' +
+        '<button class="btn" data-frz="' + esc(u.username) + '" data-v="' + (u.frozen ? "0" : "1") + '"><i class="fas ' + (u.frozen ? "fa-unlock" : "fa-lock") + '"></i> ' + (u.frozen ? "إلغاء التجميد" : "تجميد") + "</button></div></td></tr>";
+    }).join("") : '<tr><td colspan="6" class="empty">لا نتائج</td></tr>';
+  }
+  $("userSearch").addEventListener("input", renderUsers);
+  $("userFilter").addEventListener("change", renderUsers);
+  $("reloadUsers").addEventListener("click", loadUsers);
+  $("usersBody").addEventListener("click", async function (e) {
+    var ext = e.target.closest("[data-ext]"), frz = e.target.closest("[data-frz]");
+    try {
+      if (ext) {
+        var tx = prompt("تمديد سنة للمشترك " + ext.dataset.ext + "\nرقم العملية (اختياري):", "");
+        if (tx === null) return;
+        var d = await call("extendYear", { id: ext.dataset.ext, txId: tx || null }); toast(d.message); loadUsers();
+      } else if (frz) {
+        var d2 = await call("freeze", { id: frz.dataset.frz, frozen: frz.dataset.v === "1" }); toast(d2.message); loadUsers();
+      }
+    } catch (err) { toast(err.message, true); }
+  });
+  $("addForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    try {
+      var d = await call("addUser", { email: $("addEmail").value, fullName: $("addName").value, password: $("addPass").value, expiryDate: $("addExp").value });
+      toast(d.message); e.target.reset(); loadUsers();
+    } catch (err) { toast(err.message, true); }
+  });
+
+  /* ── الدفعات ── */
+  async function loadPays() {
+    $("paysBody").innerHTML = '<tr><td colspan="5" class="empty"><i class="fas fa-circle-notch fa-spin"></i></td></tr>';
+    try {
+      var d = await call("getPayments", { email: $("payEmail").value.trim() || null });
+      var rows = d.data || [];
+      $("paysBody").innerHTML = rows.length ? rows.map(function (p) {
+        return "<tr><td>" + fmtDT(p.created_at) + '</td><td class="ltr">' + esc(p.email) + '</td><td class="ltr">' + esc(p.tx_id || "—") + "</td><td>" + (p.action === "new" ? "اشتراك جديد" : "تجديد") + "</td><td>" + esc(p.new_expiry || "") + "</td></tr>";
+      }).join("") : '<tr><td colspan="5" class="empty">لا توجد دفعات</td></tr>';
+    } catch (err) { $("paysBody").innerHTML = '<tr><td colspan="5" class="empty">' + esc(err.message) + "</td></tr>"; }
+  }
+  $("reloadPays").addEventListener("click", loadPays);
+
+  if (sessionStorage.getItem(KEY_ST)) call("listClaims", { limit: 1 }).then(start).catch(function () {});
+})();
+</script>
+</body>
+</html>
