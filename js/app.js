@@ -80,10 +80,8 @@ async function applyLanguage(lang) {
     fillLangSelect(document.getElementById('languageSelect'));
     fillLangSelect(document.getElementById('loginLangSelect'));
     updateUserLabel();
-    const subscribeLink = document.getElementById('subscribeLink');
-    if (subscribeLink) {
-        subscribeLink.href = lang === 'ar' ? 'https://portal.farouk-grup.com/finance-hub' : 'https://portal.farouk-grup.com/finance-huben';
-    }
+    document.title = t('headerTitle');
+    updateSyncStatus();
     const guideLink = document.getElementById('guideLink');
     const surveyLink = document.getElementById('surveyLink');
     // الدليل والاستبيان صفحات ثابتة بثلاث لغات؛ أي لغة جديدة تعرض النسخة الإنجليزية
@@ -138,12 +136,15 @@ function getRemainingSessionTime() {
 function isSessionExpired() { return getRemainingSessionTime() <= 0; }
 
 function clearLocalSession() {
+    // V7.2: لا تبقى نسخة من مهام/ملاحظات المستخدم على جهاز مشترك بعد خروجه (إلا إن لم تُرفع بعد)
+    try { if (WS.uid && !WS.dirty) localStorage.removeItem('fg_ws_' + WS.uid); } catch (e) {}
     ['userName', 'userEmail', 'daysLeft', 'loginTimestamp', 'currentUserEmail', 'fg_sub'].forEach(k => localStorage.removeItem(k));
 }
 
 async function forceLogout(reason, isSubscriptionExpired = false) {
     dashboard.classList.remove('show');
     if (logoutTimer) { clearTimeout(logoutTimer); logoutTimer = null; }
+    await flushWorkspace();
     clearLocalSession();
     try { await sb.auth.signOut(); } catch (e) {}
     if (isSubscriptionExpired) {
@@ -242,7 +243,9 @@ async function attemptLogin() {
         } else {
             await sb.auth.signOut();
             if (sub.status === 'expired') {
-                errorMsg.innerHTML = t('errorExpired') + ' <a href="' + RENEW_URL + '" target="_blank" style="color:#cfa776;">' + t('here') + '</a>';
+                errorMsg.innerHTML = escHtml(t('errorExpired')) + ' <a href="' + RENEW_URL + '" class="js-pay" data-pay="renew" style="color:#cfa776;">' + escHtml(t('here')) + '</a>';
+            } else if (sub.status === 'pending') {
+                errorMsg.textContent = t('errorPending');
             } else if (sub.status === 'frozen') {
                 errorMsg.textContent = t('errorFrozen');
             } else {
@@ -271,6 +274,7 @@ async function initialSessionCheck() {
     try {
         const sub = await fetchSubscription();
         if (sub.status === 'expired') forceLogout(t('errorExpired'), true);
+        else if (sub.status === 'pending') forceLogout(t('errorPending'), false);
         else if (sub.status === 'frozen') forceLogout(t('errorFrozen'), false);
         else if (sub.status !== 'active') forceLogout(t('sessionExpiredMsg'), false);
         else updateUserLabel();
@@ -283,6 +287,7 @@ usernameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') passw
 
 logoutBtn.addEventListener('click', async () => {
     if (logoutTimer) clearTimeout(logoutTimer);
+    await flushWorkspace();
     clearLocalSession();
     try { await sb.auth.signOut(); } catch (e) {}
     showLoginScreen();
@@ -399,158 +404,227 @@ document.addEventListener('keydown', function(e) {
         updateDisplay(); }
 });
 
+// ============================================================
+// V7.2: المهام والملاحظات والمواعيد محفوظة في حساب المستخدم (جدول user_workspace)
+// - صف واحد لكل مستخدم: قراءة واحدة عند فتح البوابة، وحفظ واحد (upsert) مؤجَّل 0.8 ثانية بعد آخر تعديل.
+// - نسخة محلية لكل مستخدم تعمل دون اتصال وتُرفع تلقائياً عند عودة الشبكة.
+// - أول دخول بعد التحديث: البيانات القديمة المحفوظة على الجهاز تُنقل إلى الحساب تلقائياً.
+// - كل النصوص تُعرض كنص (escape) لمنع حقن HTML.
+// ============================================================
+function escHtml(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
 const todoInput = document.getElementById('todoInput');
 const addTodoBtn = document.getElementById('addTodoBtn');
 const todoList = document.getElementById('todoList');
 const pendingSpan = document.getElementById('pendingCount');
 const totalSpan = document.getElementById('totalCount');
+const notes = document.getElementById('notesArea');
+const appTitle = document.getElementById('appTitle');
+const appDate = document.getElementById('appDate');
+const appDesc = document.getElementById('appDesc');
+const appList = document.getElementById('appointmentsList');
 let todos = [];
+let apps = [];
 
-function loadTodos() {
-    todos = JSON.parse(localStorage.getItem('employeeTodos') || '[]');
-    renderTodos();
+const WS = { uid: null, timer: null, online: null, dirty: false, loaded: false };
+function wsKey() { return 'fg_ws_' + (WS.uid || 'local'); }
+function readJSON(k, d) { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } }
+function normTodos(a) { return (Array.isArray(a) ? a : []).filter(x => x && typeof x.text === 'string').slice(0, 1000).map(x => ({ text: x.text.slice(0, 500), completed: !!x.completed })); }
+function normApps(a) {
+    return (Array.isArray(a) ? a : []).filter(x => x && typeof x.title === 'string' && typeof x.date === 'string').slice(0, 2000)
+        .map(x => ({ title: x.title.slice(0, 300), date: x.date.slice(0, 10), desc: String(x.desc || '').slice(0, 2000) }));
 }
-
-function saveTodos() {
-    localStorage.setItem('employeeTodos', JSON.stringify(todos));
-    renderTodos();
+function applyWS(d) {
+    todos = normTodos(d && d.todos);
+    apps = normApps(d && d.appointments);
+    notes.value = String((d && d.notes) || '');
+    renderTodos(); renderApps();
 }
+function cacheWS() {
+    try { localStorage.setItem(wsKey(), JSON.stringify({ todos, notes: notes.value, appointments: apps, dirty: WS.dirty })); } catch (e) {}
+}
+function updateSyncStatus() {
+    const el = document.getElementById('syncStatus');
+    if (!el || WS.online === null) return;
+    el.className = 'sync-status' + (WS.online ? '' : ' off');
+    el.innerHTML = '<i class="fas ' + (WS.online ? 'fa-cloud' : 'fa-cloud-arrow-up') + '"></i> ' + escHtml(t(WS.online ? 'syncCloud' : 'syncOffline'));
+}
+async function pushWS() {
+    clearTimeout(WS.timer); WS.timer = null;
+    if (!WS.uid || !WS.loaded) return;
+    const { error } = await sb.from('user_workspace')
+        .upsert({ user_id: WS.uid, todos, notes: notes.value.slice(0, 200000), appointments: apps }, { onConflict: 'user_id' });
+    WS.online = !error; WS.dirty = !!error;
+    cacheWS(); updateSyncStatus();
+}
+function scheduleSave() {
+    WS.dirty = true; cacheWS();
+    clearTimeout(WS.timer);
+    WS.timer = setTimeout(() => { pushWS().catch(() => { WS.online = false; updateSyncStatus(); }); }, 800);
+}
+async function flushWorkspace() {
+    if (WS.timer || WS.dirty) { try { await pushWS(); } catch (e) {} }
+}
+async function loadWorkspace() {
+    let uid = null;
+    try { const { data } = await sb.auth.getSession(); uid = data && data.session && data.session.user ? data.session.user.id : null; } catch (e) {}
+    WS.uid = uid; WS.loaded = false;
+    // 1) عرض فوري من النسخة المحلية لهذا المستخدم (أو البيانات القديمة قبل V7.2)
+    let local = readJSON(wsKey(), null);
+    let legacy = false;
+    if (!local) {
+        const lt = readJSON('employeeTodos', []), la = readJSON('employeeAppointments', []), ln = localStorage.getItem('employeeNotes') || '';
+        if (lt.length || la.length || ln) { local = { todos: lt, appointments: la, notes: ln }; legacy = true; }
+    }
+    applyWS(local || {});
+    if (!uid) return;
+    // 2) قراءة واحدة من قاعدة البيانات (الأعمدة المطلوبة فقط)
+    const { data, error } = await sb.from('user_workspace').select('todos,notes,appointments').eq('user_id', uid).maybeSingle();
+    if (error) { WS.online = false; WS.loaded = true; updateSyncStatus(); return; }
+    WS.loaded = true; WS.online = true;
+    if (local && local.dirty) {                 // تعديلات تمت دون اتصال ← ترفع الآن
+        await pushWS();
+    } else if (data) {
+        applyWS(data); WS.dirty = false; cacheWS();
+    } else if (local) {                         // أول مرة: نقل البيانات المحلية إلى الحساب
+        await pushWS();
+        if (legacy && !WS.dirty) ['employeeTodos', 'employeeAppointments', 'employeeNotes'].forEach(k => localStorage.removeItem(k));
+    }
+    updateSyncStatus();
+}
+window.addEventListener('online', () => { if (WS.dirty) pushWS().catch(() => {}); });
+window.addEventListener('pagehide', () => { if (WS.timer || WS.dirty) pushWS().catch(() => {}); });
 
 function renderTodos() {
-    todoList.innerHTML = '';
-    const pending = todos.filter(t => !t.completed).length;
+    const pending = todos.filter(x => !x.completed).length;
     pendingSpan.textContent = pending;
     totalSpan.textContent = todos.length;
-    todos.forEach((todo, idx) => {
-        const div = document.createElement('div');
-        div.className = 'todo-item';
-        div.innerHTML = `
+    todoList.innerHTML = todos.map((todo, idx) => `
+        <div class="todo-item">
             <div class="todo-text">
                 <input type="checkbox" ${todo.completed ? 'checked' : ''} data-index="${idx}">
-                <span class="${todo.completed ? 'completed' : ''}">${todo.text}</span>
+                <span class="${todo.completed ? 'completed' : ''}">${escHtml(todo.text)}</span>
             </div>
             <span class="delete-btn delete-todo" data-index="${idx}"><i class="fas fa-trash-alt"></i></span>
-        `;
-        todoList.appendChild(div);
-    });
-    document.querySelectorAll('.todo-text input[type=checkbox]').forEach(cb => {
-        cb.addEventListener('change', function() {
-            todos[this.dataset.index].completed = this.checked;
-            saveTodos();
-        });
-    });
-    document.querySelectorAll('.delete-todo').forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm(t('confirmDelTask'))) {
-                todos.splice(this.dataset.index, 1);
-                saveTodos();
-            }
-        });
-    });
+        </div>`).join('');
 }
-
+todoList.addEventListener('change', function (e) {
+    const cb = e.target.closest('input[type=checkbox]'); if (!cb) return;
+    const i = +cb.dataset.index; if (!todos[i]) return;
+    todos[i].completed = cb.checked; renderTodos(); scheduleSave();
+});
+todoList.addEventListener('click', function (e) {
+    const btn = e.target.closest('.delete-todo'); if (!btn) return;
+    if (confirm(t('confirmDelTask'))) { todos.splice(+btn.dataset.index, 1); renderTodos(); scheduleSave(); }
+});
 function addTodo() {
     const text = todoInput.value.trim();
     if (!text) return;
-    todos.push({ text, completed: false });
-    saveTodos();
+    todos.push({ text: text.slice(0, 500), completed: false });
+    renderTodos(); scheduleSave();
     todoInput.value = '';
 }
-
 addTodoBtn.addEventListener('click', addTodo);
-todoInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') addTodo(); });
+todoInput.addEventListener('keypress', function (e) { if (e.key === 'Enter') addTodo(); });
 
-const notes = document.getElementById('notesArea');
-
-document.getElementById('saveLocal').addEventListener('click', function() {
-    localStorage.setItem('employeeNotes', notes.value);
+let notesTimer = null;
+notes.addEventListener('input', function () {        // حفظ تلقائي للملاحظات أثناء الكتابة
+    clearTimeout(notesTimer);
+    notesTimer = setTimeout(scheduleSave, 1200);
+});
+document.getElementById('saveLocal').addEventListener('click', async function () {
+    clearTimeout(notesTimer);
+    WS.dirty = true; cacheWS();
+    try { await pushWS(); } catch (e) {}
     alert(t('notesSaved'));
 });
-
-document.getElementById('exportNotes').addEventListener('click', function() {
+document.getElementById('exportNotes').addEventListener('click', function () {
     const blob = new Blob([notes.value], { type: 'text/plain' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `notes_faroukgrup_${new Date().toISOString().slice(0,10)}.txt`;
+    a.download = `notes_faroukgrup_${new Date().toISOString().slice(0, 10)}.txt`;
     a.click();
 });
-
-document.getElementById('importNotes').addEventListener('click', function() {
+document.getElementById('importNotes').addEventListener('click', function () {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.txt';
-    input.onchange = function(e) {
-        const file = e.target.files[0];
+    input.onchange = function (e) {
+        const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(ev) { notes.value = ev.target.result; };
+        reader.onload = function (ev) { notes.value = String(ev.target.result || '').slice(0, 200000); scheduleSave(); };
         reader.readAsText(file);
     };
     input.click();
 });
 
-function loadNotes() {
-    const saved = localStorage.getItem('employeeNotes');
-    if (saved) notes.value = saved;
-}
-
-let apps = JSON.parse(localStorage.getItem('employeeAppointments') || '[]');
-const appTitle = document.getElementById('appTitle');
-const appDate = document.getElementById('appDate');
-const appDesc = document.getElementById('appDesc');
-const appList = document.getElementById('appointmentsList');
-
 function renderApps() {
-    appList.innerHTML = '';
-    apps.slice().sort((a, b) => a.date.localeCompare(b.date)).forEach(function(a, idx) {
-        const d = new Date(a.date).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : currentLang === 'tr' ? 'tr-TR' : currentLang, { day: 'numeric',
-            month: 'short' });
-        const div = document.createElement('div');
-        div.className = 'appointment-item';
-        let descHtml = a.desc && a.desc.trim() ? `<div class="appointment-desc">📝 ${a.desc}</div>` : '';
-        div.innerHTML = `
+    apps.sort((a, b) => a.date.localeCompare(b.date));   // الترتيب على المصفوفة نفسها فيبقى رقم الحذف صحيحاً
+    const loc = currentLang === 'ar' ? 'ar-EG' : currentLang === 'tr' ? 'tr-TR' : currentLang;
+    appList.innerHTML = apps.map((a, idx) => {
+        const dt = new Date(a.date + 'T00:00:00');
+        const d = isNaN(dt) ? escHtml(a.date) : dt.toLocaleDateString(loc, { day: 'numeric', month: 'short' });
+        const descHtml = a.desc && a.desc.trim() ? `<div class="appointment-desc">📝 ${escHtml(a.desc)}</div>` : '';
+        return `
+        <div class="appointment-item">
             <div class="appointment-info">
                 <span class="appointment-date">${d}</span>
-                <span class="appointment-title">${a.title}</span>
+                <span class="appointment-title">${escHtml(a.title)}</span>
                 ${descHtml}
             </div>
             <span class="delete-btn delete-app" data-idx="${idx}"><i class="fas fa-trash-alt"></i></span>
-        `;
-        appList.appendChild(div);
-    });
-    document.querySelectorAll('.delete-app').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            if (confirm(t('confirmDelApp'))) {
-                apps.splice(this.dataset.idx, 1);
-                localStorage.setItem('employeeAppointments', JSON.stringify(apps));
-                renderApps();
-            }
-        });
-    });
+        </div>`;
+    }).join('');
 }
-
-document.getElementById('addAppBtn').addEventListener('click', function() {
+appList.addEventListener('click', function (e) {
+    const btn = e.target.closest('.delete-app'); if (!btn) return;
+    if (confirm(t('confirmDelApp'))) { apps.splice(+btn.dataset.idx, 1); renderApps(); scheduleSave(); }
+});
+document.getElementById('addAppBtn').addEventListener('click', function () {
     if (!appTitle.value || !appDate.value) return alert(t('needTitleDate'));
-    apps.push({ title: appTitle.value, date: appDate.value, desc: appDesc.value });
-    localStorage.setItem('employeeAppointments', JSON.stringify(apps));
-    renderApps();
+    apps.push({ title: appTitle.value.slice(0, 300), date: appDate.value, desc: appDesc.value.slice(0, 2000) });
+    renderApps(); scheduleSave();
     appTitle.value = '';
     appDate.value = '';
     appDesc.value = '';
 });
-
-document.getElementById('exportApps').addEventListener('click', function() {
-    const lines = apps.map(a => `${a.date},${a.title},${a.desc}`).join('\n');
-    const blob = new Blob([t('csvHeader') + '\n' + lines], { type: 'text/csv' });
+document.getElementById('exportApps').addEventListener('click', function () {
+    const q = v => '"' + String(v || '').replace(/"/g, '""') + '"';
+    const lines = apps.map(a => [a.date, a.title, a.desc].map(q).join(',')).join('\n');
+    const blob = new Blob(['\ufeff' + t('csvHeader') + '\n' + lines], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `appointments_faroukgrup_${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `appointments_faroukgrup_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
 });
 
-function loadAppointments() {
-    apps = JSON.parse(localStorage.getItem('employeeAppointments') || '[]');
-    renderApps();
+// ============================================================
+// V7.2: الاشتراك والتجديد داخل نافذة منبثقة (بوابة الدفع Entervia)
+// ============================================================
+const payOverlay = document.getElementById('payOverlay');
+const payFrame = document.getElementById('payFrame');
+const payLoading = document.getElementById('payLoading');
+function openPay(kind) {
+    const title = payOverlay.querySelector('#payTitle span');
+    title.textContent = t(kind === 'new' ? 'payTitleNew' : 'payTitleRenew');
+    document.getElementById('payClose').setAttribute('aria-label', t('close'));
+    payLoading.style.display = 'flex';
+    if (payFrame.getAttribute('src') !== RENEW_URL) payFrame.setAttribute('src', RENEW_URL); else payLoading.style.display = 'none';
+    document.getElementById('payOpen').href = RENEW_URL;
+    payOverlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
 }
+function closePay() { payOverlay.classList.remove('show'); document.body.style.overflow = ''; }
+payFrame.addEventListener('load', () => { if (payFrame.getAttribute('src') !== 'about:blank') payLoading.style.display = 'none'; });
+document.getElementById('payClose').addEventListener('click', closePay);
+payOverlay.addEventListener('click', e => { if (e.target === payOverlay) closePay(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && payOverlay.classList.contains('show')) closePay(); });
+document.addEventListener('click', function (e) {
+    const a = e.target.closest('.js-pay'); if (!a) return;
+    e.preventDefault();
+    openPay(a.dataset.pay === 'new' ? 'new' : 'renew');
+});
 
 // ============================================================
 // قائمة الأدوات من قاعدة البيانات (جدولا tool_categories و tools)
@@ -670,9 +744,7 @@ changePasswordBtn.addEventListener('click', async function() {
 });
 
 function loadAllData() {
-    loadTodos();
-    loadNotes();
-    loadAppointments();
+    loadWorkspace().catch(e => console.warn('[workspace]', e));
     renderTools();
     loadToolCatalog();
 }

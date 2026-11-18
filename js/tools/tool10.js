@@ -85,7 +85,8 @@
         let reMethod = document.getElementById('reMethod').value;
         const costEquityManual = parseFloat(document.getElementById('costEquityManual').value) / 100 || 0;
         const rf = parseFloat(document.getElementById('rf').value) / 100 || 0;
-        const beta = parseFloat(document.getElementById('beta').value) || 1;
+        const betaRaw = parseFloat(document.getElementById('beta').value);
+        const beta = isNaN(betaRaw) ? 1 : betaRaw;   // V7.2: بيتا = 0 قيمة صحيحة (أصل بلا مخاطر سوقية)، والفارغ فقط = 1
         const mrp = parseFloat(document.getElementById('marketRiskPremium').value) / 100 || 0;
 
         if (equity <= 0 && debt <= 0) {

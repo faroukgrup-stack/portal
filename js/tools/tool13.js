@@ -58,6 +58,16 @@
 
     // ===== إدارة الورديات =====
     let shiftCount = 2;
+    const MAX_SHIFTS = 3;   // V7.2: متوافق مع خيارات «عدد الورديات»
+    let shiftVals = [];
+    function readShifts() {   // V7.2: حفظ القيم المكتوبة قبل إعادة الرسم (كانت تُمسح)
+        const n = document.querySelectorAll('#shiftsContainer .shift-row').length;
+        for (let i = 1; i <= n; i++) {
+            const e = document.getElementById(`shiftEmployees${i}`), h = document.getElementById(`shiftHours${i}`);
+            shiftVals[i - 1] = { e: e ? e.value : '', h: h ? h.value : '' };
+        }
+    }
+    function syncNumShifts() { const sel = document.getElementById('numShifts'); if (sel && sel.querySelector(`option[value="${shiftCount}"]`)) sel.value = String(shiftCount); }
     function renderShifts() {
         const container = document.getElementById('shiftsContainer');
         container.innerHTML = '';
@@ -69,18 +79,30 @@
                 ${i > 1 ? `<button class="remove-shift" onclick="removeShift(${i})"><i class="fas fa-times"></i></button>` : ''}
             `;
             container.appendChild(div);
+            const v = shiftVals[i - 1];
+            if (v) {
+                const e = document.getElementById(`shiftEmployees${i}`), h = document.getElementById(`shiftHours${i}`);
+                if (e && v.e !== '') e.value = v.e;
+                if (h && v.h !== '') h.value = v.h;
+            }
         }
+        syncNumShifts();
     }
-    window.removeShift = function(index) {
-        shiftCount--;
+    window.removeShift = function(index) {   // V7.2: يحذف الوردية المحددة (كان يحذف الأخيرة دائماً)
+        readShifts();
+        shiftVals.splice(index - 1, 1);
+        shiftCount = Math.max(1, shiftCount - 1);
         renderShifts();
     };
     document.getElementById('addShiftBtn').addEventListener('click', function() {
+        if (shiftCount >= MAX_SHIFTS) return;
+        readShifts();
         shiftCount++;
         renderShifts();
     });
     document.getElementById('numShifts').addEventListener('change', function() {
-        shiftCount = parseInt(this.value);
+        readShifts();
+        shiftCount = Math.min(Math.max(parseInt(this.value) || 1, 1), MAX_SHIFTS);
         renderShifts();
     });
 

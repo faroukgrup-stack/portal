@@ -1,6 +1,8 @@
 
         (function() {
             'use strict';
+            // V7.1: عرض الفترات غير المحققة (Infinity) بالرمز ∞ بدلاً من Infinity/قيمة سالبة
+            const fxP = (v, d) => Number.isFinite(v) ? v.toFixed(d) : '∞';
 
             // ===== آلة حاسبة =====
             const calcDisplay = document.getElementById('calcDisplay');
@@ -116,6 +118,15 @@
                 }
             });
 
+            // V7.2: كتابة عدد السنوات يدوياً تعيد رسم خانات التدفقات فوراً (كانت تتغير بالأزرار فقط)
+            document.getElementById('projectYears').addEventListener('change', function() {
+                updateCashflowsFromInputs();
+                let y = parseInt(this.value) || 1;
+                y = Math.min(Math.max(y, 1), 50);
+                this.value = y;
+                renderCashflows();
+            });
+
             document.getElementById('fillExampleBtn').addEventListener('click', function() {
                 document.getElementById('projectYears').value = 5;
                 cashflows = [150000, 180000, 220000, 200000, 180000];
@@ -129,13 +140,13 @@
                 const currency = document.getElementById('currencySelect').value;
                 const company = document.getElementById('companyName').value || T('s3');
                 const initialInvestment = parseFloat(document.getElementById('initialInvestment').value) || 0;
-                const discountRate = parseFloat(document.getElementById('discountRate').value) / 100 || 0;
+                const discountRate = parseFloat(document.getElementById('discountRate').value) / 100;   // V7.2: الخانة الفارغة تُرفض بدل اعتبارها 0%
                 const years = parseInt(document.getElementById('projectYears').value) || 0;
 
                 while (cashflows.length < years) cashflows.push(0);
                 while (cashflows.length > years) cashflows.pop();
 
-                if (initialInvestment <= 0 || discountRate < 0 || years <= 0) {
+                if (initialInvestment <= 0 || !(discountRate >= 0) || years <= 0) {
                     alert(T('s4'));
                     return;
                 }
@@ -158,7 +169,7 @@
                 // بطاقات النتائج
                 document.getElementById('kpiCards').innerHTML = `
                     <div class="result-card" style="border-color:${npv >= 0 ? '#28a745' : '#dc3545'}${T('s10')}${npv >= 0 ? '#4ade80' : '#f87171'}">${currency}${npv.toFixed(2)}</div>
-                        <div class="unit">${npv >= 0 ? T('s8') : T('s9')}${T('s11')}${irrPercent.toFixed(2)}${T('s12')}${(discountRate*100).toFixed(2)}${T('s13')}${payback.toFixed(2)}${T('s14')}${dPayback.toFixed(2)}${T('s15')}${isAcceptable ? '#28a745' : '#dc3545'}${T('s16')}${statusClass}">${status}</span></div>
+                        <div class="unit">${npv >= 0 ? T('s8') : T('s9')}${T('s11')}${irrPercent.toFixed(2)}${T('s12')}${(discountRate*100).toFixed(2)}${T('s13')}${fxP(payback, 2)}${T('s14')}${fxP(dPayback, 2)}${T('s15')}${isAcceptable ? '#28a745' : '#dc3545'}${T('s16')}${statusClass}">${status}</span></div>
                     </div>
                 `;
 
@@ -184,9 +195,9 @@
                     recHtml += `${T('s19')}`;
                     recHtml += `${T('s20')}${currency}${npv.toFixed(2)}${T('s21')}${irrPercent.toFixed(2)}${T('s22')}${(discountRate*100).toFixed(2)}%).</p>`;
                     if (payback < years) {
-                        recHtml += `${T('s23')}${payback.toFixed(2)}${T('s24')}${years}${T('s25')}`;
+                        recHtml += `${T('s23')}${fxP(payback, 2)}${T('s24')}${years}${T('s25')}`;
                     } else {
-                        recHtml += `${T('s26')}${payback.toFixed(2)}${T('s27')}${years}${T('s28')}`;
+                        recHtml += `${T('s26')}${fxP(payback, 2)}${T('s27')}${years}${T('s28')}`;
                     }
                 } else if (npv > 0 || irrPercent > discountRate * 100) {
                     recHtml += `${T('s29')}`;
@@ -427,7 +438,7 @@
                             0 },
                         { label: 'IRR', value: `${D.outputs.irr.toFixed(2)}%`, good: D.outputs.irr > D
                                 .inputs.discountRate },
-                        { label: 'Payback', value: `${D.outputs.payback.toFixed(2)}${T('s62')}`, good: D.outputs
+                        { label: 'Payback', value: `${fxP(D.outputs.payback, 2)}${T('s62')}`, good: D.outputs
                                 .payback < D.inputs.years },
                         { label: T('s63'), value: D.outputs.status, good: D.outputs.isAcceptable }
                     ];
@@ -513,7 +524,7 @@
                     let recContent = '';
                     if (D.outputs.isAcceptable) {
                         recContent =
-                            `${T('s70')}${currency}${D.outputs.npv.toFixed(2)}${T('s21')}${D.outputs.irr.toFixed(2)}${T('s22')}${D.inputs.discountRate.toFixed(2)}${T('s71')}${D.outputs.payback.toFixed(2)}${T('s62')}`;
+                            `${T('s70')}${currency}${D.outputs.npv.toFixed(2)}${T('s21')}${D.outputs.irr.toFixed(2)}${T('s22')}${D.inputs.discountRate.toFixed(2)}${T('s71')}${fxP(D.outputs.payback, 2)}${T('s62')}`;
                     } else {
                         recContent =
                             `${T('s72')}${currency}${D.outputs.npv.toFixed(2)}${T('s21')}${D.outputs.irr.toFixed(2)}${T('s33')}${D.inputs.discountRate.toFixed(2)}${T('s73')}`;
@@ -564,7 +575,7 @@
                             `<tr><td>${i+1}</td><td>${currency}${(D.inputs.cashflows[i]||0).toFixed(0)}</td></tr>`;
                     }
 
-                    const fullHtml = `${T('s81')}${company}${T('s82')}${dateStr}${T('s83')}${currency}${T('s84')}${currency}${D.inputs.initialInvestment.toFixed(0)}${T('s85')}${D.inputs.discountRate.toFixed(2)}${T('s86')}${D.inputs.years}${T('s87')}${cfRows}${T('s88')}${currency}${D.outputs.npv.toFixed(2)}${T('s89')}${D.outputs.irr.toFixed(2)}${T('s90')}${D.outputs.payback.toFixed(2)}${T('s91')}${D.outputs.dPayback.toFixed(2)}${T('s92')}${D.outputs.isAcceptable ? '#28a745' : '#dc3545'};">${D.outputs.status}${T('s93')}${D.outputs.isAcceptable ? T('s78') : T('s79')}</p></div>
+                    const fullHtml = `${T('s81')}${company}${T('s82')}${dateStr}${T('s83')}${currency}${T('s84')}${currency}${D.inputs.initialInvestment.toFixed(0)}${T('s85')}${D.inputs.discountRate.toFixed(2)}${T('s86')}${D.inputs.years}${T('s87')}${cfRows}${T('s88')}${currency}${D.outputs.npv.toFixed(2)}${T('s89')}${D.outputs.irr.toFixed(2)}${T('s90')}${fxP(D.outputs.payback, 2)}${T('s91')}${fxP(D.outputs.dPayback, 2)}${T('s92')}${D.outputs.isAcceptable ? '#28a745' : '#dc3545'};">${D.outputs.status}${T('s93')}${D.outputs.isAcceptable ? T('s78') : T('s79')}</p></div>
                         ${chartImgBase64 ? `${T('s80')}${chartImgBase64}" class="chart-img" /></div>` : ''}${T('s94')}${now.getFullYear()}</div>
                     </body></html>`;
 

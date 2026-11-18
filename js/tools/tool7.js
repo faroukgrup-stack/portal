@@ -84,7 +84,7 @@
     function updateUI(results) {
         if (!results) return;
         const { currency, fixedCosts, unitPrice, unitCost, contributionMargin, breakevenUnits, breakevenRevenue, contributionMarginPercent, companyName, chart } = results;
-        const beUnitsDisplay = isFinite(breakevenUnits) ? breakevenUnits.toFixed(0) : '∞';
+        const beUnitsDisplay = isFinite(breakevenUnits) ? Math.ceil(breakevenUnits - 1e-9).toString()   /* V7.2: تقريب للأعلى — لا يمكن بيع جزء من وحدة */ : '∞';
         const beRevenueDisplay = isFinite(breakevenRevenue) ? currency + ' ' + breakevenRevenue.toFixed(0) : T('s4');
 
         document.getElementById('kpiCards').innerHTML = `${T('s5')}${beUnitsDisplay}${T('s6')}${beRevenueDisplay}${T('s7')}${currency}${contributionMargin.toFixed(2)}${T('s8')}${contributionMarginPercent.toFixed(2)}%</div></div>

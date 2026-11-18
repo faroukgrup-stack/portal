@@ -1,6 +1,8 @@
 
         (function() {
             'use strict';
+            // V7.1: عرض الفترات غير المحققة (Infinity) بالرمز ∞ بدلاً من Infinity/قيمة سالبة
+            const fxP = (v, d) => Number.isFinite(v) ? v.toFixed(d) : '∞';
 
             // ===== آلة حاسبة =====
             const calcDisplay = document.getElementById('calcDisplay');
@@ -204,7 +206,7 @@
                 `;
 
                 document.getElementById('paybackCard').innerHTML =
-                    `${T('s40')}${paybackYears.toFixed(1)}${T('s41')}${paybackMonths.toFixed(0)}${T('s42')}`;
+                    `${T('s40')}${fxP(paybackYears, 1)}${T('s41')}${fxP(paybackMonths, 0)}${T('s42')}`;
 
                 let sensRows = R.sensRows;
                 document.getElementById('sensitivityTable').innerHTML =
@@ -365,7 +367,7 @@
                         [T('s4'), `${currency} ${R.netProfit.toFixed(0)}`],
                         [T('s83'), `${R.profitMargin.toFixed(1)}%`],
                         [T('s110'), `${currency} ${R.breakevenRevenue.toFixed(0)}`],
-                        [T('s111'), `${R.paybackYears.toFixed(1)}${T('s112')}`],
+                        [T('s111'), `${fxP(R.paybackYears, 1)}${T('s112')}`],
                         [T('s113'), `${R.marginOfSafety.toFixed(1)}%`]
                     ];
                     kpis.forEach(k => ksh.addRow(k));
@@ -452,7 +454,7 @@
                     const fullHtml = `${T('s133')}${companyName} | ${new Date().toLocaleDateString(FG.locale())}${T('s134')}${kpiRows}</table>
                     <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;">
                         ${pieImg ? `${T('s131')}${pieImg}" class="chart-img"/></div>` : ''}
-                        ${lineImg ? `${T('s132')}${lineImg}" class="chart-img"/></div>` : ''}${T('s135')}${costRows}${T('s136')}${currency}${R.breakevenRevenue.toFixed(0)} (${R.breakevenCustomers.toFixed(0)}${T('s137')}${R.paybackYears.toFixed(1)}${T('s138')}${R.paybackMonths.toFixed(0)}${T('s139')}${R.marginOfSafety.toFixed(1)}${T('s140')}${R.occupancyRate.toFixed(1)}%</p>
+                        ${lineImg ? `${T('s132')}${lineImg}" class="chart-img"/></div>` : ''}${T('s135')}${costRows}${T('s136')}${currency}${R.breakevenRevenue.toFixed(0)} (${R.breakevenCustomers.toFixed(0)}${T('s137')}${fxP(R.paybackYears, 1)}${T('s138')}${fxP(R.paybackMonths, 0)}${T('s139')}${R.marginOfSafety.toFixed(1)}${T('s140')}${R.occupancyRate.toFixed(1)}%</p>
                     <div class="footer">© ${new Date().getFullYear()} FAROUK GRUP</div>
                     </body></html>`;
 

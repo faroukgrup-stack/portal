@@ -469,7 +469,7 @@
                         { title: T('s101'),
                         content: `${T('s102')}${D.outputs.status}\n${D.outputs.recommendation}` },
                         { title: T('s103'),
-                        content: D.outputs.flags.dioHigh ? T('s104') : T('s105') + (D.outputs.flags.dsoHigh ? T('s106') : T('s107')) + (D.outputs.flags.dpoLow ? T('s108') : T('s109')) },
+                        content: (D.outputs.flags.dioHigh ? T('s104') : T('s105')) + (D.outputs.flags.dsoHigh ? T('s106') : T('s107')) + (D.outputs.flags.dpoLow ? T('s108') : T('s109')) },
                         { title: T('s110'),
                         content: T('s111') }
                     ];

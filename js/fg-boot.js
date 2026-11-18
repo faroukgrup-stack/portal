@@ -45,7 +45,8 @@
     var css = [
         "../css/tools-common" + dash + ".css",
         TOOL ? "../css/tools/" + TOOL + cssSuffix + ".css" : null,
-        "../css/tools-overrides" + dash + ".css"
+        "../css/tools-overrides" + dash + ".css",
+        "../css/fg-dock.css"   // V7.2: الحاوية الجانبية (حاسبة + مساعد ذكي) والتلميحات وأزرار التصدير الموحدة
     ];
     var headHtml = '<style>html.fg-loading body{visibility:hidden}</style>';
     css.forEach(function (h) { if (h) headHtml += '<link rel="stylesheet" href="' + h + '">'; });
@@ -63,6 +64,10 @@
         start: function () { return isRTL ? "right" : "left"; },
         end: function () { return isRTL ? "left" : "right"; },
         T: function (k) { return Object.prototype.hasOwnProperty.call(dict, k) ? dict[k] : k; },
+        /** V7.2: القاموس كاملاً (تستعمله fg-dock.js لقراءة مفاتيح tip:*) */
+        dict: function () { return dict; },
+        /** V7.2: نصوص مشتركة لكل الأدوات (ui_translations, namespace = common) */
+        common: {},
         /** ترجمة رموز @{sN} القادمة من السيرفر (يعمل على النصوص والمصفوفات والكائنات) */
         localize: function (v) {
             if (typeof v === "string" && v.charCodeAt(0) === 0x2116 && v.length < 8) { // أرقام خاصة من السيرفر (JSON لا يدعم NaN/Infinity)
@@ -145,7 +150,7 @@
     /* ───────────── 4. الترجمات من قاعدة البيانات ───────────── */
     async function loadDict() {
         if (TEST) { dict = TEST.dict || {}; return; }
-        var key = "fg_i18n_" + TOOL + "_" + lang;
+        var key = "fg_i18n_v72_" + TOOL + "_" + lang;   // V7.2: مفتاح جديد لجلب التلميحات الجديدة فوراً
         var cached = null;
         try { cached = JSON.parse(localStorage.getItem(key) || "null"); } catch (e) {}
         var ttl = (CFG.I18N_CACHE_MINUTES || 60) * 60000;
@@ -162,6 +167,32 @@
             dict = r.data;
             try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), strings: r.data })); } catch (e) {}
         }
+    }
+
+    /** V7.2: النصوص المشتركة (الحاوية الجانبية، أزرار التصدير...) — كاش محلي مثل قاموس الأداة */
+    async function loadCommon() {
+        if (TEST) { FG.common = TEST.common || {}; return; }
+        var key = "fg_ui_common_" + lang, cached = null;
+        try { cached = JSON.parse(localStorage.getItem(key) || "null"); } catch (e) {}
+        var ttl = (CFG.I18N_CACHE_MINUTES || 60) * 60000;
+        var fetchIt = async function () {
+            var r = await FG.sb.rpc("get_ui_i18n", { p_namespace: "common", p_lang: lang });
+            if (!r.error && r.data) {
+                FG.common = r.data;
+                try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), strings: r.data })); } catch (e) {}
+            }
+        };
+        if (cached && cached.strings) { FG.common = cached.strings; if (Date.now() - cached.ts > ttl) fetchIt().catch(function () {}); return; }
+        await fetchIt();
+    }
+
+    function loadDock() {
+        return new Promise(function (resolve) {
+            var s = document.createElement("script");
+            s.src = (TEST && TEST.dockSrc) ? TEST.dockSrc : "../js/fg-dock.js";
+            s.onload = resolve; s.onerror = resolve;
+            document.body.appendChild(s);
+        });
     }
 
     function applyDom() {
@@ -201,11 +232,16 @@
 
     FG.ready = (async function () {
         try {
+            // V7.1: تحميل القاموس يبدأ بالتوازي مع التحقق من الاشتراك (كانا متتاليين)،
+            // فيُوفَّر زمن رحلة شبكية كاملة عند فتح كل أداة. الطرد يبقى كما هو إن لم يكن الاشتراك فعالاً.
+            var dictP = loadDict().catch(function (e) { console.error(e); });
+            var commonP = loadCommon().catch(function (e) { console.warn(e); });
             var ok = await checkAccess();
             if (!ok) return;
-            await Promise.all([loadDict(), domReady]);
+            await Promise.all([dictP, commonP, domReady]);
             applyDom();
             await loadToolScript();
+            if (!(TEST && TEST.noDock)) await loadDock();
         } catch (e) { console.error(e); }
         clearTimeout(reveal);
         document.documentElement.classList.remove("fg-loading");

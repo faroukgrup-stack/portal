@@ -22,10 +22,27 @@ try {
     if (Array.isArray(cachedLangs) && cachedLangs.length) SUPPORTED_LANGS = cachedLangs;
 } catch (e) {}
 
+/** V7.2: نصوص احتياطية للمفاتيح الجديدة إلى أن تُطبَّق الهجرة 006 على قاعدة البيانات */
+const FALLBACK_I18N = {
+    ar: { headerTitle: 'المنصة الشاملة', payTitleNew: 'الاشتراك في المنصة الشاملة', payTitleRenew: 'تجديد الاشتراك',
+          payNote: 'أكمل الدفع في النموذج أدناه. بعد نجاح الدفع تنتقل تلقائياً إلى صفحة إتمام الاشتراك لإدخال بياناتك.',
+          payOpenWindow: 'فتح صفحة الدفع في نافذة جديدة', errorPending: 'طلب اشتراكك قيد التحقق من الدفع، وسيُفعَّل حسابك فور التأكيد.',
+          syncCloud: 'محفوظ في حسابك ومتاح من أي جهاز', syncOffline: 'محفوظ على هذا الجهاز، وسيُزامَن عند عودة الاتصال', close: 'إغلاق' },
+    en: { headerTitle: 'The Comprehensive Platform', payTitleNew: 'Subscribe to the Comprehensive Platform', payTitleRenew: 'Renew subscription',
+          payNote: 'Complete the payment in the form below. After a successful payment you will be taken automatically to the page where you complete your subscription details.',
+          payOpenWindow: 'Open the payment page in a new window', errorPending: 'Your subscription request is awaiting payment verification. Your account will be activated once it is confirmed.',
+          syncCloud: 'Saved to your account and available on any device', syncOffline: 'Saved on this device; it will sync when the connection is back', close: 'Close' },
+    tr: { headerTitle: 'Kapsamlı Platform', payTitleNew: 'Kapsamlı Platforma Abone Ol', payTitleRenew: 'Aboneliği yenile',
+          payNote: 'Ödemeyi aşağıdaki formda tamamlayın. Ödeme başarılı olduktan sonra bilgilerinizi gireceğiniz abonelik tamamlama sayfasına otomatik olarak yönlendirileceksiniz.',
+          payOpenWindow: 'Ödeme sayfasını yeni pencerede aç', errorPending: 'Abonelik talebiniz ödeme doğrulaması bekliyor. Onaylandığında hesabınız etkinleştirilecek.',
+          syncCloud: 'Hesabınıza kaydedildi, her cihazdan erişilebilir', syncOffline: 'Bu cihaza kaydedildi; bağlantı gelince senkronize edilecek', close: 'Kapat' }
+};
 /** ترجمة مفتاح — تُرجع المفتاح نفسه إن لم توجد ترجمة */
 function t(key) {
     const d = translations[currentLang];
-    return d && Object.prototype.hasOwnProperty.call(d, key) ? d[key] : key;
+    if (d && Object.prototype.hasOwnProperty.call(d, key)) return d[key];
+    const f = FALLBACK_I18N[currentLang] || FALLBACK_I18N[langDir(currentLang) === 'rtl' ? 'ar' : 'en'];
+    return f && f[key] ? f[key] : key;
 }
 function langDir(code) {
     const l = SUPPORTED_LANGS.find(x => x.code === code);
@@ -44,7 +61,7 @@ async function loadLanguages() {
 
 /** تحميل قاموس لغة (من الكاش فوراً ثم تحديث من السيرفر) */
 async function loadPortalDict(lang) {
-    const key = 'fg_ui_portal_' + lang;
+    const key = 'fg_ui_portal_v72_' + lang;   // V7.2: مفتاح جديد يفرض جلب النصوص الجديدة فوراً
     const ttl = (CFG.I18N_CACHE_MINUTES || 60) * 60000;
     let cached = null;
     try { cached = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) {}

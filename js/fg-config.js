@@ -16,6 +16,6 @@ window.FG_CONFIG = {
     RTL_LANGS: ["ar"],
     I18N_CACHE_MINUTES: 60,          // مدة كاش الترجمات في المتصفح
     SUB_CHECK_MINUTES: 10,           // كل كم دقيقة يُعاد فحص الاشتراك من السيرفر
-    RENEW_URL: "https://alfan.link/faroukazem?digital=r89RJK",
+    RENEW_URL: "https://www.entervia.co/checkout/77",
     PORTAL_URL: "https://portal.farouk-grup.com/"
 };

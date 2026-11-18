@@ -70,10 +70,10 @@
                 const company = document.getElementById('companyName').value || T('s2');
 
                 const marketingSpend = parseFloat(document.getElementById('marketingSpend').value) || 0;
-                const newCustomers = parseInt(document.getElementById('newCustomers').value) || 1;
+                const newCustomers = parseFloat(document.getElementById('newCustomers').value) || 0;   // V7.2: لا قيمة افتراضية خفية (كانت 1)
                 const avgOrder = parseFloat(document.getElementById('avgOrderValue').value) || 0;
-                const visitsPerYear = parseInt(document.getElementById('visitsPerYear').value) || 1;
-                const lifespan = parseFloat(document.getElementById('customerLifespan').value) || 1;
+                const visitsPerYear = parseFloat(document.getElementById('visitsPerYear').value) || 0;   // V7.2: يقبل الكسور (مثل 1.5 زيارة)
+                const lifespan = parseFloat(document.getElementById('customerLifespan').value) || 0;
                 const profitMargin = parseFloat(document.getElementById('profitMargin').value) || 0;
 
                 if (marketingSpend <= 0 || newCustomers <= 0 || avgOrder <= 0 || visitsPerYear <= 0 || lifespan <= 0 || profitMargin <= 0) {
