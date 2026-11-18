@@ -1,0 +1,131 @@
+/* fg-dock.css — V7.2: الحاوية الجانبية + التلميحات + أزرار التصدير الموحدة
+   الحاوية تظهر في جهة نهاية السطر: يسار الصفحة في العربية (rtl) ويمين الصفحة في الإنجليزية/التركية (ltr). */
+:root { --fgd-w: 370px; --fgd-gold: #e8b95c; --fgd-bg: #0d1220; --fgd-line: rgba(232,185,92,.28); }
+
+/* الحاسبة القديمة داخل كل أداة استُبدلت بحاسبة الحاوية */
+.calc-floating-btn, #calculatorModal { display: none !important; }
+
+/* ── الشريط الجانبي ── */
+.fgd-rail { position: fixed; inset-inline-end: 0; top: 50%; transform: translateY(-50%); z-index: 10001;
+  display: flex; flex-direction: column; gap: 8px; padding: 8px 6px; background: rgba(13,18,32,.92);
+  border: 1px solid var(--fgd-line); border-inline-end: 0; border-start-start-radius: 14px; border-end-start-radius: 14px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.45); }
+html.fgd-open .fgd-rail { inset-inline-end: var(--fgd-w); }
+.fgd-rail-btn { width: 62px; min-height: 62px; border: 1px solid transparent; border-radius: 12px; background: transparent; color: var(--fgd-gold);
+  cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  font: 600 .68rem/1.15 'Tajawal', system-ui, sans-serif; text-align: center; padding: 6px 2px; }
+.fgd-rail-btn i { font-size: 1.35rem; }
+.fgd-rail-btn .fgd-robot { width: 34px; height: 34px; }
+.fgd-rail-btn:hover, .fgd-rail-btn.on { background: rgba(232,185,92,.14); border-color: var(--fgd-line); }
+.fgd-rail-btn:focus-visible { outline: 2px solid var(--fgd-gold); outline-offset: 2px; }
+
+/* ── اللوحة ── */
+.fgd-panel { position: fixed; top: 0; bottom: 0; inset-inline-end: 0; width: var(--fgd-w); z-index: 10000;
+  background: var(--fgd-bg); border-inline-start: 1px solid var(--fgd-line); box-shadow: 0 0 30px rgba(0,0,0,.5);
+  display: flex; flex-direction: column; transform: translateX(100%); transition: transform .22s ease; color: #f0f4fa;
+  font-family: 'Tajawal', system-ui, sans-serif; }
+.fgd-root[dir="rtl"] .fgd-panel { transform: translateX(-100%); }
+html.fgd-open .fgd-root .fgd-panel { transform: none; }
+.fgd-panel[aria-hidden="true"] { visibility: hidden; }
+html.fgd-open .fgd-panel { visibility: visible; }
+
+/* الأداة تبقى الجزء الأكبر: تُزاح لتتسع للحاوية على الشاشات الواسعة */
+@media (min-width: 1100px) {
+  html body { padding-inline-end: 80px !important; transition: padding .22s ease; }
+  html.fgd-open body { padding-inline-end: calc(var(--fgd-w) + 80px) !important; }
+}
+
+.fgd-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--fgd-line); }
+.fgd-title { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--fgd-gold); font-size: 1.05rem; }
+.fgd-title .fgd-robot { width: 26px; height: 26px; }
+.fgd-x { background: transparent; border: 1px solid var(--fgd-line); color: #f0f4fa; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; }
+.fgd-x:hover { background: rgba(255,255,255,.08); }
+.fgd-pane { flex: 1; overflow: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+
+/* ── الحاسبة ── */
+.fgd-target { font-size: .85rem; color: #b8c5dc; background: rgba(255,255,255,.04); border: 1px dashed var(--fgd-line); border-radius: 8px; padding: 7px 10px; }
+.fgd-target .val { color: var(--fgd-gold); }
+.fgd-disp { width: 100%; font: 700 1.6rem/1.2 'Consolas', 'Courier New', monospace; text-align: right; padding: 12px; border-radius: 10px;
+  background: #060911; color: #fff; border: 1px solid var(--fgd-line); }
+.fgd-disp:focus { outline: none; border-color: var(--fgd-gold); }
+.fgd-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+.fgd-k { height: 46px; border-radius: 10px; border: 1px solid rgba(255,255,255,.08); background: #182136; color: #fff; font-size: 1.15rem; font-weight: 700; cursor: pointer; }
+.fgd-k:hover { background: #22304d; }
+.fgd-k.op { color: var(--fgd-gold); }
+.fgd-k.fn { background: #2a1f1f; color: #ffb4b4; }
+.fgd-k.eq { grid-column: span 4; background: linear-gradient(135deg, #c9963e, #ffe296); color: #111; }
+.fgd-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.fgd-actions .fgd-btn[data-act="insert"] { grid-column: span 2; }
+.fgd-btn { border: 1px solid var(--fgd-line); background: rgba(255,255,255,.05); color: #f0f4fa; padding: 9px 10px; border-radius: 9px;
+  cursor: pointer; font: 600 .88rem 'Tajawal', system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.fgd-btn:hover { background: rgba(232,185,92,.12); }
+.fgd-btn.gold { background: linear-gradient(135deg, #c9963e, #e8b95c); color: #111; border-color: transparent; }
+.fgd-msg { min-height: 1.2em; font-size: .85rem; color: #f8b4b4; }
+.fgd-msg.ok { color: #86efac; }
+.fgd-hist-t { font-size: .8rem; color: #b8c5dc; border-top: 1px solid rgba(255,255,255,.07); padding-top: 8px; }
+.fgd-hist { display: flex; flex-direction: column; gap: 4px; direction: ltr; }
+.fgd-hist button { text-align: left; background: transparent; border: 0; color: #cfd8ea; font: .85rem 'Consolas', monospace; padding: 4px 6px; border-radius: 6px; cursor: pointer; }
+.fgd-hist button:hover { background: rgba(255,255,255,.06); }
+.fgd-flash { box-shadow: 0 0 0 3px rgba(232,185,92,.75) !important; transition: box-shadow .3s; }
+
+/* ── المساعد الذكي ── */
+.fgd-ai { padding: 0; gap: 0; }
+.fgd-chat { flex: 1; overflow: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-height: 120px; }
+.fgd-m { display: flex; gap: 8px; align-items: flex-start; font-size: .92rem; line-height: 1.65; }
+.fgd-m > div { padding: 9px 12px; border-radius: 12px; max-width: 86%; overflow-wrap: anywhere; }
+.fgd-m.bot > div { background: #162036; border: 1px solid rgba(255,255,255,.06); }
+.fgd-m.me { justify-content: flex-end; }
+.fgd-m.me > div { background: rgba(232,185,92,.18); border: 1px solid var(--fgd-line); }
+.fgd-m .fgd-robot { width: 28px; height: 28px; flex: 0 0 28px; }
+.fgd-m li { list-style: none; margin: 2px 0; padding-inline-start: 12px; position: relative; }
+.fgd-m li:not(.n)::before { content: "•"; position: absolute; inset-inline-start: 0; color: var(--fgd-gold); }
+.fgd-m.wait > div { color: #b8c5dc; }
+.fgd-quick { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; border-top: 1px solid rgba(255,255,255,.06); }
+.fgd-quick button { border: 1px solid var(--fgd-line); background: transparent; color: var(--fgd-gold); border-radius: 999px; padding: 5px 10px; font: .78rem 'Tajawal', system-ui, sans-serif; cursor: pointer; }
+.fgd-quick button:hover { background: rgba(232,185,92,.12); }
+.fgd-ask { display: flex; gap: 8px; padding: 8px 12px; }
+.fgd-ask textarea { flex: 1; resize: none; border-radius: 10px; border: 1px solid var(--fgd-line); background: #060911; color: #fff; padding: 8px 10px; font: .92rem 'Tajawal', system-ui, sans-serif; }
+.fgd-ask textarea:focus { outline: none; border-color: var(--fgd-gold); }
+.fgd-ask .fgd-btn { width: 46px; }
+.fgd-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 4px 12px 12px; font-size: .72rem; color: #8d9bb5; }
+.fgd-link { background: none; border: 0; color: var(--fgd-gold); cursor: pointer; font: .78rem 'Tajawal', system-ui, sans-serif; white-space: nowrap; }
+
+/* ── الجوال: اللوحة تصبح نافذة سفلية والأداة تبقى ظاهرة فوقها ── */
+@media (max-width: 1099px) {
+  .fgd-rail { top: auto; bottom: 90px; transform: none; }
+  html.fgd-open .fgd-rail { inset-inline-end: 0; bottom: calc(62vh + 8px); }
+  .fgd-panel { top: auto; height: 62vh; width: 100%; inset-inline: 0; border-inline-start: 0; border-top: 1px solid var(--fgd-line);
+    border-radius: 16px 16px 0 0; transform: translateY(100%) !important; }
+  html.fgd-open .fgd-root .fgd-panel { transform: none !important; }
+  html.fgd-open body { padding-bottom: 62vh !important; }
+  .fgd-rail-btn { width: 54px; min-height: 54px; font-size: .6rem; }
+}
+@media print { .fgd-root, .fgd-tip { display: none !important; } html.fgd-open body { padding: 0 !important; } }
+
+/* ── التلميحات ── */
+.fgd-tip { position: fixed; z-index: 10050; max-width: 340px; display: none; pointer-events: none;
+  background: #111827; color: #f0f4fa; border: 1px solid var(--fgd-line); border-radius: 10px; padding: 9px 12px;
+  box-shadow: 0 8px 26px rgba(0,0,0,.55); font: .86rem/1.6 'Tajawal', system-ui, sans-serif; }
+.fgd-tip strong { display: block; color: var(--fgd-gold); margin-bottom: 3px; font-size: .9rem; }
+
+/* ── أزرار التصدير الموحدة: Word أزرق، Excel أخضر، PDF أحمر ── */
+.fg-exp-row { display: flex !important; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; }
+button.fg-exp { display: inline-flex !important; align-items: center; justify-content: center; gap: 8px;
+  min-width: 210px; padding: 12px 22px !important; border-radius: 12px !important; border: 0 !important;
+  color: #fff !important; font: 700 1rem 'Tajawal', system-ui, sans-serif !important; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,.35) !important; transition: filter .15s, transform .15s; width: auto !important; }
+button.fg-exp i { font-size: 1.15rem; color: #fff !important; }
+button.fg-exp:hover { filter: brightness(1.12); transform: translateY(-1px); }
+button.fg-exp:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+button.fg-exp.fg-exp-word  { background: linear-gradient(135deg, #1e4fa8, #2b6fd6) !important; }
+button.fg-exp.fg-exp-excel { background: linear-gradient(135deg, #12703e, #1d9a56) !important; }
+button.fg-exp.fg-exp-pdf   { background: linear-gradient(135deg, #a3242c, #d13b44) !important; }
+
+/* الهاتف: شريط أصغر بلا نصوص حتى لا يغطي الخانات */
+@media (max-width: 700px) {
+  .fgd-rail { top: auto; bottom: 90px; transform: none; padding: 5px 4px; gap: 5px; opacity: .92; }
+  .fgd-rail-btn { width: 44px; min-height: 44px; padding: 4px; }
+  .fgd-rail-btn span, .fgd-rail-btn .lbl { display: none; }
+  .fgd-rail-btn svg { width: 26px; height: 26px; }
+  html.fgd-open .fgd-rail { display: none; }
+}
