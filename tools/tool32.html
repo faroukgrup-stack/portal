@@ -86,7 +86,7 @@
 <div class="form-group">
 <label><i class="fas fa-info-circle"></i> <fg-t data-i18n="h23">ملاحظة</fg-t></label>
 <div class="note" data-i18n="h24" style="margin-top:0.4rem;">
-                        اتركه = 0 لتعطيل حساب المعدل الحقيقي
+عند 0 يكون المعدل الحقيقي مساوياً للاسمي
                     </div>
 </div>
 </div>
@@ -100,15 +100,15 @@
 <div class="form-row">
 <div class="form-group">
 <label><i class="fas fa-arrow-right"></i> <fg-t data-i18n="h28">الاستثمار (B): القيمة الابتدائية</fg-t></label>
-<input id="startValueB" step="1000" type="number" value="150000"/>
+<input id="startValueB" placeholder="150000" step="1000" type="number" value=""/>
 </div>
 <div class="form-group">
 <label><i class="fas fa-arrow-left"></i> <fg-t data-i18n="h29">الاستثمار (B): القيمة النهائية</fg-t></label>
-<input id="endValueB" step="1000" type="number" value="280000"/>
+<input id="endValueB" placeholder="280000" step="1000" type="number" value=""/>
 </div>
 <div class="form-group">
 <label><i class="fas fa-calendar"></i> <fg-t data-i18n="h30">عدد سنوات (B)</fg-t></label>
-<input id="yearsB" min="1" step="1" type="number" value="5"/>
+<input id="yearsB" min="1" placeholder="5" step="1" type="number" value=""/>
 </div>
 </div>
 <button class="btn-calculate" id="calculateBtn"><i class="fas fa-calculator"></i> <fg-t data-i18n="h31">حساب CAGR الاسمي والحقيقي</fg-t></button>

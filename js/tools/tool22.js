@@ -90,7 +90,7 @@
         const name = document.getElementById('dishName').value.trim();
         const price = parseFloat(document.getElementById('dishPrice').value);
         const cost = parseFloat(document.getElementById('dishCost').value);
-        const units = parseInt(document.getElementById('dishUnits').value);
+        const units = parseFloat(String(document.getElementById('dishUnits').value).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)));
         if (!name || isNaN(price) || isNaN(cost) || isNaN(units) || price <= 0 || cost < 0 || units < 0) {
             alert(T('s2'));
             return;
@@ -152,7 +152,7 @@
                     const name = String(row[0]).trim();
                     const price = parseFloat(row[1]);
                     const cost = parseFloat(row[2]);
-                    const units = parseInt(row[3]);
+                    const units = parseFloat(row[3]);
                     if (!name || isNaN(price) || isNaN(cost) || isNaN(units) || price <= 0 || cost < 0 || units < 0) continue;
                     dishes.push({ name, price, cost, units });
                     imported++;

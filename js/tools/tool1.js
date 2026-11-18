@@ -146,27 +146,26 @@
             document.getElementById('calculateBtn').addEventListener('click', async function() {
                 const currency = document.getElementById('currencySelect').value;
                 const inputs = {
-                    fixedCapital: parseFloat(document.getElementById('fixedCapital').value) || 0,
-                    setupCapital: parseFloat(document.getElementById('setupCapital').value) || 0,
-                    monthlySales: parseFloat(document.getElementById('monthlySales').value) || 0,
-                    employees: parseFloat(document.getElementById('employees').value) || 0,
-                    netSalary: parseFloat(document.getElementById('netSalary').value) || 0,
-                    salaryBurden: parseFloat(document.getElementById('salaryBurden').value) || 1,
-                    netRent: parseFloat(document.getElementById('netRent').value) || 0,
-                    rentTax: parseFloat(document.getElementById('rentTax').value) / 100 || 0,
-                    totalVariableCostPercent: parseFloat(document.getElementById('totalVariableCostPercent')
-                        .value) || 0,
-                    opexMonthly: parseFloat(document.getElementById('opexMonthly').value) || 0,
-                    cashReserve: parseFloat(document.getElementById('cashReserve').value) || 0,
-                    wcMonths: parseFloat(document.getElementById('wcMonths').value) || 3,
-                    growth: parseFloat(document.getElementById('growthRate').value) / 100 || 0,
-                    expGrowth: parseFloat(document.getElementById('expGrowth').value) / 100 || 0,
-                    discount: parseFloat(document.getElementById('discountRate').value) / 100 || 0,
-                    taxRate: parseFloat(document.getElementById('taxRate').value) / 100 || 0,
-                    lifeYears: parseInt(document.getElementById('lifeYears').value) || 8,
-                    reinvestRate: parseFloat(document.getElementById('reinvestRate').value) / 100 || 0.10,
-                    debtService: parseFloat(document.getElementById('debtService').value) || 0,
-                    pricePerUnit: parseFloat(document.getElementById('pricePerUnit').value) || 0
+                    fixedCapital: FG.num('fixedCapital', 0),
+                    setupCapital: FG.num('setupCapital', 0),
+                    monthlySales: FG.num('monthlySales', 0),
+                    employees: FG.num('employees', 0),
+                    netSalary: FG.num('netSalary', 0),
+                    salaryBurden: FG.num('salaryBurden', 1),
+                    netRent: FG.num('netRent', 0),
+                    rentTax: FG.num('rentTax', 0) / 100,
+                    totalVariableCostPercent: FG.num('totalVariableCostPercent', 0) / 100,
+                    opexMonthly: FG.num('opexMonthly', 0),
+                    cashReserve: FG.num('cashReserve', 0),
+                    wcMonths: FG.num('wcMonths', 3),
+                    growth: FG.num('growthRate', 0) / 100,
+                    expGrowth: FG.num('expGrowth', 0) / 100,
+                    discount: FG.num('discountRate', 0) / 100,
+                    taxRate: FG.num('taxRate', 0) / 100,
+                    lifeYears: FG.int('lifeYears', 8),
+                    reinvestRate: FG.num('reinvestRate', 10) / 100,
+                    debtService: FG.num('debtService', 0),
+                    pricePerUnit: FG.num('pricePerUnit', 0)
                 };
 
                 let R;
@@ -179,7 +178,7 @@
                 document.getElementById('initialMessage').style.display = 'none';
                 document.getElementById('resultsSection').style.display = 'block';
 
-                document.getElementById('kpiCards').innerHTML = `${T('s34')}${currency}${res.npv.toFixed(0)}</div><div class="status ${res.npv>0?'status-good':'status-bad'}">${res.npv>0?T('s28'):T('s29')}${T('s35')}${!isNaN(res.irr)?(res.irr*100).toFixed(2):T('s24')}%</div><div class="status ${res.irr>inputs.discount?'status-good':'status-bad'}">${!isNaN(res.irr)?(res.irr>inputs.discount?T('s30'):T('s31')):''}${T('s36')}${res.pi.toFixed(2)}</div><div class="unit">${res.pi>=1?T('s32'):T('s33')}${T('s37')}${res.payback!==null?res.payback.toFixed(1):'∞'}${T('s38')}${res.dpbp!==null?res.dpbp.toFixed(1):'∞'}${T('s39')}${(res.roi*100).toFixed(2)}${T('s40')}${currency}${res.workingCapitalRequired.toFixed(0)}${T('s41')}${res.operatingMargin.toFixed(2)}%</div></div>
+                document.getElementById('kpiCards').innerHTML = `${T('s34')}${currency}${res.npv.toFixed(0)}</div><div class="status ${res.npv>0?'status-good':'status-bad'}">${res.npv>0?T('s28'):T('s29')}${T('s35')}${!isNaN(res.irr)?(res.irr*100).toFixed(2):T('s24')}%</div><div class="status ${res.irr>inputs.discount?'status-good':'status-bad'}">${!isNaN(res.irr)?(res.irr>inputs.discount?T('s30'):T('s31')):''}${T('s36')}${FG.fx(res.pi, 2)}</div><div class="unit">${res.pi>=1?T('s32'):T('s33')}${T('s37')}${res.payback!==null?res.payback.toFixed(1):'∞'}${T('s38')}${res.dpbp!==null?res.dpbp.toFixed(1):'∞'}${T('s39')}${FG.fx(res.roi*100, 2)}${T('s40')}${currency}${res.workingCapitalRequired.toFixed(0)}${T('s41')}${res.operatingMargin.toFixed(2)}%</div></div>
                     <div class="result-card"><i class="fas fa-percent"></i><h4>MIRR</h4><div class="value">${!isNaN(res.mirr)?(res.mirr*100).toFixed(2):T('s24')}%</div></div>
                     <div class="result-card"><i class="fas fa-shield-alt"></i><h4>DSCR</h4><div class="value">${res.dscr.toFixed(2)}${T('s42')}${currency}${res.ebitda.toFixed(0)}${T('s43')}${currency}${res.netIncome.toFixed(0)}${T('s44')}${res.netProfitMargin.toFixed(2)}%</div></div>
                 `;
@@ -205,7 +204,7 @@
                 `;
                 document.getElementById('riskDataText').innerHTML = riskDataText;
 
-                document.getElementById('breakevenCard').innerHTML = `${T('s56')}${currency}${res.beRevenueActual.toFixed(0)}${T('s57')}${res.beUnitsActual.toFixed(0)}${T('s58')}${currency}${res.totalFixedMonthly.toFixed(0)}${T('s59')}${(res.contributionMarginRatio*100).toFixed(0)}%)</span></div>
+                document.getElementById('breakevenCard').innerHTML = `${T('s56')}${currency}${FG.fx(res.beRevenueActual, 0)}${T('s57')}${FG.fx(Math.ceil(res.beUnitsActual), 0)}${T('s58')}${currency}${res.totalFixedMonthly.toFixed(0)}${T('s59')}${(res.contributionMarginRatio*100).toFixed(0)}%)</span></div>
                 `;
 
                 renderCharts(res, inputs, currency, R.charts);
@@ -528,7 +527,7 @@
                     const sections = [
                         { title: T('s116'), content: `${T('s117')}${evaluation.score}${T('s118')}${evaluation.grade}\n${evaluation.details.join('\n')}` },
                         { title: T('s119'),
-                        content: `${T('s120')}${currency} ${res.beRevenueActual.toFixed(0)}${T('s121')}${res.beUnitsActual.toFixed(0)}${T('s21')}` },
+                        content: `${T('s120')}${currency} ${FG.fx(res.beRevenueActual, 0)}${T('s121')}${FG.fx(Math.ceil(res.beUnitsActual), 0)}${T('s21')}` },
                         { title: T('s122'), content: res.npv > 0 ?
                             T('s123') :
                             T('s124')
@@ -632,7 +631,7 @@
                     const now = new Date();
                     const dateStr = now.toLocaleDateString(FG.locale());
 
-                    const fullHtml = `${T('s131')}${companyName}${T('s132')}${dateStr}${T('s133')}${currency} | NPV: ${currency} ${res.npv.toFixed(0)}${T('s134')}${currency} ${inputs.fixedCapital}${T('s135')}${currency} ${inputs.setupCapital}${T('s136')}${currency} ${inputs.monthlySales}${T('s137')}${inputs.employees}${T('s138')}${currency} ${inputs.netSalary}${T('s139')}${currency} ${inputs.netRent}${T('s140')}${(inputs.growth*100).toFixed(1)}${T('s141')}${(inputs.discount*100).toFixed(1)}${T('s142')}${kpiRows}${T('s143')}${chartImgBase64}${T('s144')}${tableRows}${T('s145')}${currency} ${res.beRevenueActual.toFixed(0)} (${res.beUnitsActual.toFixed(0)}${T('s146')}${evaluation.score}/100 - ${evaluation.grade}</p>
+                    const fullHtml = `${T('s131')}${companyName}${T('s132')}${dateStr}${T('s133')}${currency} | NPV: ${currency} ${res.npv.toFixed(0)}${T('s134')}${currency} ${inputs.fixedCapital}${T('s135')}${currency} ${inputs.setupCapital}${T('s136')}${currency} ${inputs.monthlySales}${T('s137')}${inputs.employees}${T('s138')}${currency} ${inputs.netSalary}${T('s139')}${currency} ${inputs.netRent}${T('s140')}${(inputs.growth*100).toFixed(1)}${T('s141')}${(inputs.discount*100).toFixed(1)}${T('s142')}${kpiRows}${T('s143')}${chartImgBase64}${T('s144')}${tableRows}${T('s145')}${currency} ${FG.fx(res.beRevenueActual, 0)} (${FG.fx(Math.ceil(res.beUnitsActual), 0)}${T('s146')}${evaluation.score}/100 - ${evaluation.grade}</p>
                             <p>${evaluation.details.join('<br>')}${T('s147')}${now.getFullYear()}</div>
                     </body></html>`;
 

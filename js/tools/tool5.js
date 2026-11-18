@@ -109,22 +109,22 @@
         const companyName = document.getElementById('companyName').value || T('s2');
 
         // قراءة المدخلات
-        const marketValue = parseFloat(document.getElementById('marketValue').value) || 0;
-        const units = parseFloat(document.getElementById('units').value) || 1;
-        const rentPerUnit = parseFloat(document.getElementById('rent').value) || 0;
-        const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value) || 0;
-        const occupancy = parseFloat(document.getElementById('occupancy').value) || 1;
-        const taxRatePercent = parseFloat(document.getElementById('taxRate').value) || 0;
-        const assessedDiscountPercent = parseFloat(document.getElementById('assessedDiscount').value) || 0;
-        const rentIncreasePercent = parseFloat(document.getElementById('rentIncrease').value) || 0;
-        const landAppreciationPercent = parseFloat(document.getElementById('landAppreciation').value) || 0;
-        const purchaseCosts = parseFloat(document.getElementById('purchaseCosts').value) || 0;
-        const ltvPercent = parseFloat(document.getElementById('ltv').value) || 0;
-        const interestRatePercent = parseFloat(document.getElementById('interestRate').value) || 0;
-        const loanTerm = parseInt(document.getElementById('loanTerm').value) || 20;
-        const discountRatePercent = parseFloat(document.getElementById('discountRate').value) || 0;
-        const reinvestRatePercent = parseFloat(document.getElementById('reinvestRate').value) || 0;
-        const years = parseInt(document.getElementById('years').value) || 20;
+        const marketValue = FG.num('marketValue', 0);
+        const units = FG.num('units', 1);
+        const rentPerUnit = FG.num('rent', 0);
+        const monthlyExpenses = FG.num('monthlyExpenses', 0);
+        const occupancy = FG.num('occupancy', 1);
+        const taxRatePercent = FG.num('taxRate', 0);
+        const assessedDiscountPercent = FG.num('assessedDiscount', 0);
+        const rentIncreasePercent = FG.num('rentIncrease', 0);
+        const landAppreciationPercent = FG.num('landAppreciation', 0);
+        const purchaseCosts = FG.num('purchaseCosts', 0);
+        const ltvPercent = FG.num('ltv', 0);
+        const interestRatePercent = FG.num('interestRate', 0);
+        const loanTerm = FG.int('loanTerm', 20);
+        const discountRatePercent = FG.num('discountRate', 0);
+        const reinvestRatePercent = FG.num('reinvestRate', 0);
+        const years = FG.int('years', 20);
 
         // تحويل النسب
         let R;
@@ -135,7 +135,7 @@
         document.getElementById('initialMessage').style.display = 'none';
         document.getElementById('resultsSection').style.display = 'block';
 
-        document.getElementById('kpiCards').innerHTML = `${T('s13')}${currency} ${npv.toFixed(0)}</div><div class="unit">${npv > 0 ? T('s3') : npv < 0 ? T('s4') : T('s5')}${T('s14')}${(irr*100).toFixed(2)}%</div><div class="unit">${irr > discountRate ? T('s6') : irr < discountRate ? T('s7') : T('s8')}${T('s15')}${(mirr*100).toFixed(2)}${T('s16')}${reinvestRatePercent}${T('s17')}${paybackPeriod !== null ? paybackPeriod.toFixed(1) : T('s9')}${T('s18')}${pi.toFixed(2)}</div><div class="unit">${pi > 1 ? T('s3') : pi < 1 ? T('s10') : T('s5')}${T('s19')}${cashOnCash.toFixed(2)}${T('s20')}${roi.toFixed(2)}${T('s21')}${ltv > 0 ? `${T('s11')}${(ltv*100).toFixed(0)}${T('s12')}${currency} ${loanAmount.toFixed(0)}</div></div>` : ''}
+        document.getElementById('kpiCards').innerHTML = `${T('s13')}${currency} ${npv.toFixed(0)}</div><div class="unit">${npv > 0 ? T('s3') : npv < 0 ? T('s4') : T('s5')}${T('s14')}${FG.fx(irr*100,2)}%</div><div class="unit">${irr > discountRate ? T('s6') : irr < discountRate ? T('s7') : T('s8')}${T('s15')}${FG.fx(mirr*100,2)}${T('s16')}${reinvestRatePercent}${T('s17')}${paybackPeriod !== null ? paybackPeriod.toFixed(1) : T('s9')}${T('s18')}${FG.fx(pi,2)}</div><div class="unit">${pi > 1 ? T('s3') : pi < 1 ? T('s10') : T('s5')}${T('s19')}${FG.fx(cashOnCash,2)}${T('s20')}${FG.fx(roi,2)}${T('s21')}${ltv > 0 ? `${T('s11')}${(ltv*100).toFixed(0)}${T('s12')}${currency} ${loanAmount.toFixed(0)}</div></div>` : ''}
         `;
 
         // تقييم المشروع
@@ -198,7 +198,7 @@
 
         // تحليل الحساسية (جدول سريع)
         const sensTable = document.getElementById('sensitivityTable');
-        sensTable.innerHTML = `${T('s35')}${currency}${T('s36')}${npv.toFixed(0)}</td><td>${(irr*100).toFixed(2)}</td><td>${pi.toFixed(2)}</td></tr>
+        sensTable.innerHTML = `${T('s35')}${currency}${T('s36')}${npv.toFixed(0)}</td><td>${FG.fx(irr*100,2)}</td><td>${FG.fx(pi,2)}</td></tr>
                 </tbody>
             </table>
         `;
@@ -344,7 +344,7 @@
             bc.value=T('s73');
             bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};
             mh(cv,1,4,4,`${T('s74')}${companyName}`,DB,GL,18);
-            const inf=[[T('s75'),companyName],[T('s76'),new Date().toLocaleDateString(FG.locale())],[T('s77'),currency],['📊 NPV',`${currency} ${out.npv.toFixed(0)}`],['📈 IRR',`${(out.irr*100).toFixed(2)}%`]];
+            const inf=[[T('s75'),companyName],[T('s76'),new Date().toLocaleDateString(FG.locale())],[T('s77'),currency],['📊 NPV',`${currency} ${out.npv.toFixed(0)}`],['📈 IRR',`${FG.fx(out.irr*100,2)}%`]];
             let ir=6;
             inf.forEach(([l,v],idx)=>{
                 cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
@@ -401,11 +401,11 @@
             kpiSheet.getRow(2).height=26;
             const kpis = [
                 { label: 'NPV', value: `${currency} ${out.npv.toFixed(0)}`, good: out.npv>0 },
-                { label: 'IRR', value: `${(out.irr*100).toFixed(2)}%`, good: out.irr>out.discountRate },
-                { label: 'MIRR', value: `${(out.mirr*100).toFixed(2)}%`, good: true },
+                { label: 'IRR', value: `${FG.fx(out.irr*100,2)}%`, good: out.irr>out.discountRate },
+                { label: 'MIRR', value: `${FG.fx(out.mirr*100,2)}%`, good: true },
                 { label: T('s100'), value: out.paybackPeriod!==null?out.paybackPeriod.toFixed(1)+T('s101'):T('s102'), good: out.paybackPeriod!==null&&out.paybackPeriod<inp.years/2 },
-                { label: 'PI', value: out.pi.toFixed(2), good: out.pi>1 },
-                { label: 'Cash on Cash', value: `${out.cashOnCash.toFixed(2)}%`, good: out.cashOnCash>0 }
+                { label: 'PI', value: FG.fx(out.pi,2), good: out.pi>1 },
+                { label: 'Cash on Cash', value: `${FG.fx(out.cashOnCash,2)}%`, good: out.cashOnCash>0 }
             ];
             let kRow=3;
             kpis.forEach((k,idx)=>{
@@ -454,7 +454,7 @@
             mh(sensSheet,1,5,1,T('s111'),DB,GL,14);
             sensSheet.getRow(1).height=40;
             sensSheet.addRow([T('s112'), `NPV (${currency})`, 'IRR (%)', 'PI']);
-            sensSheet.addRow([T('s113'), out.npv, (out.irr*100).toFixed(2), out.pi.toFixed(2)]);
+            sensSheet.addRow([T('s113'), out.npv, FG.fx(out.irr*100,2), FG.fx(out.pi,2)]);
             sensSheet.getRow(2).font = { bold: true, color: { argb: 'FFFFFFFF' } };
             sensSheet.getRow(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
 

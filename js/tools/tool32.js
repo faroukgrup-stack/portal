@@ -51,12 +51,13 @@
             const start = parseFloat(document.getElementById('startValue').value);
             const end = parseFloat(document.getElementById('endValue').value);
             const years = parseInt(document.getElementById('years').value);
-            const inflationPercent = parseFloat(document.getElementById('inflationRate').value) || 0;
+            const inflationPercent = FG.num('inflationRate', 0);
             const inflation = inflationPercent / 100;
 
-            const startB = parseFloat(document.getElementById('startValueB').value);
-            const endB = parseFloat(document.getElementById('endValueB').value);
-            const yearsB = parseInt(document.getElementById('yearsB').value);
+            // V7.3: خانات B اختيارية وفارغة افتراضياً (تدعم الأرقام العربية)
+            const startB = FG.num('startValueB', NaN);
+            const endB = FG.num('endValueB', NaN);
+            const yearsB = FG.num('yearsB', NaN);
 
             if (!start || !end || !years || start <= 0 || end <= 0 || years <= 0) {
                 alert(T('s3'));
@@ -100,7 +101,7 @@
                         ${beatsInflation ? T('s15') : T('s16')}${T('s21')}${totalGrowth.toFixed(2)}${T('s22')}${years}${T('s23')}${realGrowth >= 0 ? 'highlight-green' : 'highlight-red'}${T('s24')}${realGrowth.toFixed(2)}${T('s25')}${purchasingPowerLoss.toFixed(2)}${T('s26')}`;
 
             // ===== تفصيل الحسابات =====
-            document.getElementById('detailCards').innerHTML = `${T('s27')}${currency}${endRealValue.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}${T('s28')}${currency}${end.toLocaleString()}${T('s29')}${doublingTimeNominal !== null && isFinite(doublingTimeNominal) ? doublingTimeNominal.toFixed(2) : '∞'}${T('s30')}${doublingTimeReal !== null && isFinite(doublingTimeReal) ? doublingTimeReal.toFixed(2) : '∞'}${T('s31')}${rule72 !== null && isFinite(rule72) ? rule72.toFixed(2) : '∞'}${T('s32')}${simpleAnnual.toFixed(2)}${T('s33')}${cagr * 100 > simpleAnnual ? 'positive' : 'negative'}">${(cagr * 100 - simpleAnnual).toFixed(2)}${T('s34')}`;
+            document.getElementById('detailCards').innerHTML = `${T('s27')}${currency}${endRealValue.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}${T('s28')}${currency}${end.toLocaleString()}${T('s29')}${doublingTimeNominal !== null && isFinite(doublingTimeNominal) ? doublingTimeNominal.toFixed(2) : '∞'}${T('s30')}${doublingTimeReal !== null && isFinite(doublingTimeReal) ? doublingTimeReal.toFixed(2) : '∞'}${T('s31')}${rule72 !== null && isFinite(rule72) ? rule72.toFixed(2) : '∞'}${T('s32')}${simpleAnnual.toFixed(2)}${T('s33')}">${(cagr * 100 - simpleAnnual).toFixed(2)}${T('s34')}`;
 
             // ===== جدول النمو =====
             let tableHtml = `${T('s35')}`;

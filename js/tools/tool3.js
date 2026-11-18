@@ -48,7 +48,7 @@ function getEquipmentData() {
 }
 function equipmentForServer() { return getEquipmentData(); }
 async function updatePowerAlert() {
-    const electricalCapacity = parseFloat(document.getElementById('electricalCapacity').value) || 200;
+    const electricalCapacity = FG.num('electricalCapacity', 200);
     let P; try { P = await FG.calc('tool3', 'power', { equipment: equipmentForServer(), electricalCapacity }); } catch (e) { return; }
     const requiredAmps = P.requiredAmps;
     const powerAlert = document.getElementById('powerAlert');
@@ -66,33 +66,34 @@ let financeChart, riskChart;
 async function calculateAll() {
     const currency = document.getElementById('currencySelect').value;
     const companyName = document.getElementById('companyName').value || T('s9');
-    const seats = parseFloat(document.getElementById('seats').value) || 50;
-    const hoursOpen = parseFloat(document.getElementById('hoursOpen').value) || 12;
-    const totalArea = parseFloat(document.getElementById('totalArea').value) || 150;
-    const kitchenPercent = parseFloat(document.getElementById('kitchenPercent').value) || 35;
-    const electricalCapacity = parseFloat(document.getElementById('electricalCapacity').value) || 200;
+    const seats = FG.num('seats', 50);
+    const hoursOpen = FG.num('hoursOpen', 12);
+    const totalArea = FG.num('totalArea', 150);
+    const kitchenPercent = FG.num('kitchenPercent', 35);
+    const electricalCapacity = FG.num('electricalCapacity', 200);
     const waterAvailabilityText = document.getElementById('waterAvailability').options[document.getElementById('waterAvailability').selectedIndex].text;
     const ventilationText = document.getElementById('ventilation').options[document.getElementById('ventilation').selectedIndex].text;
     const deliveryAccessText = document.getElementById('deliveryAccess').options[document.getElementById('deliveryAccess').selectedIndex].text;
     const equipment = getEquipmentData();
     const waterValue = document.getElementById('waterAvailability').value;
     const ventilationValue = document.getElementById('ventilation').value;
-    const turnoverRate = parseFloat(document.getElementById('turnoverRate').value) || 2;
-    const peakHours = parseFloat(document.getElementById('peakHours').value) || 4;
-    const occupancyRate = parseFloat(document.getElementById('occupancyRate').value) / 100 || 0.7;
-    const avgMealPrice = parseFloat(document.getElementById('avgMealPrice').value) || 50;
-    const foodCostPercent = parseFloat(document.getElementById('foodCostPercent').value) / 100 || 0.3;
-    const employeesCount = parseFloat(document.getElementById('employeesCount').value) || 6;
-    const avgSalary = parseFloat(document.getElementById('avgSalary').value) || 2000;
-    const monthlyRent = parseFloat(document.getElementById('monthlyRent').value) || 4000;
-    const otherOpCost = parseFloat(document.getElementById('otherOpCost').value) || 2000;
-    const equipmentLife = parseFloat(document.getElementById('equipmentLife').value) || 10;
-    const constructionCost = parseFloat(document.getElementById('constructionCost').value) || 50000;
-    const licensesCost = parseFloat(document.getElementById('licensesCost').value) || 5000;
-    const workingCapital = parseFloat(document.getElementById('workingCapital').value) || 15000;
+    const turnoverRate = FG.num('turnoverRate', 2);
+    const peakHours = FG.num('peakHours', 4);
+    const occupancyRate = FG.num('occupancyRate', 70) / 100;
+    const avgMealPrice = FG.num('avgMealPrice', 50);
+    const foodCostPercent = FG.num('foodCostPercent', 30) / 100;
+    const employeesCount = FG.num('employeesCount', 6);
+    const avgSalary = FG.num('avgSalary', 2000);
+    const monthlyRent = FG.num('monthlyRent', 4000);
+    const otherOpCost = FG.num('otherOpCost', 2000);
+    const equipmentLife = FG.num('equipmentLife', 10);
+    const constructionCost = FG.num('constructionCost', 50000);
+    const licensesCost = FG.num('licensesCost', 5000);
+    const workingCapital = FG.num('workingCapital', 15000);
+    const workingDays = FG.num('workingDays', 26);
 
     let R;
-    try { R = await FG.calc('tool3', 'main', { seats, hoursOpen, totalArea, kitchenPercent, electricalCapacity, waterValue, ventilationValue, equipment, turnoverRate, peakHours, occupancyRate, avgMealPrice, foodCostPercent, employeesCount, avgSalary, monthlyRent, otherOpCost, equipmentLife, constructionCost, licensesCost, workingCapital }); } catch (e) { FG.calcError(e); return; }
+    try { R = await FG.calc('tool3', 'main', { seats, hoursOpen, totalArea, kitchenPercent, electricalCapacity, waterValue, ventilationValue, equipment, turnoverRate, peakHours, occupancyRate, avgMealPrice, foodCostPercent, employeesCount, avgSalary, monthlyRent, otherOpCost, equipmentLife, constructionCost, licensesCost, workingCapital, workingDays }); } catch (e) { FG.calcError(e); return; }
     const { totalPower, equipmentCost, totalSpace, kitchenArea, diningArea, seatDensity, maxCustomersDaily, actualCustomersDaily,
         monthlyRevenue, monthlyFoodCost, monthlyLaborCost, monthlyFixedCosts, totalMonthlyExpenses, netProfit, totalInvestment, monthlyDepreciation,
         netProfitAfterDepreciation, accountingProfit, contributionPerMeal, breakEvenMeals, breakEvenRevenue, revenuePerSeat, primeCost, primePercent,
@@ -102,7 +103,7 @@ async function calculateAll() {
     // عرض النتائج
     document.getElementById('initialMessage').style.display = 'none';
     document.getElementById('resultsSection').style.display = 'block';
-    document.getElementById('kpiCards').innerHTML = `${T('s25')}${currency}${Math.round(monthlyRevenue)}${T('s26')}${currency}${Math.round(accountingProfit)}</div><div class="status ${accountingProfit > 0 ? 'status-good' : 'status-bad'}">${accountingProfit > 0 ? T('s23') : T('s24')}${T('s27')}${currency}${Math.round(breakEvenRevenue)}${T('s28')}${paybackMonths === Infinity ? '∞' : paybackMonths.toFixed(1)}${T('s29')}`;
+    document.getElementById('kpiCards').innerHTML = `${T('s25')}${currency}${Math.round(monthlyRevenue)}${T('s26')}${currency}${Math.round(accountingProfit)}</div><div class="status ${accountingProfit > 0 ? 'status-good' : 'status-bad'}">${accountingProfit > 0 ? T('s23') : T('s24')}${T('s27')}${currency}${FG.fx(breakEvenRevenue, 0)}${T('s28')}${paybackMonths === Infinity ? '∞' : paybackMonths.toFixed(1)}${T('s29')}`;
     if (warnings.length > 0) {
         document.getElementById('warnings').style.display = 'block';
         document.getElementById('warnings').innerHTML = `${T('s30')}${warnings.join('<br>')}`;
@@ -312,7 +313,7 @@ async function exportToFullExcel() {
         const kpis = [
             { label: T('s120'), value: `${currency} ${Math.round(res.monthlyRevenue)}`, good: true },
             { label: T('s39'), value: `${currency} ${Math.round(res.accountingProfit)}`, good: res.accountingProfit>0 },
-            { label: T('s121'), value: `${currency} ${Math.round(res.breakEvenRevenue)}`, good: true },
+            { label: T('s121'), value: `${currency} ${FG.fx(res.breakEvenRevenue, 0)}`, good: true },
             { label: T('s122'), value: res.paybackMonths===Infinity?T('s81'):`${res.paybackMonths.toFixed(1)}${T('s82')}`, good: res.paybackMonths<24 },
             { label: 'Prime Cost', value: `${res.primePercent.toFixed(1)}%`, good: res.primePercent<65 },
             { label: T('s123'), value: `${res.profitMarginPct.toFixed(1)}%`, good: res.accountingProfit>0 }
@@ -351,7 +352,7 @@ async function exportToFullExcel() {
             [T('s128'), `${currency} ${res.totalInvestment.toFixed(0)}`, '', ''],
             [T('s129'), `${currency} ${res.monthlyRevenue.toFixed(0)}`, T('s130'), `${res.technicalScore}/100 (${res.technicalRating})`],
             [T('s131'), `${currency} ${res.totalMonthlyExpenses.toFixed(0)}`, T('s132'), `${res.financialScore}/100 (${res.financialRating})`],
-            [T('s133'), `${currency} ${res.accountingProfit.toFixed(0)}`, T('s134'), `${currency} ${res.breakEvenRevenue.toFixed(0)}`],
+            [T('s133'), `${currency} ${res.accountingProfit.toFixed(0)}`, T('s134'), `${currency} ${FG.fx(res.breakEvenRevenue, 0)}`],
             [T('s135'), res.paybackMonths===Infinity?T('s136'):`${res.paybackMonths.toFixed(1)}${T('s137')}`, T('s138'), `${res.marginOfSafetyPct.toFixed(1)}%`]
         ];
         let sRow=2;

@@ -79,6 +79,19 @@
             return v;
         },
         whenReady: function (fn) { fn(); },
+        /** قراءة رقم من خانة: الخانة الفارغة فقط تأخذ القيمة الافتراضية، والصفر المكتوب يبقى صفراً */
+        num: function (idOrEl, def) {
+            var el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+            if (def === undefined) def = 0;
+            if (!el) return def;
+            var s = String(el.value == null ? "" : el.value).trim().replace(/[٠-٩]/g, function (d) { return "٠١٢٣٤٥٦٧٨٩".indexOf(d); });
+            if (s === "") return def;
+            var n = parseFloat(s);
+            return isFinite(n) ? n : def;
+        },
+        /** تنسيق رقم قد يكون غير محدود: ∞ للانهائي و— لغير المعرّف */
+        fx: function (v, d) { v = Number(v); if (isNaN(v)) return "—"; if (!isFinite(v)) return v > 0 ? "∞" : "-∞"; return v.toFixed(d || 0); },
+        int: function (idOrEl, def) { var n = FG.num(idOrEl, def); return isFinite(n) ? Math.trunc(n) : n; },
         /** الاستدعاء الوحيد للحسابات: المدخلات ← السيرفر ← النتيجة النهائية */
         calc: async function (tool, op, input) {
             if (TEST) return FG.localize(await TEST.calc(tool, op || "main", JSON.parse(JSON.stringify(input)), lang));

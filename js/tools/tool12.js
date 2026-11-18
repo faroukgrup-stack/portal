@@ -74,15 +74,15 @@
         const currency = document.getElementById('currencySelect').value;
         const companyName = document.getElementById('companyName').value || T('s2');
 
-        const principal = parseFloat(document.getElementById('loanAmount').value) || 0;
-        const annualRate = parseFloat(document.getElementById('interestRate').value) / 100 || 0;
-        const years = parseInt(document.getElementById('loanYears').value) || 10;
+        const principal = FG.num('loanAmount', 0);
+        const annualRate = FG.num('interestRate', 0) / 100;
+        const years = FG.int('loanYears', 10);
         const frequency = parseInt(document.getElementById('paymentFrequency').value);
-        const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
-        const extraPayment = parseFloat(document.getElementById('extraPayment').value) || 0;
-        const gracePeriod = parseInt(document.getElementById('gracePeriod').value) || 0;
+        const downPayment = FG.num('downPayment', 0);
+        const extraPayment = FG.num('extraPayment', 0);
+        const gracePeriod = FG.int('gracePeriod', 0);
 
-        if (principal <= 0 || annualRate <= 0 || years <= 0) {
+        if (principal <= 0 || annualRate < 0 || years <= 0) {   // V7.3: الفائدة 0% مقبولة (قرض حسن): القسط = الأصل ÷ عدد الدفعات
             alert(T('s3'));
             return;
         }

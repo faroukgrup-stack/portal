@@ -147,6 +147,14 @@
 
             // ===== دوال الحساب والتوصيات =====
             // الحساب والتفسير والتوصيات تتم على الخادم (Supabase Edge Function)
+    // V7.3: مقارنة الدرجة الحالية بالتقييم السابق (إن كان رقماً بين 0 و200)
+    function prevCompare(prevRaw, total) {
+        const p = Number(String(prevRaw).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)));
+        if (prevRaw === '' || !isFinite(p) || total == null) return '';
+        const d = total - p;
+        return `${d > 0 ? '+' : ''}${d} (${d > 0 ? T('v73_up') : d < 0 ? T('v73_down') : T('v73_same')})`;
+    }
+
             async function evaluateAll() {
                 return await FG.calc('tool20', 'evaluate', { answers });
             }
@@ -301,7 +309,10 @@
                         [T('s98'), workPlace],
                         [T('s99'), qualification],
                         [T('s100'), grade],
-                        [T('s101'), prevScore]
+                        [T('v73_l1'), gradeDate],
+                        [T('v73_l2'), hireDate],
+                        [T('s101'), prevScore],
+                        [T('v73_l3'), prevCompare(document.getElementById("prevScore").value, totalScore) || '—']
                     ];
                     let ir = 6;
                     inf.forEach(([l, v], idx) => {
@@ -462,7 +473,7 @@
 
                 let recHtml = recommendations.map(r => `<li>${r}</li>`).join('');
 
-                return `${T('s115')}${empName}${T('s116')}${empId}${T('s117')}${workPlace}${T('s118')}${qualification}${T('s119')}${grade}${T('s120')}${gradeDate}${T('s121')}${hireDate}${T('s122')}${prevScore}${T('s123')}${totalScore}${T('s124')}${interpretation.color};">${interpretation.level}${T('s125')}${interpretation.message}${T('s126')}${recHtml}${T('s127')}${rows}${T('s128')}${new Date().toLocaleDateString(FG.locale())}</div>
+                return `${T('s115')}${empName}${T('s116')}${empId}${T('s117')}${workPlace}${T('s118')}${qualification}${T('s119')}${grade}${T('s120')}${gradeDate}${T('s121')}${hireDate}${T('s122')}${prevScore}${prevCompare(document.getElementById("prevScore").value, totalScore) ? ' — ' + T('v73_l3') + ': ' + prevCompare(document.getElementById("prevScore").value, totalScore) : ''}${T('s123')}${totalScore}${T('s124')}${interpretation.color};">${interpretation.level}${T('s125')}${interpretation.message}${T('s126')}${recHtml}${T('s127')}${rows}${T('s128')}${new Date().toLocaleDateString(FG.locale())}</div>
                     </body>
                     </html>
                 `;

@@ -46,37 +46,33 @@
         else if (k.toLowerCase() === 'c') handleCalc('C');
     });
 
-    // ===== المنافسون =====
-    let competitorCount = 2;
+    // ===== المنافسون والقنوات =====
+    // V7.3: الإضافة تُلحق صفاً جديداً فقط ولا تعيد رسم الصفوف (كانت تمسح القيم المكتوبة)
+    function makeRow(cls, tpl, removable, removeFn) {
+        const div = document.createElement('div');
+        div.className = cls;
+        div.innerHTML = `${tpl}${removable ? '<button class="remove-btn" type="button">×</button>' : ''}`;
+        const rb = div.querySelector('.remove-btn'); if (rb) rb.addEventListener('click', () => div.remove());
+        return div;
+    }
     function renderCompetitors() {
         const container = document.getElementById('competitorsContainer');
         container.innerHTML = '';
-        for (let i = 1; i <= competitorCount; i++) {
-            const div = document.createElement('div');
-            div.className = 'competitor-row';
-            div.innerHTML = `${T('s2')}${i > 1 ? '<button class="remove-btn" onclick="removeCompetitor(this)">×</button>' : ''}
-            `;
-            container.appendChild(div);
-        }
+        for (let i = 1; i <= 2; i++) container.appendChild(makeRow('competitor-row', T('s2'), i > 1));
     }
-    window.removeCompetitor = function(btn) { btn.parentElement.remove(); competitorCount--; };
-    document.getElementById('addCompetitor').addEventListener('click', () => { competitorCount++; renderCompetitors(); });
-
-    // ===== القنوات =====
-    let channelCount = 2;
+    window.removeCompetitor = function(btn) { btn.parentElement.remove(); };
+    document.getElementById('addCompetitor').addEventListener('click', () => {
+        document.getElementById('competitorsContainer').appendChild(makeRow('competitor-row', T('s2'), true));
+    });
     function renderChannels() {
         const container = document.getElementById('channelsContainer');
         container.innerHTML = '';
-        for (let i = 1; i <= channelCount; i++) {
-            const div = document.createElement('div');
-            div.className = 'channel-row';
-            div.innerHTML = `${T('s3')}${i > 1 ? '<button class="remove-btn" onclick="removeChannel(this)">×</button>' : ''}
-            `;
-            container.appendChild(div);
-        }
+        for (let i = 1; i <= 2; i++) container.appendChild(makeRow('channel-row', T('s3'), i > 1));
     }
-    window.removeChannel = function(btn) { btn.parentElement.remove(); channelCount--; };
-    document.getElementById('addChannel').addEventListener('click', () => { channelCount++; renderChannels(); });
+    window.removeChannel = function(btn) { btn.parentElement.remove(); };
+    document.getElementById('addChannel').addEventListener('click', () => {
+        document.getElementById('channelsContainer').appendChild(makeRow('channel-row', T('s3'), true));
+    });
 
     // ===== شاشة تحميل =====
     function showLoading(title, msg) {
@@ -117,34 +113,34 @@
             projectName: document.getElementById('projectName').value || T('s6'),
             projectDesc: document.getElementById('projectDesc').value || '',
             location: document.getElementById('location').value || '',
-            studyMonths: parseFloat(document.getElementById('studyMonths').value) || 12,
-            tam: parseFloat(document.getElementById('tam').value) || 0,
-            sam: parseFloat(document.getElementById('sam').value) || 0,
-            som: parseFloat(document.getElementById('som').value) || 0,
-            growthRate: parseFloat(document.getElementById('growthRate').value) / 100 || 0,
+            studyMonths: FG.num('studyMonths', 12),
+            tam: FG.num('tam', 0),
+            sam: FG.num('sam', 0),
+            som: FG.num('som', 0),
+            growthRate: FG.num('growthRate', 0) / 100,
             trends: document.getElementById('trends').value || '',
             ageGroup: document.getElementById('ageGroup').value || '',
             gender: document.getElementById('gender').value || 'all',
             geoArea: document.getElementById('geoArea').value || '',
             income: document.getElementById('income').value || 'medium',
             interests: document.getElementById('interests').value || '',
-            audienceSize: parseFloat(document.getElementById('audienceSize').value) || 0,
+            audienceSize: FG.num('audienceSize', 0),
             competitors,
             productStrategy: document.getElementById('productStrategy').value || '',
-            price: parseFloat(document.getElementById('price').value) || 0,
-            costPerMeal: parseFloat(document.getElementById('costPerMeal').value) || 0,
+            price: FG.num('price', 0),
+            costPerMeal: FG.num('costPerMeal', 0),
             placeStrategy: document.getElementById('placeStrategy').value || '',
             promotionStrategy: document.getElementById('promotionStrategy').value || '',
-            marketingTeam: parseFloat(document.getElementById('marketingTeam').value) || 0,
-            planDuration: parseFloat(document.getElementById('planDuration').value) || 12,
-            rent: parseFloat(document.getElementById('rent').value) || 0,
-            salaries: parseFloat(document.getElementById('salaries').value) || 0,
-            utilities: parseFloat(document.getElementById('utilities').value) || 0,
-            otherOpCost: parseFloat(document.getElementById('otherOpCost').value) || 0,
+            marketingTeam: FG.num('marketingTeam', 0),
+            planDuration: FG.num('planDuration', 12),
+            rent: FG.num('rent', 0),
+            salaries: FG.num('salaries', 0),
+            utilities: FG.num('utilities', 0),
+            otherOpCost: FG.num('otherOpCost', 0),
             channels,
-            purchaseFrequency: parseFloat(document.getElementById('purchaseFrequency').value) || 1,
-            loyaltyMonths: parseFloat(document.getElementById('loyaltyMonths').value) || 6,
-            walkIn: parseFloat(document.getElementById('walkIn').value) || 0
+            purchaseFrequency: FG.num('purchaseFrequency', 1),
+            loyaltyMonths: FG.num('loyaltyMonths', 6),
+            walkIn: FG.num('walkIn', 0)
         };
     }
 
@@ -156,14 +152,14 @@
 
         let R;
         try { R = await FG.calc('tool4', 'main', d); } catch (e) { FG.calcError(e); return; }
-        let { totalActiveCustomers, annualRevenue, annualMarketingCost, marketingContribution, cac, roas, ltv, breakEvenCustomers, compStrengthAvg, compWeaknessAvg, compIndex, compDesc, compColor, marketScore, marketColor, warnings, finalAdvice } = R;
+        let { annualOperatingProfit, totalActiveCustomers, annualRevenue, annualMarketingCost, marketingContribution, cac, roas, ltv, breakEvenCustomers, compStrengthAvg, compWeaknessAvg, compIndex, compDesc, compColor, marketScore, marketColor, warnings, finalAdvice } = R;
 
         document.getElementById('resultsSection').style.display = 'block';
 
         document.getElementById('reportHeader').innerHTML = `${T('s19')}${d.projectName}${T('s20')}${d.companyName}${T('s21')}${d.location}${T('s22')}${d.projectDesc}</p>
         `;
 
-        document.getElementById('resultsGrid').innerHTML = `${T('s23')}${totalActiveCustomers}${T('s24')}${d.currency}${annualRevenue.toLocaleString()}${T('s25')}${d.currency}${annualMarketingCost.toLocaleString()}${T('s26')}${marketingContribution>=0?'#4ade80':'#f87171'}">${d.currency}${marketingContribution.toLocaleString()}${T('s27')}${d.currency}${cac.toFixed(2)}${T('s28')}${d.currency}${ltv.toFixed(2)}${T('s29')}${roas}${T('s30')}${Math.ceil(breakEvenCustomers)}</div></div>
+        document.getElementById('resultsGrid').innerHTML = `${T('s23')}${totalActiveCustomers}${T('s24')}${d.currency}${annualRevenue.toLocaleString()}${T('s25')}${d.currency}${annualMarketingCost.toLocaleString()}${T('s26')}${marketingContribution>=0?'#4ade80':'#f87171'}">${d.currency}${marketingContribution.toLocaleString()}${T('s27')}${d.currency}${cac.toFixed(2)}${T('s28')}${d.currency}${ltv.toFixed(2)}${T('s29')}${roas}${T('s30')}${FG.fx(breakEvenCustomers, 0)}</div></div><div class="result-card"><div class="label">${T('v73_l1')}</div><div class="value" style="color:${annualOperatingProfit>=0?'#4ade80':'#f87171'}">${d.currency}${Math.round(annualOperatingProfit).toLocaleString()}</div></div>
         `;
 
         let alertHtml = '';
@@ -368,6 +364,7 @@
                 { label: T('s46'), value: `${currency} ${out.annualRevenue.toLocaleString()}`, good: out.annualRevenue>0 },
                 { label: T('s112'), value: `${currency} ${out.annualMarketingCost.toLocaleString()}`, good: true },
                 { label: T('s113'), value: `${currency} ${out.marketingContribution.toLocaleString()}`, good: out.marketingContribution>0 },
+                { label: T('v73_l1'), value: `${currency} ${Math.round(out.annualOperatingProfit||0).toLocaleString()}`, good: (out.annualOperatingProfit||0)>0 },
                 { label: T('s114'), value: `${currency} ${out.cac.toFixed(2)}`, good: out.cac>0 },
                 { label: T('s115'), value: `${currency} ${out.ltv.toFixed(2)}`, good: out.ltv>0 }
             ];

@@ -1,3 +1,6 @@
+// V7.3: نسبة التغير = التغير ÷ |الأساس| × 100 (صحيحة عند الأساس السالب، وغير محددة عند الأساس صفر)
+const _pc28 = (d, b) => (b && isFinite(b)) ? d / Math.abs(b) * 100 : null;
+const _pcs28 = (d, b) => { const v = _pc28(d, b); return v === null ? '—' : v.toFixed(1); };
 
         (function() {
             'use strict';
@@ -74,14 +77,14 @@
                 const currency = document.getElementById('currencySelect').value;
                 const company = document.getElementById('companyName').value || T('s2');
 
-                const baseRevenue = parseFloat(document.getElementById('baseRevenue').value) || 0;
-                const baseSalaries = parseFloat(document.getElementById('baseSalaries').value) || 0;
-                const baseMaterials = parseFloat(document.getElementById('baseMaterials').value) || 0;
-                const baseOtherCosts = parseFloat(document.getElementById('baseOtherCosts').value) || 0;
+                const baseRevenue = FG.num('baseRevenue', 0);
+                const baseSalaries = FG.num('baseSalaries', 0);
+                const baseMaterials = FG.num('baseMaterials', 0);
+                const baseOtherCosts = FG.num('baseOtherCosts', 0);
 
-                const scenarioRevenuePct = parseFloat(document.getElementById('scenarioRevenue').value) || 0;
-                const scenarioSalariesPct = parseFloat(document.getElementById('scenarioSalaries').value) || 0;
-                const scenarioMaterialsPct = parseFloat(document.getElementById('scenarioMaterials').value) || 0;
+                const scenarioRevenuePct = FG.num('scenarioRevenue', 0);
+                const scenarioSalariesPct = FG.num('scenarioSalaries', 0);
+                const scenarioMaterialsPct = FG.num('scenarioMaterials', 0);
 
                 if (baseRevenue <= 0 || baseSalaries < 0 || baseMaterials < 0 || baseOtherCosts < 0) {
                     alert(T('s3'));
@@ -113,13 +116,13 @@
                 document.getElementById('kpiCards').innerHTML = `${T('s4')}${revenueChange >= 0 ? '#4ade80' : '#f87171'}">${currency}${scenarioRevenue.toFixed(0)}</div>
                         <div class="change ${revenueChange >= 0 ? 'change-positive' : 'change-negative'}">${revenueChange >= 0 ? '+' : ''}${currency}${revenueChange.toFixed(0)} (${scenarioRevenuePct >= 0 ? '+' : ''}${scenarioRevenuePct}${T('s5')}${costsChange <= 0 ? '#4ade80' : '#f87171'}">${currency}${scenarioTotalCosts.toFixed(0)}</div>
                         <div class="change ${costsChange <= 0 ? 'change-positive' : 'change-negative'}">${costsChange >= 0 ? '+' : ''}${currency}${costsChange.toFixed(0)}${T('s6')}${profitChange >= 0 ? '#4ade80' : '#f87171'}">${currency}${scenarioProfit.toFixed(0)}</div>
-                        <div class="change ${profitChange >= 0 ? 'change-positive' : 'change-negative'}">${profitChange >= 0 ? '+' : ''}${currency}${profitChange.toFixed(0)} (${(profitChange / (currentProfit || 1) * 100).toFixed(1)}${T('s7')}${marginChange >= 0 ? '#4ade80' : '#f87171'}">${scenarioMargin.toFixed(1)}%</div>
+                        <div class="change ${profitChange >= 0 ? 'change-positive' : 'change-negative'}">${profitChange >= 0 ? '+' : ''}${currency}${profitChange.toFixed(0)} (${_pcs28(profitChange, currentProfit)}${T('s7')}${marginChange >= 0 ? '#4ade80' : '#f87171'}">${scenarioMargin.toFixed(1)}%</div>
                         <div class="change ${marginChange >= 0 ? 'change-positive' : 'change-negative'}">${marginChange >= 0 ? '+' : ''}${marginChange.toFixed(1)}%</div>
                     </div>
                 `;
 
                 // جدول المقارنة
-                document.getElementById('comparisonTable').innerHTML = `${T('s8')}${currency}${baseRevenue.toFixed(0)}</td><td>${currency}${scenarioRevenue.toFixed(0)}</td><td style="color:${revenueChange >= 0 ? '#4ade80' : '#f87171'}">${revenueChange >= 0 ? '+' : ''}${currency}${revenueChange.toFixed(0)}</td><td style="color:${revenueChange >= 0 ? '#4ade80' : '#f87171'}">${scenarioRevenuePct >= 0 ? '+' : ''}${scenarioRevenuePct}${T('s9')}${currency}${baseSalaries.toFixed(0)}</td><td>${currency}${scenarioSalaries.toFixed(0)}</td><td style="color:${(scenarioSalaries - baseSalaries) <= 0 ? '#4ade80' : '#f87171'}">${(scenarioSalaries - baseSalaries) >= 0 ? '+' : ''}${currency}${(scenarioSalaries - baseSalaries).toFixed(0)}</td><td style="color:${(scenarioSalaries - baseSalaries) <= 0 ? '#4ade80' : '#f87171'}">${scenarioSalariesPct >= 0 ? '+' : ''}${scenarioSalariesPct}${T('s10')}${currency}${baseMaterials.toFixed(0)}</td><td>${currency}${scenarioMaterials.toFixed(0)}</td><td style="color:${(scenarioMaterials - baseMaterials) <= 0 ? '#4ade80' : '#f87171'}">${(scenarioMaterials - baseMaterials) >= 0 ? '+' : ''}${currency}${(scenarioMaterials - baseMaterials).toFixed(0)}</td><td style="color:${(scenarioMaterials - baseMaterials) <= 0 ? '#4ade80' : '#f87171'}">${scenarioMaterialsPct >= 0 ? '+' : ''}${scenarioMaterialsPct}${T('s11')}${currency}${baseOtherCosts.toFixed(0)}</td><td>${currency}${baseOtherCosts.toFixed(0)}${T('s12')}${currency}${currentTotalCosts.toFixed(0)}</td><td>${currency}${scenarioTotalCosts.toFixed(0)}</td><td style="color:${costsChange <= 0 ? '#4ade80' : '#f87171'}">${costsChange >= 0 ? '+' : ''}${currency}${costsChange.toFixed(0)}</td><td style="color:${costsChange <= 0 ? '#4ade80' : '#f87171'}">${(costsChange / (currentTotalCosts || 1) * 100).toFixed(1)}${T('s13')}${currency}${currentProfit.toFixed(0)}</td><td>${currency}${scenarioProfit.toFixed(0)}</td><td style="color:${profitChange >= 0 ? '#4ade80' : '#f87171'}">${profitChange >= 0 ? '+' : ''}${currency}${profitChange.toFixed(0)}</td><td style="color:${profitChange >= 0 ? '#4ade80' : '#f87171'}">${(profitChange / (currentProfit || 1) * 100).toFixed(1)}${T('s14')}${currentMargin.toFixed(1)}%</td><td>${scenarioMargin.toFixed(1)}%</td><td style="color:${marginChange >= 0 ? '#4ade80' : '#f87171'}">${marginChange >= 0 ? '+' : ''}${marginChange.toFixed(1)}%</td><td style="color:${marginChange >= 0 ? '#4ade80' : '#f87171'}">${(marginChange / (currentMargin || 1) * 100).toFixed(1)}%</td></tr>
+                document.getElementById('comparisonTable').innerHTML = `${T('s8')}${currency}${baseRevenue.toFixed(0)}</td><td>${currency}${scenarioRevenue.toFixed(0)}</td><td style="color:${revenueChange >= 0 ? '#4ade80' : '#f87171'}">${revenueChange >= 0 ? '+' : ''}${currency}${revenueChange.toFixed(0)}</td><td style="color:${revenueChange >= 0 ? '#4ade80' : '#f87171'}">${scenarioRevenuePct >= 0 ? '+' : ''}${scenarioRevenuePct}${T('s9')}${currency}${baseSalaries.toFixed(0)}</td><td>${currency}${scenarioSalaries.toFixed(0)}</td><td style="color:${(scenarioSalaries - baseSalaries) <= 0 ? '#4ade80' : '#f87171'}">${(scenarioSalaries - baseSalaries) >= 0 ? '+' : ''}${currency}${(scenarioSalaries - baseSalaries).toFixed(0)}</td><td style="color:${(scenarioSalaries - baseSalaries) <= 0 ? '#4ade80' : '#f87171'}">${scenarioSalariesPct >= 0 ? '+' : ''}${scenarioSalariesPct}${T('s10')}${currency}${baseMaterials.toFixed(0)}</td><td>${currency}${scenarioMaterials.toFixed(0)}</td><td style="color:${(scenarioMaterials - baseMaterials) <= 0 ? '#4ade80' : '#f87171'}">${(scenarioMaterials - baseMaterials) >= 0 ? '+' : ''}${currency}${(scenarioMaterials - baseMaterials).toFixed(0)}</td><td style="color:${(scenarioMaterials - baseMaterials) <= 0 ? '#4ade80' : '#f87171'}">${scenarioMaterialsPct >= 0 ? '+' : ''}${scenarioMaterialsPct}${T('s11')}${currency}${baseOtherCosts.toFixed(0)}</td><td>${currency}${baseOtherCosts.toFixed(0)}${T('s12')}${currency}${currentTotalCosts.toFixed(0)}</td><td>${currency}${scenarioTotalCosts.toFixed(0)}</td><td style="color:${costsChange <= 0 ? '#4ade80' : '#f87171'}">${costsChange >= 0 ? '+' : ''}${currency}${costsChange.toFixed(0)}</td><td style="color:${costsChange <= 0 ? '#4ade80' : '#f87171'}">${_pcs28(costsChange, currentTotalCosts)}${T('s13')}${currency}${currentProfit.toFixed(0)}</td><td>${currency}${scenarioProfit.toFixed(0)}</td><td style="color:${profitChange >= 0 ? '#4ade80' : '#f87171'}">${profitChange >= 0 ? '+' : ''}${currency}${profitChange.toFixed(0)}</td><td style="color:${profitChange >= 0 ? '#4ade80' : '#f87171'}">${_pcs28(profitChange, currentProfit)}${T('s14')}${currentMargin.toFixed(1)}%</td><td>${scenarioMargin.toFixed(1)}%</td><td style="color:${marginChange >= 0 ? '#4ade80' : '#f87171'}">${marginChange >= 0 ? '+' : ''}${marginChange.toFixed(1)}%</td><td style="color:${marginChange >= 0 ? '#4ade80' : '#f87171'}">${_pcs28(marginChange, currentMargin)}%</td></tr>
                         </tbody>
                     </table>
                 `;
@@ -128,10 +131,10 @@
                 const recDiv = document.getElementById('recommendations');
                 let recHtml = `${T('s15')}`;
                 if (currentResults.isBetter) {
-                    recHtml += `${T('s16')}${currency}${profitChange.toFixed(0)} (${(profitChange / (currentProfit || 1) * 100).toFixed(1)}%).</p>`;
+                    recHtml += `${T('s16')}${currency}${profitChange.toFixed(0)} (${_pcs28(profitChange, currentProfit)}%).</p>`;
                     recHtml += `${T('s17')}`;
                 } else {
-                    recHtml += `${T('s18')}${currency}${Math.abs(profitChange).toFixed(0)} (${(Math.abs(profitChange) / (currentProfit || 1) * 100).toFixed(1)}%).</p>`;
+                    recHtml += `${T('s18')}${currency}${Math.abs(profitChange).toFixed(0)} (${_pcs28(Math.abs(profitChange), currentProfit)}%).</p>`;
                     let reasons = [];
                     if (revenueChange < 0) reasons.push(T('s19'));
                     if (scenarioSalaries > baseSalaries) reasons.push(T('s20'));
@@ -453,25 +456,19 @@
                     compSheet.getRow(1).height = 40;
                     compSheet.addRow([T('s69'), T('s70'), T('s71'), T('s72'), T('s73')]);
                     const cmpData = [
-                        [T('s26'), D.base.revenue, D.scenario.revenue, D.changes.revenue, (D.changes
-                            .revenue / D.base.revenue * 100)],
+                        [T('s26'), D.base.revenue, D.scenario.revenue, D.changes.revenue, _pc28(D.changes.revenue, D.base.revenue)],
                         [T('s74'), D.base.salaries, D.scenario.salaries, D.scenario.salaries - D.base
-                            .salaries, ((D.scenario.salaries - D.base.salaries) / D.base.salaries *
-                            100)
+                            .salaries, _pc28(D.scenario.salaries - D.base.salaries, D.base.salaries)
                         ],
                         [T('s75'), D.base.materials, D.scenario.materials, D.scenario.materials - D
-                            .base.materials, ((D.scenario.materials - D.base.materials) / D.base
-                            .materials * 100)
+                            .base.materials, _pc28(D.scenario.materials - D.base.materials, D.base.materials)
                         ],
                         [T('s76'), D.base.otherCosts, D.scenario.otherCosts, 0, 0],
-                        [T('s77'), D.base.totalCosts, D.scenario.totalCosts, D.changes.costs, (D
-                            .changes.costs / D.base.totalCosts * 100)
+                        [T('s77'), D.base.totalCosts, D.scenario.totalCosts, D.changes.costs, _pc28(D.changes.costs, D.base.totalCosts)
                         ],
-                        [T('s28'), D.base.profit, D.scenario.profit, D.changes.profit, (D.changes
-                            .profit / D.base.profit * 100)
+                        [T('s28'), D.base.profit, D.scenario.profit, D.changes.profit, _pc28(D.changes.profit, D.base.profit)
                         ],
-                        [T('s33'), D.base.margin, D.scenario.margin, D.changes.margin, (D.changes
-                            .margin / D.base.margin * 100)
+                        [T('s33'), D.base.margin, D.scenario.margin, D.changes.margin, _pc28(D.changes.margin, D.base.margin)
                         ]
                     ];
                     cmpData.forEach((row, idx) => {
@@ -480,7 +477,7 @@
                         row.forEach((val, colIdx) => {
                             const cell = compSheet.getCell(rowNum, colIdx + 2);
                             if (typeof val === 'number') cell.numFmt = '#,##0.00';
-                            cell.value = val;
+                            cell.value = (val === null) ? '—' : val;   // V7.3: نسبة غير محددة عند أساس صفر
                             Object.assign(cell, cs(idx % 2 === 0 ? AR : 'FFFEFCF6', DT, false, colIdx ===
                                 0 ? 'right' : 'center'));
                         });
@@ -498,8 +495,10 @@
                     mh(chartSheet, 1, 3, 1, T('s79'), DB, GL, 14);
                     chartSheet.getRow(1).height = 40;
 
-                    const chartContainer = document.querySelector('.chart-card');
-                    if (chartContainer) {
+                    // V7.3: التقاط الرسمين البيانيين معاً (كان الأول فقط)
+                    const chartCards = Array.from(document.querySelectorAll('.chart-card'));
+                    for (let ci = 0; ci < chartCards.length; ci++) {
+                        const chartContainer = chartCards[ci];
                         try {
                             const origBg = chartContainer.style.backgroundColor;
                             chartContainer.style.backgroundColor = '#ffffff';
@@ -508,8 +507,9 @@
                             chartContainer.style.backgroundColor = origBg;
                             const imgData = canvasImg.toDataURL('image/png');
                             const imageId = workbook.addImage({ base64: imgData, extension: 'png' });
-                            chartSheet.addImage(imageId, { tl: { col: 1, row: 2 }, br: { col: 2,
-                                    row: 18 }, editAs: 'oneCell' });
+                            const top = 2 + ci * 18;
+                            chartSheet.addImage(imageId, { tl: { col: 1, row: top }, br: { col: 2,
+                                    row: top + 16 }, editAs: 'oneCell' });
                         } catch (err) { /* */ }
                     }
 
@@ -522,8 +522,8 @@
                     mh(recSheet, 1, 3, 1, T('s81'), DB, GL, 14);
                     recSheet.getRow(1).height = 40;
                     let recContent = D.isBetter ?
-                        `${T('s82')}${currency} ${D.changes.profit.toFixed(0)} (${(D.changes.profit / D.base.profit * 100).toFixed(1)}${T('s83')}` :
-                        `${T('s84')}${currency} ${D.changes.profit.toFixed(0)} (${(D.changes.profit / D.base.profit * 100).toFixed(1)}${T('s85')}`;
+                        `${T('s82')}${currency} ${D.changes.profit.toFixed(0)} (${_pcs28(D.changes.profit, D.base.profit)}${T('s83')}` :
+                        `${T('s84')}${currency} ${D.changes.profit.toFixed(0)} (${_pcs28(D.changes.profit, D.base.profit)}${T('s85')}`;
                     recSheet.getCell(3, 2).value = recContent;
                     recSheet.getCell(3, 2).font = { name: 'Arial', size: 11 };
                     recSheet.getCell(3, 2).alignment = { wrapText: true, readingOrder: FG.dir() };
@@ -564,7 +564,7 @@
                         chartImgBase64 = img.toDataURL('image/png');
                     }
 
-                    const fullHtml = `${T('s93')}${company}${T('s94')}${dateStr}${T('s95')}${currency}${T('s96')}${D.scenarioPcts.revenue >= 0 ? '+' : ''}${D.scenarioPcts.revenue}${T('s97')}${D.scenarioPcts.salaries >= 0 ? '+' : ''}${D.scenarioPcts.salaries}${T('s98')}${D.scenarioPcts.materials >= 0 ? '+' : ''}${D.scenarioPcts.materials}${T('s99')}${currency}${D.base.revenue.toFixed(0)}</td><td>${currency}${D.scenario.revenue.toFixed(0)}</td><td style="color:${D.changes.revenue >= 0 ? '#28a745' : '#dc3545'}">${D.changes.revenue >= 0 ? '+' : ''}${currency}${D.changes.revenue.toFixed(0)}${T('s100')}${currency}${D.base.totalCosts.toFixed(0)}</td><td>${currency}${D.scenario.totalCosts.toFixed(0)}</td><td style="color:${D.changes.costs <= 0 ? '#28a745' : '#dc3545'}">${D.changes.costs >= 0 ? '+' : ''}${currency}${D.changes.costs.toFixed(0)}${T('s101')}${currency}${D.base.profit.toFixed(0)}</td><td>${currency}${D.scenario.profit.toFixed(0)}</td><td style="color:${D.changes.profit >= 0 ? '#28a745' : '#dc3545'}">${D.changes.profit >= 0 ? '+' : ''}${currency}${D.changes.profit.toFixed(0)}${T('s102')}${D.base.margin.toFixed(1)}%</td><td>${D.scenario.margin.toFixed(1)}%</td><td style="color:${D.changes.margin >= 0 ? '#28a745' : '#dc3545'}">${D.changes.margin >= 0 ? '+' : ''}${D.changes.margin.toFixed(1)}${T('s103')}${D.isBetter ? T('s90') : T('s91')}${T('s104')}${currency}${D.changes.profit.toFixed(0)} (${(D.changes.profit / D.base.profit * 100).toFixed(1)}%)</p>
+                    const fullHtml = `${T('s93')}${company}${T('s94')}${dateStr}${T('s95')}${currency}${T('s96')}${D.scenarioPcts.revenue >= 0 ? '+' : ''}${D.scenarioPcts.revenue}${T('s97')}${D.scenarioPcts.salaries >= 0 ? '+' : ''}${D.scenarioPcts.salaries}${T('s98')}${D.scenarioPcts.materials >= 0 ? '+' : ''}${D.scenarioPcts.materials}${T('s99')}${currency}${D.base.revenue.toFixed(0)}</td><td>${currency}${D.scenario.revenue.toFixed(0)}</td><td style="color:${D.changes.revenue >= 0 ? '#28a745' : '#dc3545'}">${D.changes.revenue >= 0 ? '+' : ''}${currency}${D.changes.revenue.toFixed(0)}${T('s100')}${currency}${D.base.totalCosts.toFixed(0)}</td><td>${currency}${D.scenario.totalCosts.toFixed(0)}</td><td style="color:${D.changes.costs <= 0 ? '#28a745' : '#dc3545'}">${D.changes.costs >= 0 ? '+' : ''}${currency}${D.changes.costs.toFixed(0)}${T('s101')}${currency}${D.base.profit.toFixed(0)}</td><td>${currency}${D.scenario.profit.toFixed(0)}</td><td style="color:${D.changes.profit >= 0 ? '#28a745' : '#dc3545'}">${D.changes.profit >= 0 ? '+' : ''}${currency}${D.changes.profit.toFixed(0)}${T('s102')}${D.base.margin.toFixed(1)}%</td><td>${D.scenario.margin.toFixed(1)}%</td><td style="color:${D.changes.margin >= 0 ? '#28a745' : '#dc3545'}">${D.changes.margin >= 0 ? '+' : ''}${D.changes.margin.toFixed(1)}${T('s103')}${D.isBetter ? T('s90') : T('s91')}${T('s104')}${currency}${D.changes.profit.toFixed(0)} (${_pcs28(D.changes.profit, D.base.profit)}%)</p>
                         </div>
                         ${chartImgBase64 ? `${T('s92')}${chartImgBase64}" class="chart-img" /></div>` : ''}${T('s105')}${now.getFullYear()}</div>
                     </body></html>`;

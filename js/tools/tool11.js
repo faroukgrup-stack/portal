@@ -64,10 +64,10 @@
     document.getElementById('calculateBtn').addEventListener('click', async function() {
         const currency = document.getElementById('currencySelect').value;
         const companyName = document.getElementById('companyName').value || T('s2');
-        const cost = parseFloat(document.getElementById('investmentCost').value) || 0;
-        const profitInput = parseFloat(document.getElementById('annualProfit').value) || 0;
+        const cost = FG.num('investmentCost', 0);
+        const profitInput = FG.num('annualProfit', 0);
         const period = parseFloat(document.getElementById('period').value);
-        const forecastYears = parseInt(document.getElementById('forecastYears').value) || 5;
+        const forecastYears = FG.int('forecastYears', 5);
 
         if (cost <= 0) {
             alert(T('s3'));
@@ -89,7 +89,7 @@
         document.getElementById('initialMessage').style.display = 'none';
         document.getElementById('resultsSection').style.display = 'block';
 
-        document.getElementById('kpiCards').innerHTML = `${T('s11')}${roi.toFixed(2)}%</div><div class="status ${statusClass}">${statusText}${T('s12')}${fxP(payback,1)}${T('s13')}${currency} ${annualProfit.toFixed(0)}${T('s14')}${currency} ${cost.toFixed(0)}</div></div>
+        document.getElementById('kpiCards').innerHTML = `${T('s11')}${FG.fx(roi,2)}%</div><div class="status ${statusClass}">${statusText}${T('s12')}${fxP(payback,1)}${T('s13')}${currency} ${annualProfit.toFixed(0)}${T('s14')}${currency} ${cost.toFixed(0)}</div></div>
         `;
 
         // رسم بياني
@@ -170,7 +170,7 @@
             bc.value=T('s22');
             bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};
             mh(cv,1,4,4,`${T('s23')}${companyName}`,DB,GL,18);
-            const inf=[[T('s24'),companyName],[T('s25'),new Date().toLocaleDateString(FG.locale())],[T('s26'),currency],['📊 ROI',`${D.roi.toFixed(2)}%`],[T('s27'),`${fxP(D.payback,1)}${T('s28')}`]];
+            const inf=[[T('s24'),companyName],[T('s25'),new Date().toLocaleDateString(FG.locale())],[T('s26'),currency],['📊 ROI',`${FG.fx(D.roi,2)}%`],[T('s27'),`${fxP(D.payback,1)}${T('s28')}`]];
             let ir=6;
             inf.forEach(([l,v],idx)=>{
                 cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
@@ -193,7 +193,7 @@
                 [T('s33'), D.annualProfit, `${currency} ${D.annualProfit.toFixed(0)}`],
                 [T('s34'), D.period === 1 ? T('s35') : (D.period === 0.5 ? T('s36') : (D.period === 0.25 ? T('s37') : T('s38'))), ''],
                 [T('s39'), D.forecastYears, ''],
-                ['ROI', D.roi, `${D.roi.toFixed(2)}%`],
+                ['ROI', D.roi, `${FG.fx(D.roi,2)}%`],
                 [T('s40'), Number.isFinite(D.payback)?D.payback:'∞', `${fxP(D.payback,1)}${T('s28')}`],
                 [T('s41'), currency, ''],
                 [T('s42'), companyName, '']
@@ -218,7 +218,7 @@
             mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString(FG.locale())}`,HB,'FFFFFFFF',10);
             kpiSheet.getRow(2).height=26;
             const kpis = [
-                { label: 'ROI', value: `${D.roi.toFixed(2)}%`, good: D.roi>0 },
+                { label: 'ROI', value: `${FG.fx(D.roi,2)}%`, good: D.roi>0 },
                 { label: T('s45'), value: `${fxP(D.payback,1)}${T('s28')}`, good: Number.isFinite(D.payback)&&D.payback<5 },
                 { label: T('s33'), value: `${currency} ${D.annualProfit.toFixed(0)}`, good: D.annualProfit>0 },
                 { label: T('s32'), value: `${currency} ${D.cost.toFixed(0)}`, good: true }
@@ -272,7 +272,7 @@
             mh(evalSheet,1,3,1,T('s51'),DB,GL,14);
             evalSheet.getRow(1).height=45;
             const sections = [
-                { title: T('s52'), content: `${T('s53')}${companyName}${T('s54')}${currency} ${D.cost.toFixed(0)}${T('s55')}${currency} ${D.annualProfit.toFixed(0)}\nROI: ${D.roi.toFixed(2)}${T('s56')}${fxP(D.payback,1)}${T('s28')}` },
+                { title: T('s52'), content: `${T('s53')}${companyName}${T('s54')}${currency} ${D.cost.toFixed(0)}${T('s55')}${currency} ${D.annualProfit.toFixed(0)}\nROI: ${FG.fx(D.roi,2)}${T('s56')}${fxP(D.payback,1)}${T('s28')}` },
                 { title: T('s57'), content: D.interpretation },
                 { title: T('s58'), content: D.roiVerdict },
                 { title: T('s62'), content: T('s63') }
@@ -330,8 +330,8 @@
                 chartImgBase64 = img.toDataURL('image/png');
             }
 
-            const fullHtml = `${T('s70')}${companyName}${T('s71')}${dateStr}${T('s72')}${currency} | ROI: ${D.roi.toFixed(2)}${T('s73')}${currency} ${D.cost.toFixed(0)}${T('s74')}${currency} ${D.annualProfit.toFixed(0)}</td></tr>
-                    <tr><th>ROI</th><td>${D.roi.toFixed(2)}${T('s75')}${fxP(D.payback,1)}${T('s76')}${D.roi>0?'#d4edda':'#f8d7da'};border-radius:10px;text-align:center;">
+            const fullHtml = `${T('s70')}${companyName}${T('s71')}${dateStr}${T('s72')}${currency} | ROI: ${FG.fx(D.roi,2)}${T('s73')}${currency} ${D.cost.toFixed(0)}${T('s74')}${currency} ${D.annualProfit.toFixed(0)}</td></tr>
+                    <tr><th>ROI</th><td>${FG.fx(D.roi,2)}${T('s75')}${fxP(D.payback,1)}${T('s76')}${D.roi>0?'#d4edda':'#f8d7da'};border-radius:10px;text-align:center;">
                     <span class="highlight" style="color:${D.roi>0?'#155724':'#721c24'};">${D.roi>0?T('s68'):T('s69')}${T('s77')}${chartImgBase64}${T('s78')}${D.interpretation}${T('s79')}${now.getFullYear()}</div>
             </body></html>`;
 

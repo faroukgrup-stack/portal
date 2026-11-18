@@ -73,7 +73,7 @@
 
             function renderCashflows() {
                 const container = document.getElementById('cashflowContainer');
-                const years = parseInt(document.getElementById('projectYears').value) || 5;
+                const years = FG.int('projectYears', 5);
                 while (cashflows.length < years) cashflows.push(0);
                 while (cashflows.length > years) cashflows.pop();
                 container.innerHTML = '';
@@ -103,14 +103,14 @@
             }
 
             document.getElementById('addYearBtn').addEventListener('click', function() {
-                const years = parseInt(document.getElementById('projectYears').value) || 5;
+                const years = FG.int('projectYears', 5);
                 document.getElementById('projectYears').value = years + 1;
                 cashflows.push(0);
                 renderCashflows();
             });
 
             document.getElementById('removeYearBtn').addEventListener('click', function() {
-                const years = parseInt(document.getElementById('projectYears').value) || 5;
+                const years = FG.int('projectYears', 5);
                 if (years > 1) {
                     document.getElementById('projectYears').value = years - 1;
                     cashflows.pop();
@@ -139,9 +139,9 @@
 
                 const currency = document.getElementById('currencySelect').value;
                 const company = document.getElementById('companyName').value || T('s3');
-                const initialInvestment = parseFloat(document.getElementById('initialInvestment').value) || 0;
+                const initialInvestment = FG.num('initialInvestment', 0);
                 const discountRate = parseFloat(document.getElementById('discountRate').value) / 100;   // V7.2: الخانة الفارغة تُرفض بدل اعتبارها 0%
-                const years = parseInt(document.getElementById('projectYears').value) || 0;
+                const years = FG.int('projectYears', 0);
 
                 while (cashflows.length < years) cashflows.push(0);
                 while (cashflows.length > years) cashflows.pop();
@@ -169,7 +169,7 @@
                 // بطاقات النتائج
                 document.getElementById('kpiCards').innerHTML = `
                     <div class="result-card" style="border-color:${npv >= 0 ? '#28a745' : '#dc3545'}${T('s10')}${npv >= 0 ? '#4ade80' : '#f87171'}">${currency}${npv.toFixed(2)}</div>
-                        <div class="unit">${npv >= 0 ? T('s8') : T('s9')}${T('s11')}${irrPercent.toFixed(2)}${T('s12')}${(discountRate*100).toFixed(2)}${T('s13')}${fxP(payback, 2)}${T('s14')}${fxP(dPayback, 2)}${T('s15')}${isAcceptable ? '#28a745' : '#dc3545'}${T('s16')}${statusClass}">${status}</span></div>
+                        <div class="unit">${npv >= 0 ? T('s8') : T('s9')}${T('s11')}${FG.fx(irrPercent, 2)}${T('s12')}${(discountRate*100).toFixed(2)}${T('s13')}${fxP(payback, 2)}${T('s14')}${fxP(dPayback, 2)}${T('s15')}${isAcceptable ? '#28a745' : '#dc3545'}${T('s16')}${statusClass}">${status}</span></div>
                     </div>
                 `;
 
@@ -193,7 +193,7 @@
                 let recHtml = `${T('s18')}`;
                 if (isAcceptable) {
                     recHtml += `${T('s19')}`;
-                    recHtml += `${T('s20')}${currency}${npv.toFixed(2)}${T('s21')}${irrPercent.toFixed(2)}${T('s22')}${(discountRate*100).toFixed(2)}%).</p>`;
+                    recHtml += `${T('s20')}${currency}${npv.toFixed(2)}${T('s21')}${FG.fx(irrPercent, 2)}${T('s22')}${(discountRate*100).toFixed(2)}%).</p>`;
                     if (payback < years) {
                         recHtml += `${T('s23')}${fxP(payback, 2)}${T('s24')}${years}${T('s25')}`;
                     } else {
@@ -204,7 +204,7 @@
                     recHtml += `${T('s30')}`;
                 } else {
                     recHtml += `${T('s31')}`;
-                    recHtml += `${T('s32')}${currency}${npv.toFixed(2)}${T('s21')}${irrPercent.toFixed(2)}${T('s33')}${(discountRate*100).toFixed(2)}%).</p>`;
+                    recHtml += `${T('s32')}${currency}${npv.toFixed(2)}${T('s21')}${FG.fx(irrPercent, 2)}${T('s33')}${(discountRate*100).toFixed(2)}%).</p>`;
                     recHtml += `${T('s34')}`;
                 }
                 recDiv.innerHTML = recHtml;
@@ -342,7 +342,7 @@
                         [T('s45'), new Date().toLocaleDateString(FG.locale())],
                         [T('s46'), currency],
                         ['📊 NPV', `${currency}${D.outputs.npv.toFixed(2)}`],
-                        ['📈 IRR', `${D.outputs.irr.toFixed(2)}%`],
+                        ['📈 IRR', `${FG.fx(D.outputs.irr, 2)}%`],
                         [T('s47'), D.outputs.status]
                     ];
                     let ir = 6;
@@ -436,7 +436,7 @@
                     const kpis = [
                         { label: 'NPV', value: `${currency}${D.outputs.npv.toFixed(2)}`, good: D.outputs.npv >
                             0 },
-                        { label: 'IRR', value: `${D.outputs.irr.toFixed(2)}%`, good: D.outputs.irr > D
+                        { label: 'IRR', value: `${FG.fx(D.outputs.irr, 2)}%`, good: D.outputs.irr > D
                                 .inputs.discountRate },
                         { label: 'Payback', value: `${fxP(D.outputs.payback, 2)}${T('s62')}`, good: D.outputs
                                 .payback < D.inputs.years },
@@ -524,10 +524,10 @@
                     let recContent = '';
                     if (D.outputs.isAcceptable) {
                         recContent =
-                            `${T('s70')}${currency}${D.outputs.npv.toFixed(2)}${T('s21')}${D.outputs.irr.toFixed(2)}${T('s22')}${D.inputs.discountRate.toFixed(2)}${T('s71')}${fxP(D.outputs.payback, 2)}${T('s62')}`;
+                            `${T('s70')}${currency}${D.outputs.npv.toFixed(2)}${T('s21')}${FG.fx(D.outputs.irr, 2)}${T('s22')}${D.inputs.discountRate.toFixed(2)}${T('s71')}${fxP(D.outputs.payback, 2)}${T('s62')}`;
                     } else {
                         recContent =
-                            `${T('s72')}${currency}${D.outputs.npv.toFixed(2)}${T('s21')}${D.outputs.irr.toFixed(2)}${T('s33')}${D.inputs.discountRate.toFixed(2)}${T('s73')}`;
+                            `${T('s72')}${currency}${D.outputs.npv.toFixed(2)}${T('s21')}${FG.fx(D.outputs.irr, 2)}${T('s33')}${D.inputs.discountRate.toFixed(2)}${T('s73')}`;
                     }
                     recSheet.getCell(3, 2).value = recContent;
                     recSheet.getCell(3, 2).font = { name: 'Arial', size: 11 };
@@ -575,7 +575,7 @@
                             `<tr><td>${i+1}</td><td>${currency}${(D.inputs.cashflows[i]||0).toFixed(0)}</td></tr>`;
                     }
 
-                    const fullHtml = `${T('s81')}${company}${T('s82')}${dateStr}${T('s83')}${currency}${T('s84')}${currency}${D.inputs.initialInvestment.toFixed(0)}${T('s85')}${D.inputs.discountRate.toFixed(2)}${T('s86')}${D.inputs.years}${T('s87')}${cfRows}${T('s88')}${currency}${D.outputs.npv.toFixed(2)}${T('s89')}${D.outputs.irr.toFixed(2)}${T('s90')}${fxP(D.outputs.payback, 2)}${T('s91')}${fxP(D.outputs.dPayback, 2)}${T('s92')}${D.outputs.isAcceptable ? '#28a745' : '#dc3545'};">${D.outputs.status}${T('s93')}${D.outputs.isAcceptable ? T('s78') : T('s79')}</p></div>
+                    const fullHtml = `${T('s81')}${company}${T('s82')}${dateStr}${T('s83')}${currency}${T('s84')}${currency}${D.inputs.initialInvestment.toFixed(0)}${T('s85')}${D.inputs.discountRate.toFixed(2)}${T('s86')}${D.inputs.years}${T('s87')}${cfRows}${T('s88')}${currency}${D.outputs.npv.toFixed(2)}${T('s89')}${FG.fx(D.outputs.irr, 2)}${T('s90')}${fxP(D.outputs.payback, 2)}${T('s91')}${fxP(D.outputs.dPayback, 2)}${T('s92')}${D.outputs.isAcceptable ? '#28a745' : '#dc3545'};">${D.outputs.status}${T('s93')}${D.outputs.isAcceptable ? T('s78') : T('s79')}</p></div>
                         ${chartImgBase64 ? `${T('s80')}${chartImgBase64}" class="chart-img" /></div>` : ''}${T('s94')}${now.getFullYear()}</div>
                     </body></html>`;
 

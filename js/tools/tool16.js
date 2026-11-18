@@ -230,7 +230,7 @@
         if (rate === null || rate.trim() === '') return;
         let r = parseFloat(rate);
         if (isNaN(r)) return;
-        let amount = parseFloat(currentInput);
+        let amount = parseFloat(currentInput) || 0;
         let result;
         try { result = (await FG.calc('tool16', 'fin', { kind: 'tax', amount, r })).result; } catch (e) { FG.calcError(e); return; }
         history.unshift({ text: `${amount}${T('s9')}${r}% = ${result}`, type: 'مالية' });
@@ -244,7 +244,7 @@
         if (rate === null || rate.trim() === '') return;
         let r = parseFloat(rate);
         if (isNaN(r)) return;
-        let amount = parseFloat(currentInput);
+        let amount = parseFloat(currentInput) || 0;
         let result;
         try { result = (await FG.calc('tool16', 'fin', { kind: 'discount', amount, r })).result; } catch (e) { FG.calcError(e); return; }
         history.unshift({ text: `${amount}${T('s11')}${r}% = ${result}`, type: 'مالية' });
@@ -255,7 +255,7 @@
 
     async function calculateROI() {
         let cost = parseFloat(currentInput);
-        if (cost === 0) { showError(T('s12')); return; }
+        if (!cost) { showError(T('s12')); return; }
         let revenue = prompt(T('s13'), cost * 1.2);
         if (revenue === null || revenue.trim() === '') return;
         let rev = parseFloat(revenue);
@@ -269,7 +269,7 @@
     }
 
     async function calculateSimpleInterest() {
-        let principal = parseFloat(currentInput);
+        let principal = parseFloat(currentInput) || 0;
         let rate = prompt(T('s16'), '5');
         if (rate === null || rate.trim() === '') return;
         let r = parseFloat(rate) / 100;

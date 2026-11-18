@@ -69,14 +69,14 @@
         const flowType = document.getElementById('flowTypeSelect').value;
 
         // قراءة القيم المدخلة (تُعتبر سنوية)
-        let revenueAnnual = parseFloat(document.getElementById('revenue').value) || 0;
-        let opexAnnual = parseFloat(document.getElementById('opex').value) || 0;
-        let depreciationAnnual = parseFloat(document.getElementById('depreciation').value) || 0;
-        let taxRatePercent = parseFloat(document.getElementById('taxRate').value) || 0;
+        let revenueAnnual = FG.num('revenue', 0);
+        let opexAnnual = FG.num('opex', 0);
+        let depreciationAnnual = FG.num('depreciation', 0);
+        let taxRatePercent = FG.num('taxRate', 0);
         let taxRate = taxRatePercent / 100;
-        let capexAnnual = parseFloat(document.getElementById('capex').value) || 0;
-        let wcChangeAnnual = parseFloat(document.getElementById('wcChange').value) || 0;
-        let growthRatePercent = parseFloat(document.getElementById('growthRate').value) || 0;
+        let capexAnnual = FG.num('capex', 0);
+        let wcChangeAnnual = FG.num('wcChange', 0);
+        let growthRatePercent = FG.num('growthRate', 0);
         let growthRate = growthRatePercent / 100;
 
         // تحويل القيم حسب الفترة المختارة

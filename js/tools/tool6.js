@@ -80,15 +80,15 @@ let npvChart = null;
 
 document.getElementById('calculateBtn').addEventListener('click', async function() {
     const currency = document.getElementById('currencySelect').value;
-    const I = parseFloat(document.getElementById('initialInvestment').value) || 0;
-    const r0 = parseFloat(document.getElementById('annualRevenue').value) || 0;
-    const c0 = parseFloat(document.getElementById('annualCosts').value) || 0;
-    const d = parseFloat(document.getElementById('depreciation').value) || 0;
-    const gR = parseFloat(document.getElementById('growthRevenue').value) / 100 || 0;
-    const gC = parseFloat(document.getElementById('growthCosts').value) / 100 || 0;
-    const disc = parseFloat(document.getElementById('discountRate').value) / 100 || 0;
-    const t = parseFloat(document.getElementById('taxRate').value) / 100 || 0;
-    const Y = parseInt(document.getElementById('years').value) || 8;
+    const I = FG.num('initialInvestment', 0);
+    const r0 = FG.num('annualRevenue', 0);
+    const c0 = FG.num('annualCosts', 0);
+    const d = FG.num('depreciation', 0);
+    const gR = FG.num('growthRevenue', 0) / 100;
+    const gC = FG.num('growthCosts', 0) / 100;
+    const disc = FG.num('discountRate', 0) / 100;
+    const t = FG.num('taxRate', 0) / 100;
+    const Y = FG.int('years', 8);
 
     if (I <= 0 || r0 <= 0) { alert(T('s2')); return; }
 
@@ -110,7 +110,7 @@ document.getElementById('calculateBtn').addEventListener('click', async function
     };
 
     // عرض بطاقات KPI
-    document.getElementById('kpiCards').innerHTML = `${T('s10')}${currency} ${fmtNum(baseNPV)}</div><div class="status ${baseNPV>0?'status-good':'status-bad'}">${baseNPV>0?T('s4'):T('s5')}${T('s11')}${isFinite(baseIRR)?(baseIRR*100).toFixed(2):'—'}%</div><div class="status ${isFinite(baseIRR)&&baseIRR>disc?'status-good':'status-bad'}">${isFinite(baseIRR)&&baseIRR>disc?T('s6'):'⚠️'}${T('s12')}${payback!==null?payback:'>'+Y}${T('s13')}${payback!==null&&payback<=Y?'status-good':'status-warning'}">${payback!==null&&payback<=Y?T('s7'):'⚠️'}${T('s14')}${pi.toFixed(3)}</div><div class="status ${pi>1?'status-good':'status-bad'}">${pi>1?T('s8'):T('s9')}</div></div>
+    document.getElementById('kpiCards').innerHTML = `${T('s10')}${currency} ${fmtNum(baseNPV)}</div><div class="status ${baseNPV>0?'status-good':'status-bad'}">${baseNPV>0?T('s4'):T('s5')}${T('s11')}${isFinite(baseIRR)?FG.fx(baseIRR*100,2):'—'}%</div><div class="status ${isFinite(baseIRR)&&baseIRR>disc?'status-good':'status-bad'}">${isFinite(baseIRR)&&baseIRR>disc?T('s6'):'⚠️'}${T('s12')}${payback!==null?payback:'>'+Y}${T('s13')}${payback!==null&&payback<=Y?'status-good':'status-warning'}">${payback!==null&&payback<=Y?T('s7'):'⚠️'}${T('s14')}${FG.fx(pi,3)}</div><div class="status ${pi>1?'status-good':'status-bad'}">${pi>1?T('s8'):T('s9')}</div></div>
     `;
 
     document.getElementById('initialMessage').style.display = 'none';
@@ -121,8 +121,8 @@ document.getElementById('calculateBtn').addEventListener('click', async function
         document.getElementById('sensitivityResults').classList.remove('hidden-section');
         document.getElementById('monteCarloResults').classList.add('hidden-section');
 
-        const rC = parseFloat(document.getElementById('revChange').value) / 100 || 0;
-        const cC = parseFloat(document.getElementById('costChange').value) / 100 || 0;
+        const rC = FG.num('revChange', 0) / 100;
+        const cC = FG.num('costChange', 0) / 100;
         let S;
         try { S = await FG.calc('tool6', 'sensitivity', Object.assign({ rC, cC }, P)); } catch (e) { FG.calcError(e); return; }
         const { matrix, rL, cL } = S;
@@ -143,16 +143,16 @@ document.getElementById('calculateBtn').addEventListener('click', async function
         document.getElementById('sensitivityTable').innerHTML = tbl;
 
         document.getElementById('interpretation').innerHTML = `${T('s18')}${baseNPV>0?T('s16'):T('s17')}</strong> — NPV = ${currency} ${fmtNum(baseNPV)}${T('s19')}${currency} ${fmtNum(S.flatMax)}${T('s20')}${currency} ${fmtNum(S.flatMin)}</p>
-            <p>📐 IRR = ${(baseIRR*100).toFixed(2)}${T('s21')}${(disc*100).toFixed(1)}%</p>
+            <p>📐 IRR = ${FG.fx(baseIRR*100,2)}${T('s21')}${(disc*100).toFixed(1)}%</p>
         `;
 
     } else { // Monte Carlo
         document.getElementById('sensitivityResults').classList.add('hidden-section');
         document.getElementById('monteCarloResults').classList.remove('hidden-section');
 
-        const rV = parseFloat(document.getElementById('revVolatility').value) / 100 || 0.15;
-        const cV = parseFloat(document.getElementById('costVolatility').value) / 100 || 0.10;
-        const nS = parseInt(document.getElementById('numSimulations').value) || 5000;
+        const rV = FG.num('revVolatility', 15) / 100;
+        const cV = FG.num('costVolatility', 10) / 100;
+        const nS = FG.int('numSimulations', 5000);
 
         let MC;
         try { MC = await FG.calc('tool6', 'montecarlo', Object.assign({ rV, cV, nS }, P)); } catch (e) { FG.calcError(e); return; }
@@ -193,10 +193,10 @@ document.getElementById('calculateBtn').addEventListener('click', async function
 
         // إحصائيات مونت كارلو
         const pLoss = parseFloat(probLoss);
-        document.getElementById('monteCarloStats').innerHTML = `${T('s32')}${mean>0?'positive':'negative'}">${currency} ${fmtNum(mean)}</td><td>${mean>0?T('s23'):T('s24')}${T('s33')}${med>0?'positive':'negative'}">${currency} ${fmtNum(med)}${T('s34')}${currency} ${fmtNum(p5)}${T('s35')}${currency} ${fmtNum(p95)}${T('s36')}${pLoss>50?'negative':'positive'}">${probLoss}%</td><td>${MC.riskLevel}${T('s37')}${currency} ${fmtNum(std)}${T('s38')}${cv}%</td><td>${MC.cvLevel}${T('s39')}${skew.toFixed(3)}</td><td>${skew>0?T('s30'):T('s31')}${T('s40')}${nS.toLocaleString()}${T('s41')}`;
+        document.getElementById('monteCarloStats').innerHTML = `${T('s32')}${mean>0?'positive':'negative'}">${currency} ${fmtNum(mean)}</td><td>${mean>0?T('s23'):T('s24')}${T('s33')}${med>0?'positive':'negative'}">${currency} ${fmtNum(med)}${T('s34')}${currency} ${fmtNum(Math.max(0,-p5))} (P5 NPV = ${fmtNum(p5)})${T('s35')}${currency} ${fmtNum(p95)}${T('s36')}${pLoss>50?'negative':'positive'}">${probLoss}%</td><td>${MC.riskLevel}${T('s37')}${currency} ${fmtNum(std)}${T('s38')}${cv}%</td><td>${MC.cvLevel}${T('s39')}${skew.toFixed(3)}</td><td>${skew>0?T('s30'):T('s31')}${T('s40')}${nS.toLocaleString()}${T('s41')}`;
 
         document.getElementById('interpretation').innerHTML = `${T('s42')}${currency} ${fmtNum(mean)}${T('s43')}${probLoss}%</strong></p>
-            <p>🛡️ VaR 95%: <strong>${currency} ${fmtNum(Math.abs(p5))}${T('s44')}${currency} ${fmtNum(p95)}</strong></p>
+            <p>🛡️ VaR 95%: <strong>${currency} ${fmtNum(Math.max(0,-p5))}</strong> <small>(P5 NPV = ${currency} ${fmtNum(p5)})</small><strong>${T('s44')}${currency} ${fmtNum(p95)}</strong></p>
         `;
     }
 });
@@ -234,7 +234,7 @@ document.getElementById('exportExcelBtn').addEventListener('click', async functi
         bc.value=T('s49');
         bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};
         mh(cv,1,4,4,`${T('s52')}${R.analysisType==='sensitivity'?T('s50'):T('s51')})`,DB,GL,18);
-        const inf=[[T('s53'),companyName],[T('s54'),new Date().toLocaleDateString(FG.locale())],[T('s55'),currency],[T('s56'),`${R.years}${T('s57')}`],[T('s58'),`${currency} ${fmtNum(R.investment)}`],['📈 NPV',`${currency} ${fmtNum(R.baseNPV)}`],['🔢 IRR',`${(R.baseIRR*100).toFixed(2)}%`],['⚖️ PI',R.pi?R.pi.toFixed(3):'-']];
+        const inf=[[T('s53'),companyName],[T('s54'),new Date().toLocaleDateString(FG.locale())],[T('s55'),currency],[T('s56'),`${R.years}${T('s57')}`],[T('s58'),`${currency} ${fmtNum(R.investment)}`],['📈 NPV',`${currency} ${fmtNum(R.baseNPV)}`],['🔢 IRR',`${FG.fx(R.baseIRR*100,2)}%`],['⚖️ PI',R.pi?FG.fx(R.pi,3):'-']];
         let ir=6;
         inf.forEach(([l,v],idx)=>{
             cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
@@ -293,8 +293,8 @@ document.getElementById('exportExcelBtn').addEventListener('click', async functi
         kpiSheet.getRow(2).height=26;
         const kpis = [
             { label: 'NPV', value: `${currency} ${fmtNum(R.baseNPV)}`, good: R.baseNPV>0 },
-            { label: 'IRR', value: `${(R.baseIRR*100).toFixed(2)}%`, good: R.baseIRR>R.discount },
-            { label: 'PI', value: R.pi.toFixed(3), good: R.pi>1 },
+            { label: 'IRR', value: `${FG.fx(R.baseIRR*100,2)}%`, good: R.baseIRR>R.discount },
+            { label: 'PI', value: FG.fx(R.pi,3), good: R.pi>1 },
             { label: T('s78'), value: R.payback?`${R.payback}${T('s79')}`:`>${R.years}${T('s79')}`, good: R.payback!==null&&R.payback<=R.years },
             { label: T('s80'), value: `${(R.discount*100).toFixed(2)}%`, good: true },
         ];
@@ -367,7 +367,8 @@ document.getElementById('exportExcelBtn').addEventListener('click', async functi
             const mcData = [
                 [T('s95'), mc.meanNPV, mc.meanNPV>0?T('s4'):T('s96')],
                 [T('s97'), mc.medianNPV, ''],
-                ['VaR 95%', mc.p5NPV, T('s98')],
+                ['VaR 95%', Math.max(0,-mc.p5NPV), T('s98')],
+                ['P5 NPV', mc.p5NPV, ''],
                 [T('s99'), mc.p95NPV, T('s100')],
                 [T('s101'), parseFloat(mc.probLoss), '%'],
                 [T('s102'), mc.stdNPV, ''],
@@ -415,7 +416,7 @@ document.getElementById('exportExcelBtn').addEventListener('click', async functi
         evalSheet.getRow(1).height=45;
         const sections = [
             { title: T('s114'), content: `${T('s115')}${companyName}${T('s116')}${currency} ${fmtNum(R.investment)}${T('s117')}${R.years}${T('s57')}` },
-            { title: T('s118'), content: `NPV = ${currency} ${fmtNum(R.baseNPV)} | IRR = ${(R.baseIRR*100).toFixed(2)}% | PI = ${R.pi.toFixed(3)}` },
+            { title: T('s118'), content: `NPV = ${currency} ${fmtNum(R.baseNPV)} | IRR = ${FG.fx(R.baseIRR*100,2)}% | PI = ${FG.fx(R.pi,3)}` },
             { title: T('s119'), content: isGood ? T('s120') : T('s121') },
         ];
         let itRow=2;
@@ -480,8 +481,8 @@ document.getElementById('exportWordBtn').addEventListener('click', async functio
         // بطاقات KPI
         const kpiData = [
             { label: T('s126'), value: `${currency} ${fmtNum(R.baseNPV)}`, good: R.baseNPV>0 },
-            { label: T('s127'), value: `${(R.baseIRR*100).toFixed(2)}%`, good: R.baseIRR>R.discount },
-            { label: T('s128'), value: R.pi.toFixed(3), good: R.pi>1 },
+            { label: T('s127'), value: `${FG.fx(R.baseIRR*100,2)}%`, good: R.baseIRR>R.discount },
+            { label: T('s128'), value: FG.fx(R.pi,3), good: R.pi>1 },
             { label: T('s129'), value: R.payback?`${R.payback}${T('s130')}`:`>${R.years}${T('s131')}`, good: R.payback!==null&&R.payback<=R.years },
         ];
         let kpiRows = '';
@@ -529,7 +530,7 @@ document.getElementById('exportWordBtn').addEventListener('click', async functio
             const mc = R.monteCarlo;
             mcHtml = T('s139');
             mcHtml += `${T('s140')}${mc.meanNPV>0?'positive':'negative'}">${currency} ${fmtNum(mc.meanNPV)}${T('s141')}${mc.medianNPV>0?'positive':'negative'}">${currency} ${fmtNum(mc.medianNPV)}</td></tr>
-                <tr><td>VaR 95%</td><td class="negative">${currency} ${fmtNum(mc.p5NPV)}${T('s142')}${currency} ${fmtNum(mc.p95NPV)}${T('s143')}${parseFloat(mc.probLoss)>50?'negative':'positive'}">${mc.probLoss}${T('s144')}${currency} ${fmtNum(mc.stdNPV)}${T('s145')}${mc.cv}${T('s146')}${mc.numSims.toLocaleString()}</td></tr>
+                <tr><td>VaR 95%</td><td class="negative">${currency} ${fmtNum(Math.max(0,-mc.p5NPV))} (P5 NPV = ${fmtNum(mc.p5NPV)})${T('s142')}${currency} ${fmtNum(mc.p95NPV)}${T('s143')}${parseFloat(mc.probLoss)>50?'negative':'positive'}">${mc.probLoss}${T('s144')}${currency} ${fmtNum(mc.stdNPV)}${T('s145')}${mc.cv}${T('s146')}${mc.numSims.toLocaleString()}</td></tr>
             </tbody></table>`;
             if (chartImg) {
                 mcHtml += `<div style="text-align:center;margin:20px 0;"><img src="${chartImg}" style="max-width:100%;border:1px solid #b8860b;border-radius:10px;" /></div>`;
@@ -543,7 +544,7 @@ document.getElementById('exportWordBtn').addEventListener('click', async functio
             ${verdictHtml}${T('s167')}${currency}${T('s168')}${currency})</th></tr></thead><tbody>${cfRows}</tbody></table>
 
             ${sensHtml}
-            ${mcHtml}${T('s169')}${currency} ${fmtNum(R.investment)}${T('s170')}${R.years}${T('s171')}${currency} ${fmtNum(R.baseNPV)} (${R.baseNPV>0?T('s151'):T('s152')}${T('s172')}${(R.baseIRR*100).toFixed(2)}${T('s173')}${R.pi.toFixed(3)}${T('s174')}${isGood?T('s153'):T('s154')}${T('s175')}${now.getFullYear()}</div>
+            ${mcHtml}${T('s169')}${currency} ${fmtNum(R.investment)}${T('s170')}${R.years}${T('s171')}${currency} ${fmtNum(R.baseNPV)} (${R.baseNPV>0?T('s151'):T('s152')}${T('s172')}${FG.fx(R.baseIRR*100,2)}${T('s173')}${FG.fx(R.pi,3)}${T('s174')}${isGood?T('s153'):T('s154')}${T('s175')}${now.getFullYear()}</div>
         </body></html>`;
 
         const blob = new Blob(['\uFEFF'+fullHtml], { type: 'application/msword' });

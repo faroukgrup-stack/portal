@@ -77,17 +77,17 @@
     document.getElementById('calculateBtn').addEventListener('click', async function() {
         const currency = document.getElementById('currencySelect').value;
         const companyName = document.getElementById('companyName').value || T('s2');
-        const equity = parseFloat(document.getElementById('equity').value) || 0;
-        const debt = parseFloat(document.getElementById('debt').value) || 0;
-        const costDebt = parseFloat(document.getElementById('costDebt').value) / 100 || 0;
-        const taxRate = parseFloat(document.getElementById('taxRate').value) / 100 || 0;
+        const equity = FG.num('equity', 0);
+        const debt = FG.num('debt', 0);
+        const costDebt = FG.num('costDebt', 0) / 100;
+        const taxRate = FG.num('taxRate', 0) / 100;
 
         let reMethod = document.getElementById('reMethod').value;
-        const costEquityManual = parseFloat(document.getElementById('costEquityManual').value) / 100 || 0;
-        const rf = parseFloat(document.getElementById('rf').value) / 100 || 0;
+        const costEquityManual = FG.num('costEquityManual', 0) / 100;
+        const rf = FG.num('rf', 0) / 100;
         const betaRaw = parseFloat(document.getElementById('beta').value);
         const beta = isNaN(betaRaw) ? 1 : betaRaw;   // V7.2: بيتا = 0 قيمة صحيحة (أصل بلا مخاطر سوقية)، والفارغ فقط = 1
-        const mrp = parseFloat(document.getElementById('marketRiskPremium').value) / 100 || 0;
+        const mrp = FG.num('marketRiskPremium', 0) / 100;
 
         if (equity <= 0 && debt <= 0) {
             alert(T('s3'));

@@ -68,13 +68,13 @@
     // ===== دالة الحساب =====
     async function computeDepreciation() {
         const currency = document.getElementById('currencySelect').value;
-        const cost = parseFloat(document.getElementById('assetCost').value) || 0;
-        const salvage = parseFloat(document.getElementById('salvageValue').value) || 0;
-        const life = parseInt(document.getElementById('usefulLife').value) || 5;
+        const cost = FG.num('assetCost', 0);
+        const salvage = FG.num('salvageValue', 0);
+        const life = FG.int('usefulLife', 5);
         const method = document.getElementById('depMethod').value;
-        const customRateInput = parseFloat(document.getElementById('customRate').value) || 20;
+        const customRateInput = FG.num('customRate', 20);
         const customRate = customRateInput / 100;
-        const purchaseMonth = parseInt(document.getElementById('purchaseMonth').value) || 1;
+        const purchaseMonth = FG.int('purchaseMonth', 1);
 
         if (cost <= salvage) {
             alert(T('s2'));

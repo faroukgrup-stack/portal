@@ -116,7 +116,7 @@
         sop9_3: { risk: T('s5'), action: T('s115'), recommendation: T('s116') },
         sop9_4: { risk: T('s5'), action: T('s117'), recommendation: T('s118') },
         sop9_5: { risk: T('s2'), action: T('s119'), recommendation: T('s120') },
-        sop10_1: { risk: T('s2'), action: T('s121'), recommendation: T('s82') },
+        sop10_1: { risk: T('s2'), action: T('s121'), recommendation: T('v73_1') },
         sop10_2: { risk: T('s2'), action: T('s122'), recommendation: T('s123') },
         sop10_3: { risk: T('s5'), action: T('s124'), recommendation: T('s125') },
         sop10_4: { risk: T('s14'), action: T('s126'), recommendation: T('s127') },
@@ -125,26 +125,29 @@
         sop10_7: { risk: T('s14'), action: T('s132'), recommendation: T('s133') }
     };
 
+    // V7.3: يظهر الإجراء التصحيحي لكل بند غير محقق عند التحميل وعند الحساب
+    function updateRecommendation(item) {
+        const id = item.dataset.id;
+        const recBox = document.getElementById(`recommendation-${id}`);
+        if (!recBox) return;
+        const data = correctiveActions[id];
+        if (!item.checked && data) {
+            recBox.style.display = 'block';
+            recBox.innerHTML = `${T('s134')}${data.risk}${T('s135')}${data.action}${T('s136')}${data.recommendation}`;
+        } else {
+            recBox.style.display = 'none';
+        }
+    }
+    function refreshAllRecommendations() { document.querySelectorAll('.sop-item').forEach(updateRecommendation); }
     function setupRecommendations() {
         document.querySelectorAll('.sop-item').forEach(item => {
-            item.addEventListener('change', function() {
-                const id = this.dataset.id;
-                const recBox = document.getElementById(`recommendation-${id}`);
-                if (!this.checked) {
-                    const data = correctiveActions[id];
-                    if (data) {
-                        recBox.style.display = 'block';
-                        recBox.innerHTML = `${T('s134')}${data.risk}${T('s135')}${data.action}${T('s136')}${data.recommendation}`;
-                    }
-                } else {
-                    recBox.style.display = 'none';
-                }
-            });
+            item.addEventListener('change', function() { updateRecommendation(this); });
         });
     }
 
     // ===== جمع بيانات التدقيق =====
     async function collectAuditData() {
+        refreshAllRecommendations();
         const date = document.getElementById('checkDate').value;
         const inspector = document.getElementById('inspectorName').value || T('s137');
         const signatureName = document.getElementById('signatureName').value || inspector;
@@ -225,15 +228,16 @@
 
             // 2. تفاصيل التدقيق
             const detailSheet = workbook.addWorksheet(T('s155'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
-            detailSheet.getColumn(1).width = 5; detailSheet.getColumn(2).width = 50; detailSheet.getColumn(3).width = 15; detailSheet.getColumn(4).width = 20; detailSheet.getColumn(5).width = 30; detailSheet.getColumn(6).width = 5;
-            mh(detailSheet,1,6,1,T('s156'),DB,GL,14);
+            [50,15,18,30,50].forEach((w,i)=>detailSheet.getColumn(i+1).width=w);
+            mh(detailSheet,1,5,1,T('s156'),DB,GL,14);
             detailSheet.getRow(1).height=40;
             detailSheet.addRow([T('s157'), T('s158'), T('s159'), T('s160'), T('s161')]);
             const headerRow = detailSheet.getRow(2);
             headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
             headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
             data.details.forEach(item => {
-                detailSheet.addRow([item.label, item.status ? T('s162') : T('s163'), item.risk, item.note, item.status ? '' : item.recommendation]);
+                const r = detailSheet.addRow([item.label, item.status ? T('s162') : T('s163'), item.risk, item.note, item.status ? '' : item.recommendation]);
+                r.alignment = { wrapText: true, vertical: 'top', readingOrder: FG.dir() };
             });
 
             // 3. ملخص النتائج
@@ -318,3 +322,4 @@
     // ===== تهيئة أولية =====
     document.getElementById('checkDate').value = new Date().toISOString().split('T')[0];
     setupRecommendations();
+    refreshAllRecommendations();

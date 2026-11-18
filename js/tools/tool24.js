@@ -15,7 +15,7 @@
 
             // ===== إظهار/إخفاء حقل العدد =====
             document.getElementById('toolService').addEventListener('change', function() {
-                const needsCount = ['weeklyContent', 'viralIdeas', 'digitalProducts', 'videoScript'];
+                const needsCount = ['weeklyContent'];   // V7.3: الخدمات المتاحة فعلاً في القائمة فقط
                 document.getElementById('countRow').style.display = needsCount.includes(this.value) ? 'block' : 'none';
             });
             document.getElementById('toolService').dispatchEvent(new Event('change'));
@@ -90,7 +90,7 @@
             // ===== الاتصال بالـ Proxy =====
             async function callAIServer(payload, signal) {
                 return await new Promise((resolve, reject) => {
-                    const timeout = setTimeout(() => reject(new Error(T('s14'))), 30000);
+                    const timeout = setTimeout(() => reject(new Error(T('s14'))), 50000);   // V7.3: أطول من مهلة الخادم (45 ث)
                     if (signal) signal.addEventListener('abort', () => {
                         clearTimeout(timeout);
                         const e = new Error('aborted'); e.name = 'AbortError'; reject(e);

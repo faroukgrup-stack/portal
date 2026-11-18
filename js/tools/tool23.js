@@ -69,12 +69,12 @@
                 const currency = document.getElementById('currencySelect').value;
                 const company = document.getElementById('companyName').value || T('s2');
 
-                const marketingSpend = parseFloat(document.getElementById('marketingSpend').value) || 0;
-                const newCustomers = parseFloat(document.getElementById('newCustomers').value) || 0;   // V7.2: لا قيمة افتراضية خفية (كانت 1)
-                const avgOrder = parseFloat(document.getElementById('avgOrderValue').value) || 0;
-                const visitsPerYear = parseFloat(document.getElementById('visitsPerYear').value) || 0;   // V7.2: يقبل الكسور (مثل 1.5 زيارة)
-                const lifespan = parseFloat(document.getElementById('customerLifespan').value) || 0;
-                const profitMargin = parseFloat(document.getElementById('profitMargin').value) || 0;
+                const marketingSpend = FG.num('marketingSpend', 0);
+                const newCustomers = FG.num('newCustomers', 0);   // V7.2: لا قيمة افتراضية خفية (كانت 1)
+                const avgOrder = FG.num('avgOrderValue', 0);
+                const visitsPerYear = FG.num('visitsPerYear', 0);   // V7.2: يقبل الكسور (مثل 1.5 زيارة)
+                const lifespan = FG.num('customerLifespan', 0);
+                const profitMargin = FG.num('profitMargin', 0);
 
                 if (marketingSpend <= 0 || newCustomers <= 0 || avgOrder <= 0 || visitsPerYear <= 0 || lifespan <= 0 || profitMargin <= 0) {
                     alert(T('s3'));

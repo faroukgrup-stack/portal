@@ -93,6 +93,7 @@
                         stage: 'pre', currency: cur,
                         berkusValues: ['berkusIdea', 'berkusPrototype', 'berkusTeam', 'berkusRelations', 'berkusExecution']
                             .map(id => parseFloat(v(id)) || 0),
+                        berkusCap: FG.num('berkusCap', 500000),   // V7.3: الحد بالعملة المختارة
                         rebuild: parseFloat(v('rebuildCost')) || 0,
                         risk: parseFloat(v('riskPremium')) || 0
                     };
@@ -114,7 +115,8 @@
                         arrPrevQ: parseFloat(v('arrPrevQ')),
                         salesMkt: parseFloat(v('salesMarketingPrevQ')),
                         exitVal: parseFloat(v('exitValue')) || 0,
-                        roi: parseFloat(v('roiMultiple')) || 10
+                        roi: FG.num('roiMultiple', 10),
+                        exitYears: Math.min(Math.max(FG.num('exitYears', 6), 1), 30)
                     };
                 }
                 const res = await FG.calc('tool27', 'main', P);
@@ -151,6 +153,7 @@
                     explainHtml += `${T('s37')}${res.magicNumber.toFixed(2)} – ${res.ev.magic ? T('s35') : T('s36')}</p>`;
                     explainHtml += `${T('s40')}${res.burnMultiple !== null ? res.burnMultiple.toFixed(2)+'x' : T('s3')} – ${res.ev.burn ? T('s38') : T('s39')}</p>`;
                     explainHtml += `${T('s43')}${isFinite(res.runwayMonths) ? res.runwayMonths.toFixed(1)+T('s31') : '∞'} – ${res.ev.runway ? T('s41') : T('s42')}</p>`;
+                    if (res.vcImpliedIrr != null && isFinite(res.vcImpliedIrr)) explainHtml += `<p><strong>${T('v73_l1')}</strong> ${(res.vcImpliedIrr*100).toFixed(1)}% (${res.roi}x / ${res.exitYears} ${T('v73_l2')})</p>`;
                     explainHtml += `${T('s44')}${cur}${(Math.min(res.evLow,res.vcLow)/1e6).toFixed(2)}${T('s45')}${cur}${(Math.max(res.evHigh,res.vcHigh)/1e6).toFixed(2)}${T('s46')}`;
                     document.getElementById('explainSection').innerHTML = explainHtml;
 
@@ -354,31 +357,31 @@
                         addInputRow(T('s92'), D.profitMargin, '%');
                         addInputRow(T('s93'), D.churn, '%');
                         addInputRow(T('s94'), D.nrr, '%');
-                        addInputRow(T('s95'), parseFloat(document.getElementById('customersCount').value) || 0);
+                        addInputRow(T('s95'), FG.num('customersCount', 0));
                         addInputRow(T('s96'), parseFloat(document.getElementById('cacInput')
                             .value) || 0);
                         addInputRow(T('s97'), parseFloat(document.getElementById('ltvInput')
                             .value) || 0);
                         addInputRow(T('s98'), parseFloat(document.getElementById('netBurnRate').value) ||
                             0);
-                        addInputRow(T('s99'), parseFloat(document.getElementById('cashOnHand').value) || 0);
+                        addInputRow(T('s99'), FG.num('cashOnHand', 0));
                         addInputRow(T('s100'), parseFloat(document.getElementById('exitValue')
                             .value) || 0);
                         addInputRow(T('s101'), parseFloat(document.getElementById('roiMultiple')
                             .value) || 10);
-                        addInputRow(T('s102'), parseFloat(document.getElementById('exitYears').value) || 6);
+                        addInputRow(T('s102'), FG.num('exitYears', 6));
                     } else {
-                        addInputRow(T('s103'), parseFloat(document.getElementById('berkusIdea').value) || 0);
+                        addInputRow(T('s103'), FG.num('berkusIdea', 0));
                         addInputRow(T('s104'), parseFloat(document.getElementById('berkusPrototype')
                             .value) || 0);
-                        addInputRow(T('s105'), parseFloat(document.getElementById('berkusTeam').value) || 0);
+                        addInputRow(T('s105'), FG.num('berkusTeam', 0));
                         addInputRow(T('s106'), parseFloat(document.getElementById('berkusRelations')
                             .value) || 0);
                         addInputRow(T('s107'), parseFloat(document.getElementById('berkusExecution')
                             .value) || 0);
                         addInputRow(T('s108'), parseFloat(document.getElementById('rebuildCost')
                             .value) || 0);
-                        addInputRow(T('s109'), parseFloat(document.getElementById('riskPremium').value) || 0,
+                        addInputRow(T('s109'), FG.num('riskPremium', 0),
                             '%');
                     }
 
@@ -404,7 +407,7 @@
                             { label: T('s118'), value: D.burnMultiple !== null ? `${D.burnMultiple.toFixed(2)}x` :
                                     T('s3'), good: D.ev.burn },
                             { label: T('s119'), value: isFinite(D.runwayMonths) ? `${D.runwayMonths.toFixed(1)}${T('s2')}` :
-                                    '∞', good: D.ev.runway12 }
+                                    '∞', good: D.ev.runway }
                         ];
                     } else {
                         kpis = [
@@ -655,7 +658,7 @@
                             { l: T('s166'), v: D.burnMultiple !== null ? `${D.burnMultiple.toFixed(2)}x` :
                                     T('s3'), g: D.ev.burn },
                             { l: T('s167'), v: isFinite(D.runwayMonths) ? `${D.runwayMonths.toFixed(1)}${T('s31')}` :
-                                    '∞', g: D.ev.runway12 }
+                                    '∞', g: D.ev.runway }
                         ];
                         kpis.forEach(k => {
                             kpiRows +=

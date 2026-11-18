@@ -64,21 +64,21 @@
         return {
             currency: document.getElementById('currencySelect').value,
             companyName: document.getElementById('companyName').value || T('s2'),
-            baseRevenue: parseFloat(document.getElementById('baseRevenue').value) || 0,
-            cogsPercent: parseFloat(document.getElementById('cogsPercent').value) / 100 || 0,
-            opexPercent: parseFloat(document.getElementById('opexPercent').value) / 100 || 0,
-            taxRate: parseFloat(document.getElementById('taxRate').value) / 100 || 0,
-            depreciation: parseFloat(document.getElementById('depreciation').value) || 0,
-            capex: parseFloat(document.getElementById('capex').value) || 0,
-            dso: parseFloat(document.getElementById('dso').value) || 0,
-            dio: parseFloat(document.getElementById('dio').value) || 0,
-            dpo: parseFloat(document.getElementById('dpo').value) || 0,
-            growthRate: parseFloat(document.getElementById('growthRate').value) / 100 || 0,
-            forecastYears: parseInt(document.getElementById('forecastYears').value) || 5,
-            discountRate: parseFloat(document.getElementById('discountRate').value) / 100 || 0.1,
-            initialWC: parseFloat(document.getElementById('initialWC').value) || 0,
-            initialInvestment: parseFloat(document.getElementById('initialInvestment').value) || 0,
-            terminalGrowth: parseFloat(document.getElementById('terminalGrowth').value) / 100 || 0.03
+            baseRevenue: FG.num('baseRevenue', 0),
+            cogsPercent: FG.num('cogsPercent', 0) / 100,
+            opexPercent: FG.num('opexPercent', 0) / 100,
+            taxRate: FG.num('taxRate', 0) / 100,
+            depreciation: FG.num('depreciation', 0),
+            capex: FG.num('capex', 0),
+            dso: FG.num('dso', 0),
+            dio: FG.num('dio', 0),
+            dpo: FG.num('dpo', 0),
+            growthRate: FG.num('growthRate', 0) / 100,
+            forecastYears: FG.int('forecastYears', 5),
+            discountRate: FG.num('discountRate', 10) / 100,
+            initialWC: FG.num('initialWC', 0),
+            initialInvestment: FG.num('initialInvestment', 0),
+            terminalGrowth: FG.num('terminalGrowth', 3) / 100
         };
     }
 
@@ -98,7 +98,7 @@
         document.getElementById('resultsSection').style.display = 'block';
         document.getElementById('initialMessage').style.display = 'none';
 
-        document.getElementById('kpiCards').innerHTML = `${T('s8')}${currency}${forecast.totalNpv.toFixed(0)}</div><div class="status ${forecast.totalNpv>0?'status-good':'status-bad'}">${forecast.totalNpv>0?T('s3'):T('s4')}${T('s9')}${forecast.irr ? (forecast.irr*100).toFixed(2)+'%' : T('s5')}</div><div class="status ${forecast.irr && forecast.irr>inputs.discountRate?'status-good':'status-warning'}">${forecast.irr && forecast.irr>inputs.discountRate ? T('s6') : T('s7')}${T('s10')}${forecast.paybackPeriod ? forecast.paybackPeriod.toFixed(1) : '∞'}${T('s11')}${currency}${forecast.terminalValue.toFixed(0)}</div></div>
+        document.getElementById('kpiCards').innerHTML = `${T('s8')}${currency}${forecast.totalNpv.toFixed(0)}</div><div class="status ${forecast.totalNpv>0?'status-good':'status-bad'}">${forecast.totalNpv>0?T('s3'):T('s4')}${T('s9')}${isFinite(forecast.irr) ? (forecast.irr*100).toFixed(2)+'%' : T('s5')}</div><div class="status ${forecast.irr && forecast.irr>inputs.discountRate?'status-good':'status-warning'}">${forecast.irr && forecast.irr>inputs.discountRate ? T('s6') : T('s7')}${T('s10')}${forecast.paybackPeriod != null ? forecast.paybackPeriod.toFixed(1) : '∞'}${T('s11')}${currency}${forecast.terminalValue.toFixed(0)}</div></div>
         `;
 
         let incomeHtml = `${T('s12')}`;
@@ -142,7 +142,7 @@
         });
 
         document.getElementById('valuationCard').innerHTML = `${T('s21')}${currency}${forecast.totalNpv.toFixed(0)}</div>
-            <div>IRR: ${forecast.irr ? (forecast.irr*100).toFixed(2)+'%' : T('s5')}${T('s22')}${forecast.paybackPeriod ? forecast.paybackPeriod.toFixed(1)+T('s19') : T('s20')}${T('s23')}${(inputs.terminalGrowth*100).toFixed(1)}%</div>
+            <div>IRR: ${isFinite(forecast.irr) ? (forecast.irr*100).toFixed(2)+'%' : T('s5')} <small>(${T('v73_l1')}: ${isFinite(forecast.irrExTV) ? (forecast.irrExTV*100).toFixed(2)+'%' : T('s5')})</small>${T('s22')}${forecast.paybackPeriod != null ? forecast.paybackPeriod.toFixed(1)+T('s19') : T('s20')}${T('s23')}${(inputs.terminalGrowth*100).toFixed(1)}%</div>
         `;
     }
 
@@ -181,7 +181,7 @@
             bc.value=T('s28');
             bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};
             mh(cv,1,4,4,`${T('s29')}${companyName}`,DB,GL,18);
-            const inf=[[T('s30'),companyName],[T('s31'),new Date().toLocaleDateString(FG.locale())],[T('s32'),currency],[T('s33'),`${years}${T('s34')}`],['💵 NPV',`${currency} ${F.totalNpv.toFixed(0)}`],['📊 IRR',F.irr?(F.irr*100).toFixed(2)+'%':T('s5')]];
+            const inf=[[T('s30'),companyName],[T('s31'),new Date().toLocaleDateString(FG.locale())],[T('s32'),currency],[T('s33'),`${years}${T('s34')}`],['💵 NPV',`${currency} ${F.totalNpv.toFixed(0)}`],['📊 IRR',isFinite(F.irr) ? (F.irr*100).toFixed(2)+'%':T('s5')]];
             let ir=6;
             inf.forEach(([l,v],idx)=>{
                 cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
@@ -237,8 +237,8 @@
             kpiSheet.getRow(2).height=26;
             const kpis = [
                 { label: 'NPV', value: `${currency} ${F.totalNpv.toFixed(0)}`, good: F.totalNpv>0 },
-                { label: 'IRR', value: F.irr?(F.irr*100).toFixed(2)+'%':T('s5'), good: F.irr && F.irr>I.discountRate },
-                { label: T('s57'), value: F.paybackPeriod?F.paybackPeriod.toFixed(1)+T('s19'):T('s20'), good: F.paybackPeriod && F.paybackPeriod<=years },
+                { label: 'IRR', value: isFinite(F.irr) ? (F.irr*100).toFixed(2)+'%':T('s5'), good: isFinite(F.irr) && F.irr>I.discountRate },
+                { label: T('s57'), value: F.paybackPeriod != null ? F.paybackPeriod.toFixed(1)+T('s19'):T('s20'), good: F.paybackPeriod != null && F.paybackPeriod<=years },
                 { label: T('s58'), value: `${currency} ${F.terminalValue.toFixed(0)}`, good: F.terminalValue>0 },
                 { label: T('s59'), value: `${currency} ${F.revenue[years-1].toFixed(0)}`, good: true }
             ];
@@ -335,7 +335,7 @@
             recSheet.getRow(1).height=45;
             const sections = [
                 { title: T('s76'), content: `${T('s77')}${companyName}${T('s78')}${currency}${T('s79')}${years}${T('s80')}${(I.growthRate*100).toFixed(1)}${T('s81')}${(I.discountRate*100).toFixed(1)}%` },
-                { title: T('s82'), content: `NPV: ${currency} ${F.totalNpv.toFixed(0)}\nIRR: ${F.irr?(F.irr*100).toFixed(2)+'%':T('s5')}${T('s83')}${F.paybackPeriod?F.paybackPeriod.toFixed(1)+T('s19'):T('s20')}${T('s84')}${currency} ${F.terminalValue.toFixed(0)}` },
+                { title: T('s82'), content: `NPV: ${currency} ${F.totalNpv.toFixed(0)}\nIRR: ${isFinite(F.irr) ? (F.irr*100).toFixed(2)+'%':T('s5')}${T('s83')}${F.paybackPeriod != null ? F.paybackPeriod.toFixed(1)+T('s19'):T('s20')}${T('s84')}${currency} ${F.terminalValue.toFixed(0)}` },
                 { title: T('s85'), content: F.totalNpv>0?T('s86'):T('s87') },
                 { title: T('s88'), content: T('s89') }
             ];
@@ -403,8 +403,8 @@
 
             const kpiData = [
                 { label: 'NPV', value: `${currency} ${F.totalNpv.toFixed(0)}`, good: F.totalNpv>0 },
-                { label: 'IRR', value: F.irr?(F.irr*100).toFixed(2)+'%':T('s5'), good: F.irr && F.irr>I.discountRate },
-                { label: T('s57'), value: F.paybackPeriod?F.paybackPeriod.toFixed(1)+T('s19'):T('s20'), good: F.paybackPeriod && F.paybackPeriod<=years },
+                { label: 'IRR', value: isFinite(F.irr) ? (F.irr*100).toFixed(2)+'%':T('s5'), good: isFinite(F.irr) && F.irr>I.discountRate },
+                { label: T('s57'), value: F.paybackPeriod != null ? F.paybackPeriod.toFixed(1)+T('s19'):T('s20'), good: F.paybackPeriod != null && F.paybackPeriod<=years },
                 { label: T('s58'), value: `${currency} ${F.terminalValue.toFixed(0)}`, good: F.terminalValue>0 }
             ];
             let kpiRows='';
@@ -428,7 +428,7 @@
             const fullHtml = `${T('s100')}${companyName}${T('s101')}${dateStr}${T('s102')}${currency}${T('s103')}${years}${T('s104')}${currency} ${I.baseRevenue.toFixed(0)}${T('s105')}${(I.growthRate*100).toFixed(1)}${T('s106')}${(I.cogsPercent*100).toFixed(0)}${T('s107')}${(I.opexPercent*100).toFixed(0)}${T('s108')}${(I.taxRate*100).toFixed(0)}${T('s109')}${(I.discountRate*100).toFixed(1)}${T('s110')}${currency} ${I.depreciation.toFixed(0)}${T('s111')}${currency} ${I.capex.toFixed(0)}${T('s112')}${currency} ${I.initialInvestment.toFixed(0)}${T('s113')}${(I.terminalGrowth*100).toFixed(1)}${T('s114')}${kpiRows}</table>
                 <div style="margin:20px 0;padding:15px;background:${F.totalNpv>0?'#d4edda':'#f8d7da'};border-radius:10px;text-align:center;"><strong>${F.totalNpv>0?T('s60'):T('s61')}${T('s115')}${revImgBase64 ? `<img src="${revImgBase64}" class="chart-img" />` : T('s99')}</div>
                 <div style="text-align:center;">${fcfImgBase64 ? `<img src="${fcfImgBase64}" class="chart-img" />` : T('s99')}${T('s116')}${incomeHtml}${T('s117')}${fcfHtml}${T('s118')}${currency} ${F.totalNpv.toFixed(0)}</p>
-                    <p><strong>IRR:</strong> ${F.irr?(F.irr*100).toFixed(2)+'%':T('s5')}${T('s119')}${F.paybackPeriod?F.paybackPeriod.toFixed(1)+T('s19'):T('s20')}${T('s120')}${currency} ${F.terminalValue.toFixed(0)}${T('s121')}${now.getFullYear()}</div>
+                    <p><strong>IRR:</strong> ${isFinite(F.irr) ? (F.irr*100).toFixed(2)+'%':T('s5')}${T('s119')}${F.paybackPeriod != null ? F.paybackPeriod.toFixed(1)+T('s19'):T('s20')}${T('s120')}${currency} ${F.terminalValue.toFixed(0)}${T('s121')}${now.getFullYear()}</div>
             </body></html>`;
 
             const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });

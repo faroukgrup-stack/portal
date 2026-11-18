@@ -74,7 +74,7 @@
 <input id="dailyCustomers" min="0" step="10" type="number" value="50"/>
 </div>
 <div class="form-group">
-<label><i class="fas fa-receipt"></i> <fg-t data-i18n="h20">متوسط الفاتورة</fg-t></label>
+<label><i class="fas fa-receipt"></i> <fg-t data-i18n="h20">متوسط الفاتورة (شامل الضريبة)</fg-t></label>
 <input id="avgBill" min="0" step="1" type="number" value="15"/>
 </div>
 <div class="form-group">
@@ -156,12 +156,26 @@
 <div class="section-title-sm"><i class="fas fa-coins"></i> <fg-t data-i18n="h38">ضرائب واستثمار أولي</fg-t></div>
 <div class="form-row">
 <div class="form-group">
-<label><i class="fas fa-percent"></i> <fg-t data-i18n="h39">ضريبة القيمة المضافة %</fg-t></label>
+<label><i class="fas fa-percent"></i> <fg-t data-i18n="h39">ضريبة القيمة المضافة المضمّنة في الأسعار %</fg-t></label>
 <input id="vatPct" max="100" min="0" step="1" type="number" value="20"/>
 </div>
 <div class="form-group">
 <label><i class="fas fa-tools"></i> <fg-t data-i18n="h40">الاستثمار الأولي</fg-t></label>
 <input id="initialInvestment" min="0" step="1000" type="number" value="50000"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-landmark"></i> <fg-t data-i18n="v73_1">ضريبة الدخل على الأرباح %</fg-t></label>
+<input id="incomeTaxPct" max="100" min="0" step="1" type="number" value="25"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-utensils"></i> <fg-t data-i18n="v73_2">حصة الطعام من المبيعات %</fg-t></label>
+<input id="foodSalesPct" max="100" min="0" step="5" type="number" value="70"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-user-friends"></i> <fg-t data-i18n="v73_3">عدد الموظفين</fg-t></label>
+<input id="employeesCount" min="0" step="1" type="number" value="4"/>
 </div>
 </div>
 <!-- تحليل الموقع -->

@@ -63,9 +63,9 @@
     // ===== دالة الحساب =====
     async function computeBreakeven() {
         const currency = document.getElementById('currencySelect').value;
-        const fixedCosts = parseFloat(document.getElementById('fixedCosts').value) || 0;
-        const unitPrice = parseFloat(document.getElementById('unitPrice').value) || 0;
-        const unitCost = parseFloat(document.getElementById('unitCost').value) || 0;
+        const fixedCosts = FG.num('fixedCosts', 0);
+        const unitPrice = FG.num('unitPrice', 0);
+        const unitCost = FG.num('unitCost', 0);
         if (fixedCosts <= 0 || unitPrice <= 0 || unitCost < 0) {
             alert(T('s2'));
             return null;

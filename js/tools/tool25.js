@@ -74,16 +74,16 @@
             async function calculateCCC() {
                 const currency = document.getElementById('currencySelect').value;
                 const company = document.getElementById('companyName').value || T('s2');
-                const periodMonths = parseInt(document.getElementById('periodMonths').value) || 12;
+                const periodMonths = FG.int('periodMonths', 12);
 
-                const invStart = parseFloat(document.getElementById('invStart').value) || 0;
-                const invEnd = parseFloat(document.getElementById('invEnd').value) || 0;
-                const arStart = parseFloat(document.getElementById('arStart').value) || 0;
-                const arEnd = parseFloat(document.getElementById('arEnd').value) || 0;
-                const apStart = parseFloat(document.getElementById('apStart').value) || 0;
-                const apEnd = parseFloat(document.getElementById('apEnd').value) || 0;
-                const cogs = parseFloat(document.getElementById('cogs').value) || 0;
-                const creditSales = parseFloat(document.getElementById('creditSales').value) || 0;
+                const invStart = FG.num('invStart', 0);
+                const invEnd = FG.num('invEnd', 0);
+                const arStart = FG.num('arStart', 0);
+                const arEnd = FG.num('arEnd', 0);
+                const apStart = FG.num('apStart', 0);
+                const apEnd = FG.num('apEnd', 0);
+                const cogs = FG.num('cogs', 0);
+                const creditSales = FG.num('creditSales', 0);
 
                 if (cogs <= 0 || creditSales <= 0) {
                     alert(T('s3'));

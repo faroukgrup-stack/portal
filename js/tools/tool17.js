@@ -124,9 +124,11 @@
 
     async function calculate() {
         const currency = document.getElementById('currencySelect').value;
-        const fixedCosts = parseFloat(document.getElementById('fixedCosts').value) || 0;
-        const actualTotalUnits = parseFloat(document.getElementById('actualTotalUnits').value) || 0;
+        const fixedCosts = FG.num('fixedCosts', 0);
+        const actualTotalUnits = FG.num('actualTotalUnits', 0);
         let products = getProductsData();
+        // V7.3: الصفوف التي فيها بعض البيانات فقط تُذكر للمستخدم بدل تجاهلها بصمت
+        const incomplete = productsData.filter(p => [p.name.trim(), p.price, p.varCost, p.mix].some(v => v !== '') && !(p.name.trim() !== '' && p.price !== '' && p.varCost !== '' && p.mix !== ''));
         if (products.length === 0) {
             alert(T('s8'));
             return;
@@ -135,7 +137,11 @@
         let R;
         try { R = await FG.calc('tool17', 'main', { fixedCosts, actualTotalUnits, products }); } catch (e) { FG.calcError(e); return; }
         products = R.products;
-        const { weightedAvgPrice, weightedAvgCMRatio, breakEvenRevenue, totalBreakEvenUnits, beUnits, beRevenue, marginOfSafety, marginOfSafetyPercent } = R;
+        const { weightedAvgPrice, weightedAvgCMRatio, breakEvenRevenue, totalBreakEvenUnits, beUnits, beRevenue, marginOfSafety, marginOfSafetyPercent, noBE, negCM, cmShare } = R;
+        const v73warn = [];
+        if (incomplete.length) v73warn.push(T('v73_w1') + incomplete.map(p => p.name.trim() || '—').join('، '));
+        if (negCM && negCM.length) v73warn.push(T('v73_w2') + negCM.join('، '));
+        if (noBE) v73warn.push(T('v73_w3'));
 
         lastCalculation = {
             currency, fixedCosts, actualTotalUnits, products,
@@ -147,18 +153,18 @@
         document.getElementById('resultsSection').style.display = 'block';
         document.getElementById('initialMessage').style.display = 'none';
 
-        document.getElementById('resultsGrid').innerHTML = `${T('s9')}${currency}${weightedAvgPrice.toFixed(2)}${T('s10')}${(weightedAvgCMRatio*100).toFixed(1)}${T('s11')}${currency}${breakEvenRevenue.toFixed(0)}${T('s12')}${Math.ceil(totalBreakEvenUnits)}</div></div>
-        `;
+        document.getElementById('resultsGrid').innerHTML = `${T('s9')}${currency}${weightedAvgPrice.toFixed(2)}${T('s10')}${(weightedAvgCMRatio*100).toFixed(1)}${T('s11')}${currency}${FG.fx(breakEvenRevenue,0)}${T('s12')}${FG.fx(Math.ceil(totalBreakEvenUnits),0)}</div></div>
+        ` + (v73warn.length ? `<div class="v73-warn" style="grid-column:1/-1;background:#fff3cd;color:#856404;border-radius:8px;padding:10px;margin-top:8px;">${v73warn.join('<br>')}</div>` : '');
 
         let tableHtml = `${T('s13')}`;
         products.forEach((p, idx) => {
-            tableHtml += `<tr><td>${p.name}</td><td>${currency}${p.price.toFixed(2)}</td><td>${currency}${p.varCost.toFixed(2)}</td><td>${currency}${p.cm.toFixed(2)} (${(p.cmRatio*100).toFixed(1)}%)</td><td>${(p.normMix*100).toFixed(1)}%</td><td>${Math.ceil(beUnits[idx])}</td><td>${currency}${beRevenue[idx].toFixed(0)}</td></tr>`;
+            tableHtml += `<tr><td>${p.name}</td><td>${currency}${p.price.toFixed(2)}</td><td>${currency}${p.varCost.toFixed(2)}</td><td>${currency}${p.cm.toFixed(2)} (${FG.fx(p.cmRatio*100,1)}%)</td><td>${(p.normMix*100).toFixed(1)}%</td><td>${FG.fx(Math.ceil(beUnits[idx]),0)}</td><td>${currency}${FG.fx(beRevenue[idx],0)}</td></tr>`;
         });
         tableHtml += '</tbody></table>';
         document.getElementById('productsBreakdown').innerHTML = tableHtml;
 
         if (marginOfSafety !== null) {
-            document.getElementById('marginSafety').innerHTML = `${T('s14')}${currency}${marginOfSafety.toFixed(0)} (${marginOfSafetyPercent.toFixed(1)}${T('s15')}${marginOfSafetyPercent.toFixed(1)}${T('s16')}`;
+            document.getElementById('marginSafety').innerHTML = `${T('s14')}${currency}${FG.fx(marginOfSafety,0)} (${FG.fx(marginOfSafetyPercent,1)}${T('s15')}${FG.fx(marginOfSafetyPercent,1)}${T('s16')}`;
         } else {
             document.getElementById('marginSafety').innerHTML = `${T('s17')}`;
         }
@@ -172,7 +178,7 @@
             const ctxPie = pieCanvas.getContext('2d');
             pieChartInstance = new Chart(ctxPie, {
                 type: 'pie',
-                data: { labels: products.map(p => p.name), datasets: [{ data: products.map(p => p.cm), backgroundColor: ['#28a745','#ffc107','#dc3545','#17a2b8','#6f42c1','#fd7e14'] }] },
+                data: { labels: products.map(p => p.name), datasets: [{ label: T('v73_l1'), data: (cmShare || products.map(p => p.cm)), backgroundColor: ['#28a745','#ffc107','#dc3545','#17a2b8','#6f42c1','#fd7e14'] }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: ctx => `${ctx.label}: ${currency}${ctx.raw.toFixed(2)}` } } } }
             });
             const ctxBar = barCanvas.getContext('2d');
@@ -226,7 +232,7 @@
             bc.value=T('s25');
             bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};
             mh(cv,1,4,4,`${T('s26')}${companyName}`,DB,GL,18);
-            const inf=[[T('s27'),companyName],[T('s28'),new Date().toLocaleDateString(FG.locale())],[T('s29'),currency],[T('s30'),`${currency} ${breakEvenRevenue.toFixed(0)}`],[T('s31'),Math.ceil(totalBreakEvenUnits)]];
+            const inf=[[T('s27'),companyName],[T('s28'),new Date().toLocaleDateString(FG.locale())],[T('s29'),currency],[T('s30'),`${currency} ${FG.fx(breakEvenRevenue,0)}`],[T('s31'),FG.fx(Math.ceil(totalBreakEvenUnits),0)]];
             let ir=6;
             inf.forEach(([l,v],idx)=>{
                 cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
@@ -281,9 +287,9 @@
             const kpis = [
                 { label: T('s46'), value: `${currency} ${weightedAvgPrice.toFixed(2)}` },
                 { label: T('s47'), value: `${(weightedAvgCMRatio*100).toFixed(1)}%` },
-                { label: T('s48'), value: `${currency} ${breakEvenRevenue.toFixed(0)}` },
-                { label: T('s49'), value: Math.ceil(totalBreakEvenUnits) },
-                { label: T('s50'), value: marginOfSafety !== null ? `${currency} ${marginOfSafety.toFixed(0)} (${marginOfSafetyPercent.toFixed(1)}%)` : T('s38') }
+                { label: T('s48'), value: `${currency} ${FG.fx(breakEvenRevenue,0)}` },
+                { label: T('s49'), value: FG.fx(Math.ceil(totalBreakEvenUnits),0) },
+                { label: T('s50'), value: marginOfSafety !== null ? `${currency} ${FG.fx(marginOfSafety,0)} (${FG.fx(marginOfSafetyPercent,1)}%)` : T('s38') }
             ];
             let rRow=3;
             kpis.forEach((k,idx)=>{
@@ -312,10 +318,10 @@
             products.forEach((p,idx)=>{
                 const row=prodDetail.getRow(pRow);
                 row.getCell(2).value=p.name; row.getCell(3).value=p.price; row.getCell(4).value=p.varCost;
-                row.getCell(5).value=`${currency} ${p.cm.toFixed(2)} (${(p.cmRatio*100).toFixed(1)}%)`;
+                row.getCell(5).value=`${currency} ${p.cm.toFixed(2)} (${FG.fx(p.cmRatio*100,1)}%)`;
                 row.getCell(6).value=`${(p.normMix*100).toFixed(1)}%`;
                 row.getCell(7).value=Math.ceil(beUnits[idx]);
-                row.getCell(8).value=`${currency} ${beRevenue[idx].toFixed(0)}`;
+                row.getCell(8).value=`${currency} ${FG.fx(beRevenue[idx],0)}`;
                 [2,3,4,5,6,7,8].forEach(col=>ap(row.getCell(col),cs(AR,DT,false,'center')));
                 pRow++;
             });
@@ -345,9 +351,9 @@
             recSheet.getRow(1).height=40;
             let recRow=3;
             const recs = [
-                { title: T('s62'), content: `${T('s63')}${currency} ${breakEvenRevenue.toFixed(0)}${T('s64')}${Math.ceil(totalBreakEvenUnits)}${T('s65')}` },
+                { title: T('s62'), content: `${T('s63')}${currency} ${FG.fx(breakEvenRevenue,0)}${T('s64')}${FG.fx(Math.ceil(totalBreakEvenUnits),0)}${T('s65')}` },
                 { title: T('s66'), content: T('s67') },
-                { title: T('s68'), content: marginOfSafety !== null ? `${T('s69')}${marginOfSafetyPercent.toFixed(1)}${T('s70')}${marginOfSafetyPercent.toFixed(1)}${T('s71')}` : T('s72') },
+                { title: T('s68'), content: marginOfSafety !== null ? `${T('s69')}${FG.fx(marginOfSafetyPercent,1)}${T('s70')}${FG.fx(marginOfSafetyPercent,1)}${T('s71')}` : T('s72') },
                 { title: T('s73'), content: T('s74') }
             ];
             recs.forEach(sec=>{
@@ -403,24 +409,24 @@
 
             let productsTableRows = '';
             products.forEach((p, idx) => {
-                productsTableRows += `<tr><td>${p.name}</td><td>${currency}${p.price.toFixed(2)}</td><td>${currency}${p.varCost.toFixed(2)}</td><td>${currency}${p.cm.toFixed(2)} (${(p.cmRatio*100).toFixed(1)}%)</td><td>${(p.normMix*100).toFixed(1)}%</td><td>${Math.ceil(beUnits[idx])}</td><td>${currency}${beRevenue[idx].toFixed(0)}</td></tr>`;
+                productsTableRows += `<tr><td>${p.name}</td><td>${currency}${p.price.toFixed(2)}</td><td>${currency}${p.varCost.toFixed(2)}</td><td>${currency}${p.cm.toFixed(2)} (${FG.fx(p.cmRatio*100,1)}%)</td><td>${(p.normMix*100).toFixed(1)}%</td><td>${FG.fx(Math.ceil(beUnits[idx]),0)}</td><td>${currency}${FG.fx(beRevenue[idx],0)}</td></tr>`;
             });
 
             const kpis = [
                 { label: T('s46'), value: `${currency}${weightedAvgPrice.toFixed(2)}`, good: true },
                 { label: T('s79'), value: `${(weightedAvgCMRatio*100).toFixed(1)}%`, good: true },
-                { label: T('s48'), value: `${currency}${breakEvenRevenue.toFixed(0)}`, good: true },
-                { label: T('s80'), value: Math.ceil(totalBreakEvenUnits), good: true }
+                { label: T('s48'), value: `${currency}${FG.fx(breakEvenRevenue,0)}`, good: true },
+                { label: T('s80'), value: FG.fx(Math.ceil(totalBreakEvenUnits),0), good: true }
             ];
             let kpiRows = '';
             kpis.forEach(k => {
                 kpiRows += `<tr style="border:1px solid #b8860b;"><td style="padding:10px;background:#d4edda;text-align:right;">${k.label}</td><td style="padding:10px;background:#d4edda;text-align:center;"><strong style="font-size:1.2rem;color:#155724;">${k.value}</strong></td></tr>`;
             });
 
-            const safetyHtml = marginOfSafety !== null ? `${T('s81')}${currency}${marginOfSafety.toFixed(0)} (${marginOfSafetyPercent.toFixed(1)}${T('s82')}${marginOfSafetyPercent.toFixed(1)}${T('s83')}` : '';
+            const safetyHtml = marginOfSafety !== null ? `${T('s81')}${currency}${FG.fx(marginOfSafety,0)} (${FG.fx(marginOfSafetyPercent,1)}${T('s82')}${FG.fx(marginOfSafetyPercent,1)}${T('s83')}` : '';
 
             const fullHtml = `${T('s86')}${companyName}${T('s87')}${dateStr}${T('s88')}${kpiRows}</table>
-                ${safetyHtml}${T('s89')}${productsTableRows}${T('s90')}${chartImgBase64}${T('s91')}${currency} ${breakEvenRevenue.toFixed(0)} (${Math.ceil(totalBreakEvenUnits)}${T('s92')}${marginOfSafety!==null?`${marginOfSafetyPercent.toFixed(1)}${T('s84')}`:T('s85')}${T('s93')}${now.getFullYear()}</div>
+                ${safetyHtml}${T('s89')}${productsTableRows}${T('s90')}${chartImgBase64}${T('s91')}${currency} ${FG.fx(breakEvenRevenue,0)} (${FG.fx(Math.ceil(totalBreakEvenUnits),0)}${T('s92')}${marginOfSafety!==null?`${FG.fx(marginOfSafetyPercent,1)}${T('s84')}`:T('s85')}${T('s93')}${now.getFullYear()}</div>
             </body></html>`;
 
             const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });

@@ -61,21 +61,21 @@
     document.getElementById('calculateBtn').addEventListener('click', async function() {
         const currency = document.getElementById('currencySelect').value;
         const companyName = document.getElementById('companyName').value || T('s2');
-        const openingCash = parseFloat(document.getElementById('openingCash').value) || 0;
-        const minCash = parseFloat(document.getElementById('minCash').value) || 0;
-        const cashSales = parseFloat(document.getElementById('cashSales').value) || 0;
-        const cardSales = parseFloat(document.getElementById('cardSales').value) || 0;
-        const arCollection = parseFloat(document.getElementById('arCollection').value) || 0;
-        const inflowGrowth = parseFloat(document.getElementById('inflowGrowth').value) / 100 || 0;
-        const otherInflows = parseFloat(document.getElementById('otherInflows').value) || 0;
-        const supplierPay = parseFloat(document.getElementById('supplierPay').value) || 0;
-        const weeklySalaries = parseFloat(document.getElementById('weeklySalaries').value) || 0;
-        const weeklyRent = parseFloat(document.getElementById('weeklyRent').value) || 0;
-        const weeklyUtilities = parseFloat(document.getElementById('weeklyUtilities').value) || 0;
-        const weeklyTaxes = parseFloat(document.getElementById('weeklyTaxes').value) || 0;
-        const weeklyLoan = parseFloat(document.getElementById('weeklyLoan').value) || 0;
-        const otherOutflows = parseFloat(document.getElementById('otherOutflows').value) || 0;
-        const outflowGrowth = parseFloat(document.getElementById('outflowGrowth').value) / 100 || 0;
+        const openingCash = FG.num('openingCash', 0);
+        const minCash = FG.num('minCash', 0);
+        const cashSales = FG.num('cashSales', 0);
+        const cardSales = FG.num('cardSales', 0);
+        const arCollection = FG.num('arCollection', 0);
+        const inflowGrowth = FG.num('inflowGrowth', 0) / 100;
+        const otherInflows = FG.num('otherInflows', 0);
+        const supplierPay = FG.num('supplierPay', 0);
+        const weeklySalaries = FG.num('weeklySalaries', 0);
+        const weeklyRent = FG.num('weeklyRent', 0);
+        const weeklyUtilities = FG.num('weeklyUtilities', 0);
+        const weeklyTaxes = FG.num('weeklyTaxes', 0);
+        const weeklyLoan = FG.num('weeklyLoan', 0);
+        const otherOutflows = FG.num('otherOutflows', 0);
+        const outflowGrowth = FG.num('outflowGrowth', 0) / 100;
 
         let R;
         try { R = await FG.calc('tool31', 'main', { openingCash, minCash, cashSales, cardSales, arCollection, inflowGrowth, otherInflows, supplierPay, weeklySalaries, weeklyRent, weeklyUtilities, weeklyTaxes, weeklyLoan, otherOutflows, outflowGrowth }); } catch (e) { FG.calcError(e); return; }
@@ -185,6 +185,7 @@
             T('s26') +
             T('s27') +
             T('s28') +
+            '<th>' + T('v73_c1') + '</th>' +   // V7.3: عمود المقبوضات الأخرى
             T('s29') +
             T('s30') +
             T('s31') +
@@ -192,6 +193,7 @@
             T('s33') +
             T('s34') +
             T('s35') +
+            '<th>' + T('v73_c2') + '</th>' +   // V7.3: عمود المدفوعات الأخرى
             T('s36') +
             T('s37') +
             T('s38') +
@@ -204,6 +206,7 @@
                 <td>${currency} ${r.sales.toFixed(0)}</td>
                 <td>${currency} ${r.cards.toFixed(0)}</td>
                 <td>${currency} ${r.ar.toFixed(0)}</td>
+                <td>${currency} ${r.other.toFixed(0)}</td>
                 <td class="positive">${currency} ${r.inflows.toFixed(0)}</td>
                 <td>${currency} ${r.sup.toFixed(0)}</td>
                 <td>${currency} ${r.sal.toFixed(0)}</td>
@@ -211,6 +214,7 @@
                 <td>${currency} ${r.util.toFixed(0)}</td>
                 <td>${currency} ${r.tax.toFixed(0)}</td>
                 <td>${currency} ${r.loan.toFixed(0)}</td>
+                <td>${currency} ${r.oth.toFixed(0)}</td>
                 <td class="negative">${currency} ${r.outflows.toFixed(0)}</td>
                 <td class="${r.net >= 0 ? 'positive' : 'negative'}">${currency} ${r.net.toFixed(0)}</td>
                 <td class="${r.ending >= 0 ? 'positive' : 'negative'}"><strong>${currency} ${r.ending.toFixed(0)}</strong></td>
@@ -270,17 +274,17 @@
 
             // Detailed table
             const ts = workbook.addWorksheet(T('s53'), { views: [{ rightToLeft: FG.isRTL(), showGridLines: false }] });
-            ts.getColumn(1).width=10; ts.getColumn(2).width=15; ts.getColumn(3).width=15; ts.getColumn(4).width=15; ts.getColumn(5).width=15; ts.getColumn(6).width=15; ts.getColumn(7).width=15; ts.getColumn(8).width=15; ts.getColumn(9).width=15; ts.getColumn(10).width=15; ts.getColumn(11).width=15; ts.getColumn(12).width=15; ts.getColumn(13).width=15; ts.getColumn(14).width=15; ts.getColumn(15).width=15;
-            mh(ts,1,15,1,T('s54'),DB,GL,14);
+            ts.getColumn(1).width=10; ts.getColumn(2).width=15; ts.getColumn(3).width=15; ts.getColumn(4).width=15; ts.getColumn(5).width=15; ts.getColumn(6).width=15; ts.getColumn(7).width=15; ts.getColumn(8).width=15; ts.getColumn(9).width=15; ts.getColumn(10).width=15; ts.getColumn(11).width=15; ts.getColumn(12).width=15; ts.getColumn(13).width=15; ts.getColumn(14).width=15; ts.getColumn(15).width=15; ts.getColumn(16).width=15; ts.getColumn(17).width=15;
+            mh(ts,1,17,1,T('s54'),DB,GL,14);
             ts.getRow(1).height=40;
-            const headerArr = [T('s55'),T('s56'),T('s57'),T('s58'),T('s59'),T('s60'),T('s61'),T('s62'),T('s63'),T('s64'),T('s65'),T('s66'),T('s67'),T('s68'),T('s69')];
+            const headerArr = [T('s55'),T('s56'),T('s57'),T('s58'),T('s59'),T('v73_c1'),T('s60'),T('s61'),T('s62'),T('s63'),T('s64'),T('s65'),T('s66'),T('v73_c2'),T('s67'),T('s68'),T('s69')];
             ts.addRow(headerArr);
             const hRow = ts.getRow(2);
             hRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
             hRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: G } };
             hRow.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: FG.dir() };
             D.rows.forEach(r => {
-                ts.addRow([r.week, r.beginning, r.sales, r.cards, r.ar, r.inflows, r.sup, r.sal, r.rent, r.util, r.tax, r.loan, r.outflows, r.net, r.ending]);
+                ts.addRow([r.week, r.beginning, r.sales, r.cards, r.ar, r.other, r.inflows, r.sup, r.sal, r.rent, r.util, r.tax, r.loan, r.oth, r.outflows, r.net, r.ending]);
             });
 
             // Chart image

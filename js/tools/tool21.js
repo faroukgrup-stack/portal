@@ -419,9 +419,9 @@
                 let allAnswered = true;
                 for (let i = 0; i < totalQuestions; i++) {
                     if (answers[i] === null) { allAnswered = false; break; }
-                    totalScore += answers[i];
                 }
                 const E = allAnswered ? await evaluateAll() : null;
+                if (E && E.totalScore != null) totalScore = E.totalScore;   // V7.3: الدرجة من الخادم (تشمل العبارة المعكوسة 14)
                 const interpretation = allAnswered ? E.interpretation : { level: T('s75'),
                     message: T('s76'), color: "#888" };
                 const recommendations = allAnswered ? E.recommendations :

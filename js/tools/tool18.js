@@ -61,20 +61,20 @@
 
     function getInputs() {
         return {
-            cash: parseFloat(document.getElementById('cash').value) || 0,
-            inventory: parseFloat(document.getElementById('inventory').value) || 0,
-            otherCurrent: parseFloat(document.getElementById('otherCurrentAssets').value) || 0,
-            fixedAssets: parseFloat(document.getElementById('fixedAssets').value) || 0,
-            currentLiabilities: parseFloat(document.getElementById('currentLiabilities').value) || 0,
-            longTermLiabilities: parseFloat(document.getElementById('longTermLiabilities').value) || 0,
-            revenue: parseFloat(document.getElementById('revenue').value) || 0,
-            cogs: parseFloat(document.getElementById('cogs').value) || 0,
-            operatingExpenses: parseFloat(document.getElementById('operatingExpenses').value) || 0,
-            interestExpense: parseFloat(document.getElementById('interestExpense').value) || 0,
-            taxRate: parseFloat(document.getElementById('taxRate').value) / 100 || 0,
-            creditSales: parseFloat(document.getElementById('creditSales').value) || 0,
-            receivables: parseFloat(document.getElementById('receivables').value) || 0,
-            payables: parseFloat(document.getElementById('payables').value) || 0,
+            cash: FG.num('cash', 0),
+            inventory: FG.num('inventory', 0),
+            otherCurrent: FG.num('otherCurrentAssets', 0),
+            fixedAssets: FG.num('fixedAssets', 0),
+            currentLiabilities: FG.num('currentLiabilities', 0),
+            longTermLiabilities: FG.num('longTermLiabilities', 0),
+            revenue: FG.num('revenue', 0),
+            cogs: FG.num('cogs', 0),
+            operatingExpenses: FG.num('operatingExpenses', 0),
+            interestExpense: FG.num('interestExpense', 0),
+            taxRate: FG.num('taxRate', 0) / 100,
+            creditSales: FG.num('creditSales', 0),
+            receivables: FG.num('receivables', 0),
+            payables: FG.num('payables', 0),
             currency: document.getElementById('currencySelect').value,
             companyName: document.getElementById('companyName').value || T('s2')
         };
@@ -99,32 +99,32 @@
 
         const formatMoney = (num) => `${currency} ${num.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0})}`;
 
-        document.getElementById('summaryCards').innerHTML = `${T('s20')}${ratios.currentRatio.toFixed(2)}</div><div class="status ${lastCalculation.EV.currentRatio.class}">${lastCalculation.EV.currentRatio.text}${T('s21')}${(ratios.netMargin*100).toFixed(1)}%</div><div class="status ${lastCalculation.EV.netMargin.class}">${lastCalculation.EV.netMargin.text}</div></div>
-            <div class="result-card"><div class="label">ROA</div><div class="value">${(ratios.roa*100).toFixed(1)}%</div><div class="status ${lastCalculation.EV.roa.class}">${lastCalculation.EV.roa.text}</div></div>
-            <div class="result-card"><div class="label">ROE</div><div class="value">${(ratios.roe*100).toFixed(1)}%</div><div class="status ${lastCalculation.EV.roe.class}">${lastCalculation.EV.roe.text}${T('s22')}${ratios.debtToEquity.toFixed(2)}</div><div class="status ${lastCalculation.EV.debtToEquity.class}">${lastCalculation.EV.debtToEquity.text}${T('s23')}${ratios.cashConversionCycle.toFixed(0)}</div><div class="status ${lastCalculation.EV.ccc.class}">${lastCalculation.EV.ccc.text}${T('s24')}${formatMoney(inputs.currentAssets)}${T('s25')}${formatMoney(inputs.totalAssets)}${T('s26')}${formatMoney(inputs.totalLiabilities)}${T('s27')}${formatMoney(inputs.equity)}</div><div class="status ${inputs.equity<0?'status-bad':'status-good'}">${inputs.equity<0?T('s18'):T('s19')}</div></div>
+        document.getElementById('summaryCards').innerHTML = `${T('s20')}${FG.fx(ratios.currentRatio,2)}</div><div class="status ${lastCalculation.EV.currentRatio.class}">${lastCalculation.EV.currentRatio.text}${T('s21')}${FG.fx(ratios.netMargin*100,1)}%</div><div class="status ${lastCalculation.EV.netMargin.class}">${lastCalculation.EV.netMargin.text}</div></div>
+            <div class="result-card"><div class="label">ROA</div><div class="value">${FG.fx(ratios.roa*100,1)}%</div><div class="status ${lastCalculation.EV.roa.class}">${lastCalculation.EV.roa.text}</div></div>
+            <div class="result-card"><div class="label">ROE</div><div class="value">${FG.fx(ratios.roe*100,1)}%</div><div class="status ${lastCalculation.EV.roe.class}">${lastCalculation.EV.roe.text}${T('s22')}${FG.fx(ratios.debtToEquity,2)}</div><div class="status ${lastCalculation.EV.debtToEquity.class}">${lastCalculation.EV.debtToEquity.text}${T('s23')}${FG.fx(ratios.cashConversionCycle,0)}</div><div class="status ${lastCalculation.EV.ccc.class}">${lastCalculation.EV.ccc.text}${T('s24')}${formatMoney(inputs.currentAssets)}${T('s25')}${formatMoney(inputs.totalAssets)}${T('s26')}${formatMoney(inputs.totalLiabilities)}${T('s27')}${formatMoney(inputs.equity)}</div><div class="status ${inputs.equity<0?'status-bad':'status-good'}">${inputs.equity<0?T('s18'):T('s19')}</div></div>
         `;
 
         let tableHtml = `${T('s28')}`;
         const addRow = (cat, name, value, ev) => { tableHtml += `<tr><td>${cat}</td><td>${name}</td><td>${value}</td><td class="${ev.class}">${ev.text}</td></tr>`; };
-        addRow(T('s29'),T('s30'), ratios.currentRatio.toFixed(2), lastCalculation.EV.currentRatio);
-        addRow(T('s29'),T('s31'), ratios.quickRatio.toFixed(2), lastCalculation.EV.quickRatio);
-        addRow(T('s29'),T('s32'), ratios.cashRatio.toFixed(2), lastCalculation.EV.cashRatio);
-        addRow(T('s33'),T('s34'), (ratios.grossMargin*100).toFixed(1)+'%', lastCalculation.EV.grossMargin);
-        addRow(T('s33'),T('s35'), (ratios.operatingMargin*100).toFixed(1)+'%', lastCalculation.EV.operatingMargin);
-        addRow(T('s33'),T('s36'), (ratios.netMargin*100).toFixed(1)+'%', lastCalculation.EV.netMargin);
-        addRow(T('s33'),'ROA', (ratios.roa*100).toFixed(1)+'%', lastCalculation.EV.roa);
-        addRow(T('s33'),'ROE', (ratios.roe*100).toFixed(1)+'%', lastCalculation.EV.roe);
-        addRow(T('s37'),T('s38'), ratios.debtToEquity.toFixed(2), lastCalculation.EV.debtToEquity);
-        addRow(T('s37'),T('s39'), ratios.debtToAssets.toFixed(2), lastCalculation.EV.debtToAssets);
-        addRow(T('s37'),T('s40'), ratios.interestCoverage.toFixed(2), lastCalculation.EV.interestCoverage);
-        addRow(T('s37'),T('s41'), (ratios.equityRatio*100).toFixed(1)+'%', lastCalculation.EV.equityRatio);
-        addRow(T('s42'),T('s43'), ratios.inventoryTurnover.toFixed(2), {text:T('s44'), class:'status-warning'});
-        addRow(T('s42'),T('s45'), ratios.daysInventory.toFixed(0)+T('s46'), {text:'', class:'status-warning'});
-        addRow(T('s42'),T('s47'), ratios.receivablesTurnover.toFixed(2), {text:T('s44'), class:'status-warning'});
-        addRow(T('s42'),T('s48'), ratios.daysSalesOutstanding.toFixed(0)+T('s46'), {text:'', class:'status-warning'});
-        addRow(T('s42'),T('s49'), ratios.payablesTurnover.toFixed(2), {text:T('s44'), class:'status-warning'});
-        addRow(T('s42'),T('s50'), ratios.daysPayables.toFixed(0)+T('s46'), {text:'', class:'status-warning'});
-        addRow(T('s42'),T('s51'), ratios.cashConversionCycle.toFixed(0)+T('s46'), {text:'', class:lastCalculation.EV.ccc.good?'status-good':'status-warning'});
+        addRow(T('s29'),T('s30'), FG.fx(ratios.currentRatio,2), lastCalculation.EV.currentRatio);
+        addRow(T('s29'),T('s31'), FG.fx(ratios.quickRatio,2), lastCalculation.EV.quickRatio);
+        addRow(T('s29'),T('s32'), FG.fx(ratios.cashRatio,2), lastCalculation.EV.cashRatio);
+        addRow(T('s33'),T('s34'), FG.fx(ratios.grossMargin*100,1)+'%', lastCalculation.EV.grossMargin);
+        addRow(T('s33'),T('s35'), FG.fx(ratios.operatingMargin*100,1)+'%', lastCalculation.EV.operatingMargin);
+        addRow(T('s33'),T('s36'), FG.fx(ratios.netMargin*100,1)+'%', lastCalculation.EV.netMargin);
+        addRow(T('s33'),'ROA', FG.fx(ratios.roa*100,1)+'%', lastCalculation.EV.roa);
+        addRow(T('s33'),'ROE', FG.fx(ratios.roe*100,1)+'%', lastCalculation.EV.roe);
+        addRow(T('s37'),T('s38'), FG.fx(ratios.debtToEquity,2), lastCalculation.EV.debtToEquity);
+        addRow(T('s37'),T('s39'), FG.fx(ratios.debtToAssets,2), lastCalculation.EV.debtToAssets);
+        addRow(T('s37'),T('s40'), FG.fx(ratios.interestCoverage,2), lastCalculation.EV.interestCoverage);
+        addRow(T('s37'),T('s41'), FG.fx(ratios.equityRatio*100,1)+'%', lastCalculation.EV.equityRatio);
+        addRow(T('s42'),T('s43'), FG.fx(ratios.inventoryTurnover,2), {text:T('s44'), class:'status-warning'});
+        addRow(T('s42'),T('s45'), FG.fx(ratios.daysInventory,0)+T('s46'), {text:'', class:'status-warning'});
+        addRow(T('s42'),T('s47'), FG.fx(ratios.receivablesTurnover,2), {text:T('s44'), class:'status-warning'});
+        addRow(T('s42'),T('s48'), FG.fx(ratios.daysSalesOutstanding,0)+T('s46'), {text:'', class:'status-warning'});
+        addRow(T('s42'),T('s49'), FG.fx(ratios.payablesTurnover,2), {text:T('s44'), class:'status-warning'});
+        addRow(T('s42'),T('s50'), FG.fx(ratios.daysPayables,0)+T('s46'), {text:'', class:'status-warning'});
+        addRow(T('s42'),T('s51'), FG.fx(ratios.cashConversionCycle,0)+T('s46'), {text:'', class:lastCalculation.EV.ccc.good?'status-good':'status-warning'});
         tableHtml += `</tbody>`;
         document.getElementById('ratiosTable').innerHTML = `<table>${tableHtml}</table>`;
 
@@ -174,13 +174,9 @@
             function safeNum(val, defaultVal = 0) {
                 return (typeof val === 'number' && !isNaN(val) && isFinite(val)) ? val : defaultVal;
             }
-            function safeToFixed(val, digits = 2) {
-                const num = safeNum(val);
-                return num.toFixed(digits);
-            }
-            function safePct(val) {
-                return (safeNum(val) * 100).toFixed(1) + '%';
-            }
+            // V7.3: غير المعرّف يظهر "—" بدل 0
+            function safeToFixed(val, digits = 2) { return FG.fx(val, digits); }
+            function safePct(val) { const v = Number(val); return isFinite(v) ? (v * 100).toFixed(1) + '%' : '—'; }
 
             const workbook = new ExcelJS.Workbook();
             workbook.creator = 'FAROUK GRUP';
@@ -261,6 +257,7 @@
                 [T('s37'),T('s38'), safeToFixed(ratios.debtToEquity,2), lastCalculation.EV.debtToEquity.text],
                 [T('s37'),T('s39'), safeToFixed(ratios.debtToAssets,2), lastCalculation.EV.debtToAssets.text],
                 [T('s37'),T('s40'), safeToFixed(ratios.interestCoverage,2), lastCalculation.EV.interestCoverage.text],
+                [T('s37'),T('s41'), safePct(ratios.equityRatio), lastCalculation.EV.equityRatio.text],
                 [T('s42'),T('s43'), safeToFixed(ratios.inventoryTurnover,2), T('s44')],
                 [T('s42'),T('s45'), safeToFixed(ratios.daysInventory,0)+T('s46'), ''],
                 [T('s42'),T('s47'), safeToFixed(ratios.receivablesTurnover,2), T('s44')],

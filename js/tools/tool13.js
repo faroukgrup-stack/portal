@@ -114,11 +114,11 @@
         const currency = document.getElementById('currencySelect').value;
         const companyName = document.getElementById('companyName').value || T('s4');
 
-        const monthlySales = parseFloat(document.getElementById('monthlySales').value) || 0;
-        const avgBill = parseFloat(document.getElementById('avgBill').value) || 1;
-        const avgMonthlyWage = parseFloat(document.getElementById('avgMonthlyWage').value) || 0;
-        const workingDays = parseInt(document.getElementById('workingDays').value) || 6;
-        const targetPercent = parseFloat(document.getElementById('targetLaborPercent').value) || 25;
+        const monthlySales = FG.num('monthlySales', 0);
+        const avgBill = FG.num('avgBill', 1);
+        const avgMonthlyWage = FG.num('avgMonthlyWage', 0);
+        const workingDays = FG.int('workingDays', 6);
+        const targetPercent = FG.num('targetLaborPercent', 25);
         const vacationType = document.getElementById('vacationDistribution').value;
 
         const shiftsDetail = [];
@@ -138,7 +138,7 @@
         document.getElementById('resultsSection').style.display = 'block';
         document.getElementById('initialMessage').style.display = 'none';
 
-        document.getElementById('resultsGrid').innerHTML = `${T('s18')}${totalEmployees}${T('s19')}${currency}${monthlyLaborCost.toLocaleString()}${T('s20')}${laborPercent.toFixed(1)}${T('s21')}${currency}${salesPerEmployee.toFixed(0)}${T('s22')}${currency}${dailyLaborCost.toFixed(0)}${T('s23')}${avgHoursPerEmployee.toFixed(1)}${T('s24')}${Math.round(expectedCustomers)}${T('s25')}${customersPerEmployee.toFixed(0)}${T('s26')}${efficiencyRating}</div><div class="unit">${laborPercent.toFixed(1)}%</div></div>
+        document.getElementById('resultsGrid').innerHTML = `${T('s18')}${totalEmployees}${T('s19')}${currency}${monthlyLaborCost.toLocaleString()}${T('s20')}${FG.fx(laborPercent,1)}${T('s21')}${currency}${salesPerEmployee.toFixed(0)}${T('s22')}${currency}${dailyLaborCost.toFixed(0)}${T('s23')}${avgHoursPerEmployee.toFixed(1)}${T('s24')}${Math.round(expectedCustomers)}${T('s25')}${customersPerEmployee.toFixed(0)}${T('s26')}${efficiencyRating}</div><div class="unit">${FG.fx(laborPercent,1)}%</div></div>
         `;
 
         document.getElementById('evaluationAlert').innerHTML = `<div class="alert ${alertClass}">${alertMessage}</div>`;
@@ -215,7 +215,7 @@
             bc.value=T('s49');
             bc.font={name:'Arial',bold:true,size:28,color:{argb:GL}}; bc.fill={type:'pattern',pattern:'solid',fgColor:{argb:DB}}; bc.alignment={horizontal:'center',vertical:'middle',wrapText:true,readingOrder:FG.dir()};
             mh(cv,1,4,4,`${T('s50')}${companyName}`,DB,GL,18);
-            const inf=[[T('s51'),companyName],[T('s52'),new Date().toLocaleDateString(FG.locale())],[T('s53'),currency],[T('s54'),`${D.laborPercent.toFixed(1)}%`],[T('s55'),D.totalEmployees]];
+            const inf=[[T('s51'),companyName],[T('s52'),new Date().toLocaleDateString(FG.locale())],[T('s53'),currency],[T('s54'),`${FG.fx(D.laborPercent,1)}%`],[T('s55'),D.totalEmployees]];
             let ir=6;
             inf.forEach(([l,v],idx)=>{
                 cv.mergeCells(ir,1,ir,2); cv.mergeCells(ir,3,ir,4);
@@ -273,7 +273,7 @@
             mh(kpiSheet,2,5,2,`${companyName} | ${new Date().toLocaleDateString(FG.locale())}`,HB,'FFFFFFFF',10);
             kpiSheet.getRow(2).height=26;
             const kpis = [
-                { label: T('s74'), value: `${D.laborPercent.toFixed(1)}%`, good: D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax },
+                { label: T('s74'), value: `${FG.fx(D.laborPercent,1)}%`, good: D.laborPercent >= D.idealMin && D.laborPercent <= D.idealMax },
                 { label: T('s75'), value: `${currency} ${D.monthlyLaborCost.toFixed(0)}`, good: true },
                 { label: T('s76'), value: `${currency} ${D.salesPerEmployee.toFixed(0)}`, good: true },
                 { label: T('s77'), value: `${D.avgHoursPerEmployee.toFixed(1)}${T('s78')}`, good: true },
@@ -374,7 +374,7 @@
                 if (count % 2 === 0 || index === kpiCards.length - 1) { kpiRows += `<tr>${row}</tr>`; row = ''; }
             });
 
-            const fullHtml = `${T('s90')}${companyName}${T('s91')}${dateStr}${T('s92')}${currency}${T('s93')}${D.laborPercent.toFixed(1)}${T('s94')}${currency} ${D.monthlySales}${T('s95')}${currency} ${D.avgBill}${T('s96')}${currency} ${D.avgMonthlyWage}${T('s97')}${D.workingDays}${T('s98')}${D.targetPercent}${T('s99')}${D.shiftsDetail.length}${T('s100')}${kpiRows}${T('s101')}${chartImgBase64}${T('s102')}${D.suggestionsHtml}${T('s103')}${now.getFullYear()}</div>
+            const fullHtml = `${T('s90')}${companyName}${T('s91')}${dateStr}${T('s92')}${currency}${T('s93')}${FG.fx(D.laborPercent,1)}${T('s94')}${currency} ${D.monthlySales}${T('s95')}${currency} ${D.avgBill}${T('s96')}${currency} ${D.avgMonthlyWage}${T('s97')}${D.workingDays}${T('s98')}${D.targetPercent}${T('s99')}${D.shiftsDetail.length}${T('s100')}${kpiRows}${T('s101')}${chartImgBase64}${T('s102')}${D.suggestionsHtml}${T('s103')}${now.getFullYear()}</div>
             </body></html>`;
 
             const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });

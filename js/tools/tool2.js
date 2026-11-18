@@ -154,36 +154,39 @@
                 const currency = document.getElementById('currencySelect').value;
                 const companyName = document.getElementById('companyName').value || T('s8');
 
-                const dailyCustomers = parseFloat(document.getElementById('dailyCustomers').value) || 0;
-                const avgBill = parseFloat(document.getElementById('avgBill').value) || 0;
-                const workingDays = parseFloat(document.getElementById('workingDays').value) || 26;
-                const rent = parseFloat(document.getElementById('rent').value) || 0;
-                const salaries = parseFloat(document.getElementById('salaries').value) || 0;
-                const employeeBurden = parseFloat(document.getElementById('employeeBurden').value) / 100 || 0;
-                const utilities = parseFloat(document.getElementById('utilities').value) || 0;
-                const internet = parseFloat(document.getElementById('internet').value) || 0;
-                const maintenance = parseFloat(document.getElementById('maintenance').value) || 0;
-                const marketing = parseFloat(document.getElementById('marketing').value) || 0;
-                const otherFixed = parseFloat(document.getElementById('otherFixed').value) || 0;
-                const foodCostPct = parseFloat(document.getElementById('foodCostPct').value) / 100 || 0;
-                const drinkCostPct = parseFloat(document.getElementById('drinkCostPct').value) / 100 || 0;
-                const packagingPct = parseFloat(document.getElementById('packagingPct').value) / 100 || 0;
-                const deliveryPct = parseFloat(document.getElementById('deliveryPct').value) / 100 || 0;
-                const deliverySalesPct = parseFloat(document.getElementById('deliverySalesPct').value) / 100 || 0;
-                const wastePct = parseFloat(document.getElementById('wastePct').value) / 100 || 0;
-                const vatPct = parseFloat(document.getElementById('vatPct').value) / 100 || 0;
-                const initialInvestment = parseFloat(document.getElementById('initialInvestment').value) || 0;
-                const footTraffic = parseFloat(document.getElementById('footTraffic').value) || 0;
-                const entryRate = parseFloat(document.getElementById('entryRate').value) / 100 || 0;
-                const purchaseRate = parseFloat(document.getElementById('purchaseRate').value) / 100 || 0;
-                const tables = parseFloat(document.getElementById('tables').value) || 0;
-                const seatsPerTable = parseFloat(document.getElementById('seatsPerTable').value) || 4;
-                const sessionMinutes = parseFloat(document.getElementById('sessionMinutes').value) || 60;
-                const hoursOpen = parseFloat(document.getElementById('hoursOpen').value) || 10;
+                const dailyCustomers = FG.num('dailyCustomers', 0);
+                const avgBill = FG.num('avgBill', 0);
+                const workingDays = FG.num('workingDays', 26);
+                const rent = FG.num('rent', 0);
+                const salaries = FG.num('salaries', 0);
+                const employeeBurden = FG.num('employeeBurden', 0) / 100;
+                const utilities = FG.num('utilities', 0);
+                const internet = FG.num('internet', 0);
+                const maintenance = FG.num('maintenance', 0);
+                const marketing = FG.num('marketing', 0);
+                const otherFixed = FG.num('otherFixed', 0);
+                const foodCostPct = FG.num('foodCostPct', 0) / 100;
+                const drinkCostPct = FG.num('drinkCostPct', 0) / 100;
+                const packagingPct = FG.num('packagingPct', 0) / 100;
+                const deliveryPct = FG.num('deliveryPct', 0) / 100;
+                const deliverySalesPct = FG.num('deliverySalesPct', 0) / 100;
+                const wastePct = FG.num('wastePct', 0) / 100;
+                const vatPct = FG.num('vatPct', 0) / 100;
+                const incomeTaxPct = FG.num('incomeTaxPct', 25) / 100;
+                const foodSalesPct = FG.num('foodSalesPct', 70) / 100;
+                const employeesCount = FG.num('employeesCount', 0);
+                const initialInvestment = FG.num('initialInvestment', 0);
+                const footTraffic = FG.num('footTraffic', 0);
+                const entryRate = FG.num('entryRate', 0) / 100;
+                const purchaseRate = FG.num('purchaseRate', 0) / 100;
+                const tables = FG.num('tables', 0);
+                const seatsPerTable = FG.num('seatsPerTable', 4);
+                const sessionMinutes = FG.num('sessionMinutes', 60);
+                const hoursOpen = FG.num('hoursOpen', 10);
 
                 currentInputs = { dailyCustomers, avgBill, workingDays, rent, salaries, employeeBurden, utilities,
                     internet, maintenance, marketing, otherFixed, foodCostPct, drinkCostPct, packagingPct,
-                    deliveryPct, deliverySalesPct, wastePct, vatPct, initialInvestment, footTraffic, entryRate,
+                    deliveryPct, deliverySalesPct, wastePct, vatPct, incomeTaxPct, foodSalesPct, employeesCount, initialInvestment, footTraffic, entryRate,
                     purchaseRate, tables, seatsPerTable, sessionMinutes, hoursOpen, currency, companyName };
 
                 let R;
@@ -230,11 +233,11 @@
                 document.getElementById('capacityCard').innerHTML =
                     `${T('s61')}${maxDailyCustomers.toFixed(0)}${T('s62')}${occupancyRate.toFixed(1)}%`;
                 document.getElementById('efficiencyCard').innerHTML =
-                    `${T('s63')}${currency}${R.revPerSeat.toFixed(0)}${T('s64')}${currency}${R.revPerEmployee.toFixed(0)}`;
+                    `${T('s63')}${currency}${R.revPerSeat.toFixed(0)}${T('s64')}${isFinite(R.revPerEmployee) ? currency + R.revPerEmployee.toFixed(0) : '—'}`;
 
                 document.getElementById('monteCarloResults').innerHTML = `${T('s65')}`;
                 document.getElementById('breakevenSummary').innerHTML =
-                    `${T('s66')}${currency}${breakevenRevenue.toFixed(0)}</span><span style="margin-right:1rem;">👥 ${breakevenCustomers.toFixed(0)}${T('s67')}`;
+                    `${T('s66')}${currency}${FG.fx(breakevenRevenue, 0)}</span><span style="margin-right:1rem;">👥 ${FG.fx(breakevenCustomers, 0)}${T('s67')}`;
 
                 renderCharts(currency, netRevenue, fixedCosts, totalVariableCost, netProfit, monthlyCustomers, avgBill,
                     breakevenCustomers, contributionMarginRatio, R.line);
@@ -244,7 +247,7 @@
             document.getElementById('calcValuationBtn').addEventListener('click', async function() {
                 if (!currentResults) { alert(T('s68')); return; }
                 const currency = currentInputs.currency;
-                const multiple = parseFloat(document.getElementById('valuationMultiple').value) || 3;
+                const multiple = FG.num('valuationMultiple', 3);
                 let valuation;
                 try { valuation = (await FG.calc('tool2', 'valuation', { annualProfit: currentResults.annualProfit, multiple })).valuation; } catch (e) { FG.calcError(e); return; }
                 document.getElementById('valuationCard').innerHTML =
@@ -366,7 +369,7 @@
                         [T('s109'), `${currency} ${R.totalVariableCost.toFixed(0)}`],
                         [T('s4'), `${currency} ${R.netProfit.toFixed(0)}`],
                         [T('s83'), `${R.profitMargin.toFixed(1)}%`],
-                        [T('s110'), `${currency} ${R.breakevenRevenue.toFixed(0)}`],
+                        [T('s110'), `${currency} ${FG.fx(R.breakevenRevenue, 0)}`],
                         [T('s111'), `${fxP(R.paybackYears, 1)}${T('s112')}`],
                         [T('s113'), `${R.marginOfSafety.toFixed(1)}%`]
                     ];
@@ -454,7 +457,7 @@
                     const fullHtml = `${T('s133')}${companyName} | ${new Date().toLocaleDateString(FG.locale())}${T('s134')}${kpiRows}</table>
                     <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;">
                         ${pieImg ? `${T('s131')}${pieImg}" class="chart-img"/></div>` : ''}
-                        ${lineImg ? `${T('s132')}${lineImg}" class="chart-img"/></div>` : ''}${T('s135')}${costRows}${T('s136')}${currency}${R.breakevenRevenue.toFixed(0)} (${R.breakevenCustomers.toFixed(0)}${T('s137')}${fxP(R.paybackYears, 1)}${T('s138')}${fxP(R.paybackMonths, 0)}${T('s139')}${R.marginOfSafety.toFixed(1)}${T('s140')}${R.occupancyRate.toFixed(1)}%</p>
+                        ${lineImg ? `${T('s132')}${lineImg}" class="chart-img"/></div>` : ''}${T('s135')}${costRows}${T('s136')}${currency}${FG.fx(R.breakevenRevenue, 0)} (${FG.fx(R.breakevenCustomers, 0)}${T('s137')}${fxP(R.paybackYears, 1)}${T('s138')}${fxP(R.paybackMonths, 0)}${T('s139')}${R.marginOfSafety.toFixed(1)}${T('s140')}${R.occupancyRate.toFixed(1)}%</p>
                     <div class="footer">© ${new Date().getFullYear()} FAROUK GRUP</div>
                     </body></html>`;
 

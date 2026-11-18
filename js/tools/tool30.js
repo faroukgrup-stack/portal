@@ -73,22 +73,22 @@
 
             // ===== الحساب الرئيسي =====
             async function computeValuation() {
-                const rev = parseFloat(document.getElementById('revenue').value) || 0;
-                const cogs = parseFloat(document.getElementById('cogs').value) || 0;
-                const opex = parseFloat(document.getElementById('opex').value) || 0;
-                const depr = parseFloat(document.getElementById('depreciation').value) || 0;
-                const interest = parseFloat(document.getElementById('interest').value) || 0;
-                const taxes = parseFloat(document.getElementById('taxes').value) || 0;
-                const totalDebt = parseFloat(document.getElementById('totalDebt').value) || 0;
-                const assetValue = parseFloat(document.getElementById('assetValue').value) || 0;
-                const multiplier = parseFloat(document.getElementById('multiplier').value) || 3;
-                const ownership = parseFloat(document.getElementById('ownershipPercent').value) || 100;
-                const estYear = parseInt(document.getElementById('estYear').value) || 2018;
-                const leaseExpiry = parseInt(document.getElementById('leaseExpiry').value) || 2029;
+                const rev = FG.num('revenue', 0);
+                const cogs = FG.num('cogs', 0);
+                const opex = FG.num('opex', 0);
+                const depr = FG.num('depreciation', 0);
+                const interest = FG.num('interest', 0);
+                const taxes = FG.num('taxes', 0);
+                const totalDebt = FG.num('totalDebt', 0);
+                const assetValue = FG.num('assetValue', 0);
+                const multiplier = FG.num('multiplier', 3);
+                const ownership = FG.num('ownershipPercent', 100);
+                const estYear = FG.int('estYear', 2018);
+                const leaseExpiry = FG.int('leaseExpiry', 2029);
 
                 const injectionEnabled = document.getElementById('capitalInjectionEnabled').checked;
-                const injectionAmount = parseFloat(document.getElementById('injectionAmount').value) || 0;
-                const injectionROI = parseFloat(document.getElementById('injectionROI').value) || 20;
+                const injectionAmount = FG.num('injectionAmount', 0);
+                const injectionROI = FG.num('injectionROI', 20);
                 return await FG.calc('tool30', 'main', { rev, cogs, opex, depr, interest, taxes, totalDebt, assetValue, multiplier, ownership, estYear, leaseExpiry, injectionEnabled, injectionAmount, injectionROI });
             }
 
@@ -100,7 +100,7 @@
 
                 // بطاقات KPI
                 document.getElementById('kpiCards').innerHTML = `
-                    <div class="result-card"><i class="fas fa-chart-bar"></i><h4>EBITDA</h4><div class="value">${currency}${res.EBITDA.toFixed(0)}${T('s12')}${currency}${(res.EBITDA * res.multiplier).toFixed(0)}${T('s13')}${res.multiplier.toFixed(2)}${T('s14')}${currency}${res.fairValue.toFixed(0)}</div><div class="status ${res.fairValue > res.totalDebt ? 'status-good' : 'status-bad'}">${res.fairValue > 0 ? T('s6') : T('s7')}${T('s15')}${res.ownership}%)</h4><div class="value">${currency}${res.sharePrice.toFixed(0)}${T('s16')}${isFinite(res.paybackYears) ? res.paybackYears.toFixed(2)+T('s8') : T('s9')}${T('s17')}${res.efficiencyIndex.toFixed(2)}</div><div class="status ${res.efficiencyIndex >= 1 ? 'status-good' : 'status-bad'}">${res.efficiencyIndex >= 1 ? T('s10') : T('s11')}</div></div>
+                    <div class="result-card"><i class="fas fa-chart-bar"></i><h4>EBITDA</h4><div class="value">${currency}${res.EBITDA.toFixed(0)}${T('s12')}${currency}${(res.EBITDA * res.multiplier).toFixed(0)}${T('s13')}${res.multiplier.toFixed(2)}${T('s14')}${currency}${res.fairValue.toFixed(0)}</div><div class="status ${res.fairValue > 0 ? 'status-good' : 'status-bad'}">${res.fairValue > 0 ? T('s6') : T('s7')}${T('s15')}${res.ownership}%)</h4><div class="value">${currency}${res.sharePrice.toFixed(0)}${T('s16')}${isFinite(res.paybackYears) ? res.paybackYears.toFixed(2)+T('s8') : T('s9')}${T('s17')}${res.efficiencyIndex.toFixed(2)}</div><div class="status ${res.efficiencyIndex >= 1 ? 'status-good' : 'status-bad'}">${res.efficiencyIndex >= 1 ? T('s10') : T('s11')}</div></div>
                 `;
 
                 // تحذير الإيجار
@@ -461,7 +461,12 @@
                             </tbody>
                         </table>
                         ${D.leaseWarning ? `<div style="background:#f8d7da;padding:10px;border-radius:8px;border-right:4px solid #dc3545;margin:20px 0;">${D.leaseWarning}</div>` : ''}
-                        ${injectionHtml}${T('s97')}${D.fairValue > 0 ? T('s86') : T('s87')}${T('s98')}${now.getFullYear()}</div>
+                        ${injectionHtml}
+                        <h3>${T('s68')}</h3>
+                        <table><thead><tr><th>${T('s69')}</th><th>${T('s70')}</th><th>${T('s60')}</th><th>${T('s71')}</th></tr></thead><tbody>
+                        ${(D.sens || []).map(r => `<tr><td>${r.m}x</td><td>${currency}${r.ev.toFixed(0)}</td><td>${currency}${r.fair.toFixed(0)}</td><td>${currency}${r.share.toFixed(0)}</td></tr>`).join('')}
+                        </tbody></table>
+                        ${T('s97')}${D.fairValue > 0 ? T('s86') : T('s87')}${T('s98')}${now.getFullYear()}</div>
                     </body></html>`;
 
                     const blob = new Blob(['\uFEFF' + fullHtml], { type: 'application/msword' });

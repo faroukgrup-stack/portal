@@ -178,40 +178,47 @@
 <!-- قسم ما قبل الإيرادات -->
 <div id="preRevenueSection" style="display:none;">
 <div class="section-title-sm" data-i18n="h59">🌱 طريقة بيركوس (Berkus Method)</div>
-<p data-i18n="h60" style="color:#aab7d4;font-size:0.85rem;margin-bottom:1rem;">قدّر قيمة كل عنصر حتى 500,000 دولار. هذه طريقة معتمدة للجولات التأسيسية.</p>
+<p data-i18n="h60" style="color:#aab7d4;font-size:0.85rem;margin-bottom:1rem;">قدّر قيمة كل عنصر بالعملة المختارة حتى الحد الأقصى أدناه (الأصل في الطريقة 500,000 دولار للعنصر، فحوّله إلى عملتك).</p>
 <div class="form-row">
 <div class="form-group tooltip">
-<label><i class="fas fa-lightbulb"></i> <fg-t data-i18n="h61">الفكرة وجودة الحل ($)</fg-t></label>
-<input id="berkusIdea" max="500000" step="10000" type="number" value="350000"/>
+<label><i class="fas fa-ruler"></i> <fg-t data-i18n="v73_h1">الحد الأقصى لكل عنصر</fg-t></label>
+<input id="berkusCap" min="0" step="10000" type="number" value="500000"/>
+<span class="tooltiptext" data-i18n="v73_h2">ما يعادل 500,000 دولار بعملتك المختارة.</span>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group tooltip">
+<label><i class="fas fa-lightbulb"></i> <fg-t data-i18n="h61">الفكرة وجودة الحل</fg-t></label>
+<input id="berkusIdea" step="10000" type="number" value="350000"/>
 <span class="tooltiptext" data-i18n="h62">مدى ابتكار الفكرة وملاءمتها للسوق.</span>
 </div>
 <div class="form-group tooltip">
-<label><i class="fas fa-code"></i> <fg-t data-i18n="h63">النموذج الأولي والتقنية ($)</fg-t></label>
-<input id="berkusPrototype" max="500000" step="10000" type="number" value="400000"/>
+<label><i class="fas fa-code"></i> <fg-t data-i18n="h63">النموذج الأولي والتقنية</fg-t></label>
+<input id="berkusPrototype" step="10000" type="number" value="400000"/>
 <span class="tooltiptext" data-i18n="h64">وجود منتج أولي أو تقنية قابلة للتطوير.</span>
 </div>
 <div class="form-group tooltip">
-<label><i class="fas fa-user-tie"></i> <fg-t data-i18n="h65">قوة الفريق المؤسس ($)</fg-t></label>
-<input id="berkusTeam" max="500000" step="10000" type="number" value="450000"/>
+<label><i class="fas fa-user-tie"></i> <fg-t data-i18n="h65">قوة الفريق المؤسس</fg-t></label>
+<input id="berkusTeam" step="10000" type="number" value="450000"/>
 <span class="tooltiptext" data-i18n="h66">خبرة المؤسسين وسجلهم الريادي.</span>
 </div>
 </div>
 <div class="form-row">
 <div class="form-group tooltip">
-<label><i class="fas fa-handshake"></i> <fg-t data-i18n="h67">العلاقات الاستراتيجية ($)</fg-t></label>
-<input id="berkusRelations" max="500000" step="10000" type="number" value="200000"/>
+<label><i class="fas fa-handshake"></i> <fg-t data-i18n="h67">العلاقات الاستراتيجية</fg-t></label>
+<input id="berkusRelations" step="10000" type="number" value="200000"/>
 <span class="tooltiptext" data-i18n="h68">الشراكات وقنوات التوزيع والعلاقات مع المستثمرين.</span>
 </div>
 <div class="form-group tooltip">
-<label><i class="fas fa-rocket"></i> <fg-t data-i18n="h69">التنفيذ والمبيعات الأولية ($)</fg-t></label>
-<input id="berkusExecution" max="500000" step="10000" type="number" value="250000"/>
+<label><i class="fas fa-rocket"></i> <fg-t data-i18n="h69">التنفيذ والمبيعات الأولية</fg-t></label>
+<input id="berkusExecution" step="10000" type="number" value="250000"/>
 <span class="tooltiptext" data-i18n="h70">أي مبيعات أو التزامات من عملاء محتملين.</span>
 </div>
 </div>
 <div class="section-title-sm" data-i18n="h71">🔧 طريقة التكلفة المستبدلة</div>
 <div class="form-row">
 <div class="form-group tooltip">
-<label><i class="fas fa-dollar-sign"></i> <fg-t data-i18n="h72">تكلفة إعادة بناء التقنية ($)</fg-t></label>
+<label><i class="fas fa-dollar-sign"></i> <fg-t data-i18n="h72">تكلفة إعادة بناء التقنية</fg-t></label>
 <input id="rebuildCost" step="10000" type="number" value="300000"/>
 <span class="tooltiptext" data-i18n="h73">التكلفة التقديرية لتطوير المنتج والتقنية من الصفر.</span>
 </div>
